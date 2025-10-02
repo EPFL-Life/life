@@ -28,31 +28,31 @@ In your first _formal_ meeting you will plan Sprint 1, and your entire project m
 
 **1. Set up Team Communication:**
 To ensure smooth collaboration throughout the semester, you need to have a reliable way to communicate with your team members and coaches.
-- [ ] Join the SwEnt Discord using the invitation link posted on Moodle. You can use Discord to communicate with your coaches as well as with other students.
-- [ ] See the `#announcements` channel for details on how to join your group's personal channel. 
-- [ ] If any of your team members are not present on Discord, contact them and remind them to join.
+- [x] Join the SwEnt Discord using the invitation link posted on Moodle. You can use Discord to communicate with your coaches as well as with other students.
+- [x] See the `#announcements` channel for details on how to join your group's personal channel. 
+- [x] If any of your team members are not present on Discord, contact them and remind them to join.
 
 **2. Set up GitHub:**
 GitHub provides many tools to help manage your project efficiently. Do the following to set it up (we let you research how to do these things):
-- [ ] Create a GitHub organization with all team members, your coaches, and Prof. Candea (GitHub ID _candea_) in it.
-- [ ] Create a project repository; make sure it's public, so that you can use tools like SonarCloud for free.
-- [ ] Grant _Maintainer_ access to your coaches and Prof. Candea, so they can give you the right level of help.
-- [ ] Set up branch protection rules:
+- [x] Create a GitHub organization with all team members, your coaches, and Prof. Candea (GitHub ID _candea_) in it.
+- [x] Create a project repository; make sure it's public, so that you can use tools like SonarCloud for free.
+- [x] Grant _Maintainer_ access to your coaches and Prof. Candea, so they can give you the right level of help.
+- [x] Set up branch protection rules:
      - No direct push to `main`
      - Require pull request reviews with at least one reviewer
      - Require status checks before merging (e.g., Android tests)
-- [ ] Add the description of your app to the README of the new repository.
+- [x] Add the description of your app to the README of the new repository.
 
 **3. Initialize the Project:**
-- [ ] Initialize the Android project in GitHub using your own bootcamp, or our [sample Android project](https://github.com/swent-epfl/Android-Sample).
-- [ ] Add a `.gitignore` for Android projects.
+- [x] Initialize the Android project in GitHub using your own bootcamp, or our [sample Android project](https://github.com/swent-epfl/Android-Sample).
+- [x] Add a `.gitignore` for Android projects.
 - [ ] Make sure all team members can clone the repository and run this new project locally.
 - [ ] Set up Firebase, including API keys. For backend code, you'd normally configure secrets via Firebase config or a secrets manager, instead of putting them in the repo, but for a frontend app, API keys can remain in config since they aren’t secret.
 
 **4. Set up a Scrum Board:**
 Having this is essential for managing collaborative work, and it will significantly boost your team's efficiency. Here are our suggestions:
-- [ ] Create a project in your GitHub org to manage your Scrum board.  Take a look at the [scrumboard in the sample Android project](https://github.com/orgs/swent-epfl/projects/17) for inspiration.
-- [ ] Add the following columns to your board:
+- [x] Create a project in your GitHub org to manage your Scrum board.  Take a look at the [scrumboard in the sample Android project](https://github.com/orgs/swent-epfl/projects/17) for inspiration.
+- [x] Add the following columns to your board:
      - `Product Backlog` for the user stories that define your application
      - `Sprint Backlog` for the tasks to be completed during the current Sprint
      - `In Development` for the tasks that are currently being worked on
@@ -74,8 +74,8 @@ Having this is essential for managing collaborative work, and it will significan
      - *My Tasks* : personalized view showing tasks assigned to each individual
 
 **5. Set up your CI:**
-- [ ] Set up a CI pipeline to run tests on your repository
-- [ ] Integrate [SonarCloud](https://www.sonarsource.com/plans-and-pricing/sonarcloud/) for code quality checks. This service is free for public repositories, but unfortunately it limits the number of seats to 5, which means that only 5 of your team members will be able to see it.
+- [x] Set up a CI pipeline to run tests on your repository
+- [x] Integrate [SonarCloud](https://www.sonarsource.com/plans-and-pricing/sonarcloud/) for code quality checks. This service is free for public repositories, but unfortunately it limits the number of seats to 5, which means that only 5 of your team members will be able to see it.
 
 **6. Set up Figma:**
 You will use Figma to create mockups and track design work
