@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.ktfmt)
     alias(libs.plugins.sonar)
     id("jacoco")
-    id("com.android.application")
+    //id("com.android.application")
     id("com.google.gms.google-services")
 }
 
@@ -13,7 +13,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.android.sample"
+        applicationId = "ch.epfllife"
         minSdk = 28
         targetSdk = 34
         versionCode = 1
