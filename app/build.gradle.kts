@@ -11,7 +11,7 @@ plugins {
 }
 
 android {
-    namespace = "com.android.sample"
+    namespace = "com.github.se.bootcamp"
     compileSdk = 34
 
 
