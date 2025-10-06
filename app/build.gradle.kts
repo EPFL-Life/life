@@ -11,7 +11,7 @@ plugins {
 }
 
 android {
-    namespace = "com.github.se.bootcamp"
+    namespace = "ch.epfllife"
     compileSdk = 34
 
 
