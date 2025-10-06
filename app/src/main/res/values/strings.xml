@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">SampleApp</string>
-    <string name="title_activity_main">MainActivity</string>
-    <string name="title_activity_second">SecondActivity</string>
+    <string name="app_name">EPFL Life</string>
+    <string name="default_web_client_id">85738580828-ovg7unu9rcn0cckulm8immn9dkv1eu77.apps.googleusercontent.com</string>
 </resources>
