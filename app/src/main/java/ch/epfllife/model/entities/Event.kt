@@ -11,5 +11,6 @@ data class Event(
     val location: Location,
     val time: String, // for the moment it will be a string
     val associationId: String,
-    val tags: Set<String>
+    val tags: Set<String>,
+    val imageUrl: String? = null // referenced Image //TODO implement this in firebase
 )
