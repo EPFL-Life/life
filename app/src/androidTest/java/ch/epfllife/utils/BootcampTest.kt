@@ -14,8 +14,6 @@ import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextClearance
-import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import ch.epfllife.HttpClientProvider
 import ch.epfllife.model.map.Location
@@ -24,8 +22,6 @@ import ch.epfllife.model.todo.ToDoStatus
 import ch.epfllife.model.todo.ToDosRepository
 import ch.epfllife.model.todo.ToDosRepositoryProvider
 import ch.epfllife.ui.navigation.NavigationTestTags
-import ch.epfllife.ui.overview.AddToDoScreenTestTags
-import ch.epfllife.ui.overview.EditToDoScreenTestTags
 import ch.epfllife.ui.overview.OverviewScreenTestTags
 import ch.epfllife.utils.FakeHttpClient.FakeLocation
 import ch.epfllife.utils.FakeHttpClient.locationSuggestions
@@ -150,98 +146,6 @@ abstract class BootcampTest(val milestone: BootcampMilestone) {
     }
   }
 
-  fun ComposeTestRule.enterAddTodoTitle(title: String) =
-      onNodeWithTag(AddToDoScreenTestTags.INPUT_TODO_TITLE).performTextInput(title)
-
-  fun ComposeTestRule.enterAddTodoDescription(description: String) =
-      onNodeWithTag(AddToDoScreenTestTags.INPUT_TODO_DESCRIPTION).performTextInput(description)
-
-  fun ComposeTestRule.enterAddTodoAssignee(assignee: String) =
-      onNodeWithTag(AddToDoScreenTestTags.INPUT_TODO_ASSIGNEE).performTextInput(assignee)
-
-  fun ComposeTestRule.enterAddTodoDate(date: String) =
-      onNodeWithTag(AddToDoScreenTestTags.INPUT_TODO_DATE).performTextInput(date)
-
-  fun ComposeTestRule.enterAddTodoLocation(location: String) =
-      onNodeWithTag(AddToDoScreenTestTags.INPUT_TODO_LOCATION).performTextInput(location)
-
-  fun ComposeTestRule.enterAddTodoLocation(location: FakeLocation) =
-      onNodeWithTag(AddToDoScreenTestTags.INPUT_TODO_LOCATION).performTextInput(location.queryName)
-
-  fun ComposeTestRule.enterEditTodoLocation(location: FakeLocation) {
-    onNodeWithTag(EditToDoScreenTestTags.INPUT_TODO_LOCATION).performTextClearance()
-    onNodeWithTag(EditToDoScreenTestTags.INPUT_TODO_LOCATION).performTextInput(location.queryName)
-  }
-
-  fun ComposeTestRule.enterEditTodoTitle(title: String) {
-    onNodeWithTag(EditToDoScreenTestTags.INPUT_TODO_TITLE).performTextClearance()
-    onNodeWithTag(EditToDoScreenTestTags.INPUT_TODO_TITLE).performTextInput(title)
-  }
-
-  fun ComposeTestRule.enterEditTodoDescription(description: String) {
-    onNodeWithTag(EditToDoScreenTestTags.INPUT_TODO_DESCRIPTION).performTextClearance()
-    onNodeWithTag(EditToDoScreenTestTags.INPUT_TODO_DESCRIPTION).performTextInput(description)
-  }
-
-  fun ComposeTestRule.enterEditTodoAssignee(assignee: String) {
-    onNodeWithTag(EditToDoScreenTestTags.INPUT_TODO_ASSIGNEE).performTextClearance()
-    onNodeWithTag(EditToDoScreenTestTags.INPUT_TODO_ASSIGNEE).performTextInput(assignee)
-  }
-
-  fun ComposeTestRule.enterEditTodoDate(date: String) {
-    onNodeWithTag(EditToDoScreenTestTags.INPUT_TODO_DATE).performTextClearance()
-    onNodeWithTag(EditToDoScreenTestTags.INPUT_TODO_DATE).performTextInput(date)
-  }
-
-  fun ComposeTestRule.enterEditTodoLocation(location: String) {
-    onNodeWithTag(EditToDoScreenTestTags.INPUT_TODO_LOCATION).performTextClearance()
-    onNodeWithTag(EditToDoScreenTestTags.INPUT_TODO_LOCATION).performTextInput(location)
-  }
-
-  fun ComposeTestRule.enterEditTodoDetails(todo: ToDo, date: String = todo.dueDate.toDateString()) {
-    enterEditTodoTitle(todo.name)
-    enterEditTodoDescription(todo.description)
-    enterEditTodoAssignee(todo.assigneeName)
-    enterEditTodoDate(date)
-    enterEditTodoLocation(todo.location?.name ?: "Any")
-  }
-
-  fun ComposeTestRule.enterAddTodoDetails(todo: ToDo, date: String = todo.dueDate.toDateString()) {
-    enterAddTodoTitle(todo.name)
-    enterAddTodoDescription(todo.description)
-    enterAddTodoAssignee(todo.assigneeName)
-    enterAddTodoDate(date)
-    enterAddTodoLocation(todo.location?.name ?: "Any")
-  }
-
-  fun ComposeTestRule.clickOnSaveForAddTodo(waitForRedirection: Boolean = false) {
-    onNodeWithTag(AddToDoScreenTestTags.TODO_SAVE).assertIsDisplayed().performClick()
-    waitUntil(UI_WAIT_TIMEOUT) {
-      !waitForRedirection ||
-          onAllNodesWithTag(AddToDoScreenTestTags.TODO_SAVE).fetchSemanticsNodes().isEmpty()
-    }
-  }
-
-  fun ComposeTestRule.clickOnSaveForEditTodo(waitForRedirection: Boolean = false) {
-    onNodeWithTag(EditToDoScreenTestTags.TODO_SAVE).assertIsDisplayed().performClick()
-    waitUntil(UI_WAIT_TIMEOUT) {
-      !waitForRedirection ||
-          onAllNodesWithTag(EditToDoScreenTestTags.TODO_SAVE).fetchSemanticsNodes().isEmpty()
-    }
-  }
-
-  fun ComposeTestRule.clickOnDeleteForEditTodo(waitForRedirection: Boolean = false) {
-    onNodeWithTag(EditToDoScreenTestTags.TODO_DELETE).assertIsDisplayed().performClick()
-    waitUntil(UI_WAIT_TIMEOUT) {
-      !waitForRedirection ||
-          onAllNodesWithTag(EditToDoScreenTestTags.TODO_DELETE).fetchSemanticsNodes().isEmpty()
-    }
-  }
-
-  fun ComposeTestRule.navigateToAddToDoScreen() {
-    onNodeWithTag(OverviewScreenTestTags.CREATE_TODO_BUTTON).assertIsDisplayed().performClick()
-  }
-
   private fun ComposeTestRule.waitUntilTodoIsDisplayed(todo: ToDo): SemanticsNodeInteraction {
     checkOverviewScreenIsDisplayed()
     waitUntil(UI_WAIT_TIMEOUT) {
@@ -259,19 +163,8 @@ abstract class BootcampTest(val milestone: BootcampMilestone) {
   fun ComposeTestRule.checkTodoItemIsDisplayed(todo: ToDo): SemanticsNodeInteraction =
       onNodeWithTag(OverviewScreenTestTags.getTestTagForTodoItem(todo)).assertIsDisplayed()
 
-  fun ComposeTestRule.navigateToEditToDoScreen(editedToDo: ToDo) {
-    // Wait for the todo item to be displayed before trying to click it
-    clickOnTodoItem(editedToDo)
-  }
-
   fun ComposeTestRule.navigateBack() {
     onNodeWithTag(NavigationTestTags.GO_BACK_BUTTON).assertIsDisplayed().performClick()
-  }
-
-  fun ComposeTestRule.checkAddToDoScreenIsDisplayed() {
-    onNodeWithTag(NavigationTestTags.TOP_BAR_TITLE)
-        .assertIsDisplayed()
-        .assertTextContains("Create a new task", substring = false, ignoreCase = true)
   }
 
   fun ComposeTestRule.checkOverviewScreenIsNotDisplayed() {
@@ -284,46 +177,10 @@ abstract class BootcampTest(val milestone: BootcampMilestone) {
         .assertTextContains("overview", substring = true, ignoreCase = true)
   }
 
-  fun ComposeTestRule.checkEditToDoScreenIsDisplayed() {
-    onNodeWithTag(NavigationTestTags.TOP_BAR_TITLE)
-        .assertIsDisplayed()
-        .assertTextContains("Edit Todo", substring = false, ignoreCase = true)
-  }
-
   fun ComposeTestRule.checkBottomBarIsNotDisplayed() {
     onNodeWithTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU).assertIsNotDisplayed()
     onNodeWithTag(NavigationTestTags.OVERVIEW_TAB).assertIsNotDisplayed()
     onNodeWithTag(NavigationTestTags.MAP_TAB).assertIsNotDisplayed()
-  }
-
-  fun ComposeTestRule.checkErrorMessageIsDisplayedForAddTodo() =
-      onNodeWithTag(AddToDoScreenTestTags.ERROR_MESSAGE, useUnmergedTree = true).assertIsDisplayed()
-
-  fun ComposeTestRule.checkErrorMessageIsDisplayedForEditTodo() =
-      onNodeWithTag(EditToDoScreenTestTags.ERROR_MESSAGE, useUnmergedTree = true)
-          .assertIsDisplayed()
-
-  fun checkNoTodoWereAdded(action: () -> Unit) {
-    val numberOfTodos = runBlocking { repository.getAllTodos().size }
-    action()
-    runTest { assertEquals(numberOfTodos, repository.getAllTodos().size) }
-  }
-
-  fun checkTodoWasNotEdited(editingTodo: ToDo = todo1, block: () -> Unit) {
-    val todoBeforeEdit = runBlocking { repository.getTodo(editingTodo.uid) }
-    block()
-    runTest {
-      val todoAfterEdit = repository.getTodo(editingTodo.uid)
-      assertEquals(todoBeforeEdit, todoAfterEdit)
-    }
-  }
-
-  fun ComposeTestRule.enterEditTodoStatus(currentStatus: ToDoStatus, status: ToDoStatus) {
-    val numberOfClick =
-        (status.ordinal - currentStatus.ordinal + ToDoStatus.entries.size) % ToDoStatus.entries.size
-    for (i in 0 until numberOfClick) {
-      onNodeWithTag(EditToDoScreenTestTags.INPUT_TODO_STATUS).assertIsDisplayed().performClick()
-    }
   }
 
   fun ComposeTestRule.onTodoItem(todo: ToDo, matcher: SemanticsMatcher) {
@@ -344,8 +201,7 @@ abstract class BootcampTest(val milestone: BootcampMilestone) {
     val hasTextLocation = hasText(location.name)
     val containsTextLocation = hasTextLocation.or(hasAnyDescendant(hasTextLocation))
     return onNode(
-        hasTestTag(AddToDoScreenTestTags.LOCATION_SUGGESTION).and(containsTextLocation),
-        useUnmergedTree = true)
+        hasTestTag("locationSuggestion").and(containsTextLocation), useUnmergedTree = true)
   }
 
   fun ComposeTestRule.assertAllLocationSuggestionsAreDisplayed(fakeLocation: FakeLocation) {

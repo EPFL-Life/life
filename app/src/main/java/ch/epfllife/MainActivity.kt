@@ -2,8 +2,6 @@ package ch.epfllife
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,8 +19,6 @@ import ch.epfllife.ui.authentication.SignInScreen
 import ch.epfllife.ui.map.MapScreen
 import ch.epfllife.ui.navigation.NavigationActions
 import ch.epfllife.ui.navigation.Screen
-import ch.epfllife.ui.overview.AddTodoScreen
-import ch.epfllife.ui.overview.EditToDoScreen
 import ch.epfllife.ui.overview.OverviewScreen
 import ch.epfllife.ui.theme.BootcampTheme
 import com.google.firebase.auth.FirebaseAuth
@@ -92,32 +88,9 @@ fun BootcampApp(
     ) {
       composable(Screen.Overview.route) {
         OverviewScreen(
-            onSelectTodo = { navigationActions.navigateTo(Screen.EditToDo(it.uid)) },
-            onAddTodo = { navigationActions.navigateTo(Screen.AddToDo) },
             onSignedOut = { navigationActions.navigateTo(Screen.Auth) },
             navigationActions = navigationActions,
             credentialManager = credentialManager)
-      }
-      composable(Screen.AddToDo.route) {
-        AddTodoScreen(
-            onDone = { navigationActions.navigateTo(Screen.Overview) },
-            onGoBack = { navigationActions.goBack() })
-      }
-      composable(Screen.EditToDo.route) { navBackStackEntry ->
-        // Get the Todo UID from the arguments
-        val uid = navBackStackEntry.arguments?.getString("uid")
-
-        // Create the EditToDoScreen with the Todo UID
-        uid?.let {
-          EditToDoScreen(
-              onDone = { navigationActions.navigateTo(Screen.Overview) },
-              todoUid = it,
-              onGoBack = { navigationActions.goBack() })
-        }
-            ?: run {
-              Log.e("EditToDoScreen", "ToDo UID is null")
-              Toast.makeText(context, "ToDo UID is null", Toast.LENGTH_SHORT).show()
-            }
       }
     }
 

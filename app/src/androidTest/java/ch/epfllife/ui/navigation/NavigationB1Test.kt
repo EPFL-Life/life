@@ -7,7 +7,6 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import ch.epfllife.BootcampApp
-import ch.epfllife.ui.overview.OverviewScreenTestTags
 import ch.epfllife.utils.BootcampMilestone
 import ch.epfllife.utils.InMemoryBootcampTest
 import junit.framework.TestCase.assertEquals
@@ -78,21 +77,6 @@ class NavigationB1Test : InMemoryBootcampTest(BootcampMilestone.B1) {
   }
 
   @Test
-  fun topBarTitleIsCorrectForAddToDo() {
-    composeTestRule.onNodeWithTag(OverviewScreenTestTags.CREATE_TODO_BUTTON).performClick()
-    composeTestRule
-        .onNodeWithTag(NavigationTestTags.TOP_BAR_TITLE)
-        .assertIsDisplayed()
-        .assertTextContains(value = "Create a new task", substring = false, ignoreCase = true)
-  }
-
-  @Test
-  fun bottomNavigationNotDisplayedForAddToDo() {
-    composeTestRule.onNodeWithTag(OverviewScreenTestTags.CREATE_TODO_BUTTON).performClick()
-    composeTestRule.onNodeWithTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU).assertDoesNotExist()
-  }
-
-  @Test
   fun navigationStartsOnOverviewTab() {
     composeTestRule.checkOverviewScreenIsDisplayed()
   }
@@ -108,40 +92,6 @@ class NavigationB1Test : InMemoryBootcampTest(BootcampMilestone.B1) {
   fun canNavigateToMapAndBackToOverview() {
     composeTestRule.onNodeWithTag(NavigationTestTags.MAP_TAB).performClick()
     composeTestRule.onNodeWithTag(NavigationTestTags.OVERVIEW_TAB).performClick()
-    composeTestRule.checkOverviewScreenIsDisplayed()
-  }
-
-  //  @Test
-  fun canNavigateBackToMapAndBackToOverviewUsingSystemBack() {
-    composeTestRule.onNodeWithTag(NavigationTestTags.MAP_TAB).performClick()
-    composeTestRule.checkOverviewScreenIsNotDisplayed()
-    composeTestRule.checkMapScreenIsDisplayed()
-    pressBack(shouldFinish = false)
-    composeTestRule.checkOverviewScreenIsDisplayed()
-  }
-
-  @Test
-  fun canNavigateToAddToDo() {
-    composeTestRule.onNodeWithTag(OverviewScreenTestTags.CREATE_TODO_BUTTON).performClick()
-    composeTestRule.checkAddToDoScreenIsDisplayed()
-    composeTestRule.checkOverviewScreenIsNotDisplayed()
-  }
-
-  @Test
-  fun canNavigateBackToOverviewFromAddToDo() {
-    composeTestRule.onNodeWithTag(OverviewScreenTestTags.CREATE_TODO_BUTTON).performClick()
-    composeTestRule.checkAddToDoScreenIsDisplayed()
-    composeTestRule.checkOverviewScreenIsNotDisplayed()
-    composeTestRule.onNodeWithTag(NavigationTestTags.GO_BACK_BUTTON).performClick()
-    composeTestRule.checkOverviewScreenIsDisplayed()
-  }
-
-  //  @Test
-  fun canNavigateBackToOverviewFromAddToDoUsingSystemBack() {
-    composeTestRule.onNodeWithTag(OverviewScreenTestTags.CREATE_TODO_BUTTON).performClick()
-    composeTestRule.checkAddToDoScreenIsDisplayed()
-    composeTestRule.checkOverviewScreenIsNotDisplayed()
-    pressBack(shouldFinish = false)
     composeTestRule.checkOverviewScreenIsDisplayed()
   }
 
