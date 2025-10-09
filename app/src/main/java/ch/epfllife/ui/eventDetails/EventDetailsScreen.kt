@@ -165,7 +165,7 @@ fun EventDetailsContent(
                       color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 Text(
-                    text = "CHF 130",
+                    text = event.price?.toString() ?: "",
                     style =
                         MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium),
                     color = MaterialTheme.colorScheme.onSurface)
