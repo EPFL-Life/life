@@ -1,13 +1,12 @@
 package ch.epfllife.model.todo
 
-import ch.epfllife.utils.BootcampMilestone
-import ch.epfllife.utils.FirestoreBootcampTest
+import ch.epfllife.utils.FirestoreTest
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
-class ToDosRepositoryFirestoreTest : FirestoreBootcampTest(BootcampMilestone.B2) {
+class ToDosRepositoryFirestoreTest : FirestoreTest() {
 
   @Before
   override fun setUp() {

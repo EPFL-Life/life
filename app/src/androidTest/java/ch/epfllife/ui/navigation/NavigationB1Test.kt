@@ -6,29 +6,20 @@ import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import ch.epfllife.BootcampApp
-import ch.epfllife.utils.BootcampMilestone
-import ch.epfllife.utils.InMemoryBootcampTest
+import ch.epfllife.App
+import ch.epfllife.utils.InMemoryTest
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-// ***************************************************************************** //
-// ***                                                                       *** //
-// *** THIS FILE WILL BE OVERWRITTEN DURING GRADING. IT SHOULD BE LOCATED IN *** //
-// *** `app/src/androidTest/java/com/github/se/bootcamp/ui/navigation`.        *** //
-// *** DO **NOT** IMPLEMENT YOUR OWN TESTS IN THIS FILE                      *** //
-// ***                                                                       *** //
-// ***************************************************************************** //
-
-class NavigationB1Test : InMemoryBootcampTest(BootcampMilestone.B1) {
+class NavigationB1Test : InMemoryTest() {
   @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
   @Before
   override fun setUp() {
     super.setUp()
-    composeTestRule.setContent { BootcampApp() }
+    composeTestRule.setContent { App() }
   }
 
   @Test
