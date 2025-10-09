@@ -188,7 +188,12 @@ fun EventDetailsContent(
                       tint = MaterialTheme.colorScheme.onSurfaceVariant)
                   Spacer(modifier = Modifier.width(8.dp))
                   Column {
-                    Text(text = event.time, style = MaterialTheme.typography.bodyMedium) //TODO we need some proper time to time-text formating (implement in repository)
+                    Text(
+                        text = event.time,
+                        style =
+                            MaterialTheme.typography
+                                .bodyMedium) // TODO we need some proper time to time-text formating
+                                             // (implement in repository)
                     Text(text = event.location.name, style = MaterialTheme.typography.bodySmall)
                   }
                 }
