@@ -195,6 +195,8 @@ dependencies {
 
     testImplementation(libs.kotlinx.coroutines.test)
 
+    implementation("io.coil-kt:coil-compose:2.7.0")
+
 }
 
 
