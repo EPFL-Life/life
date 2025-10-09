@@ -11,5 +11,6 @@ data class Event(
     val location: Location,
     val time: String, // for the moment it will be a string
     val associationId: String,
-    val tags: Set<String>
+    val tags: Set<String>,
+    val price: Int? = null
 )
