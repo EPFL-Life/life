@@ -193,7 +193,7 @@ fun EventDetailsContent(
                         style =
                             MaterialTheme.typography
                                 .bodyMedium) // TODO we need some proper time to time-text formating
-                                             // (implement in repository)
+                    // (implement in repository)
                     Text(text = event.location.name, style = MaterialTheme.typography.bodySmall)
                   }
                 }
