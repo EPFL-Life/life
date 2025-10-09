@@ -165,7 +165,7 @@ fun EventDetailsContent(
                       color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 Text(
-                    text = event.price?.toString() ?: "",
+                    text = event.price?.let { "CHF $it" } ?: "",
                     style =
                         MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium),
                     color = MaterialTheme.colorScheme.onSurface)
@@ -265,6 +265,7 @@ fun EventDetailsPreview() {
           time = "2025-10-12 18:00",
           associationId = "AeroPoly",
           tags = setOf("workshop"),
+          price = 10,
           imageUrl =
               "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")
 
