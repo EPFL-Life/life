@@ -20,7 +20,7 @@ import ch.epfllife.ui.map.MapScreen
 import ch.epfllife.ui.navigation.NavigationActions
 import ch.epfllife.ui.navigation.Screen
 import ch.epfllife.ui.overview.OverviewScreen
-import ch.epfllife.ui.theme.BootcampTheme
+import ch.epfllife.ui.theme.Theme
 import com.google.firebase.auth.FirebaseAuth
 import okhttp3.OkHttpClient
 
@@ -43,12 +43,12 @@ class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    setContent { BootcampTheme { Surface(modifier = Modifier.fillMaxSize()) { BootcampApp() } } }
+    setContent { Theme { Surface(modifier = Modifier.fillMaxSize()) { App() } } }
   }
 }
 
 /**
- * `BootcampApp` is the main composable function that sets up the whole app UI. It initializes the
+ * `App` is the main composable function that sets up the whole app UI. It initializes the
  * navigation controller and defines the navigation graph. You can add your app implementation
  * inside this function.
  *
@@ -60,7 +60,7 @@ class MainActivity : ComponentActivity() {
  * @param credentialManager The CredentialManager instance for handling authentication credentials.
  */
 @Composable
-fun BootcampApp(
+fun App(
     context: Context = LocalContext.current,
     credentialManager: CredentialManager = CredentialManager.create(context),
 ) {

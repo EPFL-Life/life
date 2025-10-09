@@ -79,7 +79,7 @@ private val DarkColorScheme =
     )
 
 @Composable
-fun BootcampTheme(
+fun Theme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     content: @Composable() () -> Unit

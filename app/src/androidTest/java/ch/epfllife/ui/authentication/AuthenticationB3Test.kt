@@ -8,16 +8,15 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import ch.epfllife.BootcampApp
+import ch.epfllife.App
 import ch.epfllife.ui.authentication.SignInScreenTestTags.APP_LOGO
 import ch.epfllife.ui.authentication.SignInScreenTestTags.LOGIN_BUTTON
 import ch.epfllife.ui.authentication.SignInScreenTestTags.LOGIN_TITLE
 import ch.epfllife.ui.overview.OverviewScreenTestTags
-import ch.epfllife.utils.BootcampMilestone
 import ch.epfllife.utils.FakeCredentialManager
 import ch.epfllife.utils.FakeJwtGenerator
 import ch.epfllife.utils.FirebaseEmulator
-import ch.epfllife.utils.FirestoreBootcampTest
+import ch.epfllife.utils.FirestoreTest
 import ch.epfllife.utils.UI_WAIT_TIMEOUT
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.runBlocking
@@ -33,7 +32,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class AuthenticationTest : FirestoreBootcampTest(BootcampMilestone.B3) {
+class AuthenticationTest : FirestoreTest() {
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -73,7 +72,7 @@ class AuthenticationTest : FirestoreBootcampTest(BootcampMilestone.B3) {
     assert(FirebaseEmulator.auth.currentUser == null)
 
     // Set the content to the full app
-    composeTestRule.setContent { BootcampApp() }
+    composeTestRule.setContent { App() }
 
     // Check that the sign-in screen is displayed
     composeTestRule.onNodeWithTag(LOGIN_BUTTON).assertIsDisplayed()
@@ -86,7 +85,7 @@ class AuthenticationTest : FirestoreBootcampTest(BootcampMilestone.B3) {
 
     val fakeCredentialManager = FakeCredentialManager.create(fakeGoogleIdToken)
 
-    composeTestRule.setContent { BootcampApp(credentialManager = fakeCredentialManager) }
+    composeTestRule.setContent { App(credentialManager = fakeCredentialManager) }
     composeTestRule
         .onNodeWithTag(SignInScreenTestTags.LOGIN_BUTTON)
         .assertIsDisplayed()
@@ -126,7 +125,7 @@ class AuthenticationTest : FirestoreBootcampTest(BootcampMilestone.B3) {
     FirebaseEmulator.auth.signOut()
 
     composeTestRule.setContent {
-      BootcampApp(credentialManager = FakeCredentialManager.create(fakeIdToken))
+      App(credentialManager = FakeCredentialManager.create(fakeIdToken))
     }
 
     composeTestRule

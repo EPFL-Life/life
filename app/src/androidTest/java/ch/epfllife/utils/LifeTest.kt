@@ -40,24 +40,8 @@ import org.junit.Before
 
 const val UI_WAIT_TIMEOUT = 5_000L
 
-enum class BootcampMilestone {
-  B1,
-  B2,
-  B3
-}
-
-/**
- * Base class for all Bootcamp tests, providing common setup and utility functions.
- *
- * It also handles gracefully automatic sign-in when required by the milestone.
- *
- * For the B1 tests, it is quite tricky. During the first week, emulators are not set up, so we
- * can't simply sign-in anonymously. However, during week 3, B1 tests won't pass if we do not
- * sign-in automatically. Hence, to detect that we are running B1 tests during the first week, we
- * check if the Firebase emulators are running. If they are not running *by mistake*, B2 and B3
- * tests will fail, notifying the user that they need to start the emulators.
- */
-abstract class BootcampTest(val milestone: BootcampMilestone) {
+/** Base class for all EPFL Life tests, providing common setup and utility functions. */
+abstract class LifeTest() {
 
   abstract fun createInitializedRepository(): ToDosRepository
 
@@ -69,32 +53,12 @@ abstract class BootcampTest(val milestone: BootcampMilestone) {
   val httpClient
     get() = HttpClientProvider.client
 
-  val shouldSignInAnounymously: Boolean =
-      when (milestone) {
-        BootcampMilestone.B3 -> false
-        BootcampMilestone.B2 -> true
-        BootcampMilestone.B1 -> FirebaseEmulator.isRunning
-      }
+  val shouldSignInAnounymously: Boolean = true
 
   val currentUser: FirebaseUser
     get() {
-      assert(milestone != BootcampMilestone.B1) {
-        "currentUser should not be read in B1 tests when Firebase Auth is not used."
-      }
       return FirebaseEmulator.auth.currentUser!!
     }
-
-  init {
-    when (milestone) {
-      BootcampMilestone.B2,
-      BootcampMilestone.B3 -> {
-        assert(FirebaseEmulator.isRunning) {
-          "FirebaseEmulator must be running for Milestone $milestone"
-        }
-      }
-      else -> {}
-    }
-  }
 
   open val todo1 =
       ToDo(

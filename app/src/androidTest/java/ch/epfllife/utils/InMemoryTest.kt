@@ -7,7 +7,7 @@ import ch.epfllife.model.todo.ToDosRepository
  * Superclass for all local tests, which sets up a local repository before each test and restores
  * the original repository after each test.
  */
-open class InMemoryBootcampTest(milestone: BootcampMilestone) : BootcampTest(milestone) {
+open class InMemoryTest() : LifeTest() {
   override fun createInitializedRepository(): ToDosRepository {
     return InMemoryToDosRepository()
   }

@@ -1,13 +1,5 @@
 package ch.epfllife.ui.overview
 
-// ***************************************************************************** //
-// ***                                                                       *** //
-// *** THIS FILE WILL BE OVERWRITTEN DURING GRADING. IT SHOULD BE LOCATED IN *** //
-// *** `app/src/androidTest/java/com/github/se/bootcamp/ui/overview`.        *** //
-// *** DO **NOT** IMPLEMENT YOUR OWN TESTS IN THIS FILE                      *** //
-// ***                                                                       *** //
-// ***************************************************************************** //
-
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.hasTestTag
@@ -16,8 +8,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performScrollToNode
 import ch.epfllife.model.todo.ToDo
-import ch.epfllife.utils.BootcampMilestone
-import ch.epfllife.utils.InMemoryBootcampTest
+import ch.epfllife.utils.InMemoryTest
 import com.google.firebase.Timestamp
 import java.util.Calendar
 import kotlin.collections.last
@@ -25,7 +16,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 
-class OverviewScreenB1Test : InMemoryBootcampTest(BootcampMilestone.B1) {
+class OverviewScreenB1Test : InMemoryTest() {
   @get:Rule val composeTestRule = createComposeRule()
 
   fun setContent(withInitialTodos: List<ToDo> = emptyList()) {
