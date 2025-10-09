@@ -188,8 +188,8 @@ fun EventDetailsContent(
                       tint = MaterialTheme.colorScheme.onSurfaceVariant)
                   Spacer(modifier = Modifier.width(8.dp))
                   Column {
-                    Text("October 12, 2025", style = MaterialTheme.typography.bodyMedium)
-                    Text("Centre Sport et Santé", style = MaterialTheme.typography.bodySmall)
+                    Text(text = event.time, style = MaterialTheme.typography.bodyMedium) //TODO we need some proper time to time-text formating (implement in repository)
+                    Text(text = event.location.name, style = MaterialTheme.typography.bodySmall)
                   }
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -198,7 +198,7 @@ fun EventDetailsContent(
                       contentDescription = "Time",
                       tint = MaterialTheme.colorScheme.onSurfaceVariant)
                   Spacer(modifier = Modifier.width(8.dp))
-                  Text("6:00PM - 8:00PM", style = MaterialTheme.typography.bodyMedium)
+                  Text(text = event.time, style = MaterialTheme.typography.bodyMedium)
                 }
               }
 
