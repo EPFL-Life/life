@@ -99,7 +99,7 @@ fun App(
         route = Screen.Map.name,
     ) {
 
-        // Map screen
+        // Map screenn
       composable(Screen.Map.route) { MapScreen(navigationActions = navigationActions) }
     }
   }
