@@ -98,6 +98,8 @@ fun App(
         startDestination = Screen.Map.route,
         route = Screen.Map.name,
     ) {
+
+        // Map screen
       composable(Screen.Map.route) { MapScreen(navigationActions = navigationActions) }
     }
   }
