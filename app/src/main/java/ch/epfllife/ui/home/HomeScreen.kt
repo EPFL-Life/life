@@ -23,73 +23,112 @@ import ch.epfllife.model.map.Location
 import ch.epfllife.ui.composables.EventCard
 import ch.epfllife.ui.composables.EventsFilterButtons
 import ch.epfllife.ui.composables.SearchBar
+import androidx.compose.material3.Text
+import androidx.compose.ui.text.style.TextAlign
 
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
-  var selected by remember { mutableStateOf(EventsFilter.Subscribed) }
+    var selected by remember { mutableStateOf(EventsFilter.Subscribed) }
 
-  val myEvents = remember {
-    listOf(
-        Event(
-            id = "1",
-            title = "Via Ferrata",
-            description = "Excursion to the Alps",
-            location = Location(0.0, 0.0, "Lausanne Train Station"),
-            time = "Oct 4th, 6:50am",
-            associationId = "ESN Lausanne",
-            tags = setOf("Sport", "Outdoor"),
-            price = 30))
-  }
+    val myEvents = remember { emptyList<Event>() } // No events to show empty state
 
-  val allEvents = remember {
-    listOf(
-        Event(
-            id = "1",
-            title = "Via Ferrata",
-            description = "Excursion to the Alps",
-            location = Location(0.0, 0.0, "Lausanne Train Station"),
-            time = "Oct 4th, 6:50am",
-            associationId = "ESN Lausanne",
-            tags = setOf("Sport", "Outdoor"),
-            price = 30),
-        Event(
-            id = "2",
-            title = "Music Festival",
-            description = "Outdoor concert organized by the Cultural Club",
-            location = Location(0.0, 0.0, "Esplanade"),
-            time = "Nov 3rd, 5:00PM",
-            associationId = "Cultural Club",
-            tags = setOf("Music", "Festival"),
-            price = 10))
-  }
+    //val myEvents = remember { listOf( Event( id = "1", title = "Via Ferrata", description = "Excursion to the Alps", location = Location(0.0, 0.0, "Lausanne Train Station"), time = "Oct 4th, 6:50am", associationId = "ESN Lausanne", tags = setOf("Sport", "Outdoor"), price = 30)) }
 
-  val shownEvents = if (selected == EventsFilter.Subscribed) myEvents else allEvents
-
-  Column(modifier = modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 12.dp)) {
-    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-      Image(
-          painter = painterResource(id = R.drawable.epfl_life_logo),
-          contentDescription = "EPFL Life Logo",
-          modifier = Modifier.height(40.dp),
-          contentScale = ContentScale.Fit)
+    val allEvents = remember {
+        listOf(
+            Event(
+                id = "1",
+                title = "Via Ferrata",
+                description = "Excursion to the Alps",
+                location = Location(0.0, 0.0, "Lausanne Train Station"),
+                time = "Oct 4th, 6:50am",
+                associationId = "ESN Lausanne",
+                tags = setOf("Sport", "Outdoor"),
+                price = 30
+            ),
+            Event(
+                id = "2",
+                title = "Music Festival",
+                description = "Outdoor concert organized by the Cultural Club",
+                location = Location(0.0, 0.0, "Esplanade"),
+                time = "Nov 3rd, 5:00PM",
+                associationId = "Cultural Club",
+                tags = setOf("Music", "Festival"),
+                price = 10
+            )
+        )
     }
 
-    Spacer(Modifier.height(12.dp))
-    SearchBar()
+    val shownEvents = if (selected == EventsFilter.Subscribed) myEvents else allEvents
 
-    Spacer(Modifier.height(12.dp))
-    EventsFilterButtons(selected = selected, onSelected = { selected = it })
-
-    Spacer(Modifier.height(12.dp))
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxSize()) {
-          items(shownEvents, key = { it.id }) { ev -> EventCard(event = ev) }
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+    ) {
+        // App Logo
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            Image(
+                painter = painterResource(id = R.drawable.epfl_life_logo),
+                contentDescription = "EPFL Life Logo",
+                modifier = Modifier.height(40.dp),
+                contentScale = ContentScale.Fit
+            )
         }
-  }
+
+        Spacer(Modifier.height(12.dp))
+        SearchBar()
+
+        Spacer(Modifier.height(12.dp))
+        EventsFilterButtons(selected = selected, onSelected = { selected = it })
+
+        Spacer(Modifier.height(12.dp))
+
+        if (shownEvents.isEmpty() && selected == EventsFilter.Subscribed) {
+            EmptyEventsMessage(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 24.dp)
+            )
+        } else {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(shownEvents, key = { it.id }) { ev ->
+                    EventCard(event = ev)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun EmptyEventsMessage(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "There’s nothing here!",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center
+        )
+        Spacer(Modifier.height(2.dp))
+        Text(
+            text = "Subscribe to clubs to fill your feed.\n\n" +
+                    "Start by pressing the “Clubs” icon on the navigation bar below.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
+        )
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun HomeScreenPreview() {
-  MaterialTheme { HomeScreen() }
+    MaterialTheme { HomeScreen() }
 }

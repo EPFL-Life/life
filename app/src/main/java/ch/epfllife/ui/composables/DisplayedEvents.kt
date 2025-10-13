@@ -49,7 +49,7 @@ private fun FilterText(text: String, selected: Boolean, onClick: () -> Unit) {
         if (selected) {
           Spacer(Modifier.height(2.dp))
           HorizontalDivider(
-              modifier = Modifier.width(40.dp),
+              modifier = Modifier.width(80.dp),
               thickness = 2.dp,
               color = MaterialTheme.colorScheme.onSurface)
         }
