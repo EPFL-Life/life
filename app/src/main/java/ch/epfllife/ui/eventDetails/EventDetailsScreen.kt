@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.model.entities.Event
 import ch.epfllife.model.map.Location
-import ch.epfllife.ui.navigation.NavigationActions
 import ch.epfllife.ui.theme.BootcampTheme
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -37,71 +36,72 @@ fun EventDetailsScreen(
     eventId: String,
     viewModel: EventDetailsViewModel = viewModel(),
     onGoBack: () -> Unit = {},
-    navigationActions: NavigationActions? = null
 ) {
   val uiState by viewModel.uiState.collectAsState()
   LaunchedEffect(eventId) {
     viewModel.loadEvent(eventId)
   } // this is triggered once the screen opens
 
-  BootcampTheme {
-    Scaffold(
+  Scaffold(
 
-        // switch to this when navigation is properly implemented
-        //            bottomBar = {
-        //                BottomNavigationMenu(
-        //                    selectedTab = Tab.Clubs, // or Tab.Overview, depending on your design
-        //                    onTabSelected = { tab ->
-        // navigationActions?.navigateTo(tab.destination) }
-        //                )
-        //            },
+      // switch to this when navigation is properly implemented
+      //            bottomBar = {
+      //                BottomNavigationMenu(
+      //                    selectedTab = Tab.Clubs, // or Tab.Overview, depending on your design
+      //                    onTabSelected = { tab ->
+      // navigationActions?.navigateTo(tab.destination) }
+      //                )
+      //            },
 
-        // use this hardcoded bottom bar for now
-        bottomBar = {
-          NavigationBar {
-            NavigationBarItem(
-                selected = false,
-                onClick = { /* Navigate Home*/},
-                label = { Text("Home") },
-                icon = { Icon(Icons.Default.Home, contentDescription = "Home") })
-            NavigationBarItem(
-                selected = true,
-                onClick = { /* Nothing */},
-                label = { Text("Clubs") },
-                icon = { Icon(Icons.Default.People, contentDescription = "Clubs") })
-            NavigationBarItem(
-                selected = false,
-                onClick = { /* Navigate to Calender */},
-                label = { Text("Calendar") },
-                icon = { Icon(Icons.Default.CalendarToday, contentDescription = "Calendar") })
-            // NavigationBarItem(selected = false, onClick = {}, label = { Text("Settings") }, icon
-            // = {})
+      // use this hardcoded bottom bar for now
+      bottomBar = {
+        NavigationBar {
+          NavigationBarItem(
+              selected = false,
+              onClick = { /* Navigate Home*/},
+              label = { Text("Home") },
+              icon = { Icon(Icons.Default.Home, contentDescription = "Home") })
+          NavigationBarItem(
+              selected = true,
+              onClick = { /* Nothing */},
+              label = { Text("Clubs") },
+              icon = { Icon(Icons.Default.People, contentDescription = "Clubs") })
+          NavigationBarItem(
+              selected = false,
+              onClick = { /* Navigate to Calender */},
+              label = { Text("Calendar") },
+              icon = { Icon(Icons.Default.CalendarToday, contentDescription = "Calendar") })
+          // NavigationBarItem(selected = false, onClick = {}, label = { Text("Settings") }, icon
+          // = {})
+        }
+      }) { paddingValues ->
+        when (val state = uiState) {
+          is EventDetailsUIState.Loading -> {
+            // Show loading spinner
+            Box(
+                modifier = Modifier.fillMaxSize().padding(paddingValues),
+                contentAlignment = Alignment.Center) {
+                  CircularProgressIndicator()
+                }
           }
-        }) { paddingValues ->
-          when {
-            uiState.isLoading ->
-                Box(
-                    modifier = Modifier.fillMaxSize().padding(paddingValues),
-                    contentAlignment = Alignment.Center) {
-                      CircularProgressIndicator()
-                    }
-            uiState.errorMsg != null ->
-                Box(
-                    modifier = Modifier.fillMaxSize().padding(paddingValues),
-                    contentAlignment = Alignment.Center) {
-                      Text(
-                          uiState.errorMsg ?: "Unknown error",
-                          color = MaterialTheme.colorScheme.error)
-                    }
-            uiState.event != null ->
-                EventDetailsContent(
-                    event = uiState.event!!,
-                    modifier = Modifier.padding(paddingValues),
-                    onGoBack = onGoBack,
-                    viewModel = viewModel)
+          is EventDetailsUIState.Error -> {
+            // Show error message
+            Box(
+                modifier = Modifier.fillMaxSize().padding(paddingValues),
+                contentAlignment = Alignment.Center) {
+                  Text(text = state.message, color = MaterialTheme.colorScheme.error)
+                }
+          }
+          is EventDetailsUIState.Success -> {
+            // Show event content
+            EventDetailsContent(
+                event = state.event,
+                modifier = Modifier.padding(paddingValues),
+                onGoBack = onGoBack,
+                viewModel = viewModel)
           }
         }
-  }
+      }
 }
 
 @Composable
@@ -118,7 +118,9 @@ fun EventDetailsContent(
       AsyncImage(
           model =
               ImageRequest.Builder(LocalContext.current)
-                  .data(event.imageUrl ?: "https://picsum.photos/600/300")
+                  .data(
+                      event.imageUrl
+                          ?: "https://www.epfl.ch/campus/services/events/wp-content/uploads/2024/09/WEB_Image-Home-Events_ORGANISER.png")
                   .crossfade(true)
                   .build(),
           contentDescription = "Event Image",
