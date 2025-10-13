@@ -43,7 +43,7 @@ class EventDetailsViewModel : ViewModel() {
                 time = "2025-10-12 18:00",
                 associationId = "AeroPoly",
                 tags = setOf("workshop"),
-                price = 10,
+                price = 10u,
                 imageUrl =
                     "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")
         _uiState.value = EventDetailsUIState.Success(fakeEvent, isEnrolled = false)

@@ -46,7 +46,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             time = "Oct 4th, 6:50am",
             associationId = "ESN Lausanne",
             tags = setOf("Sport", "Outdoor"),
-            price = 30),
+            price = 30u),
         Event(
             id = "2",
             title = "Music Festival",
@@ -55,7 +55,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             time = "Nov 3rd, 5:00PM",
             associationId = "Cultural Club",
             tags = setOf("Music", "Festival"),
-            price = 10))
+            price = 10u))
   }
 
   val shownEvents = if (selected == EventsFilter.Subscribed) myEvents else allEvents
