@@ -10,12 +10,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 /** UI state for the EventDetails screen. */
-data class EventDetailsUIState(
-    val event: Event? = null,
-    val isLoading: Boolean = false,
-    val errorMsg: String? = null,
-    val isEnrolled: Boolean = false
-)
+sealed class EventDetailsUIState {
+  object Loading : EventDetailsUIState()
+
+  data class Success(val event: Event, val isEnrolled: Boolean) : EventDetailsUIState()
+
+  data class Error(val message: String) : EventDetailsUIState()
+}
 
 /**
  * ViewModel for the EventDetails screen.
@@ -24,21 +25,20 @@ data class EventDetailsUIState(
  */
 class EventDetailsViewModel : ViewModel() {
 
-  private val _uiState = MutableStateFlow(EventDetailsUIState())
+  private val _uiState = MutableStateFlow<EventDetailsUIState>(EventDetailsUIState.Loading)
   val uiState: StateFlow<EventDetailsUIState> = _uiState.asStateFlow()
 
   /** Loads event details by ID. In the future this would call a repository. */
   fun loadEvent(eventId: String) {
     viewModelScope.launch {
-      _uiState.value = _uiState.value.copy(isLoading = true, errorMsg = null)
+      _uiState.value = EventDetailsUIState.Loading
       try {
-        // TODO: Replace this mock with real repository call
         val fakeEvent =
             Event(
                 id = "1",
                 title = "Drone Workshop",
                 description =
-                    "The Drone Workshop is a multi-evening workshop organized by AéroPoly, where you can build your own 3-inch FPV drone...",
+                    "The Drone Workshop is a multi-evening workshop organized by AéroPoly...",
                 location = Location(46.5191, 6.5668, "Centre Sport et Santé"),
                 time = "2025-10-12 18:00",
                 associationId = "AeroPoly",
@@ -46,10 +46,9 @@ class EventDetailsViewModel : ViewModel() {
                 price = 10,
                 imageUrl =
                     "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")
-        _uiState.value = EventDetailsUIState(event = fakeEvent, isLoading = false)
+        _uiState.value = EventDetailsUIState.Success(fakeEvent, isEnrolled = false)
       } catch (e: Exception) {
-        _uiState.value =
-            _uiState.value.copy(isLoading = false, errorMsg = "Failed to load event: ${e.message}")
+        _uiState.value = EventDetailsUIState.Error("Failed to load event: ${e.message}")
       }
     }
   }
@@ -61,10 +60,10 @@ class EventDetailsViewModel : ViewModel() {
   fun enrollInEvent(event: Event) {
     viewModelScope.launch {
       try {
-        // TODO: implement actual logic (Firestore / API call / Redirect)
-        _uiState.value = _uiState.value.copy(isEnrolled = true)
+        // TODO: implement logic
+        _uiState.value = EventDetailsUIState.Success(event, isEnrolled = true)
       } catch (e: Exception) {
-        _uiState.value = _uiState.value.copy(errorMsg = "Failed to enroll: ${e.message}")
+        _uiState.value = EventDetailsUIState.Error("Failed to enrol: ${e.message}")
       }
     }
   }
