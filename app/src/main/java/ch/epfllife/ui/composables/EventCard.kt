@@ -15,14 +15,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ch.epfllife.model.entities.Event
-
-object EventCardTestTags {
-  const val EVENT_CARD = "eventCard"
-}
+import ch.epfllife.model.map.Location
 
 @Composable
 fun EventCard(event: Event, modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
@@ -31,7 +28,7 @@ fun EventCard(event: Event, modifier: Modifier = Modifier, onClick: () -> Unit =
       onClick = onClick,
       shape = RoundedCornerShape(12.dp),
       elevation = CardDefaults.elevatedCardElevation(5.dp),
-      modifier = modifier.fillMaxWidth().testTag(EventCardTestTags.EVENT_CARD)) {
+      modifier = modifier.fillMaxWidth()) {
         Column(Modifier.padding(horizontal = 16.dp, vertical = 14.dp)) {
           Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(
@@ -40,12 +37,7 @@ fun EventCard(event: Event, modifier: Modifier = Modifier, onClick: () -> Unit =
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.weight(1f))
             Text(
-                text =
-                    if (event.price == 0u) {
-                      "Free"
-                    } else {
-                      "CHF ${event.price}"
-                    },
+                text = event.price?.let { "CHF $it" } ?: "Free",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.width(6.dp))
