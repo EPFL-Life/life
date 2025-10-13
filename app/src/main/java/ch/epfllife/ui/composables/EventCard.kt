@@ -16,8 +16,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ch.epfllife.model.entities.Event
+import ch.epfllife.model.map.Location
 
 @Composable
 fun EventCard(event: Event, modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
@@ -25,7 +27,7 @@ fun EventCard(event: Event, modifier: Modifier = Modifier, onClick: () -> Unit =
   Card(
       onClick = onClick,
       shape = RoundedCornerShape(12.dp),
-      elevation = CardDefaults.elevatedCardElevation(2.dp),
+      elevation = CardDefaults.elevatedCardElevation(5.dp),
       modifier = modifier.fillMaxWidth()) {
         Column(Modifier.padding(horizontal = 16.dp, vertical = 14.dp)) {
           Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
