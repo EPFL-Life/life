@@ -36,6 +36,11 @@ Students can log in via EPFL SSO and then see announcements and events in a feed
 
 https://www.figma.com/design/qNjleM72FjEUEppPUSS2Ok/EPFL-Life?node-id=0-1&t=auqmWM20TucyArQS-1
 
+## Architecture
+
+Architecture Diagram (needs login):
+https://lucid.app/lucidchart/ce4337ce-2529-4818-8026-5f91ea9d6d66/edit?viewport_loc=585%2C431%2C2440%2C1233%2C0_0&invitationId=inv_a51e27a4-cca7-4149-9a52-9373c1a27edb
+
 ## References
 
 This project uses the [Swent B3 Solution](https://github.com/swent-epfl/bootcamp-25-B3-Solution)
