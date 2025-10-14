@@ -4,7 +4,6 @@
 
 ### Authentication & Profiles
 - As a student, I want to log in via EPFL SSO so that I can access student-only features securely.
-- Stretch - As a student, I want to edit my profile (name, picture, associations followed) so that my feed is personalized.
 - Stretch - As a guest student, I want to log in using a Europe-wide login so that I can also join EPFL events while on exchange.
 
 ### Discovering Associations
@@ -14,11 +13,11 @@
 
 ### Events & Announcements
 - As a student, I want to view a chronological feed of upcoming events and announcements so that I never miss what’s happening.
-- As a student, I want to signal that I plan to attend an event so that organizers can estimate attendance.
+- As a student, I want to enroll in an event.
 - Stretch - As a student, I want to add events to my personal calendar (Google/Apple) so that I can manage time easily.
 - As a student, I want to filter events by date, category, or distance so that I only see what interests me.
 - As a student, I want to view a map of events relative to my current location so that I can find venues easily.
-- As a student, I want to open event details to see time, location, organizers, and attendees.
+- As a student, I want to open event details to see time, location and organizers.
 
 ### Social & Engagement
 - Stretch - As a student, I want to see which of my friends are attending an event so that I can coordinate plans.
@@ -30,7 +29,7 @@
 ## Association Organizer Stories
 
 ### Authentication & Access
-- As an association representative, I want to log in using my EPFL account so that I can publish official content.
+- As an association representative, I want to log in using an EPFL-email so that I can publish official content. (The email is specific to the association)
 - As an association admin, I want to manage who in my team can post on behalf of the association so that I can ensure appropriate permissions.
 
 ### Announcements & Events
