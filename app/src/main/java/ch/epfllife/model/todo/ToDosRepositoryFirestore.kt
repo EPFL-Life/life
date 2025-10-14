@@ -2,7 +2,6 @@ package ch.epfllife.model.todo
 
 import android.util.Log
 import ch.epfllife.model.map.Location
-import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentSnapshot
@@ -44,30 +43,6 @@ class ToDosRepositoryFirestore(private val db: FirebaseFirestore) : ToDosReposit
 
   override suspend fun deleteTodo(todoID: String) {
     db.collection(TODOS_COLLECTION_PATH).document(todoID).delete().await()
-  }
-
-  /**
-   * Performs a Firestore operation and calls the appropriate callback based on the result.
-   *
-   * @param task The Firestore task to perform.
-   * @param onSuccess The callback to call if the operation is successful.
-   * @param onFailure The callback to call if the operation fails.
-   */
-  private fun performFirestoreOperation(
-      task: Task<Void>,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    task.addOnCompleteListener { result ->
-      if (result.isSuccessful) {
-        onSuccess()
-      } else {
-        result.exception?.let { e ->
-          Log.e("TodosRepositoryFirestore", "Error performing Firestore operation", e)
-          onFailure(e)
-        }
-      }
-    }
   }
 
   /**

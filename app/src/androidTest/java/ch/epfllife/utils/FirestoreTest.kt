@@ -10,13 +10,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 
-open class FirestoreBootcampTest(milestone: BootcampMilestone) : BootcampTest(milestone) {
-
-  init {
-    assert(milestone != BootcampMilestone.B1) {
-      "FirestoreBootcampTest should not be used for Milestone 1, which does not use Firestore."
-    }
-  }
+open class FirestoreTest() : LifeTest() {
 
   suspend fun getTodosCount(): Int {
     val user = FirebaseEmulator.auth.currentUser ?: return 0

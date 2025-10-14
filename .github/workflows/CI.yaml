@@ -1,4 +1,4 @@
-name: Bootcamp CI - Test Runner
+name: EPFL Life CI
 
 # Run the workflow when commits are pushed on main or when a PR is modified
 on:
@@ -13,13 +13,13 @@ on:
       - reopened
 
 jobs:
-  bootcamp-ci:
-    name: CI-Bootcamp
+  epfllife-ci:
+    name: CI - EPFL Life
     # Execute the CI on the course's runners
     runs-on: ubuntu-latest
 
     env:
-      app_name: BootcampDebug
+      app_name: EPFLLifeDebug
 
     defaults:
       run:
@@ -74,7 +74,7 @@ jobs:
           else
             echo "::warning::GOOGLE_SERVICES secret is not set. google-services.json will not be created. Should be present after B2"
           fi
-          
+
           if [ -n "$LOCAL_PROPERTIES" ]; then
             echo "$LOCAL_PROPERTIES" | base64 --decode > ./local.properties
           else

@@ -1,3 +1,7 @@
+<p>
+  <img src="assets/EPFL-LIFE.svg" alt="EPFL LIFE Logo" width="300">
+</p>
+
 # EPFL LIFE
 
 ## Pitch
@@ -31,3 +35,12 @@ Students can log in via EPFL SSO and then see announcements and events in a feed
 ## Figma
 
 https://www.figma.com/design/qNjleM72FjEUEppPUSS2Ok/EPFL-Life?node-id=0-1&t=auqmWM20TucyArQS-1
+
+## References
+
+This project uses the [Swent B3 Solution](https://github.com/swent-epfl/bootcamp-25-B3-Solution)
+as the starting point.
+## Figma Wireframes & User Flows
+## Figma Design Documentation
+
+All wireframes, mockups, and user flow diagrams are documented in the [**Figma Design Documentation →**](docs/figma-designs.md)

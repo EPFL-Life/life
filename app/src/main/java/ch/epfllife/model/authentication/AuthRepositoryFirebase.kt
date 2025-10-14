@@ -3,7 +3,6 @@ package ch.epfllife.model.authentication
 import androidx.credentials.Credential
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
-import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -27,9 +26,6 @@ class AuthRepositoryFirebase(
     private val auth: FirebaseAuth = Firebase.auth,
     private val helper: GoogleSignInHelper = DefaultGoogleSignInHelper()
 ) : AuthRepository {
-
-  fun getGoogleSignInOption(serverClientId: String) =
-      GetSignInWithGoogleOption.Builder(serverClientId = serverClientId).build()
 
   override suspend fun signInWithGoogle(credential: Credential): Result<FirebaseUser> {
     return try {
