@@ -54,12 +54,12 @@ class NominatimLocationRepository(private val client: OkHttpClient) : LocationRe
             }
 
             val body = response.body?.string()
-            if (body != null) {
+            return@withContext if (body != null) {
               Log.d("NominatimLocationRepository", "Body: $body")
-              return@withContext parseBody(body)
+              parseBody(body)
             } else {
               Log.d("NominatimLocationRepository", "Empty body")
-              return@withContext emptyList()
+              emptyList()
             }
           }
         } catch (e: IOException) {
