@@ -31,7 +31,9 @@ class EventDetailsViewModel : ViewModel() {
   /** Loads event details by ID. In the future this would call a repository. */
   fun loadEvent(eventId: String) {
     viewModelScope.launch {
-      _uiState.value = EventDetailsUIState.Loading
+
+      // note that EventDetailsUIState.Loading is the default value (set before)
+
       try {
         val fakeEvent =
             Event(
