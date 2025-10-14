@@ -43,16 +43,6 @@ fun EventDetailsScreen(
   } // this is triggered once the screen opens
 
   Scaffold(
-
-      // switch to this when navigation is properly implemented
-      //            bottomBar = {
-      //                BottomNavigationMenu(
-      //                    selectedTab = Tab.Clubs, // or Tab.Overview, depending on your design
-      //                    onTabSelected = { tab ->
-      // navigationActions?.navigateTo(tab.destination) }
-      //                )
-      //            },
-
       // use this hardcoded bottom bar for now
       bottomBar = {
         NavigationBar {
