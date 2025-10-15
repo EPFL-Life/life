@@ -10,8 +10,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,12 +18,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.model.entities.Event
 import ch.epfllife.model.map.Location
+import ch.epfllife.ui.navigation.BottomNavigationMenu
+import ch.epfllife.ui.navigation.NavigationActions
+import ch.epfllife.ui.navigation.NavigationTestTags
+import ch.epfllife.ui.navigation.Tab
 import ch.epfllife.ui.theme.Theme
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -36,6 +39,7 @@ fun EventDetailsScreen(
     eventId: String,
     viewModel: EventDetailsViewModel = viewModel(),
     onGoBack: () -> Unit = {},
+    navigationActions: NavigationActions? = null,
 ) {
   val uiState by viewModel.uiState.collectAsState()
   LaunchedEffect(eventId) {
@@ -45,25 +49,10 @@ fun EventDetailsScreen(
   Scaffold(
       // use this hardcoded bottom bar for now
       bottomBar = {
-        NavigationBar {
-          NavigationBarItem(
-              selected = false,
-              onClick = { /* Navigate Home*/},
-              label = { Text("Home") },
-              icon = { Icon(Icons.Default.Home, contentDescription = "Home") })
-          NavigationBarItem(
-              selected = true,
-              onClick = { /* Nothing */},
-              label = { Text("Clubs") },
-              icon = { Icon(Icons.Default.People, contentDescription = "Clubs") })
-          NavigationBarItem(
-              selected = false,
-              onClick = { /* Navigate to Calender */},
-              label = { Text("Calendar") },
-              icon = { Icon(Icons.Default.CalendarToday, contentDescription = "Calendar") })
-          // NavigationBarItem(selected = false, onClick = {}, label = { Text("Settings") }, icon
-          // = {})
-        }
+        BottomNavigationMenu(
+            selectedTab = Tab.Settings,
+            onTabSelected = { tab -> navigationActions?.navigateTo(tab.destination) },
+            modifier = Modifier.testTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU))
       }) { paddingValues ->
         when (val state = uiState) {
           is EventDetailsUIState.Loading -> {
