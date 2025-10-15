@@ -25,6 +25,7 @@ import ch.epfllife.model.map.Location
 import ch.epfllife.ui.composables.EventCard
 import ch.epfllife.ui.composables.EventsFilterButtons
 import ch.epfllife.ui.composables.SearchBar
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
@@ -99,15 +100,13 @@ private fun EmptyEventsMessage(modifier: Modifier = Modifier) {
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center) {
         Text(
-            text = "There’s nothing here!",
+            text = stringResource(id = R.string.home_empty_title),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center)
         Spacer(Modifier.height(2.dp))
         Text(
-            text =
-                "Subscribe to clubs to fill your feed.\n\n" +
-                    "Start by pressing the “Clubs” icon on the navigation bar below.",
+            text = stringResource(id = R.string.home_empty_description),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center)

@@ -8,8 +8,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import ch.epfllife.R
 import ch.epfllife.model.enums.EventsFilter
 
 @Composable
@@ -23,11 +25,11 @@ fun EventsFilterButtons(
       horizontalArrangement = Arrangement.SpaceEvenly,
       verticalAlignment = Alignment.CenterVertically) {
         FilterText(
-            text = "Subscribed",
+            text = stringResource(id = R.string.subscribed_filter),
             selected = selected == EventsFilter.Subscribed,
             onClick = { onSelected(EventsFilter.Subscribed) })
         FilterText(
-            text = "All Events",
+            text = stringResource(id = R.string.all_events_filter),
             selected = selected == EventsFilter.All,
             onClick = { onSelected(EventsFilter.All) })
       }
