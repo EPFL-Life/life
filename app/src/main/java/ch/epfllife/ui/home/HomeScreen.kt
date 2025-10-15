@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -14,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,9 +27,16 @@ import ch.epfllife.model.map.Location
 import ch.epfllife.ui.composables.EventCard
 import ch.epfllife.ui.composables.EventsFilterButtons
 import ch.epfllife.ui.composables.SearchBar
+import ch.epfllife.ui.navigation.BottomNavigationMenu
+import ch.epfllife.ui.navigation.NavigationActions
+import ch.epfllife.ui.navigation.NavigationTestTags
+import ch.epfllife.ui.navigation.Tab
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    navigationActions: NavigationActions? = null,
+) {
   var selected by remember { mutableStateOf(EventsFilter.Subscribed) }
 
   val myEvents = remember { emptyList<Event>() } // No events to show empty state
@@ -59,34 +68,44 @@ fun HomeScreen(modifier: Modifier = Modifier) {
   }
 
   val shownEvents = if (selected == EventsFilter.Subscribed) myEvents else allEvents
+  Scaffold(
+      modifier = modifier,
+      bottomBar = {
+        BottomNavigationMenu(
+            selectedTab = Tab.HomeScreen,
+            onTabSelected = { tab -> navigationActions?.navigateTo(tab.destination) },
+            modifier = Modifier.testTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU))
+      }) { pd ->
+        Column(
+            modifier =
+                Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 12.dp).padding(pd)) {
+              Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Image(
+                    painter = painterResource(id = R.drawable.epfl_life_logo),
+                    contentDescription = "EPFL Life Logo",
+                    modifier = Modifier.height(40.dp),
+                    contentScale = ContentScale.Fit)
+              }
 
-  Column(modifier = modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 12.dp)) {
-    // App Logo
-    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-      Image(
-          painter = painterResource(id = R.drawable.epfl_life_logo),
-          contentDescription = "EPFL Life Logo",
-          modifier = Modifier.height(40.dp),
-          contentScale = ContentScale.Fit)
-    }
+              Spacer(Modifier.height(12.dp))
+              SearchBar()
 
-    Spacer(Modifier.height(12.dp))
-    SearchBar()
+              Spacer(Modifier.height(12.dp))
+              EventsFilterButtons(selected = selected, onSelected = { selected = it })
 
-    Spacer(Modifier.height(12.dp))
-    EventsFilterButtons(selected = selected, onSelected = { selected = it })
+              Spacer(Modifier.height(12.dp))
 
-    Spacer(Modifier.height(12.dp))
-
-    if (shownEvents.isEmpty() && selected == EventsFilter.Subscribed) {
-      EmptyEventsMessage(modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp))
-    } else {
-      LazyColumn(
-          verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxSize()) {
-            items(shownEvents, key = { it.id }) { ev -> EventCard(event = ev) }
-          }
-    }
-  }
+              if (shownEvents.isEmpty() && selected == EventsFilter.Subscribed) {
+                EmptyEventsMessage(modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp))
+              } else {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxSize()) {
+                      items(shownEvents, key = { it.id }) { ev -> EventCard(event = ev) }
+                    }
+              }
+            }
+      }
 }
 
 @Composable
