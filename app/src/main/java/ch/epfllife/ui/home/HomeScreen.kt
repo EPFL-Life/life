@@ -15,21 +15,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ch.epfllife.R
 import ch.epfllife.model.entities.Event
-import ch.epfllife.model.enums.EventsFilter
+import ch.epfllife.model.enums.SubscriptionFilter
 import ch.epfllife.model.map.Location
 import ch.epfllife.ui.composables.EventCard
 import ch.epfllife.ui.composables.EventsFilterButtons
 import ch.epfllife.ui.composables.SearchBar
-import androidx.compose.ui.res.stringResource
 
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
-  var selected by remember { mutableStateOf(EventsFilter.Subscribed) }
+  var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
 
   val myEvents = remember { emptyList<Event>() } // No events to show empty state
 
@@ -62,7 +62,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         )
     }
 
-  val shownEvents = if (selected == EventsFilter.Subscribed) myEvents else allEvents
+  val shownEvents = if (selected == SubscriptionFilter.Subscribed) myEvents else allEvents
 
   Column(modifier = modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 12.dp)) {
     // App Logo
@@ -82,7 +82,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 
     Spacer(Modifier.height(12.dp))
 
-    if (shownEvents.isEmpty() && selected == EventsFilter.Subscribed) {
+    if (shownEvents.isEmpty() && selected == SubscriptionFilter.Subscribed) {
       EmptyEventsMessage(modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp))
     } else {
       LazyColumn(

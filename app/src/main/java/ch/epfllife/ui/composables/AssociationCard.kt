@@ -25,56 +25,40 @@ fun AssociationCard(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {}
 ) {
-    Card(
-        onClick = onClick,
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.elevatedCardElevation(5.dp),
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(5.dp)
-    ) {
+  Card(
+      onClick = onClick,
+      shape = RoundedCornerShape(12.dp),
+      elevation = CardDefaults.elevatedCardElevation(5.dp),
+      modifier = modifier.fillMaxWidth().padding(5.dp)) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
+            modifier = Modifier.fillMaxWidth().padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            // Club/association icon
-            Image(
-                painter = painterResource(id = R.drawable.placeholder),
-                contentDescription = "${association.name} logo",
-                modifier = Modifier
-                    .size(56.dp)
-                    .align(Alignment.CenterVertically)
-            )
+            horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+              // Club/association icon
+              Image(
+                  painter = painterResource(id = R.drawable.placeholder),
+                  contentDescription = "${association.name} logo",
+                  modifier = Modifier.size(56.dp).align(Alignment.CenterVertically))
 
-            // Text section (name + description)
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .align(Alignment.CenterVertically)
-            ) {
+              // Text section (name + description)
+              Column(modifier = Modifier.weight(1f).align(Alignment.CenterVertically)) {
                 Text(
                     text = association.name,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+                    color = MaterialTheme.colorScheme.onSurface)
                 Spacer(Modifier.height(4.dp))
                 Text(
                     text = association.description,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+              }
 
-            // Right arrow icon
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = "Go to ${association.name}",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
+              // Right arrow icon
+              Icon(
+                  imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                  contentDescription = "Go to ${association.name}",
+                  tint = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+      }
 }
