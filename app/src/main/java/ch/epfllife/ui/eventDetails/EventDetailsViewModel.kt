@@ -2,7 +2,7 @@ package com.android.sample.ui.eventDetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import ch.epfllife.model.entities.Event
+import ch.epfllife.model.event.Event
 import ch.epfllife.model.map.Location
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

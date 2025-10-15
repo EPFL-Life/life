@@ -1,6 +1,6 @@
-package ch.epfllife.model.enums
+package ch.epfllife.model.event
 
-enum class Category {
+enum class EventCategory {
   CULTURE,
   SPORTS,
   TECH,
@@ -11,7 +11,7 @@ enum class Category {
 }
 
 /**
- * Converts the [Category] enum value to a more readable display string.
+ * Converts the [EventCategory] enum value to a more readable display string.
  *
  * For example:
  * - CULTURE → "Culture"
@@ -21,4 +21,4 @@ enum class Category {
  * @return A user-friendly string representation of the category, formatted with only the first
  *   letter capitalized.
  */
-fun Category.displayString(): String = name.lowercase().replaceFirstChar { it.titlecase() }
+fun EventCategory.displayString(): String = name.lowercase().replaceFirstChar { it.titlecase() }
