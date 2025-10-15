@@ -24,7 +24,7 @@ import ch.epfllife.model.entities.Event
 import ch.epfllife.model.enums.SubscriptionFilter
 import ch.epfllife.model.map.Location
 import ch.epfllife.ui.composables.EventCard
-import ch.epfllife.ui.composables.EventsFilterButtons
+import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
 import ch.epfllife.ui.composables.SearchBar
 
 @Composable
@@ -78,9 +78,16 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     SearchBar()
 
     Spacer(Modifier.height(12.dp))
-    EventsFilterButtons(selected = selected, onSelected = { selected = it })
 
-    Spacer(Modifier.height(12.dp))
+      DisplayedSubscriptionFilter(
+          selected = selected,
+          onSelected = { selected = it },
+          subscribedLabel = stringResource(id = R.string.subscribed_filter),
+          allLabel = stringResource(id = R.string.all_events_filter)
+      )
+
+
+      Spacer(Modifier.height(12.dp))
 
     if (shownEvents.isEmpty() && selected == SubscriptionFilter.Subscribed) {
       EmptyEventsMessage(modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp))

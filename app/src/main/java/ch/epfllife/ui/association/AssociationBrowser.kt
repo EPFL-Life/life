@@ -17,7 +17,7 @@ import ch.epfllife.model.entities.Association
 import ch.epfllife.model.enums.SubscriptionFilter
 import ch.epfllife.model.enums.Category
 import ch.epfllife.ui.composables.AssociationCard
-import ch.epfllife.ui.composables.DisplayedAssociationFilter
+import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
 import ch.epfllife.ui.composables.SearchBar
 
 @Composable
@@ -59,10 +59,14 @@ fun AssociationBrowser(modifier: Modifier = Modifier) {
 
         Spacer(Modifier.height(12.dp))
 
-        DisplayedAssociationFilter(
-            selected = selected, onSelected = { selected = it }, modifier = Modifier.fillMaxWidth())
+      DisplayedSubscriptionFilter(
+          selected = selected,
+          onSelected = { selected = it },
+          subscribedLabel = stringResource(id = R.string.subscribed_filter),
+          allLabel = stringResource(id = R.string.all_associations_filter)
+      )
 
-        Spacer(Modifier.height(12.dp))
+      Spacer(Modifier.height(12.dp))
 
         if (shownAssociations.isEmpty() && selected == SubscriptionFilter.Subscribed) {
           EmptyAssociationsMessage(modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp))
