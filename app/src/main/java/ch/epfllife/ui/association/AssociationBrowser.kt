@@ -14,8 +14,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ch.epfllife.R
 import ch.epfllife.model.entities.Association
-import ch.epfllife.model.enums.SubscriptionFilter
 import ch.epfllife.model.enums.Category
+import ch.epfllife.model.enums.SubscriptionFilter
 import ch.epfllife.ui.composables.AssociationCard
 import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
 import ch.epfllife.ui.composables.SearchBar
@@ -23,7 +23,9 @@ import ch.epfllife.ui.composables.SearchBar
 @Composable
 fun AssociationBrowser(modifier: Modifier = Modifier) {
   var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
-  val subscribedAssociations = remember { emptyList<Association>() } // No Associations to show empty state
+  val subscribedAssociations = remember {
+    emptyList<Association>()
+  } // No Associations to show empty state
 
   // hardcoded data
   // val subscribedAssociations = remember { listOf(Association(id = "1",name = "ESN
@@ -59,17 +61,27 @@ fun AssociationBrowser(modifier: Modifier = Modifier) {
 
         Spacer(Modifier.height(12.dp))
 
-      DisplayedSubscriptionFilter(
-          selected = selected,
-          onSelected = { selected = it },
-          subscribedLabel = stringResource(id = R.string.subscribed_filter),
-          allLabel = stringResource(id = R.string.all_associations_filter)
-      )
+        DisplayedSubscriptionFilter(
+            selected = selected,
+            onSelected = { selected = it },
+            subscribedLabel = stringResource(id = R.string.subscribed_filter),
+            allLabel = stringResource(id = R.string.all_associations_filter))
 
-      Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(12.dp))
 
-        if (shownAssociations.isEmpty() && selected == SubscriptionFilter.Subscribed) {
-          EmptyAssociationsMessage(modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp))
+        // If statement to display certain messages for empty screens
+        if (shownAssociations.isEmpty()) {
+          if (selected == SubscriptionFilter.Subscribed) {
+            EmptyAssociationsMessage(
+                title = stringResource(id = R.string.associations_empty_title),
+                description = stringResource(id = R.string.associations_empty_description),
+                modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp))
+          } else {
+            EmptyAssociationsMessage(
+                title = stringResource(id = R.string.associations_no_all_title),
+                description = stringResource(id = R.string.associations_no_all_description),
+                modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp))
+          }
         } else {
           LazyColumn(
               verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -83,19 +95,23 @@ fun AssociationBrowser(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun EmptyAssociationsMessage(modifier: Modifier = Modifier) {
+private fun EmptyAssociationsMessage(
+    title: String,
+    description: String,
+    modifier: Modifier = Modifier
+) {
   Column(
       modifier = modifier,
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center) {
         Text(
-            text = stringResource(id = R.string.associations_empty_title),
+            text = title,
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center)
         Spacer(Modifier.height(2.dp))
         Text(
-            stringResource(id = R.string.associations_empty_description),
+            text = description,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center)

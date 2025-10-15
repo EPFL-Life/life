@@ -21,55 +21,43 @@ fun DisplayedSubscriptionFilter(
     modifier: Modifier = Modifier,
     underlineWidth: Int = 80
 ) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+  Row(
+      modifier = modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.SpaceEvenly,
+      verticalAlignment = Alignment.CenterVertically) {
         FilterText(
             text = subscribedLabel,
             selected = selected == SubscriptionFilter.Subscribed,
             onClick = { onSelected(SubscriptionFilter.Subscribed) },
-            underlineWidth = underlineWidth
-        )
+            underlineWidth = underlineWidth)
 
         FilterText(
             text = allLabel,
             selected = selected == SubscriptionFilter.All,
             onClick = { onSelected(SubscriptionFilter.All) },
-            underlineWidth = underlineWidth
-        )
-    }
+            underlineWidth = underlineWidth)
+      }
 }
 
 @Composable
-private fun FilterText(
-    text: String,
-    selected: Boolean,
-    onClick: () -> Unit,
-    underlineWidth: Int
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable(onClick = onClick)
-    ) {
+private fun FilterText(text: String, selected: Boolean, onClick: () -> Unit, underlineWidth: Int) {
+  Column(
+      horizontalAlignment = Alignment.CenterHorizontally,
+      modifier = Modifier.clickable(onClick = onClick)) {
         Text(
             text = text,
-            style = MaterialTheme.typography.bodyMedium.copy(
-                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
-            ),
-            color = if (selected)
-                MaterialTheme.colorScheme.onSurface
-            else
-                MaterialTheme.colorScheme.onSurfaceVariant
-        )
+            style =
+                MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal),
+            color =
+                if (selected) MaterialTheme.colorScheme.onSurface
+                else MaterialTheme.colorScheme.onSurfaceVariant)
         if (selected) {
-            Spacer(Modifier.height(2.dp))
-            HorizontalDivider(
-                modifier = Modifier.width(underlineWidth.dp),
-                thickness = 2.dp,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+          Spacer(Modifier.height(2.dp))
+          HorizontalDivider(
+              modifier = Modifier.width(underlineWidth.dp),
+              thickness = 2.dp,
+              color = MaterialTheme.colorScheme.onSurface)
         }
-    }
+      }
 }

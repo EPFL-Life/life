@@ -23,8 +23,8 @@ import ch.epfllife.R
 import ch.epfllife.model.entities.Event
 import ch.epfllife.model.enums.SubscriptionFilter
 import ch.epfllife.model.map.Location
-import ch.epfllife.ui.composables.EventCard
 import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
+import ch.epfllife.ui.composables.EventCard
 import ch.epfllife.ui.composables.SearchBar
 
 @Composable
@@ -79,18 +79,27 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 
     Spacer(Modifier.height(12.dp))
 
-      DisplayedSubscriptionFilter(
-          selected = selected,
-          onSelected = { selected = it },
-          subscribedLabel = stringResource(id = R.string.subscribed_filter),
-          allLabel = stringResource(id = R.string.all_events_filter)
-      )
+    DisplayedSubscriptionFilter(
+        selected = selected,
+        onSelected = { selected = it },
+        subscribedLabel = stringResource(id = R.string.subscribed_filter),
+        allLabel = stringResource(id = R.string.all_events_filter))
 
+    Spacer(Modifier.height(12.dp))
 
-      Spacer(Modifier.height(12.dp))
-
-    if (shownEvents.isEmpty() && selected == SubscriptionFilter.Subscribed) {
-      EmptyEventsMessage(modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp))
+    // If statement to display certain messages for empty screens
+    if (shownEvents.isEmpty()) {
+      if (selected == SubscriptionFilter.Subscribed) {
+        EmptyEventsMessage(
+            title = stringResource(id = R.string.home_empty_title),
+            description = stringResource(id = R.string.home_empty_description),
+            modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp))
+      } else {
+        EmptyEventsMessage(
+            title = stringResource(id = R.string.home_no_events_title),
+            description = stringResource(id = R.string.home_no_events_description),
+            modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp))
+      }
     } else {
       LazyColumn(
           verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxSize()) {
@@ -101,19 +110,19 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun EmptyEventsMessage(modifier: Modifier = Modifier) {
+private fun EmptyEventsMessage(title: String, description: String, modifier: Modifier = Modifier) {
   Column(
       modifier = modifier,
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center) {
         Text(
-            text = stringResource(id = R.string.home_empty_title),
+            text = title,
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center)
         Spacer(Modifier.height(2.dp))
         Text(
-            text = stringResource(id = R.string.home_empty_description),
+            text = description,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center)
