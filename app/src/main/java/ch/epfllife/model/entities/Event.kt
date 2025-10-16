@@ -2,8 +2,6 @@ package ch.epfllife.model.entities
 
 import ch.epfllife.model.map.Location
 
-// import com.google.firebase.Timestamp
-
 data class Event(
     val id: String,
     val title: String,

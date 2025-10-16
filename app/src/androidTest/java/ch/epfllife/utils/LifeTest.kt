@@ -1,6 +1,7 @@
 package ch.epfllife.utils
 
 import androidx.activity.ComponentActivity
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsDisplayed
@@ -10,6 +11,7 @@ import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
+import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
@@ -36,6 +38,7 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.test.runTest
 import okhttp3.OkHttpClient
 import org.junit.After
+import org.junit.Assert
 import org.junit.Before
 
 const val UI_WAIT_TIMEOUT = 5_000L
@@ -69,7 +72,8 @@ abstract class LifeTest() {
           dueDate = Timestamp.Companion.fromDate(2025, Calendar.SEPTEMBER, 1),
           location = Location(46.5191, 6.5668, "Lausanne Coop"),
           status = ToDoStatus.CREATED,
-          ownerId = "user")
+          ownerId = "user",
+      )
 
   open val todo2 =
       ToDo(
@@ -80,7 +84,8 @@ abstract class LifeTest() {
           dueDate = Timestamp.Companion.fromDate(2025, Calendar.OCTOBER, 15),
           location = Location(46.5210, 6.5790, "Parc de Mon Repos"),
           status = ToDoStatus.STARTED,
-          ownerId = "user")
+          ownerId = "user",
+      )
 
   open val todo3 =
       ToDo(
@@ -91,7 +96,8 @@ abstract class LifeTest() {
           dueDate = Timestamp.Companion.fromDate(2025, Calendar.NOVEMBER, 10),
           location = Location(46.5200, 6.5800, "City Library"),
           status = ToDoStatus.ARCHIVED,
-          ownerId = "user")
+          ownerId = "user",
+      )
 
   @Before
   open fun setUp() {
@@ -151,7 +157,8 @@ abstract class LifeTest() {
     onNode(
             hasTestTag(OverviewScreenTestTags.getTestTagForTodoItem(todo))
                 .and(hasAnyDescendant(matcher)),
-            useUnmergedTree = true)
+            useUnmergedTree = true,
+        )
         .assertIsDisplayed()
   }
 
@@ -165,7 +172,9 @@ abstract class LifeTest() {
     val hasTextLocation = hasText(location.name)
     val containsTextLocation = hasTextLocation.or(hasAnyDescendant(hasTextLocation))
     return onNode(
-        hasTestTag("locationSuggestion").and(containsTextLocation), useUnmergedTree = true)
+        hasTestTag("locationSuggestion").and(containsTextLocation),
+        useUnmergedTree = true,
+    )
   }
 
   fun ComposeTestRule.assertAllLocationSuggestionsAreDisplayed(fakeLocation: FakeLocation) {
@@ -210,4 +219,21 @@ abstract class LifeTest() {
       return Timestamp(calendar.time)
     }
   }
+}
+
+/**
+ * Assert that the composable triggers the given callback when the node with the given tag is
+ * clicked.
+ *
+ * This ensures that the composable is wired correctly and the UI can respond to user interactions.
+ */
+fun ComposeContentTestRule.assertClickable(
+    composable: @Composable ((callback: () -> Unit) -> Unit),
+    tag: String,
+) {
+  var clicked = false
+  this.setContent { composable { clicked = true } }
+  this.onNodeWithTag(tag).performClick()
+
+  Assert.assertTrue("$tag should be clickable", clicked)
 }
