@@ -37,30 +37,27 @@ fun HomeScreen(modifier: Modifier = Modifier) {
   // "Excursion to the Alps", location = Location(0.0, 0.0, "Lausanne Train Station"), time = "Oct
   // 4th, 6:50am", associationId = "ESN Lausanne", tags = setOf("Sport", "Outdoor"), price = 30)) }
 
-    val allEvents = remember {
-        listOf(
-            Event(
-                id = "1",
-                title = "Via Ferrata",
-                description = "Excursion to the Alps",
-                location = Location(0.0, 0.0, "Lausanne Train Station"),
-                time = "Oct 4th, 6:50am",
-                associationId = "ESN Lausanne",
-                tags = setOf("Sport", "Outdoor"),
-                price = 30u
-            ),
-            Event(
-                id = "2",
-                title = "Music Festival",
-                description = "Outdoor concert organized by the Cultural Club",
-                location = Location(0.0, 0.0, "Esplanade"),
-                time = "Nov 3rd, 5:00PM",
-                associationId = "Cultural Club",
-                tags = setOf("Music", "Festival"),
-                price = 10u
-            )
-        )
-    }
+  val allEvents = remember {
+    listOf(
+        Event(
+            id = "1",
+            title = "Via Ferrata",
+            description = "Excursion to the Alps",
+            location = Location(0.0, 0.0, "Lausanne Train Station"),
+            time = "Oct 4th, 6:50am",
+            associationId = "ESN Lausanne",
+            tags = setOf("Sport", "Outdoor"),
+            price = 30u),
+        Event(
+            id = "2",
+            title = "Music Festival",
+            description = "Outdoor concert organized by the Cultural Club",
+            location = Location(0.0, 0.0, "Esplanade"),
+            time = "Nov 3rd, 5:00PM",
+            associationId = "Cultural Club",
+            tags = setOf("Music", "Festival"),
+            price = 10u))
+  }
 
   val shownEvents = if (selected == SubscriptionFilter.Subscribed) myEvents else allEvents
 
