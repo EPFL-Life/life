@@ -1,4 +1,4 @@
-package com.android.sample.ui.eventDetails
+package ch.epfllife.ui.eventDetails
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
