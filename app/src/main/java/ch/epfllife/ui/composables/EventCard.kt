@@ -25,7 +25,7 @@ fun EventCard(event: Event, modifier: Modifier = Modifier, onClick: () -> Unit =
   Card(
       onClick = onClick,
       shape = RoundedCornerShape(12.dp),
-      elevation = CardDefaults.elevatedCardElevation(2.dp),
+      elevation = CardDefaults.elevatedCardElevation(5.dp),
       modifier = modifier.fillMaxWidth()) {
         Column(Modifier.padding(horizontal = 16.dp, vertical = 14.dp)) {
           Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {

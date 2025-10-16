@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.ktfmt)
     alias(libs.plugins.gms)
-
+    id("org.sonarqube") version "5.1.0.4882"
 }
 
 android {
@@ -118,6 +118,13 @@ android {
 
 }
 
+sonar {
+  properties {
+    property("sonar.projectKey", "EPFL-Life_life")
+    property("sonar.organization", "epfl-life")
+    property("sonar.host.url", "https://sonarcloud.io")
+  }
+}
 
 dependencies {
 
@@ -194,6 +201,8 @@ dependencies {
     androidTestImplementation(libs.kaspresso.compose.support)
 
     testImplementation(libs.kotlinx.coroutines.test)
+
+    implementation("io.coil-kt:coil-compose:2.7.0")
 
 }
 

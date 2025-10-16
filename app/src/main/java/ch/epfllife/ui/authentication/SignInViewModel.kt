@@ -1,7 +1,6 @@
 package ch.epfllife.ui.authentication
 
 import android.content.Context
-import android.credentials.GetCredentialException
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialCancellationException
