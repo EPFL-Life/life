@@ -1,4 +1,4 @@
-package com.android.sample.ui.eventDetails
+package ch.epfllife.ui.eventDetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
