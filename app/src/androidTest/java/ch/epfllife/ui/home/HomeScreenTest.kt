@@ -12,7 +12,7 @@ import org.junit.Test
 
 /**
  * This test class verifies the correct behavior and visual rendering of the HomeScreen composable.
- * It ensures that elements such as the logo, search bar, filter buttons, and event list behave as
+ * It ensures that elements such as the logo, search bar, filter buttons, and event list behave
  * expected.
  */
 class HomeScreenTest {
