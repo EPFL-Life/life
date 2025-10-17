@@ -49,7 +49,13 @@ object DisplayedEventsTestTags {
 }
 
 @Composable
-private fun FilterText(text: String, selected: Boolean, onClick: () -> Unit, underlineWidth: Int, modifier: Modifier) {
+private fun FilterText(
+    text: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    underlineWidth: Int,
+    modifier: Modifier
+) {
   Column(
       horizontalAlignment = Alignment.CenterHorizontally,
       modifier = modifier.clickable(onClick = onClick)) {
