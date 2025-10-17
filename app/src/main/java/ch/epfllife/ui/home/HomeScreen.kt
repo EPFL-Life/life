@@ -42,10 +42,6 @@ fun HomeScreen(
 
   val myEvents = remember { emptyList<Event>() } // No events to show empty state
 
-  // val myEvents = remember { listOf( Event( id = "1", title = "Via Ferrata", description =
-  // "Excursion to the Alps", location = Location(0.0, 0.0, "Lausanne Train Station"), time = "Oct
-  // 4th, 6:50am", associationId = "ESN Lausanne", tags = setOf("Sport", "Outdoor"), price = 30)) }
-
   val allEvents = remember {
     listOf(
         Event(
@@ -91,36 +87,38 @@ fun HomeScreen(
               Spacer(Modifier.height(12.dp))
               SearchBar()
 
-    Spacer(Modifier.height(12.dp))
+              Spacer(Modifier.height(12.dp))
 
-    DisplayedSubscriptionFilter(
-        selected = selected,
-        onSelected = { selected = it },
-        subscribedLabel = stringResource(id = R.string.subscribed_filter),
-        allLabel = stringResource(id = R.string.all_events_filter))
+              DisplayedSubscriptionFilter(
+                  selected = selected,
+                  onSelected = { selected = it },
+                  subscribedLabel = stringResource(id = R.string.subscribed_filter),
+                  allLabel = stringResource(id = R.string.all_events_filter))
 
               Spacer(Modifier.height(12.dp))
 
-    // If statement to display certain messages for empty screens
-    if (shownEvents.isEmpty()) {
-      if (selected == SubscriptionFilter.Subscribed) {
-        EmptyEventsMessage(
-            title = stringResource(id = R.string.home_empty_title),
-            description = stringResource(id = R.string.home_empty_description),
-            modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp))
-      } else {
-        EmptyEventsMessage(
-            title = stringResource(id = R.string.home_no_events_title),
-            description = stringResource(id = R.string.home_no_events_description),
-            modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp))
+              // If statement to display certain messages for empty screens
+              if (shownEvents.isEmpty()) {
+                if (selected == SubscriptionFilter.Subscribed) {
+                  EmptyEventsMessage(
+                      title = stringResource(id = R.string.home_empty_title),
+                      description = stringResource(id = R.string.home_empty_description),
+                      modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp))
+                } else {
+                  EmptyEventsMessage(
+                      title = stringResource(id = R.string.home_no_events_title),
+                      description = stringResource(id = R.string.home_no_events_description),
+                      modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp))
+                }
+              } else {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxSize()) {
+                      items(shownEvents, key = { it.id }) { ev -> EventCard(event = ev) }
+                    }
+              }
+            }
       }
-    } else {
-      LazyColumn(
-          verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxSize()) {
-            items(shownEvents, key = { it.id }) { ev -> EventCard(event = ev) }
-          }
-    }
-  }
 }
 
 @Composable
