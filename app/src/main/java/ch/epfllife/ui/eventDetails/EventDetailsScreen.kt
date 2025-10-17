@@ -33,6 +33,21 @@ import ch.epfllife.ui.theme.Theme
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 
+object EventDetailsTestTags {
+  const val LOADING_INDICATOR = "loadingIndicator"
+  const val ERROR_MESSAGE = "errorMessage"
+  const val EVENT_IMAGE = "eventImage"
+  const val BACK_BUTTON = "backButton"
+  const val EVENT_TITLE = "eventTitle"
+  const val EVENT_ASSOCIATION = "eventAssociation"
+  const val EVENT_PRICE = "eventPrice"
+  const val EVENT_TIME = "eventTime"
+  const val EVENT_LOCATION = "eventLocation"
+  const val EVENT_DESCRIPTION = "eventDescription"
+  const val VIEW_LOCATION_BUTTON = "viewLocationButton"
+  const val ENROLL_BUTTON = "enrollButton"
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventDetailsScreen(
@@ -60,7 +75,8 @@ fun EventDetailsScreen(
             Box(
                 modifier = Modifier.fillMaxSize().padding(paddingValues),
                 contentAlignment = Alignment.Center) {
-                  CircularProgressIndicator()
+                  CircularProgressIndicator(
+                      modifier = Modifier.testTag(EventDetailsTestTags.LOADING_INDICATOR))
                 }
           }
           is EventDetailsUIState.Error -> {
@@ -68,7 +84,10 @@ fun EventDetailsScreen(
             Box(
                 modifier = Modifier.fillMaxSize().padding(paddingValues),
                 contentAlignment = Alignment.Center) {
-                  Text(text = state.message, color = MaterialTheme.colorScheme.error)
+                  Text(
+                      text = state.message,
+                      color = MaterialTheme.colorScheme.error,
+                      modifier = Modifier.testTag(EventDetailsTestTags.ERROR_MESSAGE))
                 }
           }
           is EventDetailsUIState.Success -> {
@@ -106,7 +125,8 @@ fun EventDetailsContent(
           modifier =
               Modifier.fillMaxWidth()
                   .height(260.dp)
-                  .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)),
+                  .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
+                  .testTag(EventDetailsTestTags.EVENT_IMAGE),
           contentScale = ContentScale.Crop)
 
       // Back Arrow on top of the picture (as in Mockup)
@@ -116,7 +136,8 @@ fun EventDetailsContent(
               Modifier.padding(16.dp)
                   .align(Alignment.TopStart)
                   .size(40.dp)
-                  .background(Color.Black.copy(alpha = 0.4f), shape = CircleShape)) {
+                  .background(Color.Black.copy(alpha = 0.4f), shape = CircleShape)
+                  .testTag(EventDetailsTestTags.BACK_BUTTON)) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Back",
@@ -139,17 +160,20 @@ fun EventDetailsContent(
                       text = event.title,
                       style =
                           MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                      color = MaterialTheme.colorScheme.onSurface)
+                      color = MaterialTheme.colorScheme.onSurface,
+                      modifier = Modifier.testTag(EventDetailsTestTags.EVENT_TITLE))
                   Text(
                       text = event.associationId,
                       style = MaterialTheme.typography.bodyMedium,
-                      color = MaterialTheme.colorScheme.onSurfaceVariant)
+                      color = MaterialTheme.colorScheme.onSurfaceVariant,
+                      modifier = Modifier.testTag(EventDetailsTestTags.EVENT_ASSOCIATION))
                 }
                 Text(
                     text = event.price?.let { "CHF $it" } ?: "",
                     style =
                         MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium),
-                    color = MaterialTheme.colorScheme.onSurface)
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.testTag(EventDetailsTestTags.EVENT_PRICE))
               }
 
           // Row containing: Date, Time, Location
@@ -171,11 +195,17 @@ fun EventDetailsContent(
                   Column {
                     Text(
                         text = event.time,
-                        style =
-                            MaterialTheme.typography
-                                .bodyMedium) // TODO we need some proper time to time-text formating
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier =
+                            Modifier.testTag(
+                                EventDetailsTestTags
+                                    .EVENT_TIME)) // TODO we need some proper time to time-text
+                    // formating
                     // (implement in repository)
-                    Text(text = event.location.name, style = MaterialTheme.typography.bodySmall)
+                    Text(
+                        text = event.location.name,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.testTag(EventDetailsTestTags.EVENT_LOCATION))
                   }
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -196,7 +226,8 @@ fun EventDetailsContent(
             Text(
                 text = event.description,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface)
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.testTag(EventDetailsTestTags.EVENT_DESCRIPTION))
           }
 
           // View Location
@@ -206,7 +237,8 @@ fun EventDetailsContent(
                       .clip(RoundedCornerShape(8.dp))
                       .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
                       .clickable {} // TODO implement navigation to map with params from Event
-                      .padding(horizontal = 16.dp, vertical = 12.dp),
+                      .padding(horizontal = 16.dp, vertical = 12.dp)
+                      .testTag(EventDetailsTestTags.VIEW_LOCATION_BUTTON),
               horizontalArrangement = Arrangement.SpaceBetween,
               verticalAlignment = Alignment.CenterVertically) {
                 Text(
@@ -225,7 +257,10 @@ fun EventDetailsContent(
           // isEnrolled fun in viewModel
           Button(
               onClick = { viewModel.enrollInEvent(event) },
-              modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+              modifier =
+                  Modifier.fillMaxWidth()
+                      .padding(top = 8.dp)
+                      .testTag(EventDetailsTestTags.ENROLL_BUTTON),
               shape = RoundedCornerShape(6.dp),
               colors =
                   ButtonDefaults.buttonColors(
