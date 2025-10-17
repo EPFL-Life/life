@@ -14,7 +14,7 @@ class EventRepositoryLocal : EventRepository {
     TODO("Not yet implemented")
   }
 
-  override suspend fun addEvent(event: Event) {
+  override suspend fun createEvent(event: Event) {
     TODO("Not yet implemented")
   }
 

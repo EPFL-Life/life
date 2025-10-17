@@ -10,6 +10,11 @@ enum class EventCategory {
   OTHER
 }
 
+enum class EventsStatus {
+  Subscribed,
+  All
+}
+
 /**
  * Converts the [EventCategory] enum value to a more readable display string.
  *
