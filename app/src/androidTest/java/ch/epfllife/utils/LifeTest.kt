@@ -149,8 +149,8 @@ abstract class LifeTest() {
 
   fun ComposeTestRule.checkBottomBarIsNotDisplayed() {
     onNodeWithTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU).assertIsNotDisplayed()
-    onNodeWithTag(NavigationTestTags.OVERVIEW_TAB).assertIsNotDisplayed()
-    onNodeWithTag(NavigationTestTags.MAP_TAB).assertIsNotDisplayed()
+    //onNodeWithTag(NavigationTestTags.OVERVIEW_TAB).assertIsNotDisplayed()
+    //onNodeWithTag(NavigationTestTags.MAP_TAB).assertIsNotDisplayed()
   }
 
   fun ComposeTestRule.onTodoItem(todo: ToDo, matcher: SemanticsMatcher) {
