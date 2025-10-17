@@ -16,7 +16,6 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import ch.epfllife.model.authentication.AuthRepository
 import ch.epfllife.ui.associationsbrowser.AssociationBrowser
-import ch.epfllife.ui.authentication.SignInScreen
 import ch.epfllife.ui.home.HomeScreen
 import ch.epfllife.ui.myevents.MyEvents
 import ch.epfllife.ui.navigation.NavigationActions
@@ -71,16 +70,6 @@ fun App(
   val startDestination = Screen.HomeScreen.route
 
   NavHost(navController = navController, startDestination = startDestination) {
-    navigation(
-        startDestination = Screen.Auth.route,
-        route = Screen.Auth.name,
-    ) {
-      composable(Screen.Auth.route) {
-        SignInScreen(
-            credentialManager = credentialManager,
-            onSignedIn = { navigationActions.navigateTo(Screen.HomeScreen) })
-      }
-    }
 
     navigation(
         startDestination = Screen.HomeScreen.route,
