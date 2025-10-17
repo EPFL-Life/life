@@ -13,6 +13,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
   }
 
   override suspend fun updateUser(userId: String, newUser: User) {
+    // add a check if the userId is the same as newUser.Id
     TODO("Not yet implemented")
   }
 

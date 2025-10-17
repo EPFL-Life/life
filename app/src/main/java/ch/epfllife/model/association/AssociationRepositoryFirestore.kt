@@ -18,6 +18,7 @@ class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : Associ
   }
 
   override suspend fun updateAssociation(associationId: String, newAssociation: Association) {
+    // add a check if the associationID is same as newAssociation.Id
     TODO("Not yet implemented")
   }
 
