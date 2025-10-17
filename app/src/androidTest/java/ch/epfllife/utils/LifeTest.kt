@@ -2,7 +2,6 @@ package ch.epfllife.utils
 
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
@@ -12,7 +11,6 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.ComposeTestRule
-import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.rules.ActivityScenarioRule
@@ -23,7 +21,6 @@ import ch.epfllife.model.todo.ToDoStatus
 import ch.epfllife.model.todo.ToDosRepository
 import ch.epfllife.model.todo.ToDosRepositoryProvider
 import ch.epfllife.ui.navigation.NavigationTestTags
-import ch.epfllife.ui.overview.OverviewScreenTestTags
 import ch.epfllife.utils.FakeHttpClient.FakeLocation
 import ch.epfllife.utils.FakeHttpClient.locationSuggestions
 import com.google.firebase.Timestamp
@@ -115,44 +112,8 @@ abstract class LifeTest() {
     }
   }
 
-  private fun ComposeTestRule.waitUntilTodoIsDisplayed(todo: ToDo): SemanticsNodeInteraction {
-    checkOverviewScreenIsDisplayed()
-    waitUntil(UI_WAIT_TIMEOUT) {
-      onAllNodesWithTag(OverviewScreenTestTags.getTestTagForTodoItem(todo))
-          .fetchSemanticsNodes()
-          .isNotEmpty()
-    }
-    return checkTodoItemIsDisplayed(todo)
-  }
-
-  fun ComposeTestRule.clickOnTodoItem(todo: ToDo) {
-    waitUntilTodoIsDisplayed(todo).performClick()
-  }
-
-  fun ComposeTestRule.checkTodoItemIsDisplayed(todo: ToDo): SemanticsNodeInteraction =
-      onNodeWithTag(OverviewScreenTestTags.getTestTagForTodoItem(todo)).assertIsDisplayed()
-
   fun ComposeTestRule.navigateBack() {
     onNodeWithTag(NavigationTestTags.GO_BACK_BUTTON).assertIsDisplayed().performClick()
-  }
-
-  fun ComposeTestRule.checkOverviewScreenIsNotDisplayed() {
-    onNodeWithTag(OverviewScreenTestTags.TODO_LIST).assertDoesNotExist()
-  }
-
-  fun ComposeTestRule.checkOverviewScreenIsDisplayed() {
-    onNodeWithTag(NavigationTestTags.TOP_BAR_TITLE)
-        .assertIsDisplayed()
-        .assertTextContains("overview", substring = true, ignoreCase = true)
-  }
-
-  fun ComposeTestRule.onTodoItem(todo: ToDo, matcher: SemanticsMatcher) {
-    onNode(
-            hasTestTag(OverviewScreenTestTags.getTestTagForTodoItem(todo))
-                .and(hasAnyDescendant(matcher)),
-            useUnmergedTree = true,
-        )
-        .assertIsDisplayed()
   }
 
   fun ComposeTestRule.checkMapScreenIsDisplayed() {
