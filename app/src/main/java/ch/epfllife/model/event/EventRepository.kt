@@ -26,7 +26,7 @@ interface EventRepository {
    *
    * @param event The Event item to add.
    */
-  suspend fun addEvent(event: Event)
+  suspend fun createEvent(event: Event)
 
   /**
    * Edits an existing Event item in the repository.
