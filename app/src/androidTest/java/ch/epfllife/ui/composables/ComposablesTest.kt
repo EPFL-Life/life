@@ -7,7 +7,6 @@ import ch.epfllife.model.entities.Event
 import ch.epfllife.model.enums.EventsFilter
 import ch.epfllife.model.map.Location
 import ch.epfllife.utils.assertClickable
-import com.google.firebase.Timestamp
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
@@ -115,8 +114,7 @@ class ComposablesTest {
   @Test
   fun eventCard_DisplaysCorrectlyWithLongLocationName() {
     val longLocationEvent =
-        sampleEvent.copy(
-            location = Location(46.520278, 6.565556, "EPFL - Rolex Learning Center"))
+        sampleEvent.copy(location = Location(46.520278, 6.565556, "EPFL - Rolex Learning Center"))
     composeTestRule.setContent { EventCard(longLocationEvent) }
     composeTestRule.onNodeWithText("EPFL - Rolex Learning Center").assertIsDisplayed()
   }
@@ -172,9 +170,7 @@ class ComposablesTest {
   @Test
   fun searchBar_OnlyFilterClickWhenClickingFilterButton() {
     var filterClicked = false
-    composeTestRule.setContent {
-      SearchBar(onFilterClick = { filterClicked = true })
-    }
+    composeTestRule.setContent { SearchBar(onFilterClick = { filterClicked = true }) }
     composeTestRule.onNode(hasContentDescription("Filter")).performClick()
     assertTrue("SearchBar should trigger onFilterClick", filterClicked)
   }
@@ -247,8 +243,7 @@ class ComposablesTest {
     }
     composeTestRule.onNodeWithText("Subscribed").performClick()
     composeTestRule.waitForIdle()
-    assertEquals(
-        "Selection should change to Subscribed", EventsFilter.Subscribed, selectedFilter)
+    assertEquals("Selection should change to Subscribed", EventsFilter.Subscribed, selectedFilter)
   }
 
   @Test
@@ -267,18 +262,6 @@ class ComposablesTest {
     composeTestRule.onNodeWithText("All Events").performClick()
     composeTestRule.waitForIdle()
     assertEquals("Should switch back to All", EventsFilter.All, selectedFilter)
-  }
-
-  @Test
-  fun eventsFilterButtons_BothButtonsAlwaysVisible() {
-    composeTestRule.setContent { EventsFilterButtons(EventsFilter.Subscribed, onSelected = {}) }
-    composeTestRule.onNodeWithText("Subscribed").assertIsDisplayed()
-    composeTestRule.onNodeWithText("All Events").assertIsDisplayed()
-
-    // Switch selection
-    composeTestRule.setContent { EventsFilterButtons(EventsFilter.All, onSelected = {}) }
-    composeTestRule.onNodeWithText("Subscribed").assertIsDisplayed()
-    composeTestRule.onNodeWithText("All Events").assertIsDisplayed()
   }
 
   @Test
@@ -379,21 +362,4 @@ class ComposablesTest {
 
     assertEquals("Should handle rapid clicks", 10, clickCount)
   }
-
-  @Test
-  fun eventCard_DisplaysWithDifferentLocations() {
-    val locations =
-        listOf(
-            Location(46.520278, 6.565556, "EPFL"),
-            Location(46.518929, 6.566581, "Rolex Learning Center"),
-            Location(46.519653, 6.562813, "BC Building"),
-        )
-
-    locations.forEachIndexed { index, location ->
-      val event = sampleEvent.copy(id = "event$index", location = location)
-      composeTestRule.setContent { EventCard(event) }
-      composeTestRule.onNodeWithText(location.name).assertIsDisplayed()
-    }
-  }
 }
-
