@@ -19,6 +19,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ch.epfllife.model.entities.Event
 
+object EventCardTestTags {
+  const val EVENT_CARD = "eventCard"
+}
+
 @Composable
 fun EventCard(event: Event, modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
 
