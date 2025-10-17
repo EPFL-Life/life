@@ -11,27 +11,33 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import ch.epfllife.model.enums.EventsFilter
+import ch.epfllife.model.enums.SubscriptionFilter
 
 @Composable
-fun EventsFilterButtons(
-    selected: EventsFilter,
-    onSelected: (EventsFilter) -> Unit,
-    modifier: Modifier = Modifier
+fun DisplayedSubscriptionFilter(
+    selected: SubscriptionFilter,
+    onSelected: (SubscriptionFilter) -> Unit,
+    subscribedLabel: String,
+    allLabel: String,
+    modifier: Modifier = Modifier,
+    underlineWidth: Int = 80
 ) {
   Row(
       modifier = modifier.fillMaxWidth(),
       horizontalArrangement = Arrangement.SpaceEvenly,
       verticalAlignment = Alignment.CenterVertically) {
         FilterText(
-            text = "Subscribed",
-            selected = selected == EventsFilter.Subscribed,
-            onClick = { onSelected(EventsFilter.Subscribed) },
+            text = subscribedLabel,
+            selected = selected == SubscriptionFilter.Subscribed,
+            onClick = { onSelected(SubscriptionFilter.Subscribed) },
+            underlineWidth = underlineWidth,
             modifier = Modifier.testTag(DisplayedEventsTestTags.BUTTON_SUBSCRIBED))
+
         FilterText(
-            text = "All Events",
-            selected = selected == EventsFilter.All,
-            onClick = { onSelected(EventsFilter.All) },
+            text = allLabel,
+            selected = selected == SubscriptionFilter.All,
+            onClick = { onSelected(SubscriptionFilter.All) },
+            underlineWidth = underlineWidth,
             modifier = Modifier.testTag(DisplayedEventsTestTags.BUTTON_ALL))
       }
 }
@@ -43,7 +49,13 @@ object DisplayedEventsTestTags {
 }
 
 @Composable
-private fun FilterText(text: String, selected: Boolean, onClick: () -> Unit, modifier: Modifier) {
+private fun FilterText(
+    text: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    underlineWidth: Int,
+    modifier: Modifier
+) {
   Column(
       horizontalAlignment = Alignment.CenterHorizontally,
       modifier = modifier.clickable(onClick = onClick)) {
@@ -58,7 +70,7 @@ private fun FilterText(text: String, selected: Boolean, onClick: () -> Unit, mod
         if (selected) {
           Spacer(Modifier.height(2.dp))
           HorizontalDivider(
-              modifier = Modifier.width(80.dp),
+              modifier = Modifier.width(underlineWidth.dp),
               thickness = 2.dp,
               color = MaterialTheme.colorScheme.onSurface)
         }

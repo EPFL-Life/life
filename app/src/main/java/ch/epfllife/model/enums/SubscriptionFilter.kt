@@ -1,6 +1,6 @@
 package ch.epfllife.model.enums
 
-enum class EventsFilter {
+enum class SubscriptionFilter {
   Subscribed,
   All
 }
