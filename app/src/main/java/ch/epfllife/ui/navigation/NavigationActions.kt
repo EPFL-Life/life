@@ -9,9 +9,16 @@ sealed class Screen(
 ) {
   object Auth : Screen(route = "auth", name = "Authentication")
 
-  object Overview : Screen(route = "overview", name = "Overview", isTopLevelDestination = true)
+  object HomeScreen :
+      Screen(route = "homescreen", name = "HomeScreen", isTopLevelDestination = true)
 
-  object Map : Screen(route = "map", name = "Map", isTopLevelDestination = true)
+  object AssociationBrowser :
+      Screen(
+          route = "associationbrowser", name = "AssociationBrowser", isTopLevelDestination = true)
+
+  object MyEvents : Screen(route = "myevents", name = "MyEvents", isTopLevelDestination = true)
+
+  object Settings : Screen(route = "settings", name = "Settings", isTopLevelDestination = true)
 }
 
 open class NavigationActions(

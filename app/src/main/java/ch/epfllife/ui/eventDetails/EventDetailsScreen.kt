@@ -1,4 +1,4 @@
-package com.android.sample.ui.eventDetails
+package ch.epfllife.ui.eventDetails
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,8 +10,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,15 +18,35 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.map.Location
+import ch.epfllife.ui.navigation.BottomNavigationMenu
+import ch.epfllife.ui.navigation.NavigationActions
+import ch.epfllife.ui.navigation.NavigationTestTags
+import ch.epfllife.ui.navigation.Tab
 import ch.epfllife.ui.theme.Theme
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+
+object EventDetailsTestTags {
+  const val LOADING_INDICATOR = "loadingIndicator"
+  const val ERROR_MESSAGE = "errorMessage"
+  const val EVENT_IMAGE = "eventImage"
+  const val BACK_BUTTON = "backButton"
+  const val EVENT_TITLE = "eventTitle"
+  const val EVENT_ASSOCIATION = "eventAssociation"
+  const val EVENT_PRICE = "eventPrice"
+  const val EVENT_TIME = "eventTime"
+  const val EVENT_LOCATION = "eventLocation"
+  const val EVENT_DESCRIPTION = "eventDescription"
+  const val VIEW_LOCATION_BUTTON = "viewLocationButton"
+  const val ENROLL_BUTTON = "enrollButton"
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,6 +54,7 @@ fun EventDetailsScreen(
     eventId: String,
     viewModel: EventDetailsViewModel = viewModel(),
     onGoBack: () -> Unit = {},
+    navigationActions: NavigationActions? = null,
 ) {
   val uiState by viewModel.uiState.collectAsState()
   LaunchedEffect(eventId) {
@@ -45,25 +64,10 @@ fun EventDetailsScreen(
   Scaffold(
       // use this hardcoded bottom bar for now
       bottomBar = {
-        NavigationBar {
-          NavigationBarItem(
-              selected = false,
-              onClick = { /* Navigate Home*/},
-              label = { Text("Home") },
-              icon = { Icon(Icons.Default.Home, contentDescription = "Home") })
-          NavigationBarItem(
-              selected = true,
-              onClick = { /* Nothing */},
-              label = { Text("Clubs") },
-              icon = { Icon(Icons.Default.People, contentDescription = "Clubs") })
-          NavigationBarItem(
-              selected = false,
-              onClick = { /* Navigate to Calender */},
-              label = { Text("Calendar") },
-              icon = { Icon(Icons.Default.CalendarToday, contentDescription = "Calendar") })
-          // NavigationBarItem(selected = false, onClick = {}, label = { Text("Settings") }, icon
-          // = {})
-        }
+        BottomNavigationMenu(
+            selectedTab = Tab.Settings,
+            onTabSelected = { tab -> navigationActions?.navigateTo(tab.destination) },
+            modifier = Modifier.testTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU))
       }) { paddingValues ->
         when (val state = uiState) {
           is EventDetailsUIState.Loading -> {
@@ -71,7 +75,8 @@ fun EventDetailsScreen(
             Box(
                 modifier = Modifier.fillMaxSize().padding(paddingValues),
                 contentAlignment = Alignment.Center) {
-                  CircularProgressIndicator()
+                  CircularProgressIndicator(
+                      modifier = Modifier.testTag(EventDetailsTestTags.LOADING_INDICATOR))
                 }
           }
           is EventDetailsUIState.Error -> {
@@ -79,7 +84,10 @@ fun EventDetailsScreen(
             Box(
                 modifier = Modifier.fillMaxSize().padding(paddingValues),
                 contentAlignment = Alignment.Center) {
-                  Text(text = state.message, color = MaterialTheme.colorScheme.error)
+                  Text(
+                      text = state.message,
+                      color = MaterialTheme.colorScheme.error,
+                      modifier = Modifier.testTag(EventDetailsTestTags.ERROR_MESSAGE))
                 }
           }
           is EventDetailsUIState.Success -> {
@@ -117,7 +125,8 @@ fun EventDetailsContent(
           modifier =
               Modifier.fillMaxWidth()
                   .height(260.dp)
-                  .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)),
+                  .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
+                  .testTag(EventDetailsTestTags.EVENT_IMAGE),
           contentScale = ContentScale.Crop)
 
       // Back Arrow on top of the picture (as in Mockup)
@@ -127,7 +136,8 @@ fun EventDetailsContent(
               Modifier.padding(16.dp)
                   .align(Alignment.TopStart)
                   .size(40.dp)
-                  .background(Color.Black.copy(alpha = 0.4f), shape = CircleShape)) {
+                  .background(Color.Black.copy(alpha = 0.4f), shape = CircleShape)
+                  .testTag(EventDetailsTestTags.BACK_BUTTON)) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Back",
@@ -150,17 +160,20 @@ fun EventDetailsContent(
                       text = event.title,
                       style =
                           MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                      color = MaterialTheme.colorScheme.onSurface)
+                      color = MaterialTheme.colorScheme.onSurface,
+                      modifier = Modifier.testTag(EventDetailsTestTags.EVENT_TITLE))
                   Text(
                       text = event.associationId,
                       style = MaterialTheme.typography.bodyMedium,
-                      color = MaterialTheme.colorScheme.onSurfaceVariant)
+                      color = MaterialTheme.colorScheme.onSurfaceVariant,
+                      modifier = Modifier.testTag(EventDetailsTestTags.EVENT_ASSOCIATION))
                 }
                 Text(
                     text = event.price?.let { "CHF $it" } ?: "",
                     style =
                         MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium),
-                    color = MaterialTheme.colorScheme.onSurface)
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.testTag(EventDetailsTestTags.EVENT_PRICE))
               }
 
           // Row containing: Date, Time, Location
@@ -182,11 +195,17 @@ fun EventDetailsContent(
                   Column {
                     Text(
                         text = event.time,
-                        style =
-                            MaterialTheme.typography
-                                .bodyMedium) // TODO we need some proper time to time-text formating
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier =
+                            Modifier.testTag(
+                                EventDetailsTestTags
+                                    .EVENT_TIME)) // TODO we need some proper time to time-text
+                    // formating
                     // (implement in repository)
-                    Text(text = event.location.name, style = MaterialTheme.typography.bodySmall)
+                    Text(
+                        text = event.location.name,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.testTag(EventDetailsTestTags.EVENT_LOCATION))
                   }
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -207,7 +226,8 @@ fun EventDetailsContent(
             Text(
                 text = event.description,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface)
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.testTag(EventDetailsTestTags.EVENT_DESCRIPTION))
           }
 
           // View Location
@@ -217,7 +237,8 @@ fun EventDetailsContent(
                       .clip(RoundedCornerShape(8.dp))
                       .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
                       .clickable {} // TODO implement navigation to map with params from Event
-                      .padding(horizontal = 16.dp, vertical = 12.dp),
+                      .padding(horizontal = 16.dp, vertical = 12.dp)
+                      .testTag(EventDetailsTestTags.VIEW_LOCATION_BUTTON),
               horizontalArrangement = Arrangement.SpaceBetween,
               verticalAlignment = Alignment.CenterVertically) {
                 Text(
@@ -236,7 +257,10 @@ fun EventDetailsContent(
           // isEnrolled fun in viewModel
           Button(
               onClick = { viewModel.enrollInEvent(event) },
-              modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+              modifier =
+                  Modifier.fillMaxWidth()
+                      .padding(top = 8.dp)
+                      .testTag(EventDetailsTestTags.ENROLL_BUTTON),
               shape = RoundedCornerShape(6.dp),
               colors =
                   ButtonDefaults.buttonColors(

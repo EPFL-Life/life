@@ -43,13 +43,15 @@ fun MapScreen(
   Scaffold(
       bottomBar = {
         BottomNavigationMenu(
-            selectedTab = Tab.Overview,
+            selectedTab = Tab.HomeScreen, // modified to prevent build error
             onTabSelected = { tab -> navigationActions?.navigateTo(tab.destination) },
             modifier = Modifier.testTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU))
       },
       topBar = {
-        TopAppBar(
-            title = { Text(Screen.Map.name, Modifier.testTag(NavigationTestTags.TOP_BAR_TITLE)) },
+        TopAppBar( // modified to prevent build error
+            title = {
+              Text(Screen.HomeScreen.name, Modifier.testTag(NavigationTestTags.TOP_BAR_TITLE))
+            },
         )
       },
       content = { pd ->

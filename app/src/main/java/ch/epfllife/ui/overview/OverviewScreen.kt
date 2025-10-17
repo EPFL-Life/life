@@ -40,10 +40,8 @@ import androidx.credentials.CredentialManager
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.model.todo.ToDo
 import ch.epfllife.model.todo.ToDoStatus
-import ch.epfllife.ui.navigation.BottomNavigationMenu
 import ch.epfllife.ui.navigation.NavigationActions
 import ch.epfllife.ui.navigation.NavigationTestTags
-import ch.epfllife.ui.navigation.Tab
 import java.util.Locale
 
 object OverviewScreenTestTags {
@@ -112,12 +110,13 @@ fun OverviewScreen(
               Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
             }
       },
+      /*
       bottomBar = {
         BottomNavigationMenu(
             selectedTab = Tab.Overview,
             onTabSelected = { tab -> navigationActions?.navigateTo(tab.destination) },
             modifier = Modifier.testTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU))
-      },
+      },*/
       content = { pd ->
         if (todos.isNotEmpty()) {
           LazyColumn(
