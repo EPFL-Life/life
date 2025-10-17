@@ -3,18 +3,18 @@ package ch.epfllife.ui.navigation
 //noinspection UsingMaterialAndMaterial3Libraries
 //noinspection UsingMaterialAndMaterial3Libraries
 
-import android.graphics.drawable.Icon
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Menu
-import androidx.compose.material.icons.outlined.Place
+import androidx.compose.material.icons.outlined.CalendarToday
+import androidx.compose.material.icons.outlined.Groups
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,16 +23,17 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 
 sealed class Tab(val name: String, val icon: ImageVector, val destination: Screen) {
-  object Overview : Tab("Overview", Icons.Outlined.Menu, Screen.Overview)
+  object HomeScreen : Tab("HomeScreen", Icons.Outlined.Home, Screen.HomeScreen)
 
-  object Map : Tab("Map", Icons.Outlined.Place, Screen.Map)
+  object AssociationBrowser :
+      Tab("AssociationBrowser", Icons.Outlined.Groups, Screen.AssociationBrowser)
+
+  object MyEvents : Tab("MyEvents", Icons.Outlined.CalendarToday, Screen.MyEvents)
+
+  object Settings : Tab("Settings", Icons.Outlined.Settings, Screen.Settings)
 }
 
-private val tabs =
-    listOf(
-        Tab.Overview,
-        Tab.Map,
-    )
+private val tabs = listOf(Tab.HomeScreen, Tab.AssociationBrowser, Tab.MyEvents, Tab.Settings)
 
 @Composable
 fun BottomNavigationMenu(
@@ -48,7 +49,7 @@ fun BottomNavigationMenu(
         tabs.forEach { tab ->
           BottomNavigationItem(
               icon = { Icon(tab.icon, contentDescription = null) },
-              label = { Text(tab.name) },
+              // label = { Text(tab.name) },
               selected = tab == selectedTab,
               onClick = { onTabSelected(tab) },
               modifier =

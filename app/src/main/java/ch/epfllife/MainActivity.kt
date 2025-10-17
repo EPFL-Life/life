@@ -15,11 +15,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import ch.epfllife.model.authentication.AuthRepository
+import ch.epfllife.ui.associationsbrowser.AssociationBrowser
 import ch.epfllife.ui.authentication.SignInScreen
-import ch.epfllife.ui.map.MapScreen
+import ch.epfllife.ui.home.HomeScreen
+import ch.epfllife.ui.myevents.MyEvents
 import ch.epfllife.ui.navigation.NavigationActions
 import ch.epfllife.ui.navigation.Screen
-import ch.epfllife.ui.overview.OverviewScreen
+import ch.epfllife.ui.settings.Settings
 import ch.epfllife.ui.theme.Theme
 import com.google.firebase.auth.FirebaseAuth
 import okhttp3.OkHttpClient
@@ -66,9 +68,7 @@ fun App(
 ) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
-  val startDestination =
-      if (FirebaseAuth.getInstance().currentUser == null) Screen.Auth.name
-      else Screen.Overview.route
+  val startDestination = Screen.HomeScreen.route
 
   NavHost(navController = navController, startDestination = startDestination) {
     navigation(
@@ -78,27 +78,38 @@ fun App(
       composable(Screen.Auth.route) {
         SignInScreen(
             credentialManager = credentialManager,
-            onSignedIn = { navigationActions.navigateTo(Screen.Overview) })
+            onSignedIn = { navigationActions.navigateTo(Screen.HomeScreen) })
       }
     }
 
     navigation(
-        startDestination = Screen.Overview.route,
-        route = Screen.Overview.name,
+        startDestination = Screen.HomeScreen.route,
+        route = Screen.HomeScreen.name,
     ) {
-      composable(Screen.Overview.route) {
-        OverviewScreen(
-            onSignedOut = { navigationActions.navigateTo(Screen.Auth) },
-            navigationActions = navigationActions,
-            credentialManager = credentialManager)
+      composable(Screen.HomeScreen.route) { HomeScreen(navigationActions = navigationActions) }
+    }
+
+    navigation(
+        startDestination = Screen.AssociationBrowser.route,
+        route = Screen.AssociationBrowser.name,
+    ) {
+      composable(Screen.AssociationBrowser.route) {
+        AssociationBrowser(navigationActions = navigationActions)
       }
     }
 
     navigation(
-        startDestination = Screen.Map.route,
-        route = Screen.Map.name,
+        startDestination = Screen.MyEvents.route,
+        route = Screen.MyEvents.name,
     ) {
-      composable(Screen.Map.route) { MapScreen(navigationActions = navigationActions) }
+      composable(Screen.MyEvents.route) { MyEvents(navigationActions = navigationActions) }
+    }
+
+    navigation(
+        startDestination = Screen.Settings.route,
+        route = Screen.Settings.name,
+    ) {
+      composable(Screen.Settings.route) { Settings(navigationActions = navigationActions) }
     }
   }
 }
