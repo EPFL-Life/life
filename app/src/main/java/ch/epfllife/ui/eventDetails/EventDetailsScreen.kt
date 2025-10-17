@@ -249,7 +249,7 @@ fun EventDetailsPreview() {
               "The Drone Workshop is a multi-evening workshop organized by AéroPoly, where you can build your own 3-inch FPV drone...",
           location = Location(46.5191, 6.5668, "Centre Sport et Santé"),
           time = "2025-10-12 18:00",
-              associationId = "AeroPoly",
+          associationId = "AeroPoly",
           tags = setOf("workshop"),
           price = 10u,
           imageUrl =
