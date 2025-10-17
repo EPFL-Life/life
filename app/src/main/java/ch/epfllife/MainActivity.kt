@@ -14,7 +14,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import ch.epfllife.model.authentication.AuthRepository
 import ch.epfllife.ui.associationsbrowser.AssociationBrowser
 import ch.epfllife.ui.home.HomeScreen
 import ch.epfllife.ui.myevents.MyEvents
@@ -22,7 +21,6 @@ import ch.epfllife.ui.navigation.NavigationActions
 import ch.epfllife.ui.navigation.Screen
 import ch.epfllife.ui.settings.Settings
 import ch.epfllife.ui.theme.Theme
-import com.google.firebase.auth.FirebaseAuth
 import okhttp3.OkHttpClient
 
 /**
@@ -37,9 +35,6 @@ object HttpClientProvider {
 }
 
 class MainActivity : ComponentActivity() {
-
-  private lateinit var auth: FirebaseAuth
-  private lateinit var authRepository: AuthRepository
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -70,7 +65,6 @@ fun App(
   val startDestination = Screen.HomeScreen.route
 
   NavHost(navController = navController, startDestination = startDestination) {
-
     navigation(
         startDestination = Screen.HomeScreen.route,
         route = Screen.HomeScreen.name,
