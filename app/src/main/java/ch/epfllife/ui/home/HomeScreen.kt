@@ -106,14 +106,6 @@ fun HomeScreen(
               }
             }
       }
-  if (shownEvents.isEmpty() && selected == EventsStatus.Subscribed) {
-    EmptyEventsMessage(modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp))
-  } else {
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxSize()) {
-          items(shownEvents, key = { it.id }) { ev -> EventCard(event = ev) }
-        }
-  }
 }
 
 @Composable
