@@ -1,4 +1,4 @@
-package com.android.sample.ui.eventDetails
+package ch.epfllife.ui.eventDetails
 
 import androidx.compose.ui.test.assertIsDisplayed
 // import androidx.compose.ui.test.assertExists
