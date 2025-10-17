@@ -68,9 +68,7 @@ fun App(
 ) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
-  val startDestination =
-      if (FirebaseAuth.getInstance().currentUser == null) Screen.Auth.name
-      else Screen.HomeScreen.route
+  val startDestination = Screen.HomeScreen.route
 
   NavHost(navController = navController, startDestination = startDestination) {
     navigation(
