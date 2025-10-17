@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasTestTag
@@ -145,12 +144,6 @@ abstract class LifeTest() {
     onNodeWithTag(NavigationTestTags.TOP_BAR_TITLE)
         .assertIsDisplayed()
         .assertTextContains("overview", substring = true, ignoreCase = true)
-  }
-
-  fun ComposeTestRule.checkBottomBarIsNotDisplayed() {
-    onNodeWithTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU).assertIsNotDisplayed()
-    onNodeWithTag(NavigationTestTags.OVERVIEW_TAB).assertIsNotDisplayed()
-    onNodeWithTag(NavigationTestTags.MAP_TAB).assertIsNotDisplayed()
   }
 
   fun ComposeTestRule.onTodoItem(todo: ToDo, matcher: SemanticsMatcher) {
