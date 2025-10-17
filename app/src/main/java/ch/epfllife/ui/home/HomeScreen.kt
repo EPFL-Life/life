@@ -32,6 +32,13 @@ import ch.epfllife.ui.navigation.NavigationActions
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.navigation.Tab
 
+object HomeScreenTestTags {
+  const val EPFLLOGO = "EPFL_LOGO"
+  const val NOTHING_TEXT = "NOTHING_TEXT"
+  const val SEARCH_BAR = "SEARCH_BAR"
+  const val EVENT_LIST = "EVENT_LIST"
+}
+
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
@@ -88,7 +95,7 @@ fun HomeScreen(
               }
 
               Spacer(Modifier.height(12.dp))
-              SearchBar()
+              SearchBar(modifier = Modifier.testTag(HomeScreenTestTags.SEARCH_BAR))
 
               Spacer(Modifier.height(12.dp))
               EventsFilterButtons(selected = selected, onSelected = { selected = it })
@@ -100,7 +107,7 @@ fun HomeScreen(
               } else {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.fillMaxSize()) {
+                    modifier = Modifier.fillMaxSize().testTag(HomeScreenTestTags.EVENT_LIST)) {
                       items(shownEvents, key = { it.id }) { ev -> EventCard(event = ev) }
                     }
               }
@@ -111,7 +118,7 @@ fun HomeScreen(
 @Composable
 private fun EmptyEventsMessage(modifier: Modifier = Modifier) {
   Column(
-      modifier = modifier,
+      modifier = modifier.testTag(HomeScreenTestTags.NOTHING_TEXT),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center) {
         Text(
@@ -128,12 +135,6 @@ private fun EmptyEventsMessage(modifier: Modifier = Modifier) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center)
       }
-}
-
-object HomeScreenTestTags {
-  const val EPFLLOGO = "EPFL_LOGO"
-  const val BOTTON_SUBSCRIBED = "BUTTON_SUBSCRIBED"
-  const val BUTTON_ALL = "BUTTON_ALL"
 }
 
 @Preview(showBackground = true)

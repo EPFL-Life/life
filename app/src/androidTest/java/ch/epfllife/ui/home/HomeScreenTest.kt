@@ -26,6 +26,16 @@ class HomeScreenTest {
   }
 
   @Test
+  fun testEmptyStateDisplayed() {
+    composeTestRule.onNodeWithTag(HomeScreenTestTags.NOTHING_TEXT).assertIsDisplayed()
+  }
+
+  @Test
+  fun testSearchBarDisplayed() {
+    composeTestRule.onNodeWithTag(HomeScreenTestTags.SEARCH_BAR).assertIsDisplayed()
+  }
+
+  @Test
   fun testUiElementsDisplayed() {
     arrayOf(
             HomeScreenTestTags.EPFLLOGO,
