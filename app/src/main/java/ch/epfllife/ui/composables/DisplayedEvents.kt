@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ch.epfllife.model.enums.EventsFilter
@@ -25,19 +26,27 @@ fun EventsFilterButtons(
         FilterText(
             text = "Subscribed",
             selected = selected == EventsFilter.Subscribed,
-            onClick = { onSelected(EventsFilter.Subscribed) })
+            onClick = { onSelected(EventsFilter.Subscribed) },
+            modifier = Modifier.testTag(DisplayedEventsTestTags.BUTTON_SUBSCRIBED))
         FilterText(
             text = "All Events",
             selected = selected == EventsFilter.All,
-            onClick = { onSelected(EventsFilter.All) })
+            onClick = { onSelected(EventsFilter.All) },
+            modifier = Modifier.testTag(DisplayedEventsTestTags.BUTTON_ALL))
       }
 }
 
+object DisplayedEventsTestTags {
+
+  const val BUTTON_SUBSCRIBED = "BUTTON_SUBSCRIBED"
+  const val BUTTON_ALL = "BUTTON_ALL"
+}
+
 @Composable
-private fun FilterText(text: String, selected: Boolean, onClick: () -> Unit) {
+private fun FilterText(text: String, selected: Boolean, onClick: () -> Unit, modifier: Modifier) {
   Column(
       horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = Modifier.clickable(onClick = onClick)) {
+      modifier = modifier.clickable(onClick = onClick)) {
         Text(
             text = text,
             style =
