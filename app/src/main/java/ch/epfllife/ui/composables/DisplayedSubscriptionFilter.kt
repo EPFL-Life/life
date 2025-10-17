@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ch.epfllife.model.enums.SubscriptionFilter
@@ -29,21 +30,29 @@ fun DisplayedSubscriptionFilter(
             text = subscribedLabel,
             selected = selected == SubscriptionFilter.Subscribed,
             onClick = { onSelected(SubscriptionFilter.Subscribed) },
-            underlineWidth = underlineWidth)
+            underlineWidth = underlineWidth,
+            modifier = Modifier.testTag(DisplayedEventsTestTags.BUTTON_SUBSCRIBED))
 
         FilterText(
             text = allLabel,
             selected = selected == SubscriptionFilter.All,
             onClick = { onSelected(SubscriptionFilter.All) },
-            underlineWidth = underlineWidth)
+            underlineWidth = underlineWidth,
+            modifier = Modifier.testTag(DisplayedEventsTestTags.BUTTON_ALL))
       }
 }
 
+object DisplayedEventsTestTags {
+
+  const val BUTTON_SUBSCRIBED = "BUTTON_SUBSCRIBED"
+  const val BUTTON_ALL = "BUTTON_ALL"
+}
+
 @Composable
-private fun FilterText(text: String, selected: Boolean, onClick: () -> Unit, underlineWidth: Int) {
+private fun FilterText(text: String, selected: Boolean, onClick: () -> Unit, underlineWidth: Int, modifier: Modifier) {
   Column(
       horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = Modifier.clickable(onClick = onClick)) {
+      modifier = modifier.clickable(onClick = onClick)) {
         Text(
             text = text,
             style =

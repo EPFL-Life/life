@@ -80,7 +80,7 @@ fun HomeScreen(
                 Image(
                     painter = painterResource(id = R.drawable.epfl_life_logo),
                     contentDescription = "EPFL Life Logo",
-                    modifier = Modifier.height(40.dp),
+                    modifier = Modifier.height(40.dp).testTag(HomeScreenTestTags.EPFLLOGO),
                     contentScale = ContentScale.Fit)
               }
 
@@ -139,6 +139,12 @@ private fun EmptyEventsMessage(title: String, description: String, modifier: Mod
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center)
       }
+}
+
+object HomeScreenTestTags {
+  const val EPFLLOGO = "EPFL_LOGO"
+  const val BOTTON_SUBSCRIBED = "BUTTON_SUBSCRIBED"
+  const val BUTTON_ALL = "BUTTON_ALL"
 }
 
 @Preview(showBackground = true)
