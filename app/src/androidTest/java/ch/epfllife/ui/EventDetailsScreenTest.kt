@@ -8,7 +8,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.viewmodel.compose.viewModel
-import ch.epfllife.model.entities.Event
+import ch.epfllife.model.event.Event
 import ch.epfllife.model.map.Location
 import ch.epfllife.ui.theme.Theme
 import org.junit.Before
