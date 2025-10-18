@@ -1,4 +1,4 @@
-package ch.epfllife.model.entities
+package ch.epfllife.model.user
 
 data class User(
     val id: String,

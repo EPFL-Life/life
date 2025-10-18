@@ -3,7 +3,7 @@ package ch.epfllife.ui.eventdetails
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.lifecycle.viewmodel.compose.viewModel
-import ch.epfllife.model.entities.Event
+import ch.epfllife.model.event.Event
 import ch.epfllife.model.map.Location
 import ch.epfllife.ui.eventDetails.EventDetailsContent
 import ch.epfllife.ui.eventDetails.EventDetailsTestTags

@@ -11,12 +11,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import ch.epfllife.model.enums.EventsFilter
+import ch.epfllife.model.event.EventsStatus
 
 @Composable
 fun EventsFilterButtons(
-    selected: EventsFilter,
-    onSelected: (EventsFilter) -> Unit,
+    selected: EventsStatus,
+    onSelected: (EventsStatus) -> Unit,
     modifier: Modifier = Modifier
 ) {
   Row(
@@ -25,13 +25,13 @@ fun EventsFilterButtons(
       verticalAlignment = Alignment.CenterVertically) {
         FilterText(
             text = "Subscribed",
-            selected = selected == EventsFilter.Subscribed,
-            onClick = { onSelected(EventsFilter.Subscribed) },
+            selected = selected == EventsStatus.Subscribed,
+            onClick = { onSelected(EventsStatus.Subscribed) },
             modifier = Modifier.testTag(DisplayedEventsTestTags.BUTTON_SUBSCRIBED))
         FilterText(
             text = "All Events",
-            selected = selected == EventsFilter.All,
-            onClick = { onSelected(EventsFilter.All) },
+            selected = selected == EventsStatus.All,
+            onClick = { onSelected(EventsStatus.All) },
             modifier = Modifier.testTag(DisplayedEventsTestTags.BUTTON_ALL))
       }
 }
