@@ -1,7 +1,7 @@
 package ch.epfllife.ui.events
 
 import androidx.compose.ui.test.junit4.createComposeRule
-import ch.epfllife.model.entities.Event
+import ch.epfllife.model.event.Event
 import ch.epfllife.model.map.Location
 import ch.epfllife.ui.composables.EventCard
 import ch.epfllife.ui.composables.EventCardTestTags
