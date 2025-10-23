@@ -17,6 +17,7 @@ import androidx.navigation.compose.rememberNavController
 import ch.epfllife.model.authentication.AuthRepository
 import ch.epfllife.ui.associationsbrowser.AssociationBrowser
 import ch.epfllife.ui.authentication.SignInScreen
+import ch.epfllife.ui.eventDetails.EventDetailsScreen
 import ch.epfllife.ui.home.HomeScreen
 import ch.epfllife.ui.myevents.MyEvents
 import ch.epfllife.ui.navigation.NavigationActions
@@ -111,5 +112,9 @@ fun App(
     ) {
       composable(Screen.Settings.route) { Settings(navigationActions = navigationActions) }
     }
+
+      navigation(startDestination = Screen.EventDetails.route, route = Screen.EventDetails.name) {
+          composable(Screen.EventDetails.route) { EventDetailsScreen(eventId = "Q0plDPEWMOXD85IJr8IF", navigationActions = navigationActions) }
+      }
   }
 }
