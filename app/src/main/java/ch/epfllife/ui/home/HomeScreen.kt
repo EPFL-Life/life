@@ -31,6 +31,7 @@ import ch.epfllife.ui.composables.SearchBar
 import ch.epfllife.ui.navigation.BottomNavigationMenu
 import ch.epfllife.ui.navigation.NavigationActions
 import ch.epfllife.ui.navigation.NavigationTestTags
+import ch.epfllife.ui.navigation.Screen
 import ch.epfllife.ui.navigation.Tab
 
 @Composable
@@ -114,7 +115,10 @@ fun HomeScreen(
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier.fillMaxSize()) {
-                      items(shownEvents, key = { it.id }) { ev -> EventCard(event = ev) }
+                      items(shownEvents, key = { it.id }) { ev -> EventCard(
+                          event = ev,
+                          onClick = { navigationActions?.navigateTo(
+                          Screen.EventDetails) } ) }
                     }
               }
             }

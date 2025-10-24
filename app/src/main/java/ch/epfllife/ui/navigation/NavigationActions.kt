@@ -19,6 +19,8 @@ sealed class Screen(
   object MyEvents : Screen(route = "myevents", name = "MyEvents", isTopLevelDestination = true)
 
   object Settings : Screen(route = "settings", name = "Settings", isTopLevelDestination = true)
+
+  object EventDetails : Screen(route = "homescreen/eventdetails", name = "EventDetails")
 }
 
 open class NavigationActions(
