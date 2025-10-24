@@ -5,22 +5,30 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.credentials.CredentialManager
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.navigation
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import ch.epfllife.model.authentication.AuthRepository
 import ch.epfllife.ui.association.AssociationBrowser
 import ch.epfllife.ui.authentication.SignInScreen
 import ch.epfllife.ui.home.HomeScreen
 import ch.epfllife.ui.myevents.MyEvents
+import ch.epfllife.ui.navigation.BottomNavigationMenu
 import ch.epfllife.ui.navigation.NavigationActions
+import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.navigation.Screen
+import ch.epfllife.ui.navigation.Tab
 import ch.epfllife.ui.settings.Settings
 import ch.epfllife.ui.theme.Theme
 import com.google.firebase.auth.FirebaseAuth
@@ -70,46 +78,53 @@ fun App(
   val navigationActions = NavigationActions(navController)
   val startDestination = Screen.HomeScreen.route
 
-  NavHost(navController = navController, startDestination = startDestination) {
-    navigation(
-        startDestination = Screen.Auth.route,
-        route = Screen.Auth.name,
-    ) {
-      composable(Screen.Auth.route) {
-        SignInScreen(
-            credentialManager = credentialManager,
-            onSignedIn = { navigationActions.navigateTo(Screen.HomeScreen) })
-      }
-    }
+  // keep the current destination of the nav
+  val backStackEntry by navController.currentBackStackEntryAsState()
+  val currentRoute = backStackEntry?.destination?.route
 
-    navigation(
-        startDestination = Screen.HomeScreen.route,
-        route = Screen.HomeScreen.name,
-    ) {
-      composable(Screen.HomeScreen.route) { HomeScreen(navigationActions = navigationActions) }
-    }
-
-    navigation(
-        startDestination = Screen.AssociationBrowser.route,
-        route = Screen.AssociationBrowser.name,
-    ) {
-      composable(Screen.AssociationBrowser.route) {
-        AssociationBrowser(navigationActions = navigationActions)
-      }
-    }
-
-    navigation(
-        startDestination = Screen.MyEvents.route,
-        route = Screen.MyEvents.name,
-    ) {
-      composable(Screen.MyEvents.route) { MyEvents(navigationActions = navigationActions) }
-    }
-
-    navigation(
-        startDestination = Screen.Settings.route,
-        route = Screen.Settings.name,
-    ) {
-      composable(Screen.Settings.route) { Settings(navigationActions = navigationActions) }
-    }
+  // list with all the tabs available
+  val allTabs = remember {
+    listOf(Tab.HomeScreen, Tab.AssociationBrowser, Tab.MyEvents, Tab.Settings)
   }
+
+  // we obtain the current Tab, if we don't find the route, will be redirected to the HomeScreen
+  val selectedTab =
+      remember(currentRoute) {
+        allTabs.firstOrNull { it.destination.route == currentRoute } ?: Tab.HomeScreen
+      }
+
+  val showBottomBar =
+      when (currentRoute) {
+        Screen.HomeScreen.route,
+        Screen.AssociationBrowser.route,
+        Screen.MyEvents.route,
+        Screen.Settings.route -> true
+        else -> false
+      }
+
+  Scaffold(
+      bottomBar = {
+        if (showBottomBar) {
+          BottomNavigationMenu(
+              selectedTab = selectedTab,
+              onTabSelected = { tab -> navigationActions.navigateTo(tab.destination) },
+              modifier = Modifier.testTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU))
+        }
+      }) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = startDestination,
+            modifier = Modifier.padding(innerPadding)) {
+              composable(Screen.Auth.route) {
+                SignInScreen(
+                    credentialManager = credentialManager,
+                    onSignedIn = { navigationActions.navigateTo(Screen.HomeScreen) })
+              }
+
+              composable(Screen.HomeScreen.route) { HomeScreen() }
+              composable(Screen.AssociationBrowser.route) { AssociationBrowser() }
+              composable(Screen.MyEvents.route) { MyEvents() }
+              composable(Screen.Settings.route) { Settings() }
+            }
+      }
 }
