@@ -22,8 +22,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ch.epfllife.R
-import ch.epfllife.model.event.Event
 import ch.epfllife.model.enums.SubscriptionFilter
+import ch.epfllife.model.event.Event
 import ch.epfllife.model.map.Location
 import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
 import ch.epfllife.ui.composables.EventCard
@@ -38,95 +38,95 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     navigationActions: NavigationActions? = null,
 ) {
-    var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
+  var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
 
-    val myEvents = remember { emptyList<Event>() } // No events to show empty state
+  val myEvents = remember { emptyList<Event>() } // No events to show empty state
 
-    val allEvents = remember {
-        listOf(
-            Event(
-                id = "1",
-                title = "Via Ferrata",
-                description = "Excursion to the Alps",
-                location = Location(0.0, 0.0, "Lausanne Train Station"),
-                time = "Oct 4th, 6:50am",
-                associationId = "ESN Lausanne",
-                tags = setOf("Sport", "Outdoor"),
-                price = 30u),
-            Event(
-                id = "2",
-                title = "Music Festival",
-                description = "Outdoor concert organized by the Cultural Club",
-                location = Location(0.0, 0.0, "Esplanade"),
-                time = "Nov 3rd, 5:00PM",
-                associationId = "Cultural Club",
-                tags = setOf("Music", "Festival"),
-                price = 10u))
-    }
+  val allEvents = remember {
+    listOf(
+        Event(
+            id = "1",
+            title = "Via Ferrata",
+            description = "Excursion to the Alps",
+            location = Location(0.0, 0.0, "Lausanne Train Station"),
+            time = "Oct 4th, 6:50am",
+            associationId = "ESN Lausanne",
+            tags = setOf("Sport", "Outdoor"),
+            price = 30u),
+        Event(
+            id = "2",
+            title = "Music Festival",
+            description = "Outdoor concert organized by the Cultural Club",
+            location = Location(0.0, 0.0, "Esplanade"),
+            time = "Nov 3rd, 5:00PM",
+            associationId = "Cultural Club",
+            tags = setOf("Music", "Festival"),
+            price = 10u))
+  }
 
-    val shownEvents = if (selected == SubscriptionFilter.Subscribed) myEvents else allEvents
-    Scaffold(
-        modifier = modifier,
-        bottomBar = {
-            BottomNavigationMenu(
-                selectedTab = Tab.HomeScreen,
-                onTabSelected = { tab -> navigationActions?.navigateTo(tab.destination) },
-                modifier = Modifier.testTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU))
-        }) { pd ->
+  val shownEvents = if (selected == SubscriptionFilter.Subscribed) myEvents else allEvents
+  Scaffold(
+      modifier = modifier,
+      bottomBar = {
+        BottomNavigationMenu(
+            selectedTab = Tab.HomeScreen,
+            onTabSelected = { tab -> navigationActions?.navigateTo(tab.destination) },
+            modifier = Modifier.testTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU))
+      }) { pd ->
         Column(
             modifier =
                 Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 12.dp).padding(pd)) {
-            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+              Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Image(
                     painter = painterResource(id = R.drawable.epfl_life_logo),
                     contentDescription = "EPFL Life Logo",
                     modifier = Modifier.height(40.dp).testTag(HomeScreenTestTags.EPFLLOGO),
                     contentScale = ContentScale.Fit)
-            }
+              }
 
-            Spacer(Modifier.height(12.dp))
-            SearchBar()
+              Spacer(Modifier.height(12.dp))
+              SearchBar()
 
-            Spacer(Modifier.height(12.dp))
+              Spacer(Modifier.height(12.dp))
 
-            DisplayedSubscriptionFilter(
-                selected = selected,
-                onSelected = { selected = it },
-                subscribedLabel = stringResource(id = R.string.subscribed_filter),
-                allLabel = stringResource(id = R.string.all_events_filter))
+              DisplayedSubscriptionFilter(
+                  selected = selected,
+                  onSelected = { selected = it },
+                  subscribedLabel = stringResource(id = R.string.subscribed_filter),
+                  allLabel = stringResource(id = R.string.all_events_filter))
 
-            Spacer(Modifier.height(12.dp))
+              Spacer(Modifier.height(12.dp))
 
-            // If statement to display certain messages for empty screens
-            if (shownEvents.isEmpty()) {
+              // If statement to display certain messages for empty screens
+              if (shownEvents.isEmpty()) {
                 if (selected == SubscriptionFilter.Subscribed) {
-                    EmptyEventsMessage(
-                        title = stringResource(id = R.string.home_empty_title),
-                        description = stringResource(id = R.string.home_empty_description),
-                        modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp))
+                  EmptyEventsMessage(
+                      title = stringResource(id = R.string.home_empty_title),
+                      description = stringResource(id = R.string.home_empty_description),
+                      modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp))
                 } else {
-                    EmptyEventsMessage(
-                        title = stringResource(id = R.string.home_no_events_title),
-                        description = stringResource(id = R.string.home_no_events_description),
-                        modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp))
+                  EmptyEventsMessage(
+                      title = stringResource(id = R.string.home_no_events_title),
+                      description = stringResource(id = R.string.home_no_events_description),
+                      modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp))
                 }
-            } else {
+              } else {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier.fillMaxSize()) {
-                    items(shownEvents, key = { it.id }) { ev -> EventCard(event = ev) }
-                }
+                      items(shownEvents, key = { it.id }) { ev -> EventCard(event = ev) }
+                    }
+              }
             }
-        }
-    }
+      }
 }
 
 @Composable
 private fun EmptyEventsMessage(title: String, description: String, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center) {
+  Column(
+      modifier = modifier,
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.Center) {
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium,
@@ -138,17 +138,17 @@ private fun EmptyEventsMessage(title: String, description: String, modifier: Mod
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center)
-    }
+      }
 }
 
 object HomeScreenTestTags {
-    const val EPFLLOGO = "EPFL_LOGO"
-    const val BOTTON_SUBSCRIBED = "BUTTON_SUBSCRIBED"
-    const val BUTTON_ALL = "BUTTON_ALL"
+  const val EPFLLOGO = "EPFL_LOGO"
+  const val BOTTON_SUBSCRIBED = "BUTTON_SUBSCRIBED"
+  const val BUTTON_ALL = "BUTTON_ALL"
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun HomeScreenPreview() {
-    MaterialTheme { HomeScreen() }
+  MaterialTheme { HomeScreen() }
 }

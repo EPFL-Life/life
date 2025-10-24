@@ -22,10 +22,10 @@ fun DisplayedSubscriptionFilter(
     modifier: Modifier = Modifier,
     underlineWidth: Int = 80
 ) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically) {
+  Row(
+      modifier = modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.SpaceEvenly,
+      verticalAlignment = Alignment.CenterVertically) {
         FilterText(
             text = subscribedLabel,
             selected = selected == SubscriptionFilter.Subscribed,
@@ -39,13 +39,13 @@ fun DisplayedSubscriptionFilter(
             onClick = { onSelected(SubscriptionFilter.All) },
             underlineWidth = underlineWidth,
             modifier = Modifier.testTag(DisplayedEventsTestTags.BUTTON_ALL))
-    }
+      }
 }
 
 object DisplayedEventsTestTags {
 
-    const val BUTTON_SUBSCRIBED = "BUTTON_SUBSCRIBED"
-    const val BUTTON_ALL = "BUTTON_ALL"
+  const val BUTTON_SUBSCRIBED = "BUTTON_SUBSCRIBED"
+  const val BUTTON_ALL = "BUTTON_ALL"
 }
 
 @Composable
@@ -56,9 +56,9 @@ private fun FilterText(
     underlineWidth: Int,
     modifier: Modifier
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.clickable(onClick = onClick)) {
+  Column(
+      horizontalAlignment = Alignment.CenterHorizontally,
+      modifier = modifier.clickable(onClick = onClick)) {
         Text(
             text = text,
             style =
@@ -68,11 +68,11 @@ private fun FilterText(
                 if (selected) MaterialTheme.colorScheme.onSurface
                 else MaterialTheme.colorScheme.onSurfaceVariant)
         if (selected) {
-            Spacer(Modifier.height(2.dp))
-            HorizontalDivider(
-                modifier = Modifier.width(underlineWidth.dp),
-                thickness = 2.dp,
-                color = MaterialTheme.colorScheme.onSurface)
+          Spacer(Modifier.height(2.dp))
+          HorizontalDivider(
+              modifier = Modifier.width(underlineWidth.dp),
+              thickness = 2.dp,
+              color = MaterialTheme.colorScheme.onSurface)
         }
-    }
+      }
 }
