@@ -19,12 +19,10 @@ import ch.epfllife.model.event.EventCategory
 import ch.epfllife.ui.composables.AssociationCard
 import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
 import ch.epfllife.ui.composables.SearchBar
-import ch.epfllife.ui.navigation.NavigationActions
 
 @Composable
 fun AssociationBrowser(
     modifier: Modifier = Modifier,
-    navigationActions: NavigationActions? = null,
 ) {
   var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
   val subscribedAssociations = remember {
