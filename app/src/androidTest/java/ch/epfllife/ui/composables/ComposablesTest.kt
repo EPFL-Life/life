@@ -3,8 +3,8 @@ package ch.epfllife.ui.composables
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
+import ch.epfllife.model.enums.SubscriptionFilter
 import ch.epfllife.model.event.Event
-import ch.epfllife.model.event.EventsStatus
 import ch.epfllife.model.map.Location
 import ch.epfllife.utils.assertClickable
 import org.junit.Assert.*
@@ -182,47 +182,75 @@ class ComposablesTest {
     composeTestRule.onNode(hasContentDescription("Search")).assertExists()
   }
 
-  // ============ EventsFilterButtons Tests ============
+  // ============ DisplayedSubscriptionFilter Tests ============
 
   @Test
   fun eventsFilterButtons_DisplaysSubscribedButton() {
-    composeTestRule.setContent { EventsFilterButtons(EventsStatus.All, onSelected = {}) }
+    composeTestRule.setContent {
+      DisplayedSubscriptionFilter(
+          selected = SubscriptionFilter.All,
+          onSelected = {},
+          subscribedLabel = "Subscribed",
+          allLabel = "All Events")
+    }
     composeTestRule.onNodeWithText("Subscribed").assertIsDisplayed()
   }
 
   @Test
   fun eventsFilterButtons_DisplaysAllEventsButton() {
-    composeTestRule.setContent { EventsFilterButtons(EventsStatus.All, onSelected = {}) }
+    composeTestRule.setContent {
+      DisplayedSubscriptionFilter(
+          selected = SubscriptionFilter.All,
+          onSelected = {},
+          subscribedLabel = "Subscribed",
+          allLabel = "All Events")
+    }
     composeTestRule.onNodeWithText("All Events").assertIsDisplayed()
   }
 
   @Test
   fun eventsFilterButtons_SubscribedButtonIsClickable() {
-    var selectedFilter: EventsStatus? = null
+    var selectedFilter: SubscriptionFilter? = null
     composeTestRule.setContent {
-      EventsFilterButtons(EventsStatus.All, onSelected = { selectedFilter = it })
+      DisplayedSubscriptionFilter(
+          selected = SubscriptionFilter.All,
+          onSelected = { selectedFilter = it },
+          subscribedLabel = "Subscribed",
+          allLabel = "All Events")
     }
     composeTestRule.onNodeWithText("Subscribed").performClick()
     assertEquals(
         "Clicking Subscribed should call onSelected with Subscribed",
-        EventsStatus.Subscribed,
+        SubscriptionFilter.Subscribed,
         selectedFilter)
   }
 
   @Test
   fun eventsFilterButtons_AllEventsButtonIsClickable() {
-    var selectedFilter: EventsStatus? = null
+    var selectedFilter: SubscriptionFilter? = null
     composeTestRule.setContent {
-      EventsFilterButtons(EventsStatus.Subscribed, onSelected = { selectedFilter = it })
+      DisplayedSubscriptionFilter(
+          selected = SubscriptionFilter.Subscribed,
+          onSelected = { selectedFilter = it },
+          subscribedLabel = "Subscribed",
+          allLabel = "All Events")
     }
     composeTestRule.onNodeWithText("All Events").performClick()
     assertEquals(
-        "Clicking All Events should call onSelected with All", EventsStatus.All, selectedFilter)
+        "Clicking All Events should call onSelected with All",
+        SubscriptionFilter.All,
+        selectedFilter)
   }
 
   @Test
   fun eventsFilterButtons_ShowsCorrectSelectionForSubscribed() {
-    composeTestRule.setContent { EventsFilterButtons(EventsStatus.Subscribed, onSelected = {}) }
+    composeTestRule.setContent {
+      DisplayedSubscriptionFilter(
+          selected = SubscriptionFilter.Subscribed,
+          onSelected = {},
+          subscribedLabel = "Subscribed",
+          allLabel = "All Events")
+    }
     // The selected button should be displayed (bold text styling)
     composeTestRule.onNodeWithText("Subscribed").assertIsDisplayed()
     composeTestRule.onNodeWithText("All Events").assertIsDisplayed()
@@ -230,45 +258,64 @@ class ComposablesTest {
 
   @Test
   fun eventsFilterButtons_ShowsCorrectSelectionForAll() {
-    composeTestRule.setContent { EventsFilterButtons(EventsStatus.All, onSelected = {}) }
+    composeTestRule.setContent {
+      DisplayedSubscriptionFilter(
+          selected = SubscriptionFilter.All,
+          onSelected = {},
+          subscribedLabel = "Subscribed",
+          allLabel = "All Events")
+    }
     composeTestRule.onNodeWithText("Subscribed").assertIsDisplayed()
     composeTestRule.onNodeWithText("All Events").assertIsDisplayed()
   }
 
   @Test
   fun eventsFilterButtons_ChangesSelectionOnClick() {
-    var selectedFilter = EventsStatus.All
+    var selectedFilter = SubscriptionFilter.All
     composeTestRule.setContent {
-      EventsFilterButtons(selectedFilter, onSelected = { selectedFilter = it })
+      DisplayedSubscriptionFilter(
+          selected = selectedFilter,
+          onSelected = { selectedFilter = it },
+          subscribedLabel = "Subscribed",
+          allLabel = "All Events")
     }
     composeTestRule.onNodeWithText("Subscribed").performClick()
     composeTestRule.waitForIdle()
-    assertEquals("Selection should change to Subscribed", EventsStatus.Subscribed, selectedFilter)
+    assertEquals(
+        "Selection should change to Subscribed", SubscriptionFilter.Subscribed, selectedFilter)
   }
 
   @Test
   fun eventsFilterButtons_CanSwitchBetweenFilters() {
-    var selectedFilter = EventsStatus.All
+    var selectedFilter = SubscriptionFilter.All
     composeTestRule.setContent {
-      EventsFilterButtons(selectedFilter, onSelected = { selectedFilter = it })
+      DisplayedSubscriptionFilter(
+          selected = selectedFilter,
+          onSelected = { selectedFilter = it },
+          subscribedLabel = "Subscribed",
+          allLabel = "All Events")
     }
 
     // Switch to Subscribed
     composeTestRule.onNodeWithText("Subscribed").performClick()
     composeTestRule.waitForIdle()
-    assertEquals("Should switch to Subscribed", EventsStatus.Subscribed, selectedFilter)
+    assertEquals("Should switch to Subscribed", SubscriptionFilter.Subscribed, selectedFilter)
 
     // Switch back to All
     composeTestRule.onNodeWithText("All Events").performClick()
     composeTestRule.waitForIdle()
-    assertEquals("Should switch back to All", EventsStatus.All, selectedFilter)
+    assertEquals("Should switch back to All", SubscriptionFilter.All, selectedFilter)
   }
 
   @Test
   fun eventsFilterButtons_CallbackCalledWithCorrectFilter() {
-    val callbackResults = mutableListOf<EventsStatus>()
+    val callbackResults = mutableListOf<SubscriptionFilter>()
     composeTestRule.setContent {
-      EventsFilterButtons(EventsStatus.All, onSelected = { callbackResults.add(it) })
+      DisplayedSubscriptionFilter(
+          selected = SubscriptionFilter.All,
+          onSelected = { callbackResults.add(it) },
+          subscribedLabel = "Subscribed",
+          allLabel = "All Events")
     }
 
     composeTestRule.onNodeWithText("Subscribed").performClick()
@@ -277,8 +324,9 @@ class ComposablesTest {
     composeTestRule.waitForIdle()
 
     assertEquals("Should have two callback calls", 2, callbackResults.size)
-    assertEquals("First callback should be Subscribed", EventsStatus.Subscribed, callbackResults[0])
-    assertEquals("Second callback should be All", EventsStatus.All, callbackResults[1])
+    assertEquals(
+        "First callback should be Subscribed", SubscriptionFilter.Subscribed, callbackResults[0])
+    assertEquals("Second callback should be All", SubscriptionFilter.All, callbackResults[1])
   }
 
   // ============ Integration Tests ============
@@ -286,13 +334,17 @@ class ComposablesTest {
   @Test
   fun composables_WorkTogetherInLayout() {
     var searchClicked = false
-    var selectedFilter = EventsStatus.All
+    var selectedFilter = SubscriptionFilter.All
     var eventClicked = false
 
     composeTestRule.setContent {
       androidx.compose.foundation.layout.Column {
         SearchBar(onSearchClick = { searchClicked = true })
-        EventsFilterButtons(selectedFilter, onSelected = { selectedFilter = it })
+        DisplayedSubscriptionFilter(
+            selected = selectedFilter,
+            onSelected = { selectedFilter = it },
+            subscribedLabel = "Subscribed",
+            allLabel = "All Events")
         EventCard(sampleEvent, onClick = { eventClicked = true })
       }
     }
@@ -308,7 +360,7 @@ class ComposablesTest {
     assertTrue("Search should be clicked", searchClicked)
 
     composeTestRule.onNodeWithText("Subscribed").performClick()
-    assertEquals("Filter should change", EventsStatus.Subscribed, selectedFilter)
+    assertEquals("Filter should change", SubscriptionFilter.Subscribed, selectedFilter)
 
     composeTestRule.onNodeWithText("Sample Event").performClick()
     assertTrue("Event should be clicked", eventClicked)
@@ -350,7 +402,11 @@ class ComposablesTest {
   fun eventsFilterButtons_DoesNotCrashWithRapidClicks() {
     var clickCount = 0
     composeTestRule.setContent {
-      EventsFilterButtons(EventsStatus.All, onSelected = { clickCount++ })
+      DisplayedSubscriptionFilter(
+          selected = SubscriptionFilter.All,
+          onSelected = { clickCount++ },
+          subscribedLabel = "Subscribed",
+          allLabel = "All Events")
     }
 
     repeat(5) {
