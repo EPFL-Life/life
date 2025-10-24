@@ -2,7 +2,7 @@ package ch.epfllife.model.association
 
 import ch.epfllife.model.event.EventCategory
 
-data class Association(
+data class  Association(
     val id: String,
     val name: String,
     val description: String,

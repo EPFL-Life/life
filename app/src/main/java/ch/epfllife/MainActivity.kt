@@ -15,7 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import ch.epfllife.model.authentication.AuthRepository
-import ch.epfllife.ui.associationsbrowser.AssociationBrowser
+import ch.epfllife.ui.association.AssociationBrowser
 import ch.epfllife.ui.authentication.SignInScreen
 import ch.epfllife.ui.home.HomeScreen
 import ch.epfllife.ui.myevents.MyEvents
