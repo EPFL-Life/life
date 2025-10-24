@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,15 +27,10 @@ import ch.epfllife.model.map.Location
 import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
 import ch.epfllife.ui.composables.EventCard
 import ch.epfllife.ui.composables.SearchBar
-import ch.epfllife.ui.navigation.BottomNavigationMenu
-import ch.epfllife.ui.navigation.NavigationActions
-import ch.epfllife.ui.navigation.NavigationTestTags
-import ch.epfllife.ui.navigation.Tab
 
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    navigationActions: NavigationActions? = null,
 ) {
   var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
 
@@ -65,60 +59,49 @@ fun HomeScreen(
   }
 
   val shownEvents = if (selected == SubscriptionFilter.Subscribed) myEvents else allEvents
-  Scaffold(
-      modifier = modifier,
-      bottomBar = {
-        BottomNavigationMenu(
-            selectedTab = Tab.HomeScreen,
-            onTabSelected = { tab -> navigationActions?.navigateTo(tab.destination) },
-            modifier = Modifier.testTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU))
-      }) { pd ->
-        Column(
-            modifier =
-                Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 12.dp).padding(pd)) {
-              Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                Image(
-                    painter = painterResource(id = R.drawable.epfl_life_logo),
-                    contentDescription = "EPFL Life Logo",
-                    modifier = Modifier.height(40.dp).testTag(HomeScreenTestTags.EPFLLOGO),
-                    contentScale = ContentScale.Fit)
-              }
 
-              Spacer(Modifier.height(12.dp))
-              SearchBar()
+  Column(modifier = modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 12.dp)) {
+    Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+      Image(
+          painter = painterResource(id = R.drawable.epfl_life_logo),
+          contentDescription = "EPFL Life Logo",
+          modifier = modifier.height(40.dp).testTag(HomeScreenTestTags.EPFLLOGO),
+          contentScale = ContentScale.Fit)
+    }
 
-              Spacer(Modifier.height(12.dp))
+    Spacer(Modifier.height(12.dp))
+    SearchBar()
 
-              DisplayedSubscriptionFilter(
-                  selected = selected,
-                  onSelected = { selected = it },
-                  subscribedLabel = stringResource(id = R.string.subscribed_filter),
-                  allLabel = stringResource(id = R.string.all_events_filter))
+    Spacer(Modifier.height(12.dp))
 
-              Spacer(Modifier.height(12.dp))
+    DisplayedSubscriptionFilter(
+        selected = selected,
+        onSelected = { selected = it },
+        subscribedLabel = stringResource(id = R.string.subscribed_filter),
+        allLabel = stringResource(id = R.string.all_events_filter))
 
-              // If statement to display certain messages for empty screens
-              if (shownEvents.isEmpty()) {
-                if (selected == SubscriptionFilter.Subscribed) {
-                  EmptyEventsMessage(
-                      title = stringResource(id = R.string.home_empty_title),
-                      description = stringResource(id = R.string.home_empty_description),
-                      modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp))
-                } else {
-                  EmptyEventsMessage(
-                      title = stringResource(id = R.string.home_no_events_title),
-                      description = stringResource(id = R.string.home_no_events_description),
-                      modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp))
-                }
-              } else {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.fillMaxSize()) {
-                      items(shownEvents, key = { it.id }) { ev -> EventCard(event = ev) }
-                    }
-              }
-            }
+    Spacer(Modifier.height(12.dp))
+
+    // If statement to display certain messages for empty screens
+    if (shownEvents.isEmpty()) {
+      if (selected == SubscriptionFilter.Subscribed) {
+        EmptyEventsMessage(
+            title = stringResource(id = R.string.home_empty_title),
+            description = stringResource(id = R.string.home_empty_description),
+            modifier = modifier.fillMaxSize().padding(horizontal = 24.dp))
+      } else {
+        EmptyEventsMessage(
+            title = stringResource(id = R.string.home_no_events_title),
+            description = stringResource(id = R.string.home_no_events_description),
+            modifier = modifier.fillMaxSize().padding(horizontal = 24.dp))
       }
+    } else {
+      LazyColumn(
+          verticalArrangement = Arrangement.spacedBy(12.dp), modifier = modifier.fillMaxSize()) {
+            items(shownEvents, key = { it.id }) { ev -> EventCard(event = ev) }
+          }
+    }
+  }
 }
 
 @Composable

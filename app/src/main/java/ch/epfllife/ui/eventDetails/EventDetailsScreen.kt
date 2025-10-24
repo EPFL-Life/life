@@ -25,10 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.map.Location
-import ch.epfllife.ui.navigation.BottomNavigationMenu
-import ch.epfllife.ui.navigation.NavigationActions
-import ch.epfllife.ui.navigation.NavigationTestTags
-import ch.epfllife.ui.navigation.Tab
 import ch.epfllife.ui.theme.Theme
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -54,52 +50,34 @@ fun EventDetailsScreen(
     eventId: String,
     viewModel: EventDetailsViewModel = viewModel(),
     onGoBack: () -> Unit = {},
-    navigationActions: NavigationActions? = null,
 ) {
   val uiState by viewModel.uiState.collectAsState()
   LaunchedEffect(eventId) {
     viewModel.loadEvent(eventId)
   } // this is triggered once the screen opens
 
-  Scaffold(
-      // use this hardcoded bottom bar for now
-      bottomBar = {
-        BottomNavigationMenu(
-            selectedTab = Tab.Settings,
-            onTabSelected = { tab -> navigationActions?.navigateTo(tab.destination) },
-            modifier = Modifier.testTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU))
-      }) { paddingValues ->
-        when (val state = uiState) {
-          is EventDetailsUIState.Loading -> {
-            // Show loading spinner
-            Box(
-                modifier = Modifier.fillMaxSize().padding(paddingValues),
-                contentAlignment = Alignment.Center) {
-                  CircularProgressIndicator(
-                      modifier = Modifier.testTag(EventDetailsTestTags.LOADING_INDICATOR))
-                }
-          }
-          is EventDetailsUIState.Error -> {
-            // Show error message
-            Box(
-                modifier = Modifier.fillMaxSize().padding(paddingValues),
-                contentAlignment = Alignment.Center) {
-                  Text(
-                      text = state.message,
-                      color = MaterialTheme.colorScheme.error,
-                      modifier = Modifier.testTag(EventDetailsTestTags.ERROR_MESSAGE))
-                }
-          }
-          is EventDetailsUIState.Success -> {
-            // Show event content
-            EventDetailsContent(
-                event = state.event,
-                modifier = Modifier.padding(paddingValues),
-                onGoBack = onGoBack,
-                viewModel = viewModel)
-          }
-        }
+  when (val state = uiState) {
+    is EventDetailsUIState.Loading -> {
+      // Show loading spinner
+      Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator(
+            modifier = Modifier.testTag(EventDetailsTestTags.LOADING_INDICATOR))
       }
+    }
+    is EventDetailsUIState.Error -> {
+      // Show error message
+      Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text(
+            text = state.message,
+            color = MaterialTheme.colorScheme.error,
+            modifier = Modifier.testTag(EventDetailsTestTags.ERROR_MESSAGE))
+      }
+    }
+    is EventDetailsUIState.Success -> {
+      // Show event content
+      EventDetailsContent(event = state.event, onGoBack = onGoBack, viewModel = viewModel)
+    }
+  }
 }
 
 @Composable
