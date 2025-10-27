@@ -18,7 +18,7 @@ class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : Associ
   override suspend fun getAssociation(associationId: String): Association? {
     val document =
         db.collection(FirestoreCollections.ASSOCIATIONS).document(associationId).get().await()
-    return documentToAssociation(document) ?: throw Exception("Association not found")
+    return documentToAssociation(document)
   }
 
   override suspend fun getAllAssociations(): List<Association> {
@@ -38,7 +38,8 @@ class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : Associ
     if (db.collection(FirestoreCollections.ASSOCIATIONS)
         .document(newAssociation.id)
         .get()
-        .await() == null) {
+        .await()
+        .exists()) {
       throw NoSuchElementException("Association with id ${newAssociation.id} not found")
     }
 
@@ -79,7 +80,7 @@ class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : Associ
       // Get the category name as a String from Firestore
       val eventCategoryString = document.getString("eventCategory") ?: return null
       // Convert the String to the EventCategory enum value
-      val eventCategory = EventCategory.valueOf(eventCategoryString)
+      val eventCategory = EventCategory.valueOf(eventCategoryString.uppercase())
 
       // 5. Construct the Association object
       Association(
