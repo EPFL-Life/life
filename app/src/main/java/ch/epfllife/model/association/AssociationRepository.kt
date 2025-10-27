@@ -6,13 +6,6 @@ import ch.epfllife.model.event.Event
 interface AssociationRepository {
 
   /**
-   * Generates and returns a new unique identifier for an association.
-   *
-   * @return A new unique identifier.
-   */
-  fun getNewUid(): String
-
-  /**
    * Retrieves a specific association by its unique identifier.
    *
    * @param associationId The unique ID of the association to fetch.
@@ -35,11 +28,12 @@ interface AssociationRepository {
   suspend fun createAssociation(association: Association)
 
   /**
-   * Updates an existing association's data. The ID is retrieved from the passed Association object
+   * Updates an existing association's data.
    *
+   * @param associationId The ID of the association to update.
    * @param newAssociation The [Association] object with the updated information.
    */
-  suspend fun updateAssociation(newAssociation: Association)
+  suspend fun updateAssociation(associationId: String, newAssociation: Association)
 
   /**
    * Retrieves all events organized by a specific association.
