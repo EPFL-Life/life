@@ -31,9 +31,11 @@ sealed class Tab(val name: String, val icon: ImageVector, val destination: Scree
   object MyEvents : Tab("MyEvents", Icons.Outlined.CalendarToday, Screen.MyEvents)
 
   object Settings : Tab("Settings", Icons.Outlined.Settings, Screen.Settings)
-}
 
-private val tabs = listOf(Tab.HomeScreen, Tab.AssociationBrowser, Tab.MyEvents, Tab.Settings)
+  companion object {
+    val tabs = listOf(HomeScreen, AssociationBrowser, MyEvents, Settings)
+  }
+}
 
 @Composable
 fun BottomNavigationMenu(
@@ -46,7 +48,7 @@ fun BottomNavigationMenu(
           modifier.fillMaxWidth().height(60.dp).testTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU),
       backgroundColor = MaterialTheme.colorScheme.surface,
       content = {
-        tabs.forEach { tab ->
+        Tab.tabs.forEach { tab ->
           BottomNavigationItem(
               icon = { Icon(tab.icon, contentDescription = null) },
               // label = { Text(tab.name) },
