@@ -6,10 +6,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import ch.epfllife.ui.navigation.NavigationTestTags
 
 @Composable
 fun Settings(modifier: Modifier = Modifier) {
-  Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+  Box(
+      modifier = modifier.fillMaxSize().testTag(NavigationTestTags.SETTINGS_SCREEN),
+      contentAlignment = Alignment.Center,
+  ) {
     Text(text = "Settings")
   }
 }
