@@ -251,3 +251,8 @@ configurations.forEach { configuration ->
     // This fixes a fatal exception for tests interacting with Cloud Firestore
     configuration.exclude("com.google.protobuf", "protobuf-lite")
 }
+
+tasks.named("build") {
+    dependsOn("assembleUnitTest")
+    dependsOn("assembleAndroidTest")
+}
