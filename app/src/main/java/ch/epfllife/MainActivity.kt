@@ -83,9 +83,7 @@ fun App(
   val currentRoute = backStackEntry?.destination?.route
 
   // list with all the tabs available
-  val allTabs = remember {
-    listOf(Tab.HomeScreen, Tab.AssociationBrowser, Tab.MyEvents, Tab.Settings)
-  }
+  val allTabs = Tab.tabs
 
   // we obtain the current Tab, if we don't find the route, will be redirected to the HomeScreen
   val selectedTab =
