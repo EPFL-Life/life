@@ -27,6 +27,7 @@ import ch.epfllife.model.map.Location
 import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
 import ch.epfllife.ui.composables.EventCard
 import ch.epfllife.ui.composables.SearchBar
+import ch.epfllife.ui.navigation.NavigationTestTags
 
 @Composable
 fun HomeScreen(
@@ -60,49 +61,55 @@ fun HomeScreen(
 
   val shownEvents = if (selected == SubscriptionFilter.Subscribed) myEvents else allEvents
 
-  Column(modifier = modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 12.dp)) {
-    Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-      Image(
-          painter = painterResource(id = R.drawable.epfl_life_logo),
-          contentDescription = "EPFL Life Logo",
-          modifier = modifier.height(40.dp).testTag(HomeScreenTestTags.EPFLLOGO),
-          contentScale = ContentScale.Fit)
-    }
+  Column(
+      modifier =
+          modifier
+              .fillMaxSize()
+              .padding(horizontal = 16.dp, vertical = 12.dp)
+              .testTag(NavigationTestTags.HOMESCREEN_SCREEN)) {
+        Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+          Image(
+              painter = painterResource(id = R.drawable.epfl_life_logo),
+              contentDescription = "EPFL Life Logo",
+              modifier = modifier.height(40.dp).testTag(HomeScreenTestTags.EPFLLOGO),
+              contentScale = ContentScale.Fit)
+        }
 
-    Spacer(Modifier.height(12.dp))
-    SearchBar()
+        Spacer(Modifier.height(12.dp))
+        SearchBar()
 
-    Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(12.dp))
 
-    DisplayedSubscriptionFilter(
-        selected = selected,
-        onSelected = { selected = it },
-        subscribedLabel = stringResource(id = R.string.subscribed_filter),
-        allLabel = stringResource(id = R.string.all_events_filter))
+        DisplayedSubscriptionFilter(
+            selected = selected,
+            onSelected = { selected = it },
+            subscribedLabel = stringResource(id = R.string.subscribed_filter),
+            allLabel = stringResource(id = R.string.all_events_filter))
 
-    Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(12.dp))
 
-    // If statement to display certain messages for empty screens
-    if (shownEvents.isEmpty()) {
-      val (title, description) =
-          if (selected == SubscriptionFilter.Subscribed) {
-            Pair(R.string.home_empty_title, R.string.home_empty_description)
-          } else {
-            Pair(R.string.home_no_events_title, R.string.home_no_events_description)
-          }
-      EmptyEventsMessage(
-          title = stringResource(id = title),
-          description = stringResource(id = description),
-          modifier = modifier.fillMaxSize().padding(horizontal = 24.dp))
-    } else {
-      LazyColumn(
-          verticalArrangement = Arrangement.spacedBy(12.dp), modifier = modifier.fillMaxSize()) {
-            items(shownEvents, key = { it.id }) { ev ->
-              EventCard(event = ev, onClick = { /* TODO: Navigate to event card */})
-            }
-          }
-    }
-  }
+        // If statement to display certain messages for empty screens
+        if (shownEvents.isEmpty()) {
+          val (title, description) =
+              if (selected == SubscriptionFilter.Subscribed) {
+                Pair(R.string.home_empty_title, R.string.home_empty_description)
+              } else {
+                Pair(R.string.home_no_events_title, R.string.home_no_events_description)
+              }
+          EmptyEventsMessage(
+              title = stringResource(id = title),
+              description = stringResource(id = description),
+              modifier = modifier.fillMaxSize().padding(horizontal = 24.dp))
+        } else {
+          LazyColumn(
+              verticalArrangement = Arrangement.spacedBy(12.dp),
+              modifier = modifier.fillMaxSize()) {
+                items(shownEvents, key = { it.id }) { ev ->
+                  EventCard(event = ev, onClick = { /* TODO: Navigate to event card */})
+                }
+              }
+        }
+      }
 }
 
 @Composable

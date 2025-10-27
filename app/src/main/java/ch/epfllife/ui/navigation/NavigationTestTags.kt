@@ -10,11 +10,24 @@ object NavigationTestTags {
   const val MYEVENTS_TAB = "MyEvents"
   const val SETTINGS_TAB = "Settings"
 
+  const val HOMESCREEN_SCREEN = "HomeScreen_Screen"
+  const val ASSOCIATIONBROWSER_SCREEN = "AssociationBrowser_Screen"
+  const val MYEVENTS_SCREEN = "MyEvents_Screen"
+  const val SETTINGS_SCREEN = "Settings_Screen"
+
   fun getTabTestTag(tab: Tab): String =
       when (tab) {
         is Tab.HomeScreen -> HOMESCREEN_TAB
         is Tab.AssociationBrowser -> ASSOCIATIONBROWSER_TAB
         is Tab.MyEvents -> MYEVENTS_TAB
         is Tab.Settings -> SETTINGS_TAB
+      }
+
+  fun getScreenTestTagForTab(tab: Tab): String =
+      when (tab) {
+        is Tab.HomeScreen -> HOMESCREEN_SCREEN
+        is Tab.AssociationBrowser -> ASSOCIATIONBROWSER_SCREEN
+        is Tab.MyEvents -> MYEVENTS_SCREEN
+        is Tab.Settings -> SETTINGS_SCREEN
       }
 }
