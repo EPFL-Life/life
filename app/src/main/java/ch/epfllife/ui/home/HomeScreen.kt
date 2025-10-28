@@ -98,7 +98,7 @@ fun HomeScreen(
     } else {
       LazyColumn(
           verticalArrangement = Arrangement.spacedBy(12.dp), modifier = modifier.fillMaxSize()) {
-            items(shownEvents, key = { it.id }) { ev -> EventCard(event = ev) }
+            items(shownEvents, key = { it.id }) { ev -> EventCard(event = ev, onClick = { /* TODO: Navigate to event card */}) }
           }
     }
   }

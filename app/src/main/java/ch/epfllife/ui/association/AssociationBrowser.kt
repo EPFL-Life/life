@@ -89,7 +89,7 @@ fun AssociationBrowser(
               verticalArrangement = Arrangement.spacedBy(12.dp),
               modifier = Modifier.fillMaxSize()) {
                 items(shownAssociations, key = { it.id }) { assoc ->
-                  AssociationCard(association = assoc)
+                  AssociationCard(association = assoc, onClick = { /* TODO: Navigate to association details */ } )
                 }
               }
         }
