@@ -73,17 +73,16 @@ fun AssociationBrowser(
 
         // If statement to display certain messages for empty screens
         if (shownAssociations.isEmpty()) {
-          if (selected == SubscriptionFilter.Subscribed) {
-            EmptyAssociationsMessage(
-                title = stringResource(id = R.string.associations_empty_title),
-                description = stringResource(id = R.string.associations_empty_description),
-                modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp))
-          } else {
-            EmptyAssociationsMessage(
-                title = stringResource(id = R.string.associations_no_all_title),
-                description = stringResource(id = R.string.associations_no_all_description),
-                modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp))
-          }
+          val (title, description) =
+              if (selected == SubscriptionFilter.Subscribed) {
+                Pair(R.string.associations_empty_title, R.string.associations_empty_description)
+              } else {
+                Pair(R.string.associations_no_all_title, R.string.associations_no_all_description)
+              }
+          EmptyAssociationsMessage(
+              title = stringResource(id = title),
+              description = stringResource(id = description),
+              modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp))
         } else {
           LazyColumn(
               verticalArrangement = Arrangement.spacedBy(12.dp),
