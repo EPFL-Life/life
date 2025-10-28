@@ -35,22 +35,18 @@ class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : Associ
 
   override suspend fun updateAssociation(newAssociation: Association) {
 
-    val newAssociationId = newAssociation.id
+    // extract doc reference
+    val docRef = db.collection(FirestoreCollections.ASSOCIATIONS).document(newAssociation.id)
 
-    // check if id exists
-    if (db.collection(FirestoreCollections.ASSOCIATIONS)
-        .document(newAssociationId)
-        .get()
-        .await()
-        .exists()) {
-      throw NoSuchElementException("Association with id ${newAssociation.id} not found")
+    // check if doc does NOT exist
+    if (!docRef.get().await().exists()) {
+      // Throw an error because we can't update a non-existent document
+      throw NoSuchElementException(
+          "Association with id ${newAssociation.id} not found! Cannot update.")
     }
 
-    // update association based on uid of passed object
-    db.collection(FirestoreCollections.ASSOCIATIONS)
-        .document(newAssociationId)
-        .set(newAssociation)
-        .await()
+    // if it exists update it
+    docRef.set(newAssociation).await()
   }
 
   //
