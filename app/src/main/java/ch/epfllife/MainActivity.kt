@@ -77,7 +77,7 @@ fun App(
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
   val startDestination =
-      if (FirebaseAuth.getInstance().currentUser == null) Screen.Auth.name
+      if (FirebaseAuth.getInstance().currentUser == null) Screen.Auth.route
       else Screen.HomeScreen.route
 
   // keep the current destination of the nav
@@ -108,23 +108,26 @@ fun App(
           BottomNavigationMenu(
               selectedTab = selectedTab,
               onTabSelected = { tab -> navigationActions.navigateTo(tab.destination) },
-              modifier = Modifier.testTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU))
+              modifier = Modifier.testTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU),
+          )
         }
       }) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = startDestination,
-            modifier = Modifier.padding(innerPadding)) {
-              composable(Screen.Auth.route) {
-                SignInScreen(
-                    credentialManager = credentialManager,
-                    onSignedIn = { navigationActions.navigateTo(Screen.HomeScreen) })
-              }
+            modifier = Modifier.padding(innerPadding),
+        ) {
+          composable(Screen.Auth.route) {
+            SignInScreen(
+                credentialManager = credentialManager,
+                onSignedIn = { navigationActions.navigateTo(Screen.HomeScreen) },
+            )
+          }
 
-              composable(Screen.HomeScreen.route) { HomeScreen() }
-              composable(Screen.AssociationBrowser.route) { AssociationBrowser() }
-              composable(Screen.MyEvents.route) { MyEvents() }
-              composable(Screen.Settings.route) { Settings() }
-            }
+          composable(Screen.HomeScreen.route) { HomeScreen() }
+          composable(Screen.AssociationBrowser.route) { AssociationBrowser() }
+          composable(Screen.MyEvents.route) { MyEvents() }
+          composable(Screen.Settings.route) { Settings() }
+        }
       }
 }
