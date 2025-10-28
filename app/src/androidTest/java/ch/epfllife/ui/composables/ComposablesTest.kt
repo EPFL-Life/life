@@ -6,7 +6,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import ch.epfllife.model.enums.SubscriptionFilter
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.map.Location
-import ch.epfllife.utils.assertClickable
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test

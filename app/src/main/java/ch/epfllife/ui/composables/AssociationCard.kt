@@ -21,16 +21,13 @@ import ch.epfllife.R
 import ch.epfllife.model.association.Association
 
 @Composable
-fun AssociationCard(
-    association: Association,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
+fun AssociationCard(association: Association, modifier: Modifier = Modifier, onClick: () -> Unit) {
   Card(
       onClick = onClick,
       shape = RoundedCornerShape(12.dp),
       elevation = CardDefaults.elevatedCardElevation(5.dp),
-      modifier = modifier.fillMaxWidth().padding(5.dp).testTag(AssociationCardTestTags.ASSOCIATION_CARD)) {
+      modifier =
+          modifier.fillMaxWidth().padding(5.dp).testTag(AssociationCardTestTags.ASSOCIATION_CARD)) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
