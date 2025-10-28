@@ -1,6 +1,8 @@
 package ch.epfllife.utils
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -21,4 +23,17 @@ fun ComposeContentTestRule.assertClickable(
   this.onNodeWithTag(tag).performClick()
 
   Assert.assertTrue("$tag should be clickable", clicked)
+}
+
+fun ComposeContentTestRule.assertTagIsDisplayed(tag: String) {
+  this.onNodeWithTag(tag, useUnmergedTree = true)
+      .assertExists("$tag must exist")
+      .assertIsDisplayed()
+}
+
+fun ComposeContentTestRule.assertTagTextEquals(tag: String, text: String) {
+  this.onNodeWithTag(tag, useUnmergedTree = true)
+      .assertExists("$tag must exist")
+      .assertIsDisplayed()
+      .assertTextEquals(text)
 }
