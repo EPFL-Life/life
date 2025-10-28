@@ -3,7 +3,7 @@ package ch.epfllife.model.association
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventRepository
 
-// we pass the eventRepository because the getEventsForAssociation function retrieves events from it
+// We pass the eventRepository because the getEventsForAssociation function retrieves events from it
 class AssociationRepositoryLocal(private val eventRepository: EventRepository) :
     AssociationRepository {
 
@@ -15,7 +15,6 @@ class AssociationRepositoryLocal(private val eventRepository: EventRepository) :
     return counter++.toString()
   }
 
-  // TODO should associationId be String or Int?
   override suspend fun getAssociation(associationId: String): Association? {
     return associations.find { it.id == associationId }
   }
@@ -42,7 +41,6 @@ class AssociationRepositoryLocal(private val eventRepository: EventRepository) :
     associations.add(newAssociation)
   }
 
-  // TODO: same here useString or Int for ID?
   override suspend fun getEventsForAssociation(associationId: String): List<Event> {
 
     if (!associations.any() { it.id == associationId }) {
