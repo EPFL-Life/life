@@ -10,19 +10,18 @@ import org.junit.Test
 
 class EventCardTest {
 
-  @get:Rule
-  val composeTestRule = createComposeRule()
+  @get:Rule val composeTestRule = createComposeRule()
   private val event =
-    Event(
-      id = "0",
-      title = "Test Event",
-      description = "This is a test event",
-      location = Location(46.520278, 6.565556, "EPFL"),
-      time = Timestamp.Companion.now().toString(),
-      associationId = "assoc1",
-      tags = emptySet(),
-      price = 0u,
-    )
+      Event(
+          id = "0",
+          title = "Test Event",
+          description = "This is a test event",
+          location = Location(46.520278, 6.565556, "EPFL"),
+          time = Timestamp.Companion.now().toString(),
+          associationId = "assoc1",
+          tags = emptySet(),
+          price = 0u,
+      )
 
   @Test
   fun isClickable() {
