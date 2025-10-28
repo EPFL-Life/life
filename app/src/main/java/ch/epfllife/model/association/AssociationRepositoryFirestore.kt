@@ -3,8 +3,8 @@ package ch.epfllife.model.association
 import android.util.Log
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventCategory
+import ch.epfllife.model.event.EventRepositoryFirestore
 import ch.epfllife.model.firestore.FirestoreCollections
-import ch.epfllife.model.map.Location
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -34,9 +34,12 @@ class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : Associ
   }
 
   override suspend fun updateAssociation(newAssociation: Association) {
+
+    val newAssociationId = newAssociation.id
+
     // check if id exists
     if (db.collection(FirestoreCollections.ASSOCIATIONS)
-        .document(newAssociation.id)
+        .document(newAssociationId)
         .get()
         .await()
         .exists()) {
@@ -45,7 +48,7 @@ class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : Associ
 
     // update association based on uid of passed object
     db.collection(FirestoreCollections.ASSOCIATIONS)
-        .document(newAssociation.id)
+        .document(newAssociationId)
         .set(newAssociation)
         .await()
   }
@@ -58,12 +61,23 @@ class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : Associ
             .get()
             .await()
 
-    return snapshot.mapNotNull { documentToEvent(it) }
+    return snapshot.mapNotNull { EventRepositoryFirestore.documentToEvent(it) }
   }
 
-  // TODO: Should the parsing functions maybe be moved to the model class or keep it here (which
-  // would maybe result some code duplication)?
   // helper function for parsing
+
+  /**
+   * Safely converts a Firestore [DocumentSnapshot] into an [Association] data class.
+   *
+   * This function performs strict type checking. If any *required* field (e.g., `name`,
+   * `description`, `eventCategory`) is missing, malformed, or of the wrong type, the function will
+   * log an error and return `null`.
+   *
+   * Optional fields like `pictureUrl` will be set to `null` if not present.
+   *
+   * @param document The Firestore [DocumentSnapshot] to parse.
+   * @return A parsed [Association] object, or `null` if conversion fails.
+   */
   private fun documentToAssociation(document: DocumentSnapshot): Association? {
     return try {
       // 1. Get the document ID
@@ -92,48 +106,6 @@ class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : Associ
     } catch (e: Exception) {
       // Log any errors during conversion (e.g., valueOf fails for enum)
       Log.e("AssociationRepository", "Error converting document to Association", e)
-      null
-    }
-  }
-
-  // helper function for parsing
-  private fun documentToEvent(document: DocumentSnapshot): Event? {
-    return try {
-      val id = document.id
-      val title = document.getString("title") ?: return null
-      val description = document.getString("description") ?: return null
-      val time = document.getString("time") ?: return null
-      val associationId = document.getString("associationId") ?: return null
-      val imageUrl = document.getString("imageUrl")
-
-      // Handle nested Location object
-      val locationData = document.get("location") as? Map<*, *> ?: return null
-      val location =
-          Location(
-              latitude = locationData["latitude"] as? Double ?: 0.0,
-              longitude = locationData["longitude"] as? Double ?: 0.0,
-              name = locationData["name"] as? String ?: "")
-
-      // Handle Set<String> for tags (Firestore stores as List)
-      val tagsList = document.get("tags") as? List<String> ?: emptyList()
-      val tags = tagsList.toSet()
-
-      // Handle UInt for price (Firestore stores as Long)
-      val priceLong = document.getLong("price") ?: 0L
-      val price = priceLong.toUInt()
-
-      Event(
-          id = id,
-          title = title,
-          description = description,
-          location = location,
-          time = time,
-          associationId = associationId,
-          tags = tags,
-          price = price,
-          imageUrl = imageUrl)
-    } catch (e: Exception) {
-      Log.e("AssociationRepository", "Error converting document to Event", e)
       null
     }
   }

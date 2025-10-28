@@ -3,7 +3,6 @@ package ch.epfllife.model.association
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventRepository
 
-// TODO this works but is it a good approach?
 // we pass the eventRepository because the getEventsForAssociation function retrieves events from it
 class AssociationRepositoryLocal(private val eventRepository: EventRepository) :
     AssociationRepository {
@@ -26,7 +25,6 @@ class AssociationRepositoryLocal(private val eventRepository: EventRepository) :
   }
 
   override suspend fun createAssociation(association: Association) {
-    // TODO should some check (Nullcheck, duplciateId Check) be added?
     associations.add(association)
   }
 
