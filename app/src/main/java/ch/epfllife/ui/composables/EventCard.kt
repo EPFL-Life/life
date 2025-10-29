@@ -58,7 +58,7 @@ fun EventCard(event: Event, modifier: Modifier = Modifier, onClick: () -> Unit) 
           Spacer(Modifier.height(2.dp))
 
           Text(
-              text = event.associationId,
+              text = event.association,
               style = MaterialTheme.typography.bodySmall,
               color = MaterialTheme.colorScheme.onSurfaceVariant)
 
@@ -70,7 +70,7 @@ fun EventCard(event: Event, modifier: Modifier = Modifier, onClick: () -> Unit) 
               verticalAlignment = Alignment.CenterVertically) {
                 InfoItem(
                     icon = Icons.Outlined.CalendarMonth,
-                    text = event.location.name,
+                    text = event.location,
                     modifier = Modifier.weight(1f, fill = false))
                 Spacer(Modifier.width(16.dp))
                 InfoItem(icon = Icons.Outlined.AccessTime, text = event.time)
