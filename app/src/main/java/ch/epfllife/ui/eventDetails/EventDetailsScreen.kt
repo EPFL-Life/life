@@ -32,6 +32,7 @@ import ch.epfllife.ui.composables.Map
 import ch.epfllife.ui.theme.Theme
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import ch.epfllife.ui.composables.PriceFormatter
 
 object EventDetailsTestTags {
   const val LOADING_INDICATOR = "loadingIndicator"
@@ -161,12 +162,13 @@ fun EventDetailsContent(
                   )
                 }
                 Text(
-                    text = event.price.let { "CHF $it" },
-                    style =
-                        MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium),
+
+                    text = PriceFormatter.formatPrice(event.price),
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium),
                     color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.testTag(EventDetailsTestTags.EVENT_PRICE),
+                    modifier = Modifier.testTag(EventDetailsTestTags.EVENT_PRICE)
                 )
+
               }
 
           // Row containing: Date, Time, Location

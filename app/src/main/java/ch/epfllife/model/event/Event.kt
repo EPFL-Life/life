@@ -10,8 +10,8 @@ data class Event(
     val description: String,
     val location: Location,
     val time: String, // for the moment it will be a string
-    val association: Association,
-    val tags: List<String>,
-    val price: UInt = 0u,
-    val pictureUrl: String? = null
+    val associationId: String,
+    val tags: Set<String>,
+    val price: UInt = 0u,   // price in cents
+    val imageUrl: String? = null // referenced Image //TODO implement this in firebase
 )
