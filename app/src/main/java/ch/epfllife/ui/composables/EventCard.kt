@@ -40,12 +40,7 @@ fun EventCard(event: Event, modifier: Modifier = Modifier, onClick: () -> Unit =
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.weight(1f))
             Text(
-                text =
-                    if (event.price == 0u) {
-                      "Free"
-                    } else {
-                      "CHF ${event.price}"
-                    },
+                text = PriceFormatter.formatPrice(event.price),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.width(6.dp))
