@@ -91,4 +91,39 @@ class AssociationRepositoryLocalTest {
         //    assertNotNull(events)
         //    assertTrue(events.isEmpty())
       }
+
+    @Test(expected = NoSuchElementException::class)
+    fun updateAssociation_throwsIfAssociationDoesNotExist() = runTest {
+        val fake = assoc1.copy(id = "nonexistent")
+        repositoryAssociation.updateAssociation(fake)
+    }
+
+    @Test
+    fun getAssociation_returnsNullForNonExistingId() = runTest {
+        repositoryAssociation.createAssociation(assoc1)
+        val result = repositoryAssociation.getAssociation("unknown-id")
+        assertNull(result)
+    }
+
+    @Test
+    fun getAllAssociations_returnsCopyOfList() = runTest {
+        repositoryAssociation.createAssociation(assoc1)
+        val list1 = repositoryAssociation.getAllAssociations()
+        val list2 = repositoryAssociation.getAllAssociations()
+
+        assertNotSame(list1, list2)
+        assertEquals(list1, list2)
+    }
+
+    @Test
+    fun getNewUid_incrementsSequentially() {
+        val id1 = repositoryAssociation.getNewUid()
+        val id2 = repositoryAssociation.getNewUid()
+        val id3 = repositoryAssociation.getNewUid()
+
+        assertEquals("0", id1)
+        assertEquals("1", id2)
+        assertEquals("2", id3)
+    }
+
 }
