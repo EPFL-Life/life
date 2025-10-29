@@ -41,12 +41,12 @@ class EventDetailsViewModel : ViewModel() {
                 title = "Drone Workshop",
                 description =
                     "The Drone Workshop is a multi-evening workshop organized by AéroPoly...",
-                location = Location(46.5191, 6.5668, "Centre Sport et Santé"),
+                location = "Centre Sport et Santé",
                 time = "2025-10-12 18:00",
-                associationId = "AeroPoly",
+                association = "AeroPoly",
                 tags = setOf("workshop"),
                 price = 10u,
-                imageUrl =
+                pictureUrl =
                     "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")
         _uiState.value = EventDetailsUIState.Success(fakeEvent, isEnrolled = false)
       } catch (e: Exception) {

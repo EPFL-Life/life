@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import ch.epfllife.R
 import ch.epfllife.model.enums.SubscriptionFilter
 import ch.epfllife.model.event.Event
+import ch.epfllife.model.event.EventRepositoryFirestore
 import ch.epfllife.model.map.Location
 import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
 import ch.epfllife.ui.composables.EventCard
@@ -36,27 +37,16 @@ fun HomeScreen(
 
   val myEvents = remember { emptyList<Event>() } // No events to show empty state
 
-  val allEvents = remember {
-    listOf(
-        Event(
-            id = "1",
-            title = "Via Ferrata",
-            description = "Excursion to the Alps",
-            location = Location(0.0, 0.0, "Lausanne Train Station"),
-            time = "Oct 4th, 6:50am",
-            associationId = "ESN Lausanne",
-            tags = setOf("Sport", "Outdoor"),
-            price = 30u),
-        Event(
-            id = "2",
-            title = "Music Festival",
-            description = "Outdoor concert organized by the Cultural Club",
-            location = Location(0.0, 0.0, "Esplanade"),
-            time = "Nov 3rd, 5:00PM",
-            associationId = "Cultural Club",
-            tags = setOf("Music", "Festival"),
-            price = 10u))
-  }
+    val repo = remember { EventRepositoryFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance()) }
+
+// call the suspend function from a composable using produceState
+    val allEvents by androidx.compose.runtime.produceState(initialValue = emptyList<Event>(), key1 = repo) {
+        value = try {
+            repo.getAllEvents()
+        } catch (_: Exception) {
+            emptyList()
+        }
+    }
 
   val shownEvents = if (selected == SubscriptionFilter.Subscribed) myEvents else allEvents
 

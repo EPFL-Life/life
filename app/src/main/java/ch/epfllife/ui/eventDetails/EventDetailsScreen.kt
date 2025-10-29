@@ -95,7 +95,7 @@ fun EventDetailsContent(
           model =
               ImageRequest.Builder(LocalContext.current)
                   .data(
-                      event.imageUrl
+                      event.pictureUrl
                           ?: "https://www.epfl.ch/campus/services/events/wp-content/uploads/2024/09/WEB_Image-Home-Events_ORGANISER.png")
                   .crossfade(true)
                   .build(),
@@ -141,7 +141,7 @@ fun EventDetailsContent(
                       color = MaterialTheme.colorScheme.onSurface,
                       modifier = Modifier.testTag(EventDetailsTestTags.EVENT_TITLE))
                   Text(
-                      text = event.associationId,
+                      text = event.association,
                       style = MaterialTheme.typography.bodyMedium,
                       color = MaterialTheme.colorScheme.onSurfaceVariant,
                       modifier = Modifier.testTag(EventDetailsTestTags.EVENT_ASSOCIATION))
@@ -181,7 +181,7 @@ fun EventDetailsContent(
                     // formating
                     // (implement in repository)
                     Text(
-                        text = event.location.name,
+                        text = event.location,
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.testTag(EventDetailsTestTags.EVENT_LOCATION))
                   }
@@ -260,12 +260,12 @@ fun EventDetailsPreview() {
           title = "Drone Workshop",
           description =
               "The Drone Workshop is a multi-evening workshop organized by AéroPoly, where you can build your own 3-inch FPV drone...",
-          location = Location(46.5191, 6.5668, "Centre Sport et Santé"),
+          location = "Centre Sport et Santé",
           time = "2025-10-12 18:00",
-          associationId = "AeroPoly",
+          association = "AeroPoly",
           tags = setOf("workshop"),
           price = 10u,
-          imageUrl =
+          pictureUrl =
               "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")
 
   Theme() { EventDetailsContent(event = sampleEvent, viewModel = viewModel()) }
