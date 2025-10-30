@@ -2,7 +2,6 @@ package ch.epfllife.model.event
 
 import android.util.Log
 import ch.epfllife.model.association.Association
-import ch.epfllife.model.association.AssociationRepositoryLocal
 import ch.epfllife.model.map.Location
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
@@ -10,8 +9,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.tasks.await
-import kotlin.coroutines.resumeWithException
-import kotlin.text.get
 
 class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventRepository {
 
