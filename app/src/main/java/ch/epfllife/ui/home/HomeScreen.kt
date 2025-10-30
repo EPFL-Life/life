@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,11 +21,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.R
 import ch.epfllife.model.enums.SubscriptionFilter
-import ch.epfllife.model.event.Event
-import ch.epfllife.model.event.EventRepositoryFirestore
-import ch.epfllife.model.map.Location
 import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
 import ch.epfllife.ui.composables.EventCard
 import ch.epfllife.ui.composables.SearchBar
@@ -33,21 +32,12 @@ import ch.epfllife.ui.navigation.NavigationTestTags
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
+    viewModel: HomeViewModel = viewModel()
 ) {
   var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
 
-  val myEvents = remember { emptyList<Event>() } // No events to show empty state
-
-    val repo = remember { EventRepositoryFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance()) }
-
-// call the suspend function from a composable using produceState
-    val allEvents by androidx.compose.runtime.produceState(initialValue = emptyList<Event>(), key1 = repo) {
-        value = try {
-            repo.getAllEvents()
-        } catch (_: Exception) {
-            emptyList()
-        }
-    }
+  val myEvents by viewModel.myEvents.collectAsState()
+  val allEvents by viewModel.allEvents.collectAsState()
 
   val shownEvents = if (selected == SubscriptionFilter.Subscribed) myEvents else allEvents
 
