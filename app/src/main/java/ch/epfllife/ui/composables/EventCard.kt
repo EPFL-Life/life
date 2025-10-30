@@ -70,7 +70,7 @@ fun EventCard(event: Event, modifier: Modifier = Modifier, onClick: () -> Unit =
               verticalAlignment = Alignment.CenterVertically) {
                 InfoItem(
                     icon = Icons.Outlined.CalendarMonth,
-                    text = event.location,
+                    text = event.location.name,
                     modifier = Modifier.weight(1f, fill = false))
                 Spacer(Modifier.width(16.dp))
                 InfoItem(icon = Icons.Outlined.AccessTime, text = event.time)

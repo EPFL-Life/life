@@ -41,7 +41,7 @@ class EventDetailsViewModel : ViewModel() {
                 title = "Drone Workshop",
                 description =
                     "The Drone Workshop is a multi-evening workshop organized by AéroPoly...",
-                location = "Centre Sport et Santé",
+                location = Location(46.5191, 6.5668, "Centre Sport et Santé"),
                 time = "2025-10-12 18:00",
                 association = "AeroPoly",
                 tags = setOf("workshop"),

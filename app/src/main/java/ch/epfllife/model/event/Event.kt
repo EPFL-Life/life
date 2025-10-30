@@ -6,7 +6,7 @@ data class Event(
     val id: String,
     val title: String,
     val description: String,
-    val location: String,
+    val location: Location,
     val time: String, // for the moment it will be a string
     val association: String,
     val tags: Set<String>,
