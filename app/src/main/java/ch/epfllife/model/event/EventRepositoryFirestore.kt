@@ -54,29 +54,6 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
    * @return A parsed [Event] object, or `null` if conversion fails.
    */
   companion object {
-
-    suspend fun getAssociationId(document: DocumentSnapshot): String? {
-      val assocRef = document.get("association") as? DocumentReference ?: return null
-      val assocSnap = assocRef.get().await()
-      if (!assocSnap.exists()) {
-        Log.e("getAssociationId", "Association doc does not exist: ${assocSnap.id}")
-        return null
-      }
-      return assocSnap.id
-    }
-    suspend fun getAssociationName(document: DocumentSnapshot): String? {
-      val assocRef = document.get("association") as? DocumentReference ?: return null
-      val assocSnap = assocRef.get().await()
-      if (!assocSnap.exists()) {
-        Log.e("getAssociationName", "Association doc does not exist: ${assocSnap.id}")
-        return null
-      }
-      val assocName = assocSnap.get("name").toString()
-      return try {
-        assocName
-      } catch (e: Exception) {""}
-    }
-
     suspend fun getAssociation(document: DocumentSnapshot): Association? {
       val assocRef = document.get("association") as? DocumentReference ?: return null
       val assocSnap = assocRef.get().await()
