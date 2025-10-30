@@ -45,12 +45,12 @@ class EventDetailsViewModel : ViewModel() {
                     "The Drone Workshop is a multi-evening workshop organized by AéroPoly...",
                 location = Location(46.5191, 6.5668, "Centre Sport et Santé"),
                 time = "2025-10-12 18:00",
-                association = Association(
-                    id = "jngeefee",
-                    name = "AéroPoly",
-                    description = "The association for drone enthusiasts at EPFL.",
-                    eventCategory = EventCategory.ACADEMIC
-                ),
+                association =
+                    Association(
+                        id = "jngeefee",
+                        name = "AéroPoly",
+                        description = "The association for drone enthusiasts at EPFL.",
+                        eventCategory = EventCategory.ACADEMIC),
                 tags = setOf("workshop"),
                 price = 10u,
                 pictureUrl =
