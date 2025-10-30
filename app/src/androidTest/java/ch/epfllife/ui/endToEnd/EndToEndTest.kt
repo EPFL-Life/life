@@ -5,7 +5,8 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.lifecycle.Lifecycle
+import androidx.test.espresso.Espresso
+import androidx.test.espresso.NoActivityResumedException
 import ch.epfllife.ThemedApp
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.navigation.Tab
@@ -34,11 +35,10 @@ class EndToEndTest {
 
   @Test
   fun canExitWithBackPressFromHome() {
-    pressBack()
-    assertDestroyed()
+    assertBackPressWouldExit()
   }
 
-  @Test fun canExitWithDoubleBackPressFromSettings() = canExitWithDoublePressFromTab(Tab.HomeScreen)
+  @Test fun canExitWithDoubleBackPressFromSettings() = canExitWithDoublePressFromTab(Tab.Settings)
 
   @Test
   fun canExitWithDoubleBackPressFromAssociationBrowser() =
@@ -48,21 +48,25 @@ class EndToEndTest {
 
   private fun canExitWithDoublePressFromTab(tab: Tab) {
     composeTestRule.onNodeWithTag(NavigationTestTags.getTabTestTag(tab)).performClick()
-    pressBack()
-    pressBack()
-    assertDestroyed()
+    Espresso.pressBack()
+    assertBackPressWouldExit()
   }
 
-  private fun pressBack() {
-    composeTestRule.activityRule.scenario.onActivity { activity ->
-      activity.onBackPressedDispatcher.onBackPressed()
+  private fun assertBackPressWouldExit() {
+    // In theory we should be able to detect that the app closes with
+    // - `composeTestRule.activityRule.scenario.state == Lifecycle.State.DESTROYED`
+    // - `composeTestRule.activity.isFinishing`
+    // In practice, that does not seems to work,
+    // so instead we abuse the fact that Espresso.pressBack() throws in case the app would be
+    // closed.
+    try {
+      Espresso.pressBack()
+    } catch (e: NoActivityResumedException) {
+      // NOTE: The documentation for Espresso.pressBack() states
+      // that a `PerformException` is thrown,
+      // but actually it is a `NoActivityResumedException`.
+      return
     }
-    composeTestRule.waitUntil { composeTestRule.activity.isFinishing }
-  }
-
-  private fun assertDestroyed() {
-    composeTestRule.waitUntil(timeoutMillis = 5000) {
-      composeTestRule.activityRule.scenario.state == Lifecycle.State.DESTROYED
-    }
+    throw AssertionError("Expected app to exit on back press, but it did not.")
   }
 }
