@@ -181,7 +181,7 @@ fun EventDetailsContent(
                     // formating
                     // (implement in repository)
                     Text(
-                        text = event.location,
+                        text = event.location.name,
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.testTag(EventDetailsTestTags.EVENT_LOCATION))
                   }
@@ -260,7 +260,7 @@ fun EventDetailsPreview() {
           title = "Drone Workshop",
           description =
               "The Drone Workshop is a multi-evening workshop organized by AéroPoly, where you can build your own 3-inch FPV drone...",
-          location = "Centre Sport et Santé",
+          location = Location(46.5191, 6.5668, "Centre Sport et Santé"),
           time = "2025-10-12 18:00",
           association = "AeroPoly",
           tags = setOf("workshop"),

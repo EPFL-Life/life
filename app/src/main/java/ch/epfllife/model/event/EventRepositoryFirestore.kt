@@ -87,7 +87,14 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
 
         // 4. Handle nested Location object
         // The 'location' field itself must exist and be a Map.
-        val location = document.getString("location") ?: return null
+
+        val locMap = document.get("location") as? Map<*, *>
+
+        val location = Location(
+          name = locMap?.get("name") as? String ?: "",
+          latitude = locMap?.get("latitude") as? Double ?: 0.0,
+          longitude = locMap?.get("longitude") as? Double ?: 0.0
+        )
 
         // 5. Handle list-to-set conversion for tags
         // If 'tags' is missing, default to an empty list, which becomes an empty set.
