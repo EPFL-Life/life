@@ -2,6 +2,7 @@ package ch.epfllife.model.event
 
 import android.util.Log
 import ch.epfllife.model.association.Association
+import ch.epfllife.model.firestore.FirestoreCollections
 import ch.epfllife.model.map.Location
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
@@ -17,7 +18,7 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
   }
 
   override suspend fun getAllEvents(): List<Event> = coroutineScope {
-    val task = db.collection("events").get().await()
+    val task = db.collection(FirestoreCollections.EVENTS).get().await()
     task.documents.map { doc ->
       async { documentToEvent(doc) }
     }.mapNotNull { it.await() }
