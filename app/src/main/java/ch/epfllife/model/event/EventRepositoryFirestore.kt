@@ -1,6 +1,8 @@
 package ch.epfllife.model.event
 
 import android.util.Log
+import ch.epfllife.model.association.Association
+import ch.epfllife.model.association.AssociationRepositoryLocal
 import ch.epfllife.model.map.Location
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
@@ -55,6 +57,16 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
    * @return A parsed [Event] object, or `null` if conversion fails.
    */
   companion object {
+
+    suspend fun getAssociationId(document: DocumentSnapshot): String? {
+      val assocRef = document.get("association") as? DocumentReference ?: return null
+      val assocSnap = assocRef.get().await()
+      if (!assocSnap.exists()) {
+        Log.e("getAssociationId", "Association doc does not exist: ${assocSnap.id}")
+        return null
+      }
+      return assocSnap.id
+    }
     suspend fun getAssociationName(document: DocumentSnapshot): String? {
       val assocRef = document.get("association") as? DocumentReference ?: return null
       val assocSnap = assocRef.get().await()
@@ -68,6 +80,23 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
       } catch (e: Exception) {""}
     }
 
+    suspend fun getAssociation(document: DocumentSnapshot): Association? {
+      val assocRef = document.get("association") as? DocumentReference ?: return null
+      val assocSnap = assocRef.get().await()
+      if (!assocSnap.exists()) {
+        Log.e("getAssociationName", "Association doc does not exist: ${assocSnap.id}")
+        return null
+      }
+
+      return Association(
+        id = assocSnap.id,
+        name = assocSnap.get("name").toString(),
+        description = assocSnap.getString("description") ?: "",
+        pictureUrl = assocSnap.getString("pictureUrl"),
+        eventCategory = EventCategory.valueOf(assocSnap.getString("eventCategory") ?: "OTHER")
+      )
+    }
+
     suspend fun documentToEvent(document: DocumentSnapshot): Event? {
       return try {
         // 1. Get the document's unique ID
@@ -79,7 +108,7 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
         val title = document.getString("title") ?: return null
         val description = document.getString("description") ?: return null
         val time = document.getString("time") ?: return null
-        val association = getAssociationName(document) ?: ""
+        val association = getAssociation(document)
 
         // 3. Get optional String field
         // If 'imageUrl' is missing, getString() returns null, which is valid.
@@ -113,7 +142,7 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
             description = description,
             location = location,
             time = time,
-            association = association,
+            association = association ?: return null,
             tags = tags,
             price = price,
             pictureUrl = pictureUrl)

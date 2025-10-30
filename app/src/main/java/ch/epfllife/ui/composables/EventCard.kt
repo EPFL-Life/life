@@ -58,7 +58,7 @@ fun EventCard(event: Event, modifier: Modifier = Modifier, onClick: () -> Unit) 
           Spacer(Modifier.height(2.dp))
 
           Text(
-              text = event.association,
+              text = event.association.name,
               style = MaterialTheme.typography.bodySmall,
               color = MaterialTheme.colorScheme.onSurfaceVariant)
 
