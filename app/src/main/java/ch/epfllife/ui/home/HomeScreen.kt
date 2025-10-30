@@ -30,10 +30,7 @@ import ch.epfllife.ui.composables.SearchBar
 import ch.epfllife.ui.navigation.NavigationTestTags
 
 @Composable
-fun HomeScreen(
-    modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = viewModel()
-) {
+fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel = viewModel()) {
   var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
 
   val myEvents by viewModel.myEvents.collectAsState()

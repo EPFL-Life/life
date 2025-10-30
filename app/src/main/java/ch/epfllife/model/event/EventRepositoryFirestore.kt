@@ -19,9 +19,7 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
 
   override suspend fun getAllEvents(): List<Event> = coroutineScope {
     val task = db.collection(FirestoreCollections.EVENTS).get().await()
-    task.documents.map { doc ->
-      async { documentToEvent(doc) }
-    }.mapNotNull { it.await() }
+    task.documents.map { doc -> async { documentToEvent(doc) } }.mapNotNull { it.await() }
   }
 
   override suspend fun getEvent(eventId: String): Event {
@@ -64,12 +62,11 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
       }
 
       return Association(
-        id = assocSnap.id,
-        name = assocSnap.get("name").toString(),
-        description = assocSnap.getString("description") ?: "",
-        pictureUrl = assocSnap.getString("pictureUrl"),
-        eventCategory = EventCategory.valueOf(assocSnap.getString("eventCategory") ?: "OTHER")
-      )
+          id = assocSnap.id,
+          name = assocSnap.get("name").toString(),
+          description = assocSnap.getString("description") ?: "",
+          pictureUrl = assocSnap.getString("pictureUrl"),
+          eventCategory = EventCategory.valueOf(assocSnap.getString("eventCategory") ?: "OTHER"))
     }
 
     suspend fun documentToEvent(document: DocumentSnapshot): Event? {
@@ -94,11 +91,11 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
 
         val locMap = document.get("location") as? Map<*, *>
 
-        val location = Location(
-          name = locMap?.get("name") as? String ?: "",
-          latitude = locMap?.get("latitude") as? Double ?: 0.0,
-          longitude = locMap?.get("longitude") as? Double ?: 0.0
-        )
+        val location =
+            Location(
+                name = locMap?.get("name") as? String ?: "",
+                latitude = locMap?.get("latitude") as? Double ?: 0.0,
+                longitude = locMap?.get("longitude") as? Double ?: 0.0)
 
         // 5. Handle list-to-set conversion for tags
         // If 'tags' is missing, default to an empty list, which becomes an empty set.
