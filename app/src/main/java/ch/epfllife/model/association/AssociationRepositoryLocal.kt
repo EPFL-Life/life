@@ -49,6 +49,6 @@ class AssociationRepositoryLocal(private val eventRepository: EventRepository) :
     }
 
     // return list of events
-    return eventRepository.getAllEvents().filter() { it.association == associationId }
+    return eventRepository.getAllEvents().filter() { it.association.id == associationId }
   }
 }

@@ -2,7 +2,9 @@ package ch.epfllife.ui.eventDetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import ch.epfllife.model.association.Association
 import ch.epfllife.model.event.Event
+import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.map.Location
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -43,7 +45,12 @@ class EventDetailsViewModel : ViewModel() {
                     "The Drone Workshop is a multi-evening workshop organized by AéroPoly...",
                 location = Location(46.5191, 6.5668, "Centre Sport et Santé"),
                 time = "2025-10-12 18:00",
-                association = "AeroPoly",
+                association = Association(
+                    id = "jngeefee",
+                    name = "AéroPoly",
+                    description = "The association for drone enthusiasts at EPFL.",
+                    eventCategory = EventCategory.ACADEMIC
+                ),
                 tags = setOf("workshop"),
                 price = 10u,
                 pictureUrl =
