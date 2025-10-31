@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -20,16 +21,13 @@ import ch.epfllife.R
 import ch.epfllife.model.association.Association
 
 @Composable
-fun AssociationCard(
-    association: Association,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
-) {
+fun AssociationCard(association: Association, modifier: Modifier = Modifier, onClick: () -> Unit) {
   Card(
       onClick = onClick,
       shape = RoundedCornerShape(12.dp),
       elevation = CardDefaults.elevatedCardElevation(5.dp),
-      modifier = modifier.fillMaxWidth().padding(5.dp)) {
+      modifier =
+          modifier.fillMaxWidth().padding(5.dp).testTag(AssociationCardTestTags.ASSOCIATION_CARD)) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -46,12 +44,14 @@ fun AssociationCard(
                     text = association.name,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface)
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.testTag(AssociationCardTestTags.ASSOCIATION_NAME))
                 Spacer(Modifier.height(4.dp))
                 Text(
                     text = association.description,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.testTag(AssociationCardTestTags.ASSOCIATION_DESCRIPTION))
               }
 
               // Right arrow icon
@@ -61,4 +61,10 @@ fun AssociationCard(
                   tint = MaterialTheme.colorScheme.onSurfaceVariant)
             }
       }
+}
+
+object AssociationCardTestTags {
+  const val ASSOCIATION_CARD = "association_card"
+  const val ASSOCIATION_NAME = "association_name"
+  const val ASSOCIATION_DESCRIPTION = "association_description"
 }
