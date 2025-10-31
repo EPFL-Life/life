@@ -39,7 +39,7 @@ class EventDetailsViewModel : ViewModel() {
       try {
         val fakeEvent =
             Event(
-                id = "1",
+                id = eventId,
                 title = "Drone Workshop",
                 description =
                     "The Drone Workshop is a multi-evening workshop organized by AéroPoly...",
@@ -85,6 +85,8 @@ class EventDetailsViewModel : ViewModel() {
     // TODO implement actual logic (Firestore / API call)
     // we need this to decide whether the button should be gray or not ("Enroll in event" or
     // "Enrolled")
+    if (event.id == event.title) return false
+
     return false
   }
 }
