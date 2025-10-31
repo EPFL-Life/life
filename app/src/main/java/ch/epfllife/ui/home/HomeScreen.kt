@@ -26,6 +26,7 @@ import ch.epfllife.model.event.Event
 import ch.epfllife.model.map.Location
 import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
 import ch.epfllife.ui.composables.EventCard
+import ch.epfllife.ui.composables.Price
 import ch.epfllife.ui.composables.SearchBar
 
 @Composable
@@ -46,7 +47,7 @@ fun HomeScreen(
             time = "Oct 4th, 6:50am",
             associationId = "ESN Lausanne",
             tags = setOf("Sport", "Outdoor"),
-            price = 30u),
+            price = Price(30u)),
         Event(
             id = "2",
             title = "Music Festival",
@@ -55,7 +56,7 @@ fun HomeScreen(
             time = "Nov 3rd, 5:00PM",
             associationId = "Cultural Club",
             tags = setOf("Music", "Festival"),
-            price = 10u))
+            price = Price(10u)))
   }
 
   val shownEvents = if (selected == SubscriptionFilter.Subscribed) myEvents else allEvents

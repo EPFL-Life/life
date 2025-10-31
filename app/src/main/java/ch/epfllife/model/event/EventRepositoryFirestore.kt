@@ -2,6 +2,7 @@ package ch.epfllife.model.event
 
 import android.util.Log
 import ch.epfllife.model.map.Location
+import ch.epfllife.ui.composables.Price
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -93,7 +94,7 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
             time = time,
             associationId = associationId,
             tags = tags,
-            price = price,
+            price = Price(price),
             imageUrl = imageUrl)
       } catch (e: Exception) {
         // Catch any other errors (e.g., bad casts, toUInt() failure)

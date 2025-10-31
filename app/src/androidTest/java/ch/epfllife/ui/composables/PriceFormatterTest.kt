@@ -5,39 +5,26 @@ import org.junit.Test
 
 class PriceFormatterTest {
 
+  fun assertFormatting(priceInCents: UInt, expected: String) {
+    val result = Price(priceInCents).formatPrice()
+    assertEquals(expected, result)
+  }
+
   @Test
   fun returnsFree() {
-    val result = PriceFormatter.formatPrice(0u)
-    assertEquals("Free", result)
+    assertFormatting(priceInCents = 0u, expected = "Free")
   }
 
   @Test
   fun noCents() {
-    val result = PriceFormatter.formatPrice(300u)
-    assertEquals("CHF 3.00", result)
+    assertFormatting(priceInCents = 300u, expected = "CHF 3.00")
   }
 
-  @Test
-  fun oneNumberCent() {
-    val result = PriceFormatter.formatPrice(305u)
-    assertEquals("CHF 3.05", result)
-  }
+  @Test fun oneNumberCent() = assertFormatting(305u, "CHF 3.05")
 
-  @Test
-  fun multipleFrancs() {
-    val result = PriceFormatter.formatPrice(1250u)
-    assertEquals("CHF 12.50", result)
-  }
+  @Test fun multipleFrancs() = assertFormatting(priceInCents = 1250u, expected = "CHF 12.50")
 
-  @Test
-  fun smallPrices() {
-    val result = PriceFormatter.formatPrice(75u)
-    assertEquals("CHF 0.75", result)
-  }
+  @Test fun smallPrices() = assertFormatting(priceInCents = 7u, expected = "CHF 0.07")
 
-  @Test
-  fun completePrice() {
-    val result = PriceFormatter.formatPrice(123456u)
-    assertEquals("CHF 1234.56", result)
-  }
+  @Test fun completePrice() = assertFormatting(priceInCents = 123456u, expected = "CHF 1234.56")
 }

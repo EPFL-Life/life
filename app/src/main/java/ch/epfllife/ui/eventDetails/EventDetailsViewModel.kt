@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.map.Location
+import ch.epfllife.ui.composables.Price
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -45,7 +46,7 @@ class EventDetailsViewModel : ViewModel() {
                 time = "2025-10-12 18:00",
                 associationId = "AeroPoly",
                 tags = setOf("workshop"),
-                price = 10u,
+                price = Price(10u),
                 imageUrl =
                     "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")
         _uiState.value = EventDetailsUIState.Success(fakeEvent, isEnrolled = false)

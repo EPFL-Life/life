@@ -26,7 +26,7 @@ class ComposablesTest {
           time = "2024-03-15 14:00",
           associationId = "TestAssociation",
           tags = emptySet(),
-          price = 0u,
+          price = Price(0u),
       )
 
   @Test
@@ -45,14 +45,14 @@ class ComposablesTest {
 
   @Test
   fun eventCard_DisplaysFreePrice() {
-    val freeEvent = sampleEvent.copy(price = 0u)
+    val freeEvent = sampleEvent.copy(price = Price(0u))
     composeTestRule.setContent { EventCard(freeEvent) }
     composeTestRule.onNodeWithText("Free").assertIsDisplayed()
   }
 
   @Test
   fun eventCard_DisplaysPaidPrice() {
-    val paidEvent = sampleEvent.copy(price = 25u)
+    val paidEvent = sampleEvent.copy(price = Price(25u))
     composeTestRule.setContent { EventCard(paidEvent) }
     composeTestRule.onNodeWithText("CHF 25").assertIsDisplayed()
   }
@@ -86,7 +86,7 @@ class ComposablesTest {
   @Test
   fun eventCard_DisplaysMultipleEvents() {
     val event1 = sampleEvent.copy(id = "1", title = "Event One")
-    val event2 = sampleEvent.copy(id = "2", title = "Event Two", price = 10u)
+    val event2 = sampleEvent.copy(id = "2", title = "Event Two", price = Price(10u))
 
     composeTestRule.setContent {
       androidx.compose.foundation.layout.Column {
@@ -375,7 +375,7 @@ class ComposablesTest {
 
   @Test
   fun eventCard_HandlesZeroPrice() {
-    val freeEvent = sampleEvent.copy(price = 0u)
+    val freeEvent = sampleEvent.copy(price = Price(0u))
     composeTestRule.setContent { EventCard(freeEvent) }
     composeTestRule.onNodeWithText("Free").assertIsDisplayed()
     composeTestRule.onNodeWithText("CHF", substring = true).assertDoesNotExist()
@@ -383,7 +383,7 @@ class ComposablesTest {
 
   @Test
   fun eventCard_HandlesLargePrice() {
-    val expensiveEvent = sampleEvent.copy(price = 9999u)
+    val expensiveEvent = sampleEvent.copy(price = Price(9999u))
     composeTestRule.setContent { EventCard(expensiveEvent) }
     composeTestRule.onNodeWithText("CHF 9999").assertIsDisplayed()
   }

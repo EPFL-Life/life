@@ -5,6 +5,7 @@ import ch.epfllife.model.event.Event
 import ch.epfllife.model.map.Location
 import ch.epfllife.ui.composables.EventCard
 import ch.epfllife.ui.composables.EventCardTestTags
+import ch.epfllife.ui.composables.Price
 import ch.epfllife.utils.assertClickable
 import com.google.firebase.Timestamp
 import org.junit.Rule
@@ -22,7 +23,7 @@ class EventCardTest {
           time = Timestamp.now().toString(),
           associationId = "assoc1",
           tags = emptySet(),
-          price = 0u,
+          price = Price(0u),
       )
 
   @Test
