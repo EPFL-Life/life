@@ -3,8 +3,8 @@ package ch.epfllife.ui.eventDetails
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ch.epfllife.model.event.Event
-import ch.epfllife.model.event.EventRepository
-import ch.epfllife.model.event.EventRepositoryFirestore
+import ch.epfllife.model.map.Location
+import ch.epfllife.ui.composables.Price
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,12 +38,20 @@ class EventDetailsViewModel(
   fun loadEvent(eventId: String) {
     viewModelScope.launch {
       try {
-        val event = repo.getEvent(eventId)
-        if (event != null) {
-          _uiState.value = EventDetailsUIState.Success(event, isEnrolled = isEnrolled(event))
-        } else {
-          _uiState.value = EventDetailsUIState.Error("Event not found")
-        }
+        val fakeEvent =
+            Event(
+                id = "1",
+                title = "Drone Workshop",
+                description =
+                    "The Drone Workshop is a multi-evening workshop organized by AéroPoly...",
+                location = Location(46.5191, 6.5668, "Centre Sport et Santé"),
+                time = "2025-10-12 18:00",
+                associationId = "AeroPoly",
+                tags = setOf("workshop"),
+                price = Price(10u),
+                imageUrl =
+                    "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")
+        _uiState.value = EventDetailsUIState.Success(fakeEvent, isEnrolled = false)
       } catch (e: Exception) {
         _uiState.value = EventDetailsUIState.Error("Failed to load event: ${e.message}")
       }

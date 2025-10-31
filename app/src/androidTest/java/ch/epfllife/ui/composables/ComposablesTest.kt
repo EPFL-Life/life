@@ -23,15 +23,101 @@ class ComposablesTest {
           description = "This is a sample event",
           location = Location(46.520278, 6.565556, "EPFL"),
           time = "2024-03-15 14:00",
-          association =
-              Association(
-                  id = "hjebgfehib2",
-                  name = "TestAssociation",
-                  description = "This is a test",
-                  eventCategory = EventCategory.ACADEMIC),
-          tags = emptyList(),
-          price = 0u,
+          associationId = "TestAssociation",
+          tags = emptySet(),
+          price = Price(0u),
       )
+
+  @Test
+  fun eventCard_IsClickable() {
+    composeTestRule.assertClickable(
+        { clickHandler -> EventCard(sampleEvent, onClick = clickHandler) },
+        EventCardTestTags.EVENT_CARD,
+    )
+  }
+
+  @Test
+  fun eventCard_DisplaysEventTitle() {
+    composeTestRule.setContent { EventCard(sampleEvent) }
+    composeTestRule.onNodeWithText("Sample Event").assertIsDisplayed()
+  }
+
+  @Test
+  fun eventCard_DisplaysFreePrice() {
+    val freeEvent = sampleEvent.copy(price = Price(0u))
+    composeTestRule.setContent { EventCard(freeEvent) }
+    composeTestRule.onNodeWithText("Free").assertIsDisplayed()
+  }
+
+  @Test
+  fun eventCard_DisplaysPaidPrice() {
+    val paidEvent = sampleEvent.copy(price = Price(25u))
+    composeTestRule.setContent { EventCard(paidEvent) }
+    composeTestRule.onNodeWithText("CHF 25").assertIsDisplayed()
+  }
+
+  @Test
+  fun eventCard_DisplaysAssociationId() {
+    composeTestRule.setContent { EventCard(sampleEvent) }
+    composeTestRule.onNodeWithText("TestAssociation").assertIsDisplayed()
+  }
+
+  @Test
+  fun eventCard_DisplaysLocationName() {
+    composeTestRule.setContent { EventCard(sampleEvent) }
+    composeTestRule.onNodeWithText("EPFL").assertIsDisplayed()
+  }
+
+  @Test
+  fun eventCard_DisplaysEventTime() {
+    composeTestRule.setContent { EventCard(sampleEvent) }
+    composeTestRule.onNodeWithText("2024-03-15 14:00").assertIsDisplayed()
+  }
+
+  @Test
+  fun eventCard_TriggersOnClick() {
+    var clicked = false
+    composeTestRule.setContent { EventCard(sampleEvent, onClick = { clicked = true }) }
+    composeTestRule.onNodeWithTag(EventCardTestTags.EVENT_CARD).performClick()
+    assertTrue("EventCard should trigger onClick callback", clicked)
+  }
+
+  @Test
+  fun eventCard_DisplaysMultipleEvents() {
+    val event1 = sampleEvent.copy(id = "1", title = "Event One")
+    val event2 = sampleEvent.copy(id = "2", title = "Event Two", price = Price(10u))
+
+    composeTestRule.setContent {
+      androidx.compose.foundation.layout.Column {
+        EventCard(event1)
+        EventCard(event2)
+      }
+    }
+
+    composeTestRule.onNodeWithText("Event One").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Event Two").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Free").assertIsDisplayed()
+    composeTestRule.onNodeWithText("CHF 10").assertIsDisplayed()
+  }
+
+  @Test
+  fun eventCard_DisplaysCorrectlyWithLongTitle() {
+    val longTitleEvent =
+        sampleEvent.copy(title = "This is a very long event title that should still display")
+    composeTestRule.setContent { EventCard(longTitleEvent) }
+    composeTestRule
+        .onNodeWithText("This is a very long event title that should still display")
+        .assertIsDisplayed()
+  }
+
+  @Test
+  fun eventCard_DisplaysCorrectlyWithLongLocationName() {
+    val longLocationEvent =
+        sampleEvent.copy(location = Location(46.520278, 6.565556, "EPFL - Rolex Learning Center"))
+    composeTestRule.setContent { EventCard(longLocationEvent) }
+    composeTestRule.onNodeWithText("EPFL - Rolex Learning Center").assertIsDisplayed()
+  }
+
   // ============ SearchBar Tests ============
 
   @Test
@@ -277,6 +363,28 @@ class ComposablesTest {
 
     composeTestRule.onNodeWithText("Sample Event").performClick()
     assertTrue("Event should be clicked", eventClicked)
+  }
+
+  @Test
+  fun eventCard_HandlesEmptyTags() {
+    val eventWithEmptyTags = sampleEvent.copy(tags = emptySet())
+    composeTestRule.setContent { EventCard(eventWithEmptyTags) }
+    composeTestRule.onNodeWithText("Sample Event").assertIsDisplayed()
+  }
+
+  @Test
+  fun eventCard_HandlesZeroPrice() {
+    val freeEvent = sampleEvent.copy(price = Price(0u))
+    composeTestRule.setContent { EventCard(freeEvent) }
+    composeTestRule.onNodeWithText("Free").assertIsDisplayed()
+    composeTestRule.onNodeWithText("CHF", substring = true).assertDoesNotExist()
+  }
+
+  @Test
+  fun eventCard_HandlesLargePrice() {
+    val expensiveEvent = sampleEvent.copy(price = Price(9999u))
+    composeTestRule.setContent { EventCard(expensiveEvent) }
+    composeTestRule.onNodeWithText("CHF 9999").assertIsDisplayed()
   }
 
   @Test

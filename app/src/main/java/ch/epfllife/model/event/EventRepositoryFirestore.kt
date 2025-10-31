@@ -5,7 +5,7 @@ import ch.epfllife.model.association.Association
 import ch.epfllife.model.association.AssociationRepositoryFirestore
 import ch.epfllife.model.firestore.FirestoreCollections
 import ch.epfllife.model.map.Location
-import com.google.firebase.firestore.DocumentReference
+import ch.epfllife.ui.composables.Price
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.async
@@ -180,8 +180,8 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
             time = time,
             association = association!!,
             tags = tags,
-            price = price,
-            pictureUrl = pictureUrl)
+            price = Price(price),
+            imageUrl = imageUrl)
       } catch (e: Exception) {
         // Catch any other errors (e.g., bad casts, toUInt() failure)
         Log.e("FirestoreMapper", "Error converting document ${document.id} to Event", e)

@@ -8,6 +8,7 @@ import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.event.EventRepository
 import ch.epfllife.model.map.Location
+import ch.epfllife.ui.composables.Price
 import ch.epfllife.ui.eventDetails.EventDetailsContent
 import ch.epfllife.ui.eventDetails.EventDetailsTestTags
 import ch.epfllife.ui.eventDetails.EventDetailsUIState
@@ -31,15 +32,10 @@ class EventDetailsTest {
           description = "The Drone Workshop is a multi-evening workshop organized by AéroPoly...",
           location = Location(46.5191, 6.5668, "Centre Sport et Santé"),
           time = "2025-10-12 18:00",
-          association =
-              Association(
-                  name = "AeroPoly",
-                  id = "AeroPoly",
-                  description = "Description",
-                  eventCategory = EventCategory.ACADEMIC),
-          tags = listOf("workshop"),
-          price = 10u,
-          pictureUrl =
+          associationId = "AeroPoly",
+          tags = setOf("workshop"),
+          price = Price(10u),
+          imageUrl =
               "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")
 
   // Helper that creates a ViewModel with a fake repo returning sampleEvent for any id
@@ -320,16 +316,18 @@ class EventDetailsTest {
 
   @Test
   fun content_DisplaysFreeEvent() {
-    val freeEvent = sampleEvent.copy(price = 0u)
-    setEventContent(freeEvent)
+    val freeEvent = sampleEvent.copy(price = Price(0u))
+    composeTestRule.setContent { EventDetailsContent(event = freeEvent, viewModel = viewModel()) }
     // Price should be empty string for 0u price based on the code
     composeTestRule.onNodeWithTag(EventDetailsTestTags.EVENT_PRICE).assertIsDisplayed()
   }
 
   @Test
   fun content_DisplaysExpensiveEvent() {
-    val expensiveEvent = sampleEvent.copy(price = 999u)
-    setEventContent(expensiveEvent)
+    val expensiveEvent = sampleEvent.copy(price = Price(999u))
+    composeTestRule.setContent {
+      EventDetailsContent(event = expensiveEvent, viewModel = viewModel())
+    }
     composeTestRule.onNodeWithText("CHF 999").assertIsDisplayed()
   }
 

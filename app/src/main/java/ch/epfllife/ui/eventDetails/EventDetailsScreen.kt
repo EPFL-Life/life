@@ -27,7 +27,7 @@ import ch.epfllife.model.association.Association
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.map.Location
-import ch.epfllife.ui.composables.PriceFormatter
+import ch.epfllife.ui.composables.Price
 import ch.epfllife.ui.theme.Theme
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -160,7 +160,7 @@ fun EventDetailsContent(
                   )
                 }
                 Text(
-                    text = PriceFormatter.formatPrice(event.price),
+                    text = event.price.formatPrice(),
                     style =
                         MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium),
                     color = MaterialTheme.colorScheme.onSurface,
@@ -282,18 +282,11 @@ fun EventDetailsPreview() {
               "The Drone Workshop is a multi-evening workshop organized by AéroPoly, where you can build your own 3-inch FPV drone...",
           location = Location(46.5191, 6.5668, "Centre Sport et Santé"),
           time = "2025-10-12 18:00",
-          association =
-              Association(
-                  id = "dkjaend38rh",
-                  name = "AeroPoly",
-                  description = "AéroPoly is the EPFL drone club.",
-                  eventCategory = EventCategory.ACADEMIC,
-              ),
-          tags = listOf("workshop"),
-          price = 10u,
-          pictureUrl =
-              "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg",
-      )
+          associationId = "AeroPoly",
+          tags = setOf("workshop"),
+          price = Price(10u),
+          imageUrl =
+              "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")
 
   Theme() { EventDetailsContent(event = sampleEvent, viewModel = viewModel(), onOpenMap = {}) }
 }

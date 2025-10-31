@@ -5,6 +5,9 @@ import ch.epfllife.model.association.Association
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.map.Location
+import ch.epfllife.ui.composables.EventCard
+import ch.epfllife.ui.composables.EventCardTestTags
+import ch.epfllife.ui.composables.Price
 import ch.epfllife.utils.assertClickable
 import com.google.firebase.Timestamp
 import org.junit.Rule
@@ -19,16 +22,10 @@ class EventCardTest {
           title = "Test Event",
           description = "This is a test event",
           location = Location(46.520278, 6.565556, "EPFL"),
-          time = Timestamp.Companion.now().toString(),
-          association =
-              Association(
-                  name = "assoc1",
-                  id = "assoc1",
-                  description = "This is a test",
-                  eventCategory = EventCategory.ACADEMIC,
-              ),
-          tags = emptyList(),
-          price = 0u,
+          time = Timestamp.now().toString(),
+          associationId = "assoc1",
+          tags = emptySet(),
+          price = Price(0u),
       )
 
   @Test

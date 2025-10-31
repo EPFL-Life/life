@@ -2,6 +2,7 @@ package ch.epfllife.model.event
 
 import ch.epfllife.model.association.Association
 import ch.epfllife.model.map.Location
+import ch.epfllife.ui.composables.Price
 
 /** If this is modified please also fix documentToEvent() parser accordingly! */
 data class Event(
@@ -12,6 +13,6 @@ data class Event(
     val time: String, // for the moment it will be a string
     val associationId: String,
     val tags: Set<String>,
-    val price: UInt = 0u, // price in cents
+    val price: Price,
     val imageUrl: String? = null // referenced Image //TODO implement this in firebase
 )
