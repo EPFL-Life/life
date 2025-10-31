@@ -20,7 +20,7 @@ class EventCardTest {
           time = Timestamp.Companion.now().toString(),
           associationId = "assoc1",
           tags = emptySet(),
-          price = 0u,
+          price = Price(0u),
       )
 
   @Test

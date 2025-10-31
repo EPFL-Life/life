@@ -5,6 +5,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.map.Location
+import ch.epfllife.ui.composables.Price
 import ch.epfllife.ui.eventDetails.EventDetailsContent
 import ch.epfllife.ui.eventDetails.EventDetailsTestTags
 import ch.epfllife.ui.eventDetails.EventDetailsUIState
@@ -30,7 +31,7 @@ class EventDetailsTest {
           time = "2025-10-12 18:00",
           associationId = "AeroPoly",
           tags = setOf("workshop"),
-          price = 10u,
+          price = Price(10u),
           imageUrl =
               "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")
 
@@ -195,7 +196,7 @@ class EventDetailsTest {
 
   @Test
   fun content_DisplaysFreeEvent() {
-    val freeEvent = sampleEvent.copy(price = 0u)
+    val freeEvent = sampleEvent.copy(price = Price(0u))
     composeTestRule.setContent { EventDetailsContent(event = freeEvent, viewModel = viewModel()) }
     // Price should be empty string for 0u price based on the code
     composeTestRule.onNodeWithTag(EventDetailsTestTags.EVENT_PRICE).assertIsDisplayed()
@@ -203,7 +204,7 @@ class EventDetailsTest {
 
   @Test
   fun content_DisplaysExpensiveEvent() {
-    val expensiveEvent = sampleEvent.copy(price = 999u)
+    val expensiveEvent = sampleEvent.copy(price = Price(999u))
     composeTestRule.setContent {
       EventDetailsContent(event = expensiveEvent, viewModel = viewModel())
     }

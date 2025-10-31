@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.map.Location
+import ch.epfllife.ui.composables.Price
 import ch.epfllife.ui.theme.Theme
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -264,7 +265,7 @@ fun EventDetailsPreview() {
           time = "2025-10-12 18:00",
           associationId = "AeroPoly",
           tags = setOf("workshop"),
-          price = 10u,
+          price = Price(10u),
           imageUrl =
               "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")
 

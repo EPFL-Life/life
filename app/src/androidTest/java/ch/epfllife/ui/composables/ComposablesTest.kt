@@ -23,7 +23,7 @@ class ComposablesTest {
           time = "2024-03-15 14:00",
           associationId = "TestAssociation",
           tags = emptySet(),
-          price = 0u,
+          price = Price(0u),
       )
   // ============ SearchBar Tests ============
 
