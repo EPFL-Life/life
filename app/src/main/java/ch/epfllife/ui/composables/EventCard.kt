@@ -25,7 +25,7 @@ object EventCardTestTags {
 }
 
 @Composable
-fun EventCard(event: Event, modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
+fun EventCard(event: Event, modifier: Modifier = Modifier, onClick: () -> Unit) {
 
   Card(
       onClick = onClick,

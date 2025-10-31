@@ -85,21 +85,22 @@ fun HomeScreen(
 
     // If statement to display certain messages for empty screens
     if (shownEvents.isEmpty()) {
-      if (selected == SubscriptionFilter.Subscribed) {
-        EmptyEventsMessage(
-            title = stringResource(id = R.string.home_empty_title),
-            description = stringResource(id = R.string.home_empty_description),
-            modifier = modifier.fillMaxSize().padding(horizontal = 24.dp))
-      } else {
-        EmptyEventsMessage(
-            title = stringResource(id = R.string.home_no_events_title),
-            description = stringResource(id = R.string.home_no_events_description),
-            modifier = modifier.fillMaxSize().padding(horizontal = 24.dp))
-      }
+      val (title, description) =
+          if (selected == SubscriptionFilter.Subscribed) {
+            Pair(R.string.home_empty_title, R.string.home_empty_description)
+          } else {
+            Pair(R.string.home_no_events_title, R.string.home_no_events_description)
+          }
+      EmptyEventsMessage(
+          title = stringResource(id = title),
+          description = stringResource(id = description),
+          modifier = modifier.fillMaxSize().padding(horizontal = 24.dp))
     } else {
       LazyColumn(
           verticalArrangement = Arrangement.spacedBy(12.dp), modifier = modifier.fillMaxSize()) {
-            items(shownEvents, key = { it.id }) { ev -> EventCard(event = ev) }
+            items(shownEvents, key = { it.id }) { ev ->
+              EventCard(event = ev, onClick = { /* TODO: Navigate to event card */})
+            }
           }
     }
   }
