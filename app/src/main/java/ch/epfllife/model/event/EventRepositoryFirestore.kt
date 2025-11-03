@@ -64,9 +64,9 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
       return Association(
           id = assocSnap.id,
           name = assocSnap.get("name").toString(),
-          description = assocSnap.getString("description") ?: "",
+          description = assocSnap.getString("description")!!,
           pictureUrl = assocSnap.getString("pictureUrl"),
-          eventCategory = EventCategory.valueOf(assocSnap.getString("eventCategory") ?: "OTHER"))
+          eventCategory = EventCategory.valueOf(assocSnap.getString("eventCategory")!!))
     }
 
     suspend fun documentToEvent(document: DocumentSnapshot): Event? {
