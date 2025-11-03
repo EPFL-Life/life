@@ -224,7 +224,7 @@ tasks.register("jacocoTestReport", JacocoReport::class) {
     description = "Generate Jacoco coverage reports"
     group = "test"
 
-    //mustRunAfter("testDebugUnitTest", "connectedDebugAndroidTest")
+    mustRunAfter("testDebugUnitTest", "connectedDebugAndroidTest")
 
     reports {
         xml.required = true
