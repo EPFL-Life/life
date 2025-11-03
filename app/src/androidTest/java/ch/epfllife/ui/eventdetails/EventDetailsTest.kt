@@ -26,14 +26,14 @@ class EventDetailsTest {
   private val sampleEvent =
       Event(
           id = "AeroPoly",
-          title = "AeroPoly Drone Workshop",
+          title = "Drone Workshop",
           description = "The Drone Workshop is a multi-evening workshop organized by AéroPoly...",
           location = Location(46.5191, 6.5668, "Centre Sport et Santé"),
           time = "2025-10-12 18:00",
           association =
               Association(
-                  name = "assoc1",
-                  id = "assoc1",
+                  name = "AeroPoly",
+                  id = "AeroPoly",
                   description = "Description",
                   eventCategory = EventCategory.ACADEMIC),
           tags = setOf("workshop"),
