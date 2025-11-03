@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -19,6 +20,7 @@ import ch.epfllife.model.event.EventCategory
 import ch.epfllife.ui.composables.AssociationCard
 import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
 import ch.epfllife.ui.composables.SearchBar
+import ch.epfllife.ui.navigation.NavigationTestTags
 
 @Composable
 fun AssociationBrowser(
@@ -54,7 +56,11 @@ fun AssociationBrowser(
       if (selected == SubscriptionFilter.Subscribed) subscribedAssociations else allAssociations
 
   Column(
-      modifier = modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 12.dp),
+      modifier =
+          modifier
+              .fillMaxSize()
+              .padding(horizontal = 16.dp, vertical = 12.dp)
+              .testTag(NavigationTestTags.ASSOCIATIONBROWSER_SCREEN),
       horizontalAlignment = Alignment.CenterHorizontally) {
         // Empty space where the logo would normally be
         Spacer(Modifier.height(40.dp))
