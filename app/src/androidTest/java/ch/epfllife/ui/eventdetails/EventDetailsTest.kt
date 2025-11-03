@@ -33,8 +33,8 @@ class EventDetailsTest {
             time = "2025-10-12 18:00",
             association =
                 Association(
-                    name = "AeroPoly",
-                    id = "gejn82",
+                    name = "assoc1",
+                    id = "assoc1",
                     description = "Description",
                     eventCategory = EventCategory.ACADEMIC
                 ),
