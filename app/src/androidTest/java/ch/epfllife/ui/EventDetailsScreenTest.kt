@@ -24,92 +24,83 @@ import org.junit.Test
  */
 class EventDetailsScreenTest {
 
-    @get:Rule
-    val composeTestRule = createComposeRule()
+  @get:Rule val composeTestRule = createComposeRule()
 
-    private lateinit var sampleEvent: Event
+  private lateinit var sampleEvent: Event
 
-    @Before
-    fun setUp() {
-        // Create a mock event similar to the one used in the Preview
-        sampleEvent =
-            Event(
-                id = "1",
-                title = "Drone Workshop",
-                description =
-                    "The Drone Workshop is a multi-evening workshop organized by AéroPoly, where you can build your own 3-inch FPV drone...",
-                location = Location(46.5191, 6.5668, "Centre Sport et Santé"),
-                time = "2025-10-12 18:00",
-                association =
-                    Association(
-                        id = "AeroPoly",
-                        name = "AeroPoly",
-                        description = "Description",
-                        eventCategory = EventCategory.ACADEMIC
-                    ),
-                tags = setOf("workshop"),
-                price = 10u,
-                pictureUrl =
-                    "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg"
-            )
+  @Before
+  fun setUp() {
+    // Create a mock event similar to the one used in the Preview
+    sampleEvent =
+        Event(
+            id = "1",
+            title = "Drone Workshop",
+            description =
+                "The Drone Workshop is a multi-evening workshop organized by AéroPoly, where you can build your own 3-inch FPV drone...",
+            location = Location(46.5191, 6.5668, "Centre Sport et Santé"),
+            time = "2025-10-12 18:00",
+            association =
+                Association(
+                    id = "AeroPoly",
+                    name = "AeroPoly",
+                    description = "Description",
+                    eventCategory = EventCategory.ACADEMIC),
+            tags = setOf("workshop"),
+            price = 10u,
+            pictureUrl =
+                "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")
 
-        composeTestRule.setContent {
-            Theme {
-                EventDetailsContent(
-                    event = sampleEvent,
-                    onGoBack = {},
-                    viewModel = viewModel()
-                )
-            }
-        }
+    composeTestRule.setContent {
+      Theme { EventDetailsContent(event = sampleEvent, onGoBack = {}, viewModel = viewModel()) }
     }
+  }
 
-    /** Ensures that the event image is visible. */
-    @Test
-    fun eventImage_isDisplayed() {
-        composeTestRule.onNodeWithContentDescription("Event Image").assertIsDisplayed()
-    }
+  /** Ensures that the event image is visible. */
+  @Test
+  fun eventImage_isDisplayed() {
+    composeTestRule.onNodeWithContentDescription("Event Image").assertIsDisplayed()
+  }
 
-    /** Verifies that the title, club name, price, and description appear correctly. */
-    @Test
-    fun eventInformation_isDisplayedCorrectly() {
-        composeTestRule.onNodeWithText("Drone Workshop").assertIsDisplayed()
-        composeTestRule.onNodeWithText("AeroPoly").assertIsDisplayed()
-        composeTestRule.onNodeWithText("CHF 10").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Description").assertIsDisplayed()
-        composeTestRule.onNodeWithText(sampleEvent.description).assertIsDisplayed()
-    }
+  /** Verifies that the title, club name, price, and description appear correctly. */
+  @Test
+  fun eventInformation_isDisplayedCorrectly() {
+    composeTestRule.onNodeWithText("Drone Workshop").assertIsDisplayed()
+    composeTestRule.onNodeWithText("AeroPoly").assertIsDisplayed()
+    composeTestRule.onNodeWithText("CHF 10").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Description").assertIsDisplayed()
+    composeTestRule.onNodeWithText(sampleEvent.description).assertIsDisplayed()
+  }
 
-    /**
-     * Ensures that the date and time information are shown. Option 2 fix: avoids failure when
-     * multiple identical nodes are found.
-     */
-    @Test
-    fun dateAndTime_areDisplayed() {
-        composeTestRule.onNodeWithContentDescription("Date").assertExists()
-        composeTestRule.onNodeWithContentDescription("Time").assertExists()
-        // FIX: Instead of assuming a single node, we assert that *at least one* node displays the text
-        composeTestRule.onAllNodesWithText("2025-10-12 18:00")[0].assertIsDisplayed()
-    }
+  /**
+   * Ensures that the date and time information are shown. Option 2 fix: avoids failure when
+   * multiple identical nodes are found.
+   */
+  @Test
+  fun dateAndTime_areDisplayed() {
+    composeTestRule.onNodeWithContentDescription("Date").assertExists()
+    composeTestRule.onNodeWithContentDescription("Time").assertExists()
+    // FIX: Instead of assuming a single node, we assert that *at least one* node displays the text
+    composeTestRule.onAllNodesWithText("2025-10-12 18:00")[0].assertIsDisplayed()
+  }
 
-    /** Checks that the “View Location on Map” section is present and clickable. */
-    @Test
-    fun viewLocationOnMap_isDisplayedAndClickable() {
-        composeTestRule.onNodeWithText("View Location on Map").assertIsDisplayed()
-        composeTestRule.onNodeWithText("View Location on Map").performClick()
-    }
+  /** Checks that the “View Location on Map” section is present and clickable. */
+  @Test
+  fun viewLocationOnMap_isDisplayedAndClickable() {
+    composeTestRule.onNodeWithText("View Location on Map").assertIsDisplayed()
+    composeTestRule.onNodeWithText("View Location on Map").performClick()
+  }
 
-    /** Ensures that the enrolment button is visible and can be clicked. */
-    @Test
-    fun enrollButton_isDisplayedAndClickable() {
-        composeTestRule.onNodeWithText("Enrol in event").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Enrol in event").performClick()
-    }
+  /** Ensures that the enrolment button is visible and can be clicked. */
+  @Test
+  fun enrollButton_isDisplayedAndClickable() {
+    composeTestRule.onNodeWithText("Enrol in event").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Enrol in event").performClick()
+  }
 
-    /** Checks that the back arrow button exists and can be clicked. */
-    @Test
-    fun backButton_isDisplayedAndClickable() {
-        composeTestRule.onNodeWithContentDescription("Back").assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescription("Back").performClick()
-    }
+  /** Checks that the back arrow button exists and can be clicked. */
+  @Test
+  fun backButton_isDisplayedAndClickable() {
+    composeTestRule.onNodeWithContentDescription("Back").assertIsDisplayed()
+    composeTestRule.onNodeWithContentDescription("Back").performClick()
+  }
 }
