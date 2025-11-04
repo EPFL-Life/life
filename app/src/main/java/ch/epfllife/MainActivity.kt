@@ -84,7 +84,9 @@ fun App(
 ) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
-  val startDestination = Screen.HomeScreen.route
+  val startDestination =
+      if (FirebaseAuth.getInstance().currentUser == null) Screen.Auth.name
+      else Screen.HomeScreen.route
 
   // keep the current destination of the nav
   val backStackEntry by navController.currentBackStackEntryAsState()
