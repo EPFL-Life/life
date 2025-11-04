@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -64,7 +65,7 @@ fun SignInScreen(
   // Navigate to overview screen on successful login
   LaunchedEffect(uiState.user) {
     uiState.user?.let {
-      Toast.makeText(context, "Login successful!", Toast.LENGTH_SHORT).show()
+      Toast.makeText(context, R.string.signin_success_message, Toast.LENGTH_SHORT).show()
       onSignedIn()
     }
   }
@@ -81,8 +82,9 @@ fun SignInScreen(
         ) {
           // App Logo Image
           Image(
-              painter = painterResource(id = R.drawable.app_logo), // Ensure this drawable exists
-              contentDescription = "App Logo",
+              painter =
+                  painterResource(id = R.drawable.epfl_life_logo), // Ensure this drawable exists
+              contentDescription = stringResource(R.string.signin_epfllife_logo_alt_text),
               modifier = Modifier.size(250.dp).testTag(SignInScreenTestTags.APP_LOGO))
 
           Spacer(modifier = Modifier.height(16.dp))
@@ -90,7 +92,7 @@ fun SignInScreen(
           // Welcome Text
           Text(
               modifier = Modifier.testTag(SignInScreenTestTags.LOGIN_TITLE),
-              text = "Welcome",
+              text = stringResource(R.string.signin_welcome),
               style =
                   MaterialTheme.typography.headlineLarge.copy(fontSize = 57.sp, lineHeight = 64.sp),
               fontWeight = FontWeight.Bold,
@@ -129,14 +131,14 @@ fun GoogleSignInButton(onSignInClick: () -> Unit) {
               Image(
                   painter =
                       painterResource(id = R.drawable.google_logo), // Ensure this drawable exists
-                  contentDescription = "Google Logo",
+                  contentDescription = stringResource(R.string.signin_google_logo_alt_text),
                   modifier =
                       Modifier.size(30.dp) // Size of the Google logo
                           .padding(end = 8.dp))
 
               // Text for the button
               Text(
-                  text = "Sign in with Google",
+                  text = stringResource(R.string.signin_with_google),
                   color = Color.Gray, // Text color
                   fontSize = 16.sp, // Font size
                   fontWeight = FontWeight.Medium)
