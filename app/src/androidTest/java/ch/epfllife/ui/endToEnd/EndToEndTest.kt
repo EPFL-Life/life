@@ -2,6 +2,7 @@ package ch.epfllife.ui.endToEnd
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -11,11 +12,17 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import ch.epfllife.ThemedApp
 import ch.epfllife.model.authentication.Auth
+import ch.epfllife.ui.authentication.SignInScreenTestTags
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.navigation.Tab
+import ch.epfllife.ui.settings.SettingsScreenTestTags
 import ch.epfllife.utils.FakeCredentialManager
 import ch.epfllife.utils.FirebaseEmulator
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -89,6 +96,23 @@ class EndToEndTest {
   fun canExitWithDoubleBackPressFromMyEvents() {
     useLoggedInApp()
     canExitWithDoublePressFromTab(Tab.MyEvents)
+  }
+
+  @Test
+  fun canSignInAndOutAgain() {
+    useLoggedOutApp()
+    assertNull(Firebase.auth.currentUser)
+    composeTestRule.onNodeWithTag(NavigationTestTags.SIGN_IN_SCREEN).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(SignInScreenTestTags.SIGN_IN_BUTTON).performClick()
+    composeTestRule.waitUntil(5000) {
+      composeTestRule.onNodeWithTag(NavigationTestTags.HOMESCREEN_SCREEN).isDisplayed()
+    }
+    assertNotNull(Firebase.auth.currentUser)
+    composeTestRule.onNodeWithTag(NavigationTestTags.SETTINGS_TAB).performClick()
+    composeTestRule.onNodeWithTag(NavigationTestTags.SETTINGS_SCREEN).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(SettingsScreenTestTags.SIGN_OUT_BUTTON).performClick()
+    composeTestRule.onNodeWithTag(NavigationTestTags.SIGN_IN_SCREEN).assertIsDisplayed()
+    assertNull(Firebase.auth.currentUser)
   }
 
   private fun canExitWithDoublePressFromTab(tab: Tab) {
