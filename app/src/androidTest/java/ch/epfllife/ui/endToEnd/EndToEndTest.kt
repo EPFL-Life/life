@@ -17,13 +17,11 @@ import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.navigation.Tab
 import ch.epfllife.ui.settings.SettingsScreenTestTags
 import ch.epfllife.utils.FakeCredentialManager
-import ch.epfllife.utils.FirebaseEmulator
+import ch.epfllife.utils.setUpEmulatorAuth
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -42,19 +40,13 @@ class EndToEndTest {
     // https://stackoverflow.com/questions/39457305/android-testing-waited-for-the-root-of-the-view-hierarchy-to-have-window-focus
     UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         .executeShellCommand("am broadcast -a android.intent.action.CLOSE_SYSTEM_DIALOGS")
-    assertTrue(
-        "Firebase emulator must be running for local end-to-end tests",
-        FirebaseEmulator.isRunning,
-    )
-    // Reset to signed out state
-    val signOutResult = auth.signOut()
-    assertTrue("Sign out must succeed", signOutResult.isSuccess)
+    setUpEmulatorAuth(auth, "EndToEndTest")
   }
 
   fun useLoggedInApp() {
     runTest {
       val signInResult = auth.signInWithCredential(FakeCredentialManager.defaultUserCredentials)
-      assertTrue("Sign in must succeed", signInResult.isSuccess)
+      Assert.assertTrue("Sign in must succeed", signInResult.isSuccess)
     }
     composeTestRule.setContent { ThemedApp(auth) }
   }
@@ -101,18 +93,18 @@ class EndToEndTest {
   @Test
   fun canSignInAndOutAgain() {
     useLoggedOutApp()
-    assertNull(Firebase.auth.currentUser)
+    Assert.assertNull(Firebase.auth.currentUser)
     composeTestRule.onNodeWithTag(NavigationTestTags.SIGN_IN_SCREEN).assertIsDisplayed()
     composeTestRule.onNodeWithTag(SignInScreenTestTags.SIGN_IN_BUTTON).performClick()
     composeTestRule.waitUntil(5000) {
       composeTestRule.onNodeWithTag(NavigationTestTags.HOMESCREEN_SCREEN).isDisplayed()
     }
-    assertNotNull(Firebase.auth.currentUser)
+    Assert.assertNotNull(Firebase.auth.currentUser)
     composeTestRule.onNodeWithTag(NavigationTestTags.SETTINGS_TAB).performClick()
     composeTestRule.onNodeWithTag(NavigationTestTags.SETTINGS_SCREEN).assertIsDisplayed()
     composeTestRule.onNodeWithTag(SettingsScreenTestTags.SIGN_OUT_BUTTON).performClick()
     composeTestRule.onNodeWithTag(NavigationTestTags.SIGN_IN_SCREEN).assertIsDisplayed()
-    assertNull(Firebase.auth.currentUser)
+    Assert.assertNull(Firebase.auth.currentUser)
   }
 
   private fun canExitWithDoublePressFromTab(tab: Tab) {

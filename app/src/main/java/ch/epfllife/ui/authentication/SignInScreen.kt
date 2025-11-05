@@ -39,9 +39,10 @@ import ch.epfllife.model.authentication.Auth
 import ch.epfllife.ui.navigation.NavigationTestTags
 
 object SignInScreenTestTags {
-  const val APP_LOGO = "appLogo"
+  const val SIGN_IN_APP_LOGO = "signInAppLogo"
   const val SIGN_IN_TITLE = "signInTitle"
   const val SIGN_IN_BUTTON = "signInButton"
+  const val GOOGLE_LOGO = "googleLogo"
 }
 
 @Composable
@@ -62,7 +63,7 @@ fun SignInScreen(
     }
   }
 
-  // Navigate to overview screen on successful login
+  // Navigate to home screen on successful login
   LaunchedEffect(uiState.user) {
     uiState.user?.let {
       Toast.makeText(context, R.string.signin_success_message, Toast.LENGTH_SHORT).show()
@@ -81,7 +82,7 @@ fun SignInScreen(
     Image(
         painter = painterResource(id = R.drawable.epfl_life_logo), // Ensure this drawable exists
         contentDescription = stringResource(R.string.signin_epfllife_logo_alt_text),
-        modifier = Modifier.size(250.dp).testTag(SignInScreenTestTags.APP_LOGO),
+        modifier = Modifier.size(250.dp).testTag(SignInScreenTestTags.SIGN_IN_APP_LOGO),
     )
 
     Spacer(modifier = Modifier.height(16.dp))
@@ -131,7 +132,8 @@ fun GoogleSignInButton(onSignInClick: () -> Unit) {
           contentDescription = stringResource(R.string.signin_google_logo_alt_text),
           modifier =
               Modifier.size(30.dp) // Size of the Google logo
-                  .padding(end = 8.dp),
+                  .padding(end = 8.dp)
+                  .testTag(SignInScreenTestTags.GOOGLE_LOGO),
       )
 
       // Text for the button

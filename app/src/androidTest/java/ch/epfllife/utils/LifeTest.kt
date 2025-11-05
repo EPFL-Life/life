@@ -8,6 +8,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.navigation.Tab
+import ch.epfllife.model.authentication.Auth
 import org.junit.Assert
 
 /**
@@ -45,4 +46,14 @@ fun ComposeContentTestRule.navigateToTab(tab: Tab) {
   val screenTag = NavigationTestTags.getScreenTestTagForTab(tab)
   this.onNodeWithTag(tabTag, useUnmergedTree = true).performClick()
   this.onNodeWithTag(screenTag, useUnmergedTree = true).assertIsDisplayed()
+}
+
+fun setUpEmulatorAuth(auth: Auth, test: String) {
+  Assert.assertTrue(
+      "Firebase emulator must be running for local $test tests",
+      FirebaseEmulator.isRunning,
+  )
+  // Reset to signed out state
+  val signOutResult = auth.signOut()
+  Assert.assertTrue("Sign out must succeed", signOutResult.isSuccess)
 }
