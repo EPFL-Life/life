@@ -17,7 +17,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,11 +36,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.R
 import ch.epfllife.model.authentication.Auth
+import ch.epfllife.ui.navigation.NavigationTestTags
 
 object SignInScreenTestTags {
   const val APP_LOGO = "appLogo"
-  const val LOGIN_TITLE = "loginTitle"
-  const val LOGIN_BUTTON = "loginButton"
+  const val SIGN_IN_TITLE = "signInTitle"
+  const val SIGN_IN_BUTTON = "signInButton"
 }
 
 @Composable
@@ -72,47 +72,40 @@ fun SignInScreen(
 
   // The main container for the screen
   // A surface container using the 'background' color from the theme
-  Scaffold(
-      modifier = Modifier.fillMaxSize(),
-      content = { padding ->
-        Column(
-            modifier = Modifier.fillMaxSize().padding(padding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-          // App Logo Image
-          Image(
-              painter =
-                  painterResource(id = R.drawable.epfl_life_logo), // Ensure this drawable exists
-              contentDescription = stringResource(R.string.signin_epfllife_logo_alt_text),
-              modifier = Modifier.size(250.dp).testTag(SignInScreenTestTags.APP_LOGO),
-          )
+  Column(
+      modifier = Modifier.fillMaxSize().testTag(NavigationTestTags.SIGN_IN_SCREEN),
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.Center,
+  ) {
+    // App Logo Image
+    Image(
+        painter = painterResource(id = R.drawable.epfl_life_logo), // Ensure this drawable exists
+        contentDescription = stringResource(R.string.signin_epfllife_logo_alt_text),
+        modifier = Modifier.size(250.dp).testTag(SignInScreenTestTags.APP_LOGO),
+    )
 
-          Spacer(modifier = Modifier.height(16.dp))
+    Spacer(modifier = Modifier.height(16.dp))
 
-          // Welcome Text
-          Text(
-              modifier = Modifier.testTag(SignInScreenTestTags.LOGIN_TITLE),
-              text = stringResource(R.string.signin_welcome),
-              style =
-                  MaterialTheme.typography.headlineLarge.copy(fontSize = 57.sp, lineHeight = 64.sp),
-              fontWeight = FontWeight.Bold,
-              // center the text
+    // Welcome Text
+    Text(
+        modifier = Modifier.testTag(SignInScreenTestTags.SIGN_IN_TITLE),
+        text = stringResource(R.string.signin_welcome),
+        style = MaterialTheme.typography.headlineLarge.copy(fontSize = 57.sp, lineHeight = 64.sp),
+        fontWeight = FontWeight.Bold,
+        // center the text
 
-              textAlign = TextAlign.Center,
-          )
+        textAlign = TextAlign.Center,
+    )
 
-          Spacer(modifier = Modifier.height(48.dp))
+    Spacer(modifier = Modifier.height(48.dp))
 
-          // Authenticate With Google Button
-          if (uiState.isLoading) {
-            CircularProgressIndicator(modifier = Modifier.size(48.dp))
-          } else {
-            GoogleSignInButton(onSignInClick = { authViewModel.signIn(context) })
-          }
-        }
-      },
-  )
+    // Authenticate With Google Button
+    if (uiState.isLoading) {
+      CircularProgressIndicator(modifier = Modifier.size(48.dp))
+    } else {
+      GoogleSignInButton(onSignInClick = { authViewModel.signIn(context) })
+    }
+  }
 }
 
 @Composable
@@ -125,7 +118,7 @@ fun GoogleSignInButton(onSignInClick: () -> Unit) {
       modifier =
           Modifier.padding(8.dp)
               .height(48.dp) // Adjust height as needed
-              .testTag(SignInScreenTestTags.LOGIN_BUTTON),
+              .testTag(SignInScreenTestTags.SIGN_IN_BUTTON),
   ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,

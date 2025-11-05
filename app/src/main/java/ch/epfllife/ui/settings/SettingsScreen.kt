@@ -46,6 +46,15 @@ fun SettingsScreen(
       contentAlignment = Alignment.Center,
   ) {
     Text(text = "SettingsScreen")
-    Button(onClick = { viewModel.signOut() }) { Text("Sign out") }
+    Button(
+        modifier = modifier.testTag(SettingsScreenTestTags.SIGN_OUT_BUTTON),
+        onClick = { viewModel.signOut() },
+    ) {
+      Text("Sign out")
+    }
   }
+}
+
+object SettingsScreenTestTags {
+  const val SIGN_OUT_BUTTON = "signOutButton"
 }
