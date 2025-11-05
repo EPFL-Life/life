@@ -56,10 +56,6 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
     suspend fun getAssociation(document: DocumentSnapshot): Association? {
       val assocRef = document.get("association") as? DocumentReference ?: return null
       val assocSnap = assocRef.get().await()
-      if (!assocSnap.exists()) {
-        Log.e("getAssociationName", "Association doc does not exist: ${assocSnap.id}")
-        return null
-      }
 
       return Association(
           id = assocSnap.id,
