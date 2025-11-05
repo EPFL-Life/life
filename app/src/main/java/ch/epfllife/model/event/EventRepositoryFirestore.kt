@@ -73,9 +73,9 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
         // 2. Get required String fields
         // If any are missing (null), the Elvis operator (?:) will return null
         // from the entire function.
-        val title = document.getString("title") ?: return null
-        val description = document.getString("description") ?: return null
-        val time = document.getString("time") ?: return null
+        val title = document.getString("title")!!
+        val description = document.getString("description")!!
+        val time = document.getString("time")!!
         val association = getAssociation(document)
 
         // 3. Get optional String field
@@ -89,13 +89,13 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
 
         val location =
             Location(
-                name = locMap?.get("name") as? String ?: "",
-                latitude = locMap?.get("latitude") as? Double ?: 0.0,
-                longitude = locMap?.get("longitude") as? Double ?: 0.0)
+                name = locMap?.get("name") as String,
+                latitude = locMap["latitude"] as Double,
+                longitude = locMap["longitude"] as Double)
 
         // 5. Handle list-to-set conversion for tags
         // If 'tags' is missing, default to an empty list, which becomes an empty set.
-        val tagsList = document.get("tags") as? List<String> ?: emptyList()
+        val tagsList = document.get("tags") as List<String>
         val tags = tagsList.toSet()
 
         // 6. Handle numeric conversion for price (required)
@@ -110,7 +110,7 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
             description = description,
             location = location,
             time = time,
-            association = association ?: return null,
+            association = association!!,
             tags = tags,
             price = price,
             pictureUrl = pictureUrl)
