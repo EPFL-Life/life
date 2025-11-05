@@ -27,16 +27,16 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
     TODO("Not yet implemented")
   }
 
-  override suspend fun createEvent(event: Event) {
+  override suspend fun createEvent(event: Event): Result<Unit> {
     TODO("Not yet implemented")
   }
 
-  override suspend fun updateEvent(eventId: String, newEvent: Event) {
+  override suspend fun updateEvent(eventId: String, newEvent: Event): Result<Unit> {
     // add a check if the eventId is same as newEvent.Id
     TODO("Not yet implemented")
   }
 
-  override suspend fun deleteEvent(eventId: String) {
+  override suspend fun deleteEvent(eventId: String): Result<Unit> {
     TODO("Not yet implemented")
   }
 
