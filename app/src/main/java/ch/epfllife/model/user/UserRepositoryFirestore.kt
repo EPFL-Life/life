@@ -4,16 +4,27 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepository {
 
-  override suspend fun getUser(userId: String): User? {
+  override fun getNewUid(): String {
     TODO("Not yet implemented")
   }
 
-  override suspend fun createUser(user: User) {
+  override suspend fun getAllUsers(): List<User> {
     TODO("Not yet implemented")
   }
 
-  override suspend fun updateUser(userId: String, newUser: User) {
-    // add a check if the userId is the same as newUser.Id
+  override suspend fun getUser(userId: String): User {
+    TODO("Not yet implemented")
+  }
+
+  override suspend fun createUser(user: User): Result<Unit> {
+    TODO("Not yet implemented")
+  }
+
+  override suspend fun updateUser(userId: String, newUser: User): Result<Unit> {
+    TODO("Not yet implemented")
+  }
+
+  override suspend fun deleteUser(userId: String): Result<Unit> {
     TODO("Not yet implemented")
   }
 
