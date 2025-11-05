@@ -7,6 +7,7 @@ import ch.epfllife.model.map.Location
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlin.text.get
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.tasks.await
@@ -95,8 +96,8 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
 
         // 5. Handle list-to-set conversion for tags
         // If 'tags' is missing, default to an empty list, which becomes an empty set.
-        val tagsList = document.get("tags") as List<String>
-        val tags = tagsList.toSet()
+        val tags: Set<String> =
+            (document.get("tags") as List<*>).mapNotNull { it as String }.toSet()
 
         // 6. Handle numeric conversion for price (required)
         // Firestore stores all numbers as Long. Fail if 'price' is missing.
