@@ -12,5 +12,5 @@ data class Event(
     val association: Association,
     val tags: Set<String>,
     val price: UInt = 0u,
-    val pictureUrl: String? = null // referenced Image //TODO implement this in firebase
+    val pictureUrl: String? = null
 )
