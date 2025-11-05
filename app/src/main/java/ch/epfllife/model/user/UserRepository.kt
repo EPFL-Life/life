@@ -36,7 +36,7 @@ interface UserRepository {
    * Adds a new User's profile to the database (e.g., Firestore). This is typically called once
    * right after sign-up.
    *
-   * @param user The User to add. The **user.id must be the Firebase Auth UID**.
+   * @param newUser The User to add. The **user.id must be the Firebase Auth UID**.
    * @return A [Result] indicating success or failure.
    */
   suspend fun createUser(newUser: User): Result<Unit>
