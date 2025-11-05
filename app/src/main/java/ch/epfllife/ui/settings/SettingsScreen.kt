@@ -13,15 +13,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.credentials.CredentialManager
 import androidx.lifecycle.viewmodel.compose.viewModel
+import ch.epfllife.model.authentication.Auth
 import ch.epfllife.ui.navigation.NavigationTestTags
 
 @Composable
 fun SettingsScreen(
     modifier: Modifier = Modifier,
-    viewModel: SettingsViewModel = viewModel(),
-    credentialManager: CredentialManager,
+    auth: Auth,
+    viewModel: SettingsViewModel = viewModel { SettingsViewModel(auth) },
     onSignedOut: () -> Unit,
 ) {
   val context = LocalContext.current
@@ -46,6 +46,6 @@ fun SettingsScreen(
       contentAlignment = Alignment.Center,
   ) {
     Text(text = "SettingsScreen")
-    Button(onClick = { viewModel.signOut(credentialManager) }) { Text("Sign out") }
+    Button(onClick = { viewModel.signOut() }) { Text("Sign out") }
   }
 }

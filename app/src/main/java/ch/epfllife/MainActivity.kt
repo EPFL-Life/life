@@ -21,6 +21,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import ch.epfllife.model.authentication.AuthRepository
+import ch.epfllife.model.authentication.Auth
 import ch.epfllife.ui.association.AssociationBrowser
 import ch.epfllife.ui.association.AssociationDetailsScreen
 import ch.epfllife.ui.authentication.SignInScreen
@@ -34,50 +35,35 @@ import ch.epfllife.ui.navigation.Tab
 import ch.epfllife.ui.settings.SettingsScreen
 import ch.epfllife.ui.theme.Theme
 import com.google.firebase.auth.FirebaseAuth
-import okhttp3.OkHttpClient
-
-/**
- * *B3 only*:
- *
- * Provide an OkHttpClient client for network requests.
- *
- * Property `client` is mutable for testing purposes.
- */
-object HttpClientProvider {
-  var client: OkHttpClient = OkHttpClient()
-}
 
 class MainActivity : ComponentActivity() {
-
-  private lateinit var auth: FirebaseAuth
-  private lateinit var authRepository: AuthRepository
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    setContent { ThemedApp(CredentialManager.create(LocalContext.current)) }
+    setContent { ThemedApp(auth = Auth(CredentialManager.create(LocalContext.current))) }
   }
 }
 
 @Composable
-fun ThemedApp(credentialManager: CredentialManager) {
-  Theme { Surface(modifier = Modifier.fillMaxSize()) { App(credentialManager) } }
+fun ThemedApp(auth: Auth) {
+  Theme { Surface(modifier = Modifier.fillMaxSize()) { App(auth) } }
 }
 
 /**
  * `App` is the main composable function that sets up the whole app UI. It initializes the
  * navigation controller and defines the navigation graph.
  *
- * @param credentialManager The CredentialManager instance for handling authentication credentials.
+ * @param auth The auth handler.
  */
 @Composable
 fun App(
-    credentialManager: CredentialManager,
+    auth: Auth,
 ) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
   val startDestination =
-      if (FirebaseAuth.getInstance().currentUser == null) Screen.Auth.route
+      if (FirebaseAuth.getInstance().currentUser == null) Screen.SignIn.route
       else Screen.HomeScreen.route
 
   // keep the current destination of the nav
@@ -117,9 +103,9 @@ fun App(
             startDestination = startDestination,
             modifier = Modifier.padding(innerPadding),
         ) {
-          composable(Screen.Auth.route) {
+          composable(Screen.SignIn.route) {
             SignInScreen(
-                credentialManager = credentialManager,
+                auth = auth,
                 onSignedIn = { navigationActions.navigateTo(Screen.HomeScreen) },
             )
           }
@@ -136,8 +122,8 @@ fun App(
               }
           composable(Screen.Settings.route) {
             SettingsScreen(
-                credentialManager = credentialManager,
-                onSignedOut = { navigationActions.navigateTo(Screen.Auth) },
+                auth = auth,
+                onSignedOut = { navigationActions.navigateTo(Screen.SignIn) },
             )
           }
         }

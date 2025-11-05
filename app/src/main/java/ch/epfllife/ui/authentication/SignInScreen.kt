@@ -34,9 +34,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.credentials.CredentialManager
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.R
+import ch.epfllife.model.authentication.Auth
 
 object SignInScreenTestTags {
   const val APP_LOGO = "appLogo"
@@ -46,8 +46,8 @@ object SignInScreenTestTags {
 
 @Composable
 fun SignInScreen(
-    authViewModel: SignInViewModel = viewModel(),
-    credentialManager: CredentialManager,
+    auth: Auth,
+    authViewModel: SignInViewModel = viewModel { SignInViewModel(auth) },
     onSignedIn: () -> Unit,
 ) {
 
@@ -85,7 +85,8 @@ fun SignInScreen(
               painter =
                   painterResource(id = R.drawable.epfl_life_logo), // Ensure this drawable exists
               contentDescription = stringResource(R.string.signin_epfllife_logo_alt_text),
-              modifier = Modifier.size(250.dp).testTag(SignInScreenTestTags.APP_LOGO))
+              modifier = Modifier.size(250.dp).testTag(SignInScreenTestTags.APP_LOGO),
+          )
 
           Spacer(modifier = Modifier.height(16.dp))
 
@@ -98,7 +99,8 @@ fun SignInScreen(
               fontWeight = FontWeight.Bold,
               // center the text
 
-              textAlign = TextAlign.Center)
+              textAlign = TextAlign.Center,
+          )
 
           Spacer(modifier = Modifier.height(48.dp))
 
@@ -106,10 +108,11 @@ fun SignInScreen(
           if (uiState.isLoading) {
             CircularProgressIndicator(modifier = Modifier.size(48.dp))
           } else {
-            GoogleSignInButton(onSignInClick = { authViewModel.signIn(context, credentialManager) })
+            GoogleSignInButton(onSignInClick = { authViewModel.signIn(context) })
           }
         }
-      })
+      },
+  )
 }
 
 @Composable
@@ -122,26 +125,29 @@ fun GoogleSignInButton(onSignInClick: () -> Unit) {
       modifier =
           Modifier.padding(8.dp)
               .height(48.dp) // Adjust height as needed
-              .testTag(SignInScreenTestTags.LOGIN_BUTTON)) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth()) {
-              // Load the Google logo from resources
-              Image(
-                  painter =
-                      painterResource(id = R.drawable.google_logo), // Ensure this drawable exists
-                  contentDescription = stringResource(R.string.signin_google_logo_alt_text),
-                  modifier =
-                      Modifier.size(30.dp) // Size of the Google logo
-                          .padding(end = 8.dp))
+              .testTag(SignInScreenTestTags.LOGIN_BUTTON),
+  ) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+      // Load the Google logo from resources
+      Image(
+          painter = painterResource(id = R.drawable.google_logo), // Ensure this drawable exists
+          contentDescription = stringResource(R.string.signin_google_logo_alt_text),
+          modifier =
+              Modifier.size(30.dp) // Size of the Google logo
+                  .padding(end = 8.dp),
+      )
 
-              // Text for the button
-              Text(
-                  text = stringResource(R.string.signin_with_google),
-                  color = Color.Gray, // Text color
-                  fontSize = 16.sp, // Font size
-                  fontWeight = FontWeight.Medium)
-            }
-      }
+      // Text for the button
+      Text(
+          text = stringResource(R.string.signin_with_google),
+          color = Color.Gray, // Text color
+          fontSize = 16.sp, // Font size
+          fontWeight = FontWeight.Medium,
+      )
+    }
+  }
 }
