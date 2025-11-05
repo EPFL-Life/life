@@ -4,7 +4,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepository {
 
-  override fun getNewUid(): String {
+  override suspend fun getCurrentUser(): User? {
     TODO("Not yet implemented")
   }
 
@@ -12,11 +12,11 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     TODO("Not yet implemented")
   }
 
-  override suspend fun getUser(userId: String): User {
+  override suspend fun getUser(userId: String): User? {
     TODO("Not yet implemented")
   }
 
-  override suspend fun createUser(user: User): Result<Unit> {
+  override suspend fun createUser(newUser: User): Result<Unit> {
     TODO("Not yet implemented")
   }
 
@@ -25,10 +25,6 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
   }
 
   override suspend fun deleteUser(userId: String): Result<Unit> {
-    TODO("Not yet implemented")
-  }
-
-  override suspend fun getCurrentUser(): User? {
     TODO("Not yet implemented")
   }
 }
