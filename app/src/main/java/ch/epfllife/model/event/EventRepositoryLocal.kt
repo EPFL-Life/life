@@ -50,10 +50,10 @@ class EventRepositoryLocal : EventRepository {
   override suspend fun deleteEvent(eventId: String): Result<Unit> {
     val removed = events.removeIf { it.id == eventId }
 
-    if (removed) {
-      return Result.success(Unit)
+    return if (removed) {
+      Result.success(Unit)
     } else {
-      return Result.failure(NoSuchElementException("Event with id $eventId not found!"))
+      Result.failure(NoSuchElementException("Event with id $eventId not found!"))
     }
   }
 }
