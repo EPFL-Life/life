@@ -1,10 +1,21 @@
 package ch.epfllife.model.user
 
-/** Represents a repository that manages User data. */
+/**
+ * Represents a repository that manages User data, acting as the bridge between authentication
+ * (Firebase Auth) and the user database (Firestore).
+ */
 interface UserRepository {
 
-  /** Generates and returns a new unique identifier for a User. */
-  fun getNewUid(): String
+  /**
+   * Retrieves the profile of the *currently authenticated* user.
+   *
+   * This method connects the authentication service (Firebase Auth) to the user database. It first
+   * finds *who* is logged in, then fetches their corresponding User profile.
+   *
+   * @return The [User] object for the current user, or null if not logged in or if their profile
+   *   doesn't exist in the database.
+   */
+  suspend fun getCurrentUser(): User?
 
   /**
    * Retrieves all User profiles from the repository.
@@ -19,37 +30,35 @@ interface UserRepository {
    * @param userId The unique identifier of the User to retrieve.
    * @return The User with the specified identifier.
    */
-  suspend fun getUser(userId: String): User
+  suspend fun getUser(userId: String): User?
 
   /**
-   * Adds a new User to the repository.
+   * Adds a new User's profile to the database (e.g., Firestore). This is typically called once
+   * right after sign-up.
    *
-   * @param user The User to add.
+   * @param user The User to add. The **user.id must be the Firebase Auth UID**.
+   * @return A [Result] indicating success or failure.
    */
-  suspend fun createUser(user: User): Result<Unit>
+  suspend fun createUser(newUser: User): Result<Unit>
 
   /**
    * Edits an existing User in the repository.
    *
+   * After careful consideration we pass the userID and User *separately* so the function call is
+   * more clear and understandable. This is especially because the ID here is bound to an auth
+   * account. (discuss with @Daniel if you want to change this)
+   *
    * @param userId The unique identifier of the User to edit.
    * @param newUser The new value for the User.
+   * @return A [Result] indicating success or failure.
    */
   suspend fun updateUser(userId: String, newUser: User): Result<Unit>
 
   /**
-   * Deletes a User from the repository.
+   * Deletes a User's profile from the database.
    *
    * @param userId The unique identifier of the User to delete.
+   * @return A [Result] indicating success or failure.
    */
   suspend fun deleteUser(userId: String): Result<Unit>
-
-  /**
-   * This is an additional function because this class also relates to authentication (here we use a
-   * pragmatic approach to prevent creating an extra class) Retrieves the profile of the currently
-   * authenticated user. This is a common convenience method.
-   *
-   * @return The [User] object for the current user, or null if not logged in or profile doesn't
-   *   exist.
-   */
-  suspend fun getCurrentUser(): User?
 }
