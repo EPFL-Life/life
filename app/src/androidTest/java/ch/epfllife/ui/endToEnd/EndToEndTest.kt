@@ -7,6 +7,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.NoActivityResumedException
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.uiautomator.UiDevice
 import ch.epfllife.ThemedApp
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.navigation.Tab
@@ -20,6 +22,13 @@ class EndToEndTest {
 
   @Before
   fun setup() {
+    // CI tests sometimes fail because of an open system dialog
+    // (likely caused through the fact that it runs too slow)
+    // This should fix it, by closing open system dialogs before starting the test.
+    // Source:
+    // https://stackoverflow.com/questions/39457305/android-testing-waited-for-the-root-of-the-view-hierarchy-to-have-window-focus
+    UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        .executeShellCommand("am broadcast -a android.intent.action.CLOSE_SYSTEM_DIALOGS")
     composeTestRule.setContent { ThemedApp() }
   }
 
