@@ -12,6 +12,7 @@ import androidx.test.uiautomator.UiDevice
 import ch.epfllife.ThemedApp
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.navigation.Tab
+import ch.epfllife.utils.FakeCredentialManager
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -29,7 +30,7 @@ class EndToEndTest {
     // https://stackoverflow.com/questions/39457305/android-testing-waited-for-the-root-of-the-view-hierarchy-to-have-window-focus
     UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         .executeShellCommand("am broadcast -a android.intent.action.CLOSE_SYSTEM_DIALOGS")
-    composeTestRule.setContent { ThemedApp() }
+    composeTestRule.setContent { ThemedApp(FakeCredentialManager.withTestUser) }
   }
 
   @Test

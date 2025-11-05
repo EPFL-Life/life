@@ -32,7 +32,8 @@ object FakeJwtGenerator {
                 "sub" to counter.toString(),
                 "email" to email,
                 "name" to name,
-                "picture" to "http://example.com/avatar.png"))
+                "picture" to "http://example.com/avatar.png",
+            ))
 
     val headerEncoded = base64UrlEncode(header.toString().toByteArray())
     val payloadEncoded = base64UrlEncode(payload.toString().toByteArray())
@@ -42,6 +43,8 @@ object FakeJwtGenerator {
 
     return "$headerEncoded.$payloadEncoded.$signature"
   }
+
+  val testUserToken = createFakeGoogleIdToken(name = "Test User", email = "test.user@example.com")
 }
 
 class FakeCredentialManager private constructor(private val context: Context) :
@@ -60,7 +63,8 @@ class FakeCredentialManager private constructor(private val context: Context) :
       val fakeCustomCredential =
           CustomCredential(
               type = TYPE_GOOGLE_ID_TOKEN_CREDENTIAL,
-              data = bundleOf("id_token" to fakeUserIdToken))
+              data = bundleOf("id_token" to fakeUserIdToken),
+          )
 
       every { mockGetCredentialResponse.credential } returns fakeCustomCredential
       coEvery {
@@ -69,5 +73,7 @@ class FakeCredentialManager private constructor(private val context: Context) :
 
       return fakeCredentialManager
     }
+
+    val withTestUser = create(FakeJwtGenerator.testUserToken)
   }
 }
