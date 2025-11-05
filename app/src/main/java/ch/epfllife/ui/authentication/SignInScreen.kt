@@ -47,8 +47,8 @@ object SignInScreenTestTags {
 @Composable
 fun SignInScreen(
     authViewModel: SignInViewModel = viewModel(),
-    credentialManager: CredentialManager = CredentialManager.create(LocalContext.current),
-    onSignedIn: () -> Unit = {},
+    credentialManager: CredentialManager,
+    onSignedIn: () -> Unit,
 ) {
 
   val context = LocalContext.current

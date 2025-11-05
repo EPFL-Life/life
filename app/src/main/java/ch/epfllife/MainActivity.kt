@@ -1,6 +1,5 @@
 package ch.epfllife
 
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -32,7 +31,7 @@ import ch.epfllife.ui.navigation.NavigationActions
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.navigation.Screen
 import ch.epfllife.ui.navigation.Tab
-import ch.epfllife.ui.settings.Settings
+import ch.epfllife.ui.settings.SettingsScreen
 import ch.epfllife.ui.theme.Theme
 import com.google.firebase.auth.FirebaseAuth
 import okhttp3.OkHttpClient
@@ -56,31 +55,24 @@ class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    setContent { ThemedApp() }
+    setContent { ThemedApp(CredentialManager.create(LocalContext.current)) }
   }
 }
 
 @Composable
-fun ThemedApp() {
-  Theme { Surface(modifier = Modifier.fillMaxSize()) { App() } }
+fun ThemedApp(credentialManager: CredentialManager) {
+  Theme { Surface(modifier = Modifier.fillMaxSize()) { App(credentialManager) } }
 }
 
 /**
  * `App` is the main composable function that sets up the whole app UI. It initializes the
- * navigation controller and defines the navigation graph. You can add your app implementation
- * inside this function.
+ * navigation controller and defines the navigation graph.
  *
- * @param navHostController The navigation controller used for navigating between screens.
- *
- * For B3:
- *
- * @param context The context of the application, used for accessing resources and services.
  * @param credentialManager The CredentialManager instance for handling authentication credentials.
  */
 @Composable
 fun App(
-    context: Context = LocalContext.current,
-    credentialManager: CredentialManager = CredentialManager.create(context),
+    credentialManager: CredentialManager,
 ) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
@@ -135,8 +127,6 @@ fun App(
           composable(Screen.HomeScreen.route) { HomeScreen() }
           composable(Screen.AssociationBrowser.route) { AssociationBrowser() }
           composable(Screen.MyEvents.route) { MyEvents() }
-          composable(Screen.Settings.route) { Settings() }
-
           composable(
               route = Screen.AssociationDetails.route + "/{associationId}",
               arguments = listOf(navArgument("associationId") { type = NavType.StringType })) {
@@ -144,6 +134,12 @@ fun App(
                 val associationId = backStackEntry.arguments?.getString("associationId") ?: ""
                 AssociationDetailsScreen(associationId = associationId)
               }
+          composable(Screen.Settings.route) {
+            SettingsScreen(
+                credentialManager = credentialManager,
+                onSignedOut = { navigationActions.navigateTo(Screen.Auth) },
+            )
+          }
         }
       }
 }
