@@ -10,9 +10,13 @@ import androidx.test.espresso.NoActivityResumedException
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import ch.epfllife.ThemedApp
+import ch.epfllife.model.authentication.Auth
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.navigation.Tab
 import ch.epfllife.utils.FakeCredentialManager
+import ch.epfllife.utils.FirebaseEmulator
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -20,6 +24,7 @@ import org.junit.Test
 class EndToEndTest {
 
   @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+  private val auth = Auth(FakeCredentialManager.withDefaultTestUser)
 
   @Before
   fun setup() {
@@ -30,11 +35,30 @@ class EndToEndTest {
     // https://stackoverflow.com/questions/39457305/android-testing-waited-for-the-root-of-the-view-hierarchy-to-have-window-focus
     UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         .executeShellCommand("am broadcast -a android.intent.action.CLOSE_SYSTEM_DIALOGS")
-    composeTestRule.setContent { ThemedApp(FakeCredentialManager.withTestUser) }
+    assertTrue(
+        "Firebase emulator must be running for local end-to-end tests",
+        FirebaseEmulator.isRunning,
+    )
+    // Reset to signed out state
+    val signOutResult = auth.signOut()
+    assertTrue("Sign out must succeed", signOutResult.isSuccess)
+  }
+
+  fun useLoggedInApp() {
+    runTest {
+      val signInResult = auth.signInWithCredential(FakeCredentialManager.defaultUserCredentials)
+      assertTrue("Sign in must succeed", signInResult.isSuccess)
+    }
+    composeTestRule.setContent { ThemedApp(auth) }
+  }
+
+  fun useLoggedOutApp() {
+    composeTestRule.setContent { ThemedApp(auth) }
   }
 
   @Test
   fun canGoThroughAllTabs() {
+    useLoggedInApp()
     Tab.tabs.forEach { tab ->
       composeTestRule.onNodeWithTag(NavigationTestTags.getTabTestTag(tab)).performClick()
       composeTestRule
@@ -45,16 +69,27 @@ class EndToEndTest {
 
   @Test
   fun canExitWithBackPressFromHome() {
+    useLoggedInApp()
     assertBackPressWouldExit()
   }
 
-  @Test fun canExitWithDoubleBackPressFromSettings() = canExitWithDoublePressFromTab(Tab.Settings)
+  @Test
+  fun canExitWithDoubleBackPressFromSettings() {
+    useLoggedInApp()
+    canExitWithDoublePressFromTab(Tab.Settings)
+  }
 
   @Test
-  fun canExitWithDoubleBackPressFromAssociationBrowser() =
-      canExitWithDoublePressFromTab(Tab.AssociationBrowser)
+  fun canExitWithDoubleBackPressFromAssociationBrowser() {
+    useLoggedInApp()
+    canExitWithDoublePressFromTab(Tab.AssociationBrowser)
+  }
 
-  @Test fun canExitWithDoubleBackPressFromMyEvents() = canExitWithDoublePressFromTab(Tab.MyEvents)
+  @Test
+  fun canExitWithDoubleBackPressFromMyEvents() {
+    useLoggedInApp()
+    canExitWithDoublePressFromTab(Tab.MyEvents)
+  }
 
   private fun canExitWithDoublePressFromTab(tab: Tab) {
     composeTestRule.onNodeWithTag(NavigationTestTags.getTabTestTag(tab)).performClick()

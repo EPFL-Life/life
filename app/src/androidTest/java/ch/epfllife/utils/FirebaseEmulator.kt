@@ -79,7 +79,7 @@ object FirebaseEmulator {
   }
 
   /**
-   * Seeds a Google user in the Firebase Auth Emulator using a fake JWT id_token.
+   * Seeds a Google user in the Firebase SignIn Emulator using a fake JWT id_token.
    *
    * @param fakeIdToken A JWT-shaped string, must contain at least "sub".
    * @param email The email address to associate with the account.
@@ -107,7 +107,7 @@ object FirebaseEmulator {
 
     val response = httpClient.newCall(request).execute()
     assert(response.isSuccessful) {
-      "Failed to create user in Auth Emulator: ${response.code} ${response.message}"
+      "Failed to create user in SignIn Emulator: ${response.code} ${response.message}"
     }
   }
 
@@ -131,7 +131,7 @@ object FirebaseEmulator {
                     .build())
             .execute()
     assert(response.isSuccessful) {
-      "Failed to change email in Auth Emulator: ${response.code} ${response.message}"
+      "Failed to change email in SignIn Emulator: ${response.code} ${response.message}"
     }
   }
 
