@@ -130,7 +130,7 @@ fun AssociationDetailsContent(
                         else stringResource(R.string.subscribe_to, association.name))
                   }
 
-              Divider()
+              HorizontalDivider()
 
               // About Section
               Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -144,7 +144,7 @@ fun AssociationDetailsContent(
                     style = MaterialTheme.typography.bodyMedium)
               }
 
-              Divider()
+              HorizontalDivider()
 
               // Social Pages
               val context = LocalContext.current
@@ -239,7 +239,7 @@ fun AssociationDetailsContent(
                     }
               }
 
-              Divider()
+              HorizontalDivider()
 
               // Upcoming Events
               Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
