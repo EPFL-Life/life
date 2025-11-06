@@ -15,12 +15,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.credentials.CredentialManager
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import ch.epfllife.model.authentication.AuthRepository
 import ch.epfllife.ui.association.AssociationBrowser
+import ch.epfllife.ui.association.AssociationDetailsScreen
 import ch.epfllife.ui.authentication.SignInScreen
 import ch.epfllife.ui.home.HomeScreen
 import ch.epfllife.ui.myevents.MyEvents
@@ -128,6 +131,14 @@ fun App(
               composable(Screen.AssociationBrowser.route) { AssociationBrowser() }
               composable(Screen.MyEvents.route) { MyEvents() }
               composable(Screen.Settings.route) { Settings() }
+
+              composable(
+                  route = Screen.AssociationDetails.route + "/{associationId}",
+                  arguments = listOf(navArgument("associationId") { type = NavType.StringType })) {
+                      backStackEntry ->
+                    val associationId = backStackEntry.arguments?.getString("associationId") ?: ""
+                    AssociationDetailsScreen(associationId = associationId)
+                  }
             }
       }
 }
