@@ -21,10 +21,10 @@ object ExampleEvents {
           description = "Join us for an exciting symposium on satellite technology.",
           location = satelliteLocation,
           time = "2025-11-20 09:00",
-          associationId = "asso-sat",
+          association = ExampleAssociation.association1,
           tags = setOf("tech", "symposium", "space"),
           price = 25u, // Using UInt
-          imageUrl = "https://actu.epfl.ch/image/76257/original/5616x3744.jpg")
+          pictureUrl = "https://actu.epfl.ch/image/76257/original/5616x3744.jpg")
 
   val event2 =
       Event(
@@ -33,10 +33,10 @@ object ExampleEvents {
           description = "Annual music festival at EPFL. Don't miss out!",
           location = epflCampusLocation,
           time = "2026-05-08 18:00",
-          associationId = "asso-belec",
+          association = ExampleAssociation.association2,
           tags = setOf("music", "festival", "party"),
           price = 45u,
-          imageUrl =
+          pictureUrl =
               "https://www.jambase.com/wp-content/uploads/2023/04/332066973_940895027072259_250410373047721675_n-e1680722695547-1480x832.jpg")
 
   val event3 =
@@ -48,10 +48,10 @@ object ExampleEvents {
           location =
               Location(latitude = 46.5193, longitude = 6.5656, name = "Rolex Learning Center"),
           time = "2025-12-05 12:30",
-          associationId = "asso-cs",
+          association = ExampleAssociation.association3,
           tags = setOf("food", "networking", "free"),
           price = 0u, // Free event
-          imageUrl = null // No image
+          pictureUrl = null // No image
           )
 
   // A list of all sample events for convenience
