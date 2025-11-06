@@ -6,6 +6,8 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import ch.epfllife.ui.navigation.NavigationTestTags
+import ch.epfllife.ui.navigation.Tab
 import org.junit.Assert
 
 /**
@@ -38,8 +40,9 @@ fun ComposeContentTestRule.assertTagTextEquals(tag: String, text: String) {
       .assertTextEquals(text)
 }
 
-fun ComposeContentTestRule.navigateToTab(tab: String, screenTag: String) {
-
-  this.onNodeWithTag(tab, useUnmergedTree = true).performClick()
+fun ComposeContentTestRule.navigateToTab(tab: Tab) {
+  val tabTag = NavigationTestTags.getTabTestTag(tab)
+  val screenTag = NavigationTestTags.getScreenTestTagForTab(tab)
+  this.onNodeWithTag(tabTag, useUnmergedTree = true).performClick()
   this.onNodeWithTag(screenTag, useUnmergedTree = true).assertIsDisplayed()
 }
