@@ -101,8 +101,12 @@ class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : Associ
             pictureUrl = pictureUrl,
             eventCategory = eventCategory)
       } catch (e: NullPointerException) {
-        // Log any errors during conversion (e.g., valueOf fails for enum)
+        // this can happen when one of the required fields is not present
         Log.e("AssociationRepository", "Error converting document to Association", e)
+        null
+      } catch (e: IllegalArgumentException) {
+        // this can happen when parsing the eventCategory convert to non-existent enum value
+        Log.e("AssociationRepository", "Error converting EventCategory to enum", e)
         null
       }
     }
