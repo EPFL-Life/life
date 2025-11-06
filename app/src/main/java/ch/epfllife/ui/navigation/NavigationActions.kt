@@ -21,7 +21,7 @@ sealed class Screen(
   object Settings : Screen(route = "settings", name = "Settings", isTopLevelDestination = true)
 
   object AssociationDetails :
-      Screen(route = "associationdetails/{associationID}", name = "AssociationDetails")
+      Screen(route = "associationdetails/{associationId}", name = "AssociationDetails")
 }
 
 open class NavigationActions(
