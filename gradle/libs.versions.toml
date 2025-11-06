@@ -1,6 +1,7 @@
 [versions]
 # Plugins
 agp = "8.13.0"
+coilCompose = "2.7.0"
 json = "20240303"
 kotlin = "1.9.0"
 gms = "4.4.2"
@@ -9,6 +10,7 @@ ktfmt = "0.17.0"
 # UI Compose
 mockitoAndroid = "5.13.0"
 ui = "1.6.8"
+uiautomator = "2.4.0-alpha06"
 uiTestJunit4 = "1.6.8"
 uiTestManifest = "1.6.8"
 uiTooling = "1.6.8"
@@ -89,6 +91,8 @@ androidx-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", versi
 androidx-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "uiTestManifest" }
 androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "uiTooling" }
 androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "ui" }
+androidx-uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiautomator" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 core-ktx = { module = "com.google.android.play:core-ktx", version.ref = "coreKtxVersion" }
 credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
 credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }

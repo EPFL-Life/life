@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,90 +21,72 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.R
 import ch.epfllife.model.enums.SubscriptionFilter
-import ch.epfllife.model.event.Event
-import ch.epfllife.model.map.Location
 import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
 import ch.epfllife.ui.composables.EventCard
 import ch.epfllife.ui.composables.SearchBar
+import ch.epfllife.ui.navigation.NavigationTestTags
 
 @Composable
-fun HomeScreen(
-    modifier: Modifier = Modifier,
-) {
+fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel = viewModel()) {
   var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
 
-  val myEvents = remember { emptyList<Event>() } // No events to show empty state
-
-  val allEvents = remember {
-    listOf(
-        Event(
-            id = "1",
-            title = "Via Ferrata",
-            description = "Excursion to the Alps",
-            location = Location(0.0, 0.0, "Lausanne Train Station"),
-            time = "Oct 4th, 6:50am",
-            associationId = "ESN Lausanne",
-            tags = setOf("Sport", "Outdoor"),
-            price = 30u),
-        Event(
-            id = "2",
-            title = "Music Festival",
-            description = "Outdoor concert organized by the Cultural Club",
-            location = Location(0.0, 0.0, "Esplanade"),
-            time = "Nov 3rd, 5:00PM",
-            associationId = "Cultural Club",
-            tags = setOf("Music", "Festival"),
-            price = 10u))
-  }
+  val myEvents by viewModel.myEvents.collectAsState()
+  val allEvents by viewModel.allEvents.collectAsState()
 
   val shownEvents = if (selected == SubscriptionFilter.Subscribed) myEvents else allEvents
 
-  Column(modifier = modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 12.dp)) {
-    Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-      Image(
-          painter = painterResource(id = R.drawable.epfl_life_logo),
-          contentDescription = "EPFL Life Logo",
-          modifier = modifier.height(40.dp).testTag(HomeScreenTestTags.EPFLLOGO),
-          contentScale = ContentScale.Fit)
-    }
+  Column(
+      modifier =
+          modifier
+              .fillMaxSize()
+              .padding(horizontal = 16.dp, vertical = 12.dp)
+              .testTag(NavigationTestTags.HOMESCREEN_SCREEN)) {
+        Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+          Image(
+              painter = painterResource(id = R.drawable.epfl_life_logo),
+              contentDescription = "EPFL Life Logo",
+              modifier = modifier.height(40.dp).testTag(HomeScreenTestTags.EPFLLOGO),
+              contentScale = ContentScale.Fit)
+        }
 
-    Spacer(Modifier.height(12.dp))
-    SearchBar()
+        Spacer(Modifier.height(12.dp))
+        SearchBar()
 
-    Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(12.dp))
 
-    DisplayedSubscriptionFilter(
-        selected = selected,
-        onSelected = { selected = it },
-        subscribedLabel = stringResource(id = R.string.subscribed_filter),
-        allLabel = stringResource(id = R.string.all_events_filter))
+        DisplayedSubscriptionFilter(
+            selected = selected,
+            onSelected = { selected = it },
+            subscribedLabel = stringResource(id = R.string.subscribed_filter),
+            allLabel = stringResource(id = R.string.all_events_filter))
 
-    Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(12.dp))
 
-    // If statement to display certain messages for empty screens
-    if (shownEvents.isEmpty()) {
-      if (selected == SubscriptionFilter.Subscribed) {
-        EmptyEventsMessage(
-            title = stringResource(id = R.string.home_empty_title),
-            description = stringResource(id = R.string.home_empty_description),
-            modifier = modifier.fillMaxSize().padding(horizontal = 24.dp))
-      } else {
-        EmptyEventsMessage(
-            title = stringResource(id = R.string.home_no_events_title),
-            description = stringResource(id = R.string.home_no_events_description),
-            modifier = modifier.fillMaxSize().padding(horizontal = 24.dp))
+        // If statement to display certain messages for empty screens
+        if (shownEvents.isEmpty()) {
+          val (title, description) =
+              if (selected == SubscriptionFilter.Subscribed) {
+                Pair(R.string.home_empty_title, R.string.home_empty_description)
+              } else {
+                Pair(R.string.home_no_events_title, R.string.home_no_events_description)
+              }
+          EmptyEventsMessage(
+              title = stringResource(id = title),
+              description = stringResource(id = description),
+              modifier = modifier.fillMaxSize().padding(horizontal = 24.dp))
+        } else {
+          LazyColumn(
+              verticalArrangement = Arrangement.spacedBy(12.dp),
+              modifier = modifier.fillMaxSize()) {
+                items(shownEvents, key = { it.id }) { ev ->
+                  EventCard(event = ev, onClick = { /* TODO: Navigate to event card */})
+                }
+              }
+        }
       }
-    } else {
-      LazyColumn(
-          verticalArrangement = Arrangement.spacedBy(12.dp), modifier = modifier.fillMaxSize()) {
-            items(shownEvents, key = { it.id }) { ev ->
-              EventCard(event = ev, onClick = { /* TODO: Navigate to event card */})
-            }
-          }
-    }
-  }
 }
 
 @Composable

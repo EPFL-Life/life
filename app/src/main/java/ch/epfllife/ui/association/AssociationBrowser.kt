@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -19,6 +20,7 @@ import ch.epfllife.model.event.EventCategory
 import ch.epfllife.ui.composables.AssociationCard
 import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
 import ch.epfllife.ui.composables.SearchBar
+import ch.epfllife.ui.navigation.NavigationTestTags
 
 @Composable
 fun AssociationBrowser(
@@ -49,7 +51,11 @@ fun AssociationBrowser(
       if (selected == SubscriptionFilter.Subscribed) subscribedAssociations else allAssociations
 
   Column(
-      modifier = modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 12.dp),
+      modifier =
+          modifier
+              .fillMaxSize()
+              .padding(horizontal = 16.dp, vertical = 12.dp)
+              .testTag(NavigationTestTags.ASSOCIATIONBROWSER_SCREEN),
       horizontalAlignment = Alignment.CenterHorizontally) {
         // Empty space where the logo would normally be
         Spacer(Modifier.height(40.dp))
@@ -68,17 +74,16 @@ fun AssociationBrowser(
 
         // If statement to display certain messages for empty screens
         if (shownAssociations.isEmpty()) {
-          if (selected == SubscriptionFilter.Subscribed) {
-            EmptyAssociationsMessage(
-                title = stringResource(id = R.string.associations_empty_title),
-                description = stringResource(id = R.string.associations_empty_description),
-                modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp))
-          } else {
-            EmptyAssociationsMessage(
-                title = stringResource(id = R.string.associations_no_all_title),
-                description = stringResource(id = R.string.associations_no_all_description),
-                modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp))
-          }
+          val (title, description) =
+              if (selected == SubscriptionFilter.Subscribed) {
+                Pair(R.string.associations_empty_title, R.string.associations_empty_description)
+              } else {
+                Pair(R.string.associations_no_all_title, R.string.associations_no_all_description)
+              }
+          EmptyAssociationsMessage(
+              title = stringResource(id = title),
+              description = stringResource(id = description),
+              modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp))
         } else {
           LazyColumn(
               verticalArrangement = Arrangement.spacedBy(12.dp),

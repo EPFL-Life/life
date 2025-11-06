@@ -1,3 +1,4 @@
+import org.gradle.kotlin.dsl.invoke
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -78,6 +79,7 @@ android {
     }
 
     testOptions {
+        animationsDisabled = true
         unitTests {
             isIncludeAndroidResources = true
 
@@ -119,12 +121,15 @@ android {
 }
 
 sonar {
-  properties {
-    property("sonar.projectKey", "EPFL-Life_life")
-    property("sonar.organization", "epfl-life")
-    property("sonar.host.url", "https://sonarcloud.io")
-    property("sonar.coverage.jacoco.xmlReportPaths", "${project.layout.buildDirectory.get()}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
-  }
+    properties {
+        property("sonar.projectKey", "EPFL-Life_life")
+        property("sonar.organization", "epfl-life")
+        property("sonar.host.url", "https://sonarcloud.io")
+        property(
+            "sonar.coverage.jacoco.xmlReportPaths",
+            "${project.layout.buildDirectory.get()}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
+        )
+    }
 }
 
 dependencies {
@@ -146,10 +151,8 @@ dependencies {
     implementation(libs.androidx.material)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.coil.compose)
     implementation(platform(libs.androidx.compose.bom))
-    testImplementation(libs.test.core.ktx)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.material)
     implementation(libs.androidx.material.icons.extended)
 
@@ -179,7 +182,10 @@ dependencies {
     implementation(libs.okhttp)
 
     // Testing Unit
+    testImplementation(libs.test.core.ktx)
     testImplementation(libs.junit)
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
     androidTestImplementation(libs.mockk)
     androidTestImplementation(libs.mockk.android)
     androidTestImplementation(libs.mockk.agent)
@@ -202,9 +208,7 @@ dependencies {
     androidTestImplementation(libs.kaspresso.compose.support)
 
     testImplementation(libs.kotlinx.coroutines.test)
-
-    implementation("io.coil-kt:coil-compose:2.7.0")
-
+    androidTestImplementation(libs.androidx.uiautomator)
 }
 
 
@@ -217,6 +221,9 @@ tasks.withType<Test> {
 }
 
 tasks.register("jacocoTestReport", JacocoReport::class) {
+    description = "Generate Jacoco coverage reports"
+    group = "test"
+
     mustRunAfter("testDebugUnitTest", "connectedDebugAndroidTest")
 
     reports {

@@ -56,8 +56,13 @@ class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    setContent { Theme { Surface(modifier = Modifier.fillMaxSize()) { App() } } }
+    setContent { ThemedApp() }
   }
+}
+
+@Composable
+fun ThemedApp() {
+  Theme { Surface(modifier = Modifier.fillMaxSize()) { App() } }
 }
 
 /**
