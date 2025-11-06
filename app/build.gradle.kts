@@ -121,12 +121,15 @@ android {
 }
 
 sonar {
-  properties {
-    property("sonar.projectKey", "EPFL-Life_life")
-    property("sonar.organization", "epfl-life")
-    property("sonar.host.url", "https://sonarcloud.io")
-    property("sonar.coverage.jacoco.xmlReportPaths", "${project.layout.buildDirectory.get()}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
-  }
+    properties {
+        property("sonar.projectKey", "EPFL-Life_life")
+        property("sonar.organization", "epfl-life")
+        property("sonar.host.url", "https://sonarcloud.io")
+        property(
+            "sonar.coverage.jacoco.xmlReportPaths",
+            "${project.layout.buildDirectory.get()}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
+        )
+    }
 }
 
 dependencies {
