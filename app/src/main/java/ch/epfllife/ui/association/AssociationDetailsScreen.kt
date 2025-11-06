@@ -33,12 +33,19 @@ import ch.epfllife.ui.theme.Theme
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 
+/**
+ * Association details screen.
+ *
+ * @param associationId The ID of the association to display.
+ * @param onGoBack Callback when the user presses the back button.
+ */
 @Composable
 fun AssociationDetailsScreen(associationId: String, onGoBack: () -> Unit = {}) {
-  // TODO: Replace with real ViewModel loading later
+  // For now, we still use a sample association.
+  // In the future, you can replace this with a ViewModel fetching the association by ID.
   val sampleAssociation =
       Association(
-          id = "1",
+          id = associationId, // Now we actually use the passed associationId
           name = "ESN Lausanne",
           description = "Erasmus Student Network at EPFL.",
           eventCategory = EventCategory.CULTURE,
@@ -64,8 +71,8 @@ fun AssociationDetailsContent(
     onGoBack: () -> Unit = {}
 ) {
   var isSubscribed by remember { mutableStateOf(false) }
-
   val scrollState = rememberScrollState()
+  val context = LocalContext.current
 
   Column(
       modifier =
@@ -73,7 +80,7 @@ fun AssociationDetailsContent(
               .fillMaxSize()
               .verticalScroll(scrollState)
               .background(MaterialTheme.colorScheme.surface)) {
-        // --- Header Image ---
+        // Header Image
         Box(modifier = Modifier.fillMaxWidth()) {
           AsyncImage(
               model =
@@ -103,10 +110,10 @@ fun AssociationDetailsContent(
               }
         }
 
-        // --- Content Below Header ---
+        // Content Below Header
         Column(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(0.dp)) {
+            verticalArrangement = Arrangement.spacedBy(8.dp)) {
               Text(
                   text = association.name,
                   style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold))
@@ -124,13 +131,13 @@ fun AssociationDetailsContent(
                       ButtonDefaults.buttonColors(
                           containerColor = if (isSubscribed) Color.Gray else Color(0xFFDC2626),
                           contentColor = Color.White)) {
-                    Text( // move hardcoded strings to strings.xml
+                    Text(
                         if (isSubscribed)
                             stringResource(R.string.unsubscribe_from, association.name)
                         else stringResource(R.string.subscribe_to, association.name))
                   }
 
-              HorizontalDivider()
+              HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
 
               // About Section
               Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -138,17 +145,14 @@ fun AssociationDetailsContent(
                     stringResource(R.string.about_section_title),
                     style =
                         MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold))
-                // TODO: Replace association description from database
                 Text(
                     association.about ?: stringResource(R.string.about_placeholder),
                     style = MaterialTheme.typography.bodyMedium)
               }
 
-              HorizontalDivider()
+              HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
 
               // Social Pages
-              val context = LocalContext.current
-
               Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
                     stringResource(R.string.social_pages_title),
@@ -158,80 +162,23 @@ fun AssociationDetailsContent(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(24.dp),
                     verticalAlignment = Alignment.CenterVertically) {
-                      // Instagram
-                      association.socialLinks?.get("instagram")?.let { url ->
+                      association.socialLinks?.forEach { (platform, url) ->
                         IconButton(
                             onClick = {
-                              val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                              context.startActivity(intent)
+                              context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
                             }) {
+                              val iconRes =
+                                  when (platform) {
+                                    "instagram" -> R.drawable.ic_instagram
+                                    "telegram" -> R.drawable.ic_telegram
+                                    "whatsapp" -> R.drawable.ic_whatsapp
+                                    "linkedin" -> R.drawable.ic_linkedin
+                                    "website" -> R.drawable.ic_google
+                                    else -> R.drawable.ic_google
+                                  }
                               Icon(
-                                  painter = painterResource(id = R.drawable.ic_instagram),
-                                  contentDescription =
-                                      stringResource(R.string.instagram_description),
-                                  tint = Color.Unspecified,
-                                  modifier = Modifier.size(32.dp))
-                            }
-                      }
-
-                      // Telegram
-                      association.socialLinks?.get("telegram")?.let { url ->
-                        IconButton(
-                            onClick = {
-                              val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                              context.startActivity(intent)
-                            }) {
-                              Icon(
-                                  painter = painterResource(id = R.drawable.ic_telegram),
-                                  contentDescription =
-                                      stringResource(R.string.telegram_description),
-                                  tint = Color.Unspecified,
-                                  modifier = Modifier.size(32.dp))
-                            }
-                      }
-
-                      // WhatsApp
-                      association.socialLinks?.get("whatsapp")?.let { url ->
-                        IconButton(
-                            onClick = {
-                              val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                              context.startActivity(intent)
-                            }) {
-                              Icon(
-                                  painter = painterResource(id = R.drawable.ic_whatsapp),
-                                  contentDescription =
-                                      stringResource(R.string.whatsapp_description),
-                                  tint = Color.Unspecified,
-                                  modifier = Modifier.size(32.dp))
-                            }
-                      }
-
-                      // LinkedIn
-                      association.socialLinks?.get("linkedin")?.let { url ->
-                        IconButton(
-                            onClick = {
-                              val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                              context.startActivity(intent)
-                            }) {
-                              Icon(
-                                  painter = painterResource(id = R.drawable.ic_linkedin),
-                                  contentDescription =
-                                      stringResource(R.string.linkedin_description),
-                                  tint = Color.Unspecified,
-                                  modifier = Modifier.size(32.dp))
-                            }
-                      }
-
-                      // Google (Website)
-                      association.socialLinks?.get("website")?.let { url ->
-                        IconButton(
-                            onClick = {
-                              val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                              context.startActivity(intent)
-                            }) {
-                              Icon(
-                                  painter = painterResource(id = R.drawable.ic_google),
-                                  contentDescription = stringResource(R.string.website_description),
+                                  painter = painterResource(id = iconRes),
+                                  contentDescription = platform,
                                   tint = Color.Unspecified,
                                   modifier = Modifier.size(32.dp))
                             }
@@ -239,9 +186,9 @@ fun AssociationDetailsContent(
                     }
               }
 
-              HorizontalDivider()
+              HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
 
-              // Upcoming Events
+              // Upcoming Events (dummy data)
               Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(
                     stringResource(R.string.upcoming_events_title),
