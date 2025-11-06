@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import ch.epfllife.ThemedApp
 import ch.epfllife.ui.home.HomeScreenTestTags
+import ch.epfllife.utils.navigateToTab
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -21,142 +22,180 @@ class NavigationTest {
 
   @Test
   fun testTagsAreCorrectlySet() {
-    composeTestRule.onNodeWithTag(NavigationTestTags.SETTINGS_TAB).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(NavigationTestTags.HOMESCREEN_TAB).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(NavigationTestTags.ASSOCIATIONBROWSER_TAB).assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag(NavigationTestTags.SETTINGS_TAB, useUnmergedTree = true)
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU, useUnmergedTree = true)
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag(NavigationTestTags.HOMESCREEN_TAB, useUnmergedTree = true)
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag(NavigationTestTags.ASSOCIATIONBROWSER_TAB, useUnmergedTree = true)
+        .assertIsDisplayed()
   }
 
   @Test
-  fun canGoThroughAllTabs_and_bottomBarIsVisible() {
+  fun canGoThroughAllTabsAndBottomBarIsVisible() {
     Tab.tabs.forEach { tab ->
-      composeTestRule.onNodeWithTag(NavigationTestTags.getTabTestTag(tab)).performClick()
+      val tabTag = NavigationTestTags.getTabTestTag(tab)
+      val screenTag = NavigationTestTags.getScreenTestTagForTab(tab)
+      composeTestRule.navigateToTab(tabTag, screenTag)
       composeTestRule
-          .onNodeWithTag(NavigationTestTags.getScreenTestTagForTab(tab))
+          .onNodeWithTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU, useUnmergedTree = true)
           .assertIsDisplayed()
-      composeTestRule.onNodeWithTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU).assertIsDisplayed()
     }
   }
 
   @Test
   fun bottomNavigationIsDisplayedForAssociationBrowser() {
-    composeTestRule.onNodeWithTag(NavigationTestTags.ASSOCIATIONBROWSER_TAB).performClick()
-    composeTestRule.onNodeWithTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU).assertIsDisplayed()
-  }
-
-  @Test
-  fun tabsAreClickable() {
+    composeTestRule.navigateToTab(
+        NavigationTestTags.ASSOCIATIONBROWSER_TAB, NavigationTestTags.ASSOCIATIONBROWSER_SCREEN)
     composeTestRule
-        .onNodeWithTag(NavigationTestTags.HOMESCREEN_TAB)
+        .onNodeWithTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU, useUnmergedTree = true)
         .assertIsDisplayed()
-        .performClick()
-    composeTestRule
-        .onNodeWithTag(NavigationTestTags.ASSOCIATIONBROWSER_TAB)
-        .assertIsDisplayed()
-        .performClick()
   }
 
   @Test
   fun navigationStartsOnHomeScreen() {
-    composeTestRule.onNodeWithTag(NavigationTestTags.HOMESCREEN_SCREEN).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(HomeScreenTestTags.EPFLLOGO).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU).assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag(NavigationTestTags.HOMESCREEN_SCREEN, useUnmergedTree = true)
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag(HomeScreenTestTags.EPFLLOGO, useUnmergedTree = true)
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU, useUnmergedTree = true)
+        .assertIsDisplayed()
   }
 
   @Test
   fun canNavigateToAssociationBrowser() {
-    composeTestRule.onNodeWithTag(NavigationTestTags.ASSOCIATIONBROWSER_TAB).performClick()
-    composeTestRule.onNodeWithTag(NavigationTestTags.ASSOCIATIONBROWSER_SCREEN).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(NavigationTestTags.HOMESCREEN_SCREEN).assertDoesNotExist()
+    composeTestRule.navigateToTab(
+        NavigationTestTags.ASSOCIATIONBROWSER_TAB, NavigationTestTags.ASSOCIATIONBROWSER_SCREEN)
+    composeTestRule
+        .onNodeWithTag(NavigationTestTags.HOMESCREEN_SCREEN, useUnmergedTree = true)
+        .assertDoesNotExist()
   }
 
   @Test
   fun canNavigateToAssociationBrowserAndBackToHome() {
-    composeTestRule.onNodeWithTag(NavigationTestTags.ASSOCIATIONBROWSER_TAB).performClick()
-    composeTestRule.onNodeWithTag(NavigationTestTags.HOMESCREEN_TAB).performClick()
-    composeTestRule.onNodeWithTag(NavigationTestTags.HOMESCREEN_SCREEN).assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag(NavigationTestTags.ASSOCIATIONBROWSER_TAB, useUnmergedTree = true)
+        .performClick()
+    composeTestRule.navigateToTab(
+        NavigationTestTags.HOMESCREEN_TAB, NavigationTestTags.HOMESCREEN_SCREEN)
   }
 
   @Test
   fun bottomNavigationIsDisplayedForMyEvents() {
-    composeTestRule.onNodeWithTag(NavigationTestTags.MYEVENTS_TAB).performClick()
-    composeTestRule.onNodeWithTag(NavigationTestTags.MYEVENTS_SCREEN).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU).assertIsDisplayed()
+
+    composeTestRule.navigateToTab(
+        NavigationTestTags.MYEVENTS_TAB, NavigationTestTags.MYEVENTS_SCREEN)
+    composeTestRule
+        .onNodeWithTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU, useUnmergedTree = true)
+        .assertIsDisplayed()
   }
 
   @Test
   fun bottomNavigationIsDisplayedForSettings() {
-    composeTestRule.onNodeWithTag(NavigationTestTags.SETTINGS_TAB).performClick()
-    composeTestRule.onNodeWithTag(NavigationTestTags.SETTINGS_SCREEN).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU).assertIsDisplayed()
+    composeTestRule.navigateToTab(
+        NavigationTestTags.SETTINGS_TAB, NavigationTestTags.SETTINGS_SCREEN)
+    composeTestRule
+        .onNodeWithTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU, useUnmergedTree = true)
+        .assertIsDisplayed()
   }
 
   @Test
   fun canNavigateToMyEvents() {
-    composeTestRule.onNodeWithTag(NavigationTestTags.MYEVENTS_TAB).performClick()
-    composeTestRule.onNodeWithTag(NavigationTestTags.MYEVENTS_SCREEN).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(NavigationTestTags.HOMESCREEN_SCREEN).assertDoesNotExist()
-    composeTestRule.onNodeWithTag(NavigationTestTags.ASSOCIATIONBROWSER_SCREEN).assertDoesNotExist()
+    composeTestRule.navigateToTab(
+        NavigationTestTags.MYEVENTS_TAB, NavigationTestTags.MYEVENTS_SCREEN)
+    composeTestRule
+        .onNodeWithTag(NavigationTestTags.HOMESCREEN_SCREEN, useUnmergedTree = true)
+        .assertDoesNotExist()
+    composeTestRule
+        .onNodeWithTag(NavigationTestTags.ASSOCIATIONBROWSER_SCREEN, useUnmergedTree = true)
+        .assertDoesNotExist()
   }
 
   @Test
   fun canNavigateToSettings() {
-    composeTestRule.onNodeWithTag(NavigationTestTags.SETTINGS_TAB).performClick()
-    composeTestRule.onNodeWithTag(NavigationTestTags.SETTINGS_SCREEN).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(NavigationTestTags.HOMESCREEN_SCREEN).assertDoesNotExist()
-    composeTestRule.onNodeWithTag(NavigationTestTags.ASSOCIATIONBROWSER_SCREEN).assertDoesNotExist()
-    composeTestRule.onNodeWithTag(NavigationTestTags.MYEVENTS_SCREEN).assertDoesNotExist()
+    composeTestRule.navigateToTab(
+        NavigationTestTags.SETTINGS_TAB, NavigationTestTags.SETTINGS_SCREEN)
+    composeTestRule
+        .onNodeWithTag(NavigationTestTags.HOMESCREEN_SCREEN, useUnmergedTree = true)
+        .assertDoesNotExist()
+    composeTestRule
+        .onNodeWithTag(NavigationTestTags.ASSOCIATIONBROWSER_SCREEN, useUnmergedTree = true)
+        .assertDoesNotExist()
+    composeTestRule
+        .onNodeWithTag(NavigationTestTags.MYEVENTS_SCREEN, useUnmergedTree = true)
+        .assertDoesNotExist()
   }
 
   @Test
   fun canNavigateToSettingsAndBackToHome() {
-    composeTestRule.onNodeWithTag(NavigationTestTags.SETTINGS_TAB).performClick()
-    composeTestRule.onNodeWithTag(NavigationTestTags.SETTINGS_SCREEN).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(NavigationTestTags.HOMESCREEN_TAB).performClick()
-    composeTestRule.onNodeWithTag(NavigationTestTags.HOMESCREEN_SCREEN).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(HomeScreenTestTags.EPFLLOGO).assertIsDisplayed()
+    composeTestRule.navigateToTab(
+        NavigationTestTags.SETTINGS_TAB, NavigationTestTags.SETTINGS_SCREEN)
+    composeTestRule.navigateToTab(
+        NavigationTestTags.HOMESCREEN_TAB, NavigationTestTags.HOMESCREEN_SCREEN)
+    composeTestRule
+        .onNodeWithTag(HomeScreenTestTags.EPFLLOGO, useUnmergedTree = true)
+        .assertIsDisplayed()
   }
 
   @Test
   fun canNavigateAcrossAllTabsAndReturnHome() {
     // Home -> AssociationBrowser
-    composeTestRule.onNodeWithTag(NavigationTestTags.ASSOCIATIONBROWSER_TAB).performClick()
-    composeTestRule.onNodeWithTag(NavigationTestTags.ASSOCIATIONBROWSER_SCREEN).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(NavigationTestTags.HOMESCREEN_SCREEN).assertDoesNotExist()
+    composeTestRule.navigateToTab(
+        NavigationTestTags.ASSOCIATIONBROWSER_TAB, NavigationTestTags.ASSOCIATIONBROWSER_SCREEN)
+    composeTestRule
+        .onNodeWithTag(NavigationTestTags.HOMESCREEN_SCREEN, useUnmergedTree = true)
+        .assertDoesNotExist()
 
     // AssociationBrowser -> MyEvents
-    composeTestRule.onNodeWithTag(NavigationTestTags.MYEVENTS_TAB).performClick()
-    composeTestRule.onNodeWithTag(NavigationTestTags.MYEVENTS_SCREEN).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(NavigationTestTags.ASSOCIATIONBROWSER_SCREEN).assertDoesNotExist()
+    composeTestRule.navigateToTab(
+        NavigationTestTags.MYEVENTS_TAB, NavigationTestTags.MYEVENTS_SCREEN)
+    composeTestRule
+        .onNodeWithTag(NavigationTestTags.ASSOCIATIONBROWSER_SCREEN, useUnmergedTree = true)
+        .assertDoesNotExist()
 
     // MyEvents -> Settings
-    composeTestRule.onNodeWithTag(NavigationTestTags.SETTINGS_TAB).performClick()
-    composeTestRule.onNodeWithTag(NavigationTestTags.SETTINGS_SCREEN).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(NavigationTestTags.MYEVENTS_SCREEN).assertDoesNotExist()
+    composeTestRule.navigateToTab(
+        NavigationTestTags.SETTINGS_TAB, NavigationTestTags.SETTINGS_SCREEN)
+    composeTestRule
+        .onNodeWithTag(NavigationTestTags.MYEVENTS_SCREEN, useUnmergedTree = true)
+        .assertDoesNotExist()
 
     // Settings -> Home
-    composeTestRule.onNodeWithTag(NavigationTestTags.HOMESCREEN_TAB).performClick()
-    composeTestRule.onNodeWithTag(NavigationTestTags.HOMESCREEN_SCREEN).assertIsDisplayed()
+    composeTestRule.navigateToTab(
+        NavigationTestTags.HOMESCREEN_TAB, NavigationTestTags.HOMESCREEN_SCREEN)
   }
 
   @Test
-  fun clickingSameTopLevelTabTwice_staysOnSameScreen_andBottomBarVisible() {
-    composeTestRule.onNodeWithTag(NavigationTestTags.ASSOCIATIONBROWSER_TAB).performClick()
-    composeTestRule.onNodeWithTag(NavigationTestTags.ASSOCIATIONBROWSER_SCREEN).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU).assertIsDisplayed()
+  fun canClickTwice() {
+    composeTestRule.navigateToTab(
+        NavigationTestTags.ASSOCIATIONBROWSER_TAB, NavigationTestTags.ASSOCIATIONBROWSER_SCREEN)
+    composeTestRule
+        .onNodeWithTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU, useUnmergedTree = true)
+        .assertIsDisplayed()
 
-    composeTestRule.onNodeWithTag(NavigationTestTags.ASSOCIATIONBROWSER_TAB).performClick()
-    composeTestRule.onNodeWithTag(NavigationTestTags.ASSOCIATIONBROWSER_SCREEN).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU).assertIsDisplayed()
+    composeTestRule.navigateToTab(
+        NavigationTestTags.ASSOCIATIONBROWSER_TAB, NavigationTestTags.ASSOCIATIONBROWSER_SCREEN)
+    composeTestRule
+        .onNodeWithTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU, useUnmergedTree = true)
+        .assertIsDisplayed()
   }
 
   @Test
   fun returningToHomeRestoresHomeUiElements() {
-    composeTestRule.onNodeWithTag(NavigationTestTags.MYEVENTS_TAB).performClick()
-    composeTestRule.onNodeWithTag(NavigationTestTags.MYEVENTS_SCREEN).assertIsDisplayed()
-
-    composeTestRule.onNodeWithTag(NavigationTestTags.HOMESCREEN_TAB).performClick()
-    composeTestRule.onNodeWithTag(NavigationTestTags.HOMESCREEN_SCREEN).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(HomeScreenTestTags.EPFLLOGO).assertIsDisplayed()
+    composeTestRule.navigateToTab(
+        NavigationTestTags.MYEVENTS_TAB, NavigationTestTags.MYEVENTS_SCREEN)
+    composeTestRule.navigateToTab(
+        NavigationTestTags.HOMESCREEN_TAB, NavigationTestTags.HOMESCREEN_SCREEN)
+    composeTestRule
+        .onNodeWithTag(HomeScreenTestTags.EPFLLOGO, useUnmergedTree = true)
+        .assertIsDisplayed()
   }
 }
