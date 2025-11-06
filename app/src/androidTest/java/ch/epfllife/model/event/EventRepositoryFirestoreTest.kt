@@ -75,7 +75,7 @@ class EventRepositoryFirestoreTest {
   }
 
   @Test
-  fun documentToEvent_malformedLocation_returnsNull() {
+  fun documentToEvent_malformedId_returnsNull() {
 
     // arrange: mock the document
     whenever(mockDocument.id).thenReturn(null) // this will result in a parsing error
