@@ -203,20 +203,20 @@ fun AssociationDetailsContent(
                             description = "Kick off the semester with music and fun.",
                             location = Location(46.5191, 6.5668, "EPFL Esplanade"),
                             time = "2025-10-20 18:00",
-                            associationId = association.name,
+                            association = association,
                             tags = setOf("party"),
                             price = 0u,
-                            imageUrl = null),
+                            pictureUrl = null),
                         Event(
                             id = "2",
                             title = "Hiking Trip",
                             description = "Join us for a scenic hike in the mountains.",
                             location = Location(46.2, 7.0, "Les Pleiades"),
                             time = "2025-11-02 09:00",
-                            associationId = association.name,
+                            association = association,
                             tags = setOf("outdoors"),
                             price = 15u,
-                            imageUrl = null))
+                            pictureUrl = null))
 
                 dummyEvents.forEach { event -> EventCard(event = event, onClick = {}) }
               }
