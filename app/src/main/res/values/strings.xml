@@ -23,4 +23,19 @@
     <string name="all_events_filter">All Events</string>
     <string name="all_associations_filter">All Associations</string>
 
+    <!-- Association Details Screen -->
+    <string name="association_image_description">Association Image</string>
+    <string name="back_button_description">Back</string>
+    <string name="subscribe_to">Subscribe to %1$s</string>
+    <string name="unsubscribe_from">Unsubscribe from %1$s</string>
+    <string name="about_section_title">About</string>
+    <string name="social_pages_title">Social Pages</string>
+    <string name="instagram_description">Instagram</string>
+    <string name="telegram_description">Telegram</string>
+    <string name="whatsapp_description">WhatsApp</string>
+    <string name="linkedin_description">LinkedIn</string>
+    <string name="website_description">Website</string>
+    <string name="about_placeholder">No description available.</string>
+    <string name="upcoming_events_title">Upcoming Events</string>
+
 </resources>
