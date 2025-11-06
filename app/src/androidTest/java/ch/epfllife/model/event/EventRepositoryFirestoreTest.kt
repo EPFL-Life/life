@@ -1,6 +1,5 @@
 package ch.epfllife.model.event
 
-import ch.epfllife.model.map.Location
 import com.google.firebase.firestore.DocumentSnapshot
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -20,6 +19,11 @@ class EventRepositoryFirestoreTest {
     MockitoAnnotations.openMocks(this)
   }
 
+  /** Helper function to create the nested location map */
+  private fun createLocationMap(lat: Double, lon: Double, name: String): Map<String, Any> {
+    return mapOf("latitude" to lat, "longitude" to lon, "name" to name)
+  }
+
   @Test
   fun documentToEvent_validDocument_returnsEvent() {
 
@@ -27,7 +31,7 @@ class EventRepositoryFirestoreTest {
     whenever(mockDocument.id).thenReturn("testId")
     whenever(mockDocument.getString("title")).thenReturn("Test Event")
     whenever(mockDocument.getString("description")).thenReturn("This is a test event")
-    whenever(mockDocument.get("location")).thenReturn(Location(1.0, 2.0, "Test Location"))
+    whenever(mockDocument.get("location")).thenReturn(createLocationMap(1.0, 2.0, "Test Location"))
     whenever(mockDocument.getString("time")).thenReturn("10:00")
     whenever(mockDocument.getString("associationId")).thenReturn("testAssociationId")
     whenever(mockDocument.get("tags")).thenReturn(listOf("tag1", "tag2"))
@@ -59,7 +63,7 @@ class EventRepositoryFirestoreTest {
     whenever(mockDocument.id).thenReturn("testId")
     whenever(mockDocument.getString("title")).thenReturn("Test Event")
     whenever(mockDocument.getString("description")).thenReturn("This is a test event")
-    whenever(mockDocument.get("location")).thenReturn(Location(1.0, 2.0, "Test Location"))
+    whenever(mockDocument.get("location")).thenReturn(createLocationMap(3.0, 4.0, "Test Location2"))
     whenever(mockDocument.getString("time")).thenReturn("10:00")
     // associationId is "missing" therefore Mockito return null -> this will result in a parsing
     // error
@@ -82,7 +86,7 @@ class EventRepositoryFirestoreTest {
     whenever(mockDocument.getString("title")).thenReturn("Test Event")
     whenever(mockDocument.getString("description")).thenReturn("This is a test event")
     whenever(mockDocument.getString("time")).thenReturn("10:00")
-    whenever(mockDocument.get("location")).thenReturn(Location(1.0, 2.0, "Test Location"))
+    whenever(mockDocument.get("location")).thenReturn(createLocationMap(5.0, 6.0, "Test Location3"))
     whenever(mockDocument.getString("associationId")).thenReturn("testAssociationId")
     whenever(mockDocument.get("tags")).thenReturn(listOf("tag1", "tag2"))
     whenever(mockDocument.getLong("price")).thenReturn(-100L)
