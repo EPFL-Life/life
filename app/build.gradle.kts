@@ -1,3 +1,4 @@
+import org.gradle.kotlin.dsl.invoke
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -207,6 +208,7 @@ dependencies {
     androidTestImplementation(libs.kaspresso.compose.support)
 
     testImplementation(libs.kotlinx.coroutines.test)
+    androidTestImplementation(libs.androidx.uiautomator)
 }
 
 
