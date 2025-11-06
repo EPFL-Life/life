@@ -31,11 +31,6 @@ fun AssociationBrowser(
     emptyList<Association>()
   } // No Associations to show empty state
 
-  // hardcoded data
-  // val subscribedAssociations = remember { listOf(Association(id = "1",name = "ESN
-  // Lausanne",description = "Erasmus Student Network at EPFL.",pictureUrl = null,category =
-  // Category.CULTURE))}
-
   val allAssociations = remember {
     listOf(
         Association(
