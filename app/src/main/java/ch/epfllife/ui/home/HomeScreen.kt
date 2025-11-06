@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,44 +21,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.R
 import ch.epfllife.model.enums.SubscriptionFilter
-import ch.epfllife.model.event.Event
-import ch.epfllife.model.map.Location
 import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
 import ch.epfllife.ui.composables.EventCard
 import ch.epfllife.ui.composables.SearchBar
 import ch.epfllife.ui.navigation.NavigationTestTags
 
 @Composable
-fun HomeScreen(
-    modifier: Modifier = Modifier,
-) {
+fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel = viewModel()) {
   var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
 
-  val myEvents = remember { emptyList<Event>() } // No events to show empty state
-
-  val allEvents = remember {
-    listOf(
-        Event(
-            id = "1",
-            title = "Via Ferrata",
-            description = "Excursion to the Alps",
-            location = Location(0.0, 0.0, "Lausanne Train Station"),
-            time = "Oct 4th, 6:50am",
-            associationId = "ESN Lausanne",
-            tags = setOf("Sport", "Outdoor"),
-            price = 30u),
-        Event(
-            id = "2",
-            title = "Music Festival",
-            description = "Outdoor concert organized by the Cultural Club",
-            location = Location(0.0, 0.0, "Esplanade"),
-            time = "Nov 3rd, 5:00PM",
-            associationId = "Cultural Club",
-            tags = setOf("Music", "Festival"),
-            price = 10u))
-  }
+  val myEvents by viewModel.myEvents.collectAsState()
+  val allEvents by viewModel.allEvents.collectAsState()
 
   val shownEvents = if (selected == SubscriptionFilter.Subscribed) myEvents else allEvents
 

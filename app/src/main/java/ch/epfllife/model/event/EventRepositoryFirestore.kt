@@ -1,9 +1,16 @@
 package ch.epfllife.model.event
 
 import android.util.Log
+import ch.epfllife.model.association.Association
+import ch.epfllife.model.firestore.FirestoreCollections
 import ch.epfllife.model.map.Location
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlin.text.get
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.tasks.await
 
 class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventRepository {
 
@@ -11,8 +18,9 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
     TODO("Not yet implemented")
   }
 
-  override suspend fun getAllEvents(): List<Event> {
-    TODO("Not yet implemented")
+  override suspend fun getAllEvents(): List<Event> = coroutineScope {
+    val task = db.collection(FirestoreCollections.EVENTS).get().await()
+    task.documents.map { doc -> async { documentToEvent(doc) } }.mapNotNull { it.await() }
   }
 
   override suspend fun getEvent(eventId: String): Event {
@@ -46,7 +54,19 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
    * @return A parsed [Event] object, or `null` if conversion fails.
    */
   companion object {
-    fun documentToEvent(document: DocumentSnapshot): Event? {
+    suspend fun getAssociation(document: DocumentSnapshot): Association? {
+      val assocRef = document.get("association") as? DocumentReference ?: return null
+      val assocSnap = assocRef.get().await()
+
+      return Association(
+          id = assocSnap.id,
+          name = assocSnap.get("name").toString(),
+          description = assocSnap.getString("description")!!,
+          pictureUrl = assocSnap.getString("pictureUrl"),
+          eventCategory = EventCategory.valueOf(assocSnap.getString("eventCategory")!!))
+    }
+
+    suspend fun documentToEvent(document: DocumentSnapshot): Event? {
       return try {
         // 1. Get the document's unique ID
         val id = document.id
@@ -54,30 +74,29 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
         // 2. Get required String fields
         // If any are missing (null), the Elvis operator (?:) will return null
         // from the entire function.
-        val title = document.getString("title") ?: return null
-        val description = document.getString("description") ?: return null
-        val time = document.getString("time") ?: return null
-        val associationId = document.getString("associationId") ?: return null
+        val title = document.getString("title")!!
+        val description = document.getString("description")!!
+        val time = document.getString("time")!!
+        val association = getAssociation(document)
 
         // 3. Get optional String field
         // If 'imageUrl' is missing, getString() returns null, which is valid.
-        val imageUrl = document.getString("imageUrl")
+        val pictureUrl = document.getString("pictureUrl")
 
         // 4. Handle nested Location object
         // The 'location' field itself must exist and be a Map.
-        val locationData = document.get("location") as? Map<*, *> ?: return null
 
-        // All sub-fields of Location are required.
-        val latitude = locationData["latitude"] as? Double ?: return null
-        val longitude = locationData["longitude"] as? Double ?: return null
-        val name = locationData["name"] as? String ?: return null
+        val locMap = document.get("location") as? Map<*, *>
 
-        val location = Location(latitude = latitude, longitude = longitude, name = name)
+        val location =
+            Location(
+                name = locMap?.get("name") as String,
+                latitude = locMap["latitude"] as Double,
+                longitude = locMap["longitude"] as Double)
 
         // 5. Handle list-to-set conversion for tags
         // If 'tags' is missing, default to an empty list, which becomes an empty set.
-        val tagsList = document.get("tags") as? List<String> ?: emptyList()
-        val tags = tagsList.toSet()
+        val tags: Set<String> = (document["tags"] as List<*>).mapNotNull { it as String }.toSet()
 
         // 6. Handle numeric conversion for price (required)
         // Firestore stores all numbers as Long. Fail if 'price' is missing.
@@ -91,10 +110,10 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
             description = description,
             location = location,
             time = time,
-            associationId = associationId,
+            association = association!!,
             tags = tags,
             price = price,
-            imageUrl = imageUrl)
+            pictureUrl = pictureUrl)
       } catch (e: Exception) {
         // Catch any other errors (e.g., bad casts, toUInt() failure)
         Log.e("FirestoreMapper", "Error converting document ${document.id} to Event", e)
