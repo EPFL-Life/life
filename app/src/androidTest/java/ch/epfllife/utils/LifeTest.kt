@@ -37,3 +37,9 @@ fun ComposeContentTestRule.assertTagTextEquals(tag: String, text: String) {
       .assertIsDisplayed()
       .assertTextEquals(text)
 }
+
+fun ComposeContentTestRule.navigateToTab(tab: String, screenTag: String) {
+
+  this.onNodeWithTag(tab, useUnmergedTree = true).performClick()
+  this.onNodeWithTag(screenTag, useUnmergedTree = true).assertIsDisplayed()
+}
