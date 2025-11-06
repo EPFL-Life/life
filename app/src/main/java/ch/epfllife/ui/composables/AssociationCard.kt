@@ -36,7 +36,10 @@ fun AssociationCard(association: Association, modifier: Modifier = Modifier, onC
               Image(
                   painter = painterResource(id = R.drawable.placeholder),
                   contentDescription = "${association.name} logo",
-                  modifier = Modifier.size(56.dp).align(Alignment.CenterVertically))
+                  modifier =
+                      Modifier.size(56.dp)
+                          .align(Alignment.CenterVertically)
+                          .testTag(AssociationCardTestTags.ASSOCIATION_LOGO))
 
               // Text section (name + description)
               Column(modifier = Modifier.weight(1f).align(Alignment.CenterVertically)) {
@@ -65,6 +68,7 @@ fun AssociationCard(association: Association, modifier: Modifier = Modifier, onC
 
 object AssociationCardTestTags {
   const val ASSOCIATION_CARD = "association_card"
+  const val ASSOCIATION_LOGO = "association_logo"
   const val ASSOCIATION_NAME = "association_name"
   const val ASSOCIATION_DESCRIPTION = "association_description"
 }
