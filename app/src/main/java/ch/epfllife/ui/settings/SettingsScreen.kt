@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.lifecycle.viewmodel.compose.viewModel
+import ch.epfllife.R
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.ui.navigation.NavigationTestTags
 
@@ -27,18 +28,9 @@ fun SettingsScreen(
   val context = LocalContext.current
   val uiState by viewModel.uiState.collectAsState()
   LaunchedEffect(uiState.signInState) {
-    when (uiState.signInState) {
-      is SignInState.SignedIn -> {
-        /* show ui as usual */
-      }
-      is SignInState.SignOutFailed -> {
-        val message = (uiState.signInState as SignInState.SignOutFailed).message
-        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-      }
-      SignInState.SignedOut -> {
-        onSignedOut()
-        Toast.makeText(context, "Sign out successful", Toast.LENGTH_SHORT).show()
-      }
+    if (uiState.signInState is SignInState.SignedOut) {
+      onSignedOut()
+      Toast.makeText(context, R.string.signout_successful, Toast.LENGTH_SHORT).show()
     }
   }
   Box(
