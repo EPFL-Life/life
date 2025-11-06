@@ -45,6 +45,9 @@ https://lucid.app/lucidchart/ce4337ce-2529-4818-8026-5f91ea9d6d66/edit?viewport_
 
 This project uses the [Swent B3 Solution](https://github.com/swent-epfl/bootcamp-25-B3-Solution)
 as the starting point.
+It also uses the [Android Sample Project](https://github.com/GabrielFleischer/Android-Sample) as an inspiration.
+It may contain AI generated code and text.
+
 ## Figma Wireframes & User Flows
 ## Figma Design Documentation
 
