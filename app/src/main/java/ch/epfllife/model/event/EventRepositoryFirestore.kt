@@ -96,8 +96,7 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
 
         // 5. Handle list-to-set conversion for tags
         // If 'tags' is missing, default to an empty list, which becomes an empty set.
-        val tags: Set<String> =
-            (document.get("tags") as List<*>).mapNotNull { it as String }.toSet()
+        val tags: Set<String> = (document["tags"] as List<*>).mapNotNull { it as String }.toSet()
 
         // 6. Handle numeric conversion for price (required)
         // Firestore stores all numbers as Long. Fail if 'price' is missing.
