@@ -62,47 +62,49 @@ class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : Associ
 
   // helper function for parsing
 
-  /**
-   * Safely converts a Firestore [DocumentSnapshot] into an [Association] data class.
-   *
-   * This function performs strict type checking. If any *required* field (e.g., `name`,
-   * `description`, `eventCategory`) is missing, malformed, or of the wrong type, the function will
-   * log an error and return `null`.
-   *
-   * Optional fields like `pictureUrl` will be set to `null` if not present.
-   *
-   * @param document The Firestore [DocumentSnapshot] to parse.
-   * @return A parsed [Association] object, or `null` if conversion fails.
-   */
-  private fun documentToAssociation(document: DocumentSnapshot): Association? {
-    return try {
-      // 1. Get the document ID
-      val id = document.id
+  companion object {
+    /**
+     * Safely converts a Firestore [DocumentSnapshot] into an [Association] data class.
+     *
+     * This function performs strict type checking. If any *required* field (e.g., `name`,
+     * `description`, `eventCategory`) is missing, malformed, or of the wrong type, the function
+     * will log an error and return `null`.
+     *
+     * Optional fields like `pictureUrl` will be set to `null` if not present.
+     *
+     * @param document The Firestore [DocumentSnapshot] to parse.
+     * @return A parsed [Association] object, or `null` if conversion fails.
+     */
+    fun documentToAssociation(document: DocumentSnapshot): Association? {
+      return try {
+        // 1. Get the document ID
+        val id = document.id
 
-      // 2. Get required String fields (return null if missing)
-      val name = document.getString("name") ?: return null
-      val description = document.getString("description") ?: return null
+        // 2. Get required String fields (return null if missing)
+        val name = document.getString("name")!!
+        val description = document.getString("description")!!
 
-      // 3. Get the nullable String field (no check needed, defaults to null)
-      val pictureUrl = document.getString("pictureUrl")
+        // 3. Get the nullable String field (no check needed, defaults to null)
+        val pictureUrl = document.getString("pictureUrl")
 
-      // 4. Handle the Enum (EventCategory)
-      // Get the category name as a String from Firestore
-      val eventCategoryString = document.getString("eventCategory") ?: return null
-      // Convert the String to the EventCategory enum value
-      val eventCategory = EventCategory.valueOf(eventCategoryString.uppercase())
+        // 4. Handle the Enum (EventCategory)
+        // Get the category name as a String from Firestore
+        val eventCategoryString = document.getString("eventCategory")!!
+        // Convert the String to the EventCategory enum value
+        val eventCategory = EventCategory.valueOf(eventCategoryString.uppercase())
 
-      // 5. Construct the Association object
-      Association(
-          id = id,
-          name = name,
-          description = description,
-          pictureUrl = pictureUrl,
-          eventCategory = eventCategory)
-    } catch (e: Exception) {
-      // Log any errors during conversion (e.g., valueOf fails for enum)
-      Log.e("AssociationRepository", "Error converting document to Association", e)
-      null
+        // 5. Construct the Association object
+        Association(
+            id = id,
+            name = name,
+            description = description,
+            pictureUrl = pictureUrl,
+            eventCategory = eventCategory)
+      } catch (e: Exception) {
+        // Log any errors during conversion (e.g., valueOf fails for enum)
+        Log.e("AssociationRepository", "Error converting document to Association", e)
+        null
+      }
     }
   }
 }
