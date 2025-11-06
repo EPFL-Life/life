@@ -1,6 +1,7 @@
 package ch.epfllife.model.authentication
 
 import android.content.Context
+import android.credentials.GetCredentialException
 import android.os.Bundle
 import androidx.credentials.Credential
 import androidx.credentials.CredentialManager
@@ -10,60 +11,76 @@ import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.tasks.await
 
+sealed class SignInResult {
+  data class Success(val user: FirebaseUser) : SignInResult()
+
+  data object Failure : SignInResult()
+
+  data object Cancelled : SignInResult()
+}
+
 /** A Firebase implementation of [Auth]. */
-class Auth(val credentialManager: CredentialManager) {
-  suspend fun signInFromContext(context: Context): Result<FirebaseUser> {
-    val credential = getCredential(credentialManager, context)
-    return signInWithCredential(credential)
+class Auth(val credentialManager: CredentialManager, val auth: FirebaseAuth = Firebase.auth) {
+  suspend fun signInFromContext(context: Context): SignInResult {
+    try {
+      val credential = getCredential(credentialManager, context)
+      return signInWithCredential(credential)
+    } catch (e: androidx.credentials.exceptions.GetCredentialCancellationException) {
+      return SignInResult.Cancelled
+    } catch (e: androidx.credentials.exceptions.GetCredentialException) {
+      return SignInResult.Failure
+    }
   }
 
-  suspend fun signInWithCredential(credential: Credential): Result<FirebaseUser> {
-    return try {
-      if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-        val idToken = extractIdTokenCredential(credential.data).idToken
-        val firebaseCred = toFirebaseCredential(idToken)
+  suspend fun signInWithCredential(credential: Credential): SignInResult {
+    return if (credential is CustomCredential &&
+        credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+      val idToken = extractIdTokenCredential(credential.data).idToken
+      val firebaseCred = toFirebaseCredential(idToken)
 
-        // Sign in with Firebase
+      // Sign in with Firebase
+      try {
         val user =
-            Firebase.auth.signInWithCredential(firebaseCred).await().user
-                ?: return Result.failure(
-                    IllegalStateException("Login failed : Could not retrieve user information"))
-        Result.success(user)
-      } else {
-        Result.failure(IllegalStateException("Login failed: Credential is not of type Google ID"))
+            this.auth.signInWithCredential(firebaseCred).await().user ?: return SignInResult.Failure
+        SignInResult.Success(user)
+      } catch (e: FirebaseAuthInvalidUserException) {
+        SignInResult.Failure
+      } catch (e: FirebaseAuthInvalidCredentialsException) {
+        SignInResult.Failure
+      } catch (e: FirebaseAuthUserCollisionException) {
+        SignInResult.Failure
+      } catch (e: CancellationException) {
+        SignInResult.Failure
       }
-    } catch (e: Exception) {
-      Result.failure(
-          IllegalStateException("Login failed: ${e.localizedMessage ?: "Unexpected error."}"))
+    } else {
+      error("Cannot handle credentials of type ${credential.type}")
     }
   }
 
-  fun signOut(): Result<Unit> {
-    return try {
-      // Firebase sign out
-      Firebase.auth.signOut()
-
-      Result.success(Unit)
-    } catch (e: Exception) {
-      Result.failure(
-          IllegalStateException("Logout failed: ${e.localizedMessage ?: "Unexpected error."}"))
-    }
-  }
+  fun signOut() = this.auth.signOut()
 }
 
 private fun extractIdTokenCredential(bundle: Bundle) = GoogleIdTokenCredential.createFrom(bundle)
 
 private fun toFirebaseCredential(idToken: String) = GoogleAuthProvider.getCredential(idToken, null)
 
-private suspend fun getCredential(
-    credentialManager: CredentialManager,
-    context: Context,
-) =
+/**
+ * This will launch a sign-in menu in the given context, if no credentials are present in the
+ * `credentialManager`.
+ *
+ * @throws GetCredentialException If the request fails
+ */
+private suspend fun getCredential(credentialManager: CredentialManager, context: Context) =
     credentialManager
         .getCredential(context, signInRequest(signInOptions = getSignInOptions(context)))
         .credential

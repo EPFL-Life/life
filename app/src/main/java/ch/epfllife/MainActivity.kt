@@ -20,7 +20,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import ch.epfllife.model.authentication.AuthRepository
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.ui.association.AssociationBrowser
 import ch.epfllife.ui.association.AssociationDetailsScreen
