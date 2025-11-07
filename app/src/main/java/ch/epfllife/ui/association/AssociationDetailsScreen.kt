@@ -29,6 +29,7 @@ import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.map.Location
 import ch.epfllife.ui.composables.EventCard
+import ch.epfllife.ui.composables.Price
 import ch.epfllife.ui.theme.Theme
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -205,7 +206,7 @@ fun AssociationDetailsContent(
                             time = "2025-10-20 18:00",
                             association = association,
                             tags = setOf("party"),
-                            price = 0u,
+                            price = Price(0u),
                             pictureUrl = null),
                         Event(
                             id = "2",
@@ -215,7 +216,7 @@ fun AssociationDetailsContent(
                             time = "2025-11-02 09:00",
                             association = association,
                             tags = setOf("outdoors"),
-                            price = 15u,
+                            price = Price(15u),
                             pictureUrl = null))
 
                 dummyEvents.forEach { event -> EventCard(event = event, onClick = {}) }

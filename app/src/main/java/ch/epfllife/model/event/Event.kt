@@ -14,5 +14,4 @@ data class Event(
     val tags: Set<String>,
     val price: Price,
     val pictureUrl: String? = null
-
 )
