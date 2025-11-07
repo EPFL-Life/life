@@ -1,9 +1,9 @@
 // Kotlin
 package ch.epfllife.model.event
 
-import ch.epfllife.example_data.ExampleAssociations
-import ch.epfllife.example_data.ExampleEvents
-import ch.epfllife.utils.FirestoreLifeTest
+import ch.epfllife.model.association.Association
+import ch.epfllife.model.map.Location
+import ch.epfllife.ui.composables.Price
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
@@ -197,7 +197,24 @@ class EventRepositoryFirestoreTest : FirestoreLifeTest() {
   @Test
   fun documentToEventReturnsEventWhenDocumentIsValid() = runTest {
     // Expected event object
-    val expected = ExampleEvents.event1
+    val expected =
+        Event(
+            id = "event123",
+            title = "Kotlin Meetup",
+            description = "A meetup about Kotlin",
+            time = "2025-11-10T18:00:00Z",
+            pictureUrl = "https://example.com/pic.png",
+            price = Price(150u),
+            location = Location(name = "Main Hall", latitude = 46.5191, longitude = 6.5668),
+            tags = setOf("kotlin", "meetup"),
+            association =
+                Association(
+                    id = "assoc1",
+                    name = "EPFL Life",
+                    description = "Student association",
+                    pictureUrl = "https://example.com/assoc.png",
+                    eventCategory = EventCategory.SPORTS))
+
     // Mock main document using expected fields
     whenever(mockDocument.id).thenReturn(expected.id)
     whenever(mockDocument.getString("title")).thenReturn(expected.title)
@@ -217,7 +234,7 @@ class EventRepositoryFirestoreTest : FirestoreLifeTest() {
     whenever(mockDocument.get("tags")).thenReturn(expected.tags.toList())
 
     // Price as Long (Firestore numeric)
-    whenever(mockDocument.getLong("price")).thenReturn(expected.price.toLong())
+    `when`(doc.getLong("price")).thenReturn(expected.price.price.toLong())
 
     // Mock association reference stored in main document
     val assocRef = mock(DocumentReference::class.java)
