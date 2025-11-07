@@ -29,4 +29,11 @@ class LocationTest {
     }
     assertThrows(IllegalArgumentException::class.java) { Location(Any(), Any()) }
   }
+
+  @Test
+  fun boxed_double_values_via_Any_are_handled() {
+    val loc = Location(1.23 as Any, 4.56 as Any)
+    assertEquals(1.23, loc.latitude, 1e-9)
+    assertEquals(4.56, loc.longitude, 1e-9)
+  }
 }
