@@ -149,7 +149,7 @@ fun EventDetailsContent(
                       modifier = Modifier.testTag(EventDetailsTestTags.EVENT_ASSOCIATION))
                 }
                 Text(
-                    text = event.price.let { "CHF $it" },
+                    text = event.price.let { "CHF ${it.price}" },
                     style =
                         MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium),
                     color = MaterialTheme.colorScheme.onSurface,

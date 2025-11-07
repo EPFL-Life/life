@@ -23,9 +23,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.R
+import ch.epfllife.model.association.Association
 import ch.epfllife.model.enums.SubscriptionFilter
+import ch.epfllife.model.event.Event
+import ch.epfllife.model.event.EventCategory
+import ch.epfllife.model.map.Location
 import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
 import ch.epfllife.ui.composables.EventCard
+import ch.epfllife.ui.composables.Price
 import ch.epfllife.ui.composables.SearchBar
 import ch.epfllife.ui.navigation.NavigationTestTags
 
@@ -33,8 +38,27 @@ import ch.epfllife.ui.navigation.NavigationTestTags
 fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel = viewModel()) {
   var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
 
+  val exampleEvent =
+      Event(
+          id = "1",
+          title = "Drone Workshop",
+          description =
+              "The Drone Workshop is a multi-evening workshop organized by AéroPoly, where you can build your own 3-inch FPV drone...",
+          location = Location(46.5191, 6.5668, "Centre Sport et Santé"),
+          time = "2025-10-12 18:00",
+          association =
+              Association(
+                  id = "AeroPoly",
+                  name = "AeroPoly",
+                  description = "Description",
+                  eventCategory = EventCategory.ACADEMIC),
+          tags = setOf("workshop"),
+          price = Price(10u),
+          pictureUrl =
+              "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")
+
   val myEvents by viewModel.myEvents.collectAsState()
-  val allEvents by viewModel.allEvents.collectAsState()
+  val allEvents = listOf<Event>(exampleEvent)
 
   val shownEvents = if (selected == SubscriptionFilter.Subscribed) myEvents else allEvents
 

@@ -102,7 +102,7 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
         // 6. Handle numeric conversion for price (required)
         // Firestore stores all numbers as Long. Fail if 'price' is missing.
         val priceLong = document.getLong("price") ?: return null
-        val price = priceLong.toUInt() // Convert to Kotlin's unsigned int
+        val price = Price(priceLong.toUInt()) // Convert to Kotlin's unsigned int and then price
 
         // 7. Construct and return the final Event object
         Event(
@@ -113,7 +113,7 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
             time = time,
             association = association!!,
             tags = tags,
-            price = Price(price),
+            price = price,
             pictureUrl = pictureUrl)
       } catch (e: Exception) {
         // Catch any other errors (e.g., bad casts, toUInt() failure)
