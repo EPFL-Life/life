@@ -3,8 +3,10 @@ package ch.epfllife.ui.composables
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
+import ch.epfllife.model.association.Association
 import ch.epfllife.model.enums.SubscriptionFilter
 import ch.epfllife.model.event.Event
+import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.map.Location
 import org.junit.Assert.*
 import org.junit.Rule
@@ -21,7 +23,12 @@ class ComposablesTest {
           description = "This is a sample event",
           location = Location(46.520278, 6.565556, "EPFL"),
           time = "2024-03-15 14:00",
-          associationId = "TestAssociation",
+          association =
+              Association(
+                  id = "hjebgfehib2",
+                  name = "TestAssociation",
+                  description = "This is a test",
+                  eventCategory = EventCategory.ACADEMIC),
           tags = emptySet(),
           price = Price(0u),
       )

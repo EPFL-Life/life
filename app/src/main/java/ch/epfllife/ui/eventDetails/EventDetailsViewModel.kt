@@ -2,7 +2,9 @@ package ch.epfllife.ui.eventDetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import ch.epfllife.model.association.Association
 import ch.epfllife.model.event.Event
+import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.map.Location
 import ch.epfllife.ui.composables.Price
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,16 +40,21 @@ class EventDetailsViewModel : ViewModel() {
       try {
         val fakeEvent =
             Event(
-                id = "1",
+                id = eventId,
                 title = "Drone Workshop",
                 description =
                     "The Drone Workshop is a multi-evening workshop organized by AéroPoly...",
                 location = Location(46.5191, 6.5668, "Centre Sport et Santé"),
                 time = "2025-10-12 18:00",
-                associationId = "AeroPoly",
+                association =
+                    Association(
+                        id = "AéroPoly",
+                        name = "AéroPoly",
+                        description = "The association for drone enthusiasts at EPFL.",
+                        eventCategory = EventCategory.ACADEMIC),
                 tags = setOf("workshop"),
                 price = Price(10u),
-                imageUrl =
+                pictureUrl =
                     "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")
         _uiState.value = EventDetailsUIState.Success(fakeEvent, isEnrolled = false)
       } catch (e: Exception) {
@@ -79,6 +86,8 @@ class EventDetailsViewModel : ViewModel() {
     // TODO implement actual logic (Firestore / API call)
     // we need this to decide whether the button should be gray or not ("Enroll in event" or
     // "Enrolled")
+    if (event.id == event.title) return false
+
     return false
   }
 }

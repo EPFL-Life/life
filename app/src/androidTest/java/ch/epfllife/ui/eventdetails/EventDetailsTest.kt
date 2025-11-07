@@ -3,7 +3,9 @@ package ch.epfllife.ui.eventdetails
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.lifecycle.viewmodel.compose.viewModel
+import ch.epfllife.model.association.Association
 import ch.epfllife.model.event.Event
+import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.map.Location
 import ch.epfllife.ui.composables.Price
 import ch.epfllife.ui.eventDetails.EventDetailsContent
@@ -24,15 +26,20 @@ class EventDetailsTest {
 
   private val sampleEvent =
       Event(
-          id = "event1",
+          id = "AeroPoly",
           title = "Drone Workshop",
           description = "The Drone Workshop is a multi-evening workshop organized by AéroPoly...",
           location = Location(46.5191, 6.5668, "Centre Sport et Santé"),
           time = "2025-10-12 18:00",
-          associationId = "AeroPoly",
+          association =
+              Association(
+                  name = "AeroPoly",
+                  id = "AeroPoly",
+                  description = "Description",
+                  eventCategory = EventCategory.ACADEMIC),
           tags = setOf("workshop"),
           price = Price(10u),
-          imageUrl =
+          pictureUrl =
               "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")
 
   // ============ ViewModel Tests ============
@@ -239,7 +246,7 @@ class EventDetailsTest {
 
   @Test
   fun content_HandlesEventWithoutImageUrl() {
-    val eventWithoutImage = sampleEvent.copy(imageUrl = null)
+    val eventWithoutImage = sampleEvent.copy(pictureUrl = null)
     composeTestRule.setContent {
       EventDetailsContent(event = eventWithoutImage, viewModel = viewModel())
     }

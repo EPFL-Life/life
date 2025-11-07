@@ -1,3 +1,4 @@
+import org.gradle.kotlin.dsl.invoke
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -78,6 +79,7 @@ android {
     }
 
     testOptions {
+        animationsDisabled = true
         unitTests {
             isIncludeAndroidResources = true
 
@@ -119,12 +121,15 @@ android {
 }
 
 sonar {
-  properties {
-    property("sonar.projectKey", "EPFL-Life_life")
-    property("sonar.organization", "epfl-life")
-    property("sonar.host.url", "https://sonarcloud.io")
-    property("sonar.coverage.jacoco.xmlReportPaths", "${project.layout.buildDirectory.get()}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
-  }
+    properties {
+        property("sonar.projectKey", "EPFL-Life_life")
+        property("sonar.organization", "epfl-life")
+        property("sonar.host.url", "https://sonarcloud.io")
+        property(
+            "sonar.coverage.jacoco.xmlReportPaths",
+            "${project.layout.buildDirectory.get()}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
+        )
+    }
 }
 
 dependencies {
@@ -203,6 +208,7 @@ dependencies {
     androidTestImplementation(libs.kaspresso.compose.support)
 
     testImplementation(libs.kotlinx.coroutines.test)
+    androidTestImplementation(libs.androidx.uiautomator)
 }
 
 

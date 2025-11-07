@@ -1,9 +1,13 @@
 package ch.epfllife.utils
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import ch.epfllife.ui.navigation.NavigationTestTags
+import ch.epfllife.ui.navigation.Tab
 import org.junit.Assert
 
 /**
@@ -21,4 +25,24 @@ fun ComposeContentTestRule.assertClickable(
   this.onNodeWithTag(tag).performClick()
 
   Assert.assertTrue("$tag should be clickable", clicked)
+}
+
+fun ComposeContentTestRule.assertTagIsDisplayed(tag: String) {
+  this.onNodeWithTag(tag, useUnmergedTree = true)
+      .assertExists("$tag must exist")
+      .assertIsDisplayed()
+}
+
+fun ComposeContentTestRule.assertTagTextEquals(tag: String, text: String) {
+  this.onNodeWithTag(tag, useUnmergedTree = true)
+      .assertExists("$tag must exist")
+      .assertIsDisplayed()
+      .assertTextEquals(text)
+}
+
+fun ComposeContentTestRule.navigateToTab(tab: Tab) {
+  val tabTag = NavigationTestTags.getTabTestTag(tab)
+  val screenTag = NavigationTestTags.getScreenTestTagForTab(tab)
+  this.onNodeWithTag(tabTag, useUnmergedTree = true).performClick()
+  this.onNodeWithTag(screenTag, useUnmergedTree = true).assertIsDisplayed()
 }

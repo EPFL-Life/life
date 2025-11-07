@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import ch.epfllife.model.association.Association
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.map.Location
 import ch.epfllife.ui.composables.Price
@@ -96,7 +97,7 @@ fun EventDetailsContent(
           model =
               ImageRequest.Builder(LocalContext.current)
                   .data(
-                      event.imageUrl
+                      event.pictureUrl
                           ?: "https://www.epfl.ch/campus/services/events/wp-content/uploads/2024/09/WEB_Image-Home-Events_ORGANISER.png")
                   .crossfade(true)
                   .build(),
@@ -142,7 +143,7 @@ fun EventDetailsContent(
                       color = MaterialTheme.colorScheme.onSurface,
                       modifier = Modifier.testTag(EventDetailsTestTags.EVENT_TITLE))
                   Text(
-                      text = event.associationId,
+                      text = event.association.name,
                       style = MaterialTheme.typography.bodyMedium,
                       color = MaterialTheme.colorScheme.onSurfaceVariant,
                       modifier = Modifier.testTag(EventDetailsTestTags.EVENT_ASSOCIATION))
@@ -263,10 +264,15 @@ fun EventDetailsPreview() {
               "The Drone Workshop is a multi-evening workshop organized by AéroPoly, where you can build your own 3-inch FPV drone...",
           location = Location(46.5191, 6.5668, "Centre Sport et Santé"),
           time = "2025-10-12 18:00",
-          associationId = "AeroPoly",
+          association =
+              Association(
+                  id = "dkjaend38rh",
+                  name = "AeroPoly",
+                  description = "AéroPoly is the EPFL drone club.",
+                  eventCategory = ch.epfllife.model.event.EventCategory.ACADEMIC),
           tags = setOf("workshop"),
           price = Price(10u),
-          imageUrl =
+          pictureUrl =
               "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")
 
   Theme() { EventDetailsContent(event = sampleEvent, viewModel = viewModel()) }

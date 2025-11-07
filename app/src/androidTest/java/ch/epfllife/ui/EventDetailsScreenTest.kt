@@ -8,7 +8,9 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.viewmodel.compose.viewModel
+import ch.epfllife.model.association.Association
 import ch.epfllife.model.event.Event
+import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.map.Location
 import ch.epfllife.ui.composables.Price
 import ch.epfllife.ui.theme.Theme
@@ -38,10 +40,15 @@ class EventDetailsScreenTest {
                 "The Drone Workshop is a multi-evening workshop organized by AéroPoly, where you can build your own 3-inch FPV drone...",
             location = Location(46.5191, 6.5668, "Centre Sport et Santé"),
             time = "2025-10-12 18:00",
-            associationId = "AeroPoly",
+            association =
+                Association(
+                    id = "AeroPoly",
+                    name = "AeroPoly",
+                    description = "Description",
+                    eventCategory = EventCategory.ACADEMIC),
             tags = setOf("workshop"),
             price = Price(10u),
-            imageUrl =
+            pictureUrl =
                 "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")
 
     composeTestRule.setContent {

@@ -1,7 +1,9 @@
 package ch.epfllife.ui.composables
 
 import androidx.compose.ui.test.junit4.createComposeRule
+import ch.epfllife.model.association.Association
 import ch.epfllife.model.event.Event
+import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.map.Location
 import ch.epfllife.utils.assertClickable
 import com.google.firebase.Timestamp
@@ -18,7 +20,12 @@ class EventCardTest {
           description = "This is a test event",
           location = Location(46.520278, 6.565556, "EPFL"),
           time = Timestamp.Companion.now().toString(),
-          associationId = "assoc1",
+          association =
+              Association(
+                  name = "assoc1",
+                  id = "assoc1",
+                  description = "This is a test",
+                  eventCategory = EventCategory.ACADEMIC),
           tags = emptySet(),
           price = Price(0u),
       )
