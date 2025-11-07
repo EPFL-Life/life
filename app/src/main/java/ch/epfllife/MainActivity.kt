@@ -33,7 +33,6 @@ import ch.epfllife.ui.navigation.Screen
 import ch.epfllife.ui.navigation.Tab
 import ch.epfllife.ui.settings.SettingsScreen
 import ch.epfllife.ui.theme.Theme
-import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : ComponentActivity() {
 
@@ -62,8 +61,7 @@ fun App(
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
   val startDestination =
-      if (FirebaseAuth.getInstance().currentUser == null) Screen.SignIn.route
-      else Screen.HomeScreen.route
+      if (auth.auth.currentUser == null) Screen.SignIn.route else Screen.HomeScreen.route
 
   // keep the current destination of the nav
   val backStackEntry by navController.currentBackStackEntryAsState()
