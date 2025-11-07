@@ -26,7 +26,6 @@ import ch.epfllife.R
 import ch.epfllife.model.enums.SubscriptionFilter
 import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
 import ch.epfllife.ui.composables.EventCard
-import ch.epfllife.ui.composables.Price
 import ch.epfllife.ui.composables.SearchBar
 import ch.epfllife.ui.navigation.NavigationTestTags
 
@@ -38,29 +37,8 @@ fun HomeScreen(
 ) {
   var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
 
-  val myEvents = remember { emptyList<Event>() } // No events to show empty state
-
-  val allEvents = remember {
-    listOf(
-        Event(
-            id = "1",
-            title = "Via Ferrata",
-            description = "Excursion to the Alps",
-            location = Location(0.0, 0.0, "Lausanne Train Station"),
-            time = "Oct 4th, 6:50am",
-            associationId = "ESN Lausanne",
-            tags = setOf("Sport", "Outdoor"),
-            price = Price(30u)),
-        Event(
-            id = "2",
-            title = "Music Festival",
-            description = "Outdoor concert organized by the Cultural Club",
-            location = Location(0.0, 0.0, "Esplanade"),
-            time = "Nov 3rd, 5:00PM",
-            associationId = "Cultural Club",
-            tags = setOf("Music", "Festival"),
-            price = Price(10u)))
-  }
+  val myEvents by viewModel.myEvents.collectAsState()
+  val allEvents by viewModel.allEvents.collectAsState()
 
   val shownEvents = if (selected == SubscriptionFilter.Subscribed) myEvents else allEvents
 

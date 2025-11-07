@@ -28,6 +28,7 @@ import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.map.Location
 import ch.epfllife.ui.composables.BackButton
 import ch.epfllife.ui.composables.EventCard
+import ch.epfllife.ui.composables.Price
 import ch.epfllife.ui.theme.Theme
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -211,6 +212,90 @@ fun AssociationDetailsContent(
                           )
                         }
                   }
+
+              HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
+
+              // About Section
+              Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    stringResource(R.string.about_section_title),
+                    style =
+                        MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold))
+                Text(
+                    association.about ?: stringResource(R.string.about_placeholder),
+                    style = MaterialTheme.typography.bodyMedium)
+              }
+
+              HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
+
+              // Social Pages
+              Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    stringResource(R.string.social_pages_title),
+                    style =
+                        MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold))
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(24.dp),
+                    verticalAlignment = Alignment.CenterVertically) {
+                      association.socialLinks?.forEach { (platform, url) ->
+                        IconButton(
+                            onClick = {
+                              context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
+                            }) {
+                              val iconRes =
+                                  when (platform) {
+                                    "instagram" -> R.drawable.ic_instagram
+                                    "telegram" -> R.drawable.ic_telegram
+                                    "whatsapp" -> R.drawable.ic_whatsapp
+                                    "linkedin" -> R.drawable.ic_linkedin
+                                    "website" -> R.drawable.ic_google
+                                    else -> R.drawable.ic_google
+                                  }
+                              Icon(
+                                  painter = painterResource(id = iconRes),
+                                  contentDescription = platform,
+                                  tint = Color.Unspecified,
+                                  modifier = Modifier.size(32.dp))
+                            }
+                      }
+                    }
+              }
+
+              HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
+
+              // Upcoming Events (dummy data)
+              Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    stringResource(R.string.upcoming_events_title),
+                    style =
+                        MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold))
+
+                val dummyEvents =
+                    listOf(
+                        Event(
+                            id = "1",
+                            title = "Welcome Party",
+                            description = "Kick off the semester with music and fun.",
+                            location = Location(46.5191, 6.5668, "EPFL Esplanade"),
+                            time = "2025-10-20 18:00",
+                            association = association,
+                            tags = setOf("party"),
+                            price = Price(0u),
+                            pictureUrl = null),
+                        Event(
+                            id = "2",
+                            title = "Hiking Trip",
+                            description = "Join us for a scenic hike in the mountains.",
+                            location = Location(46.2, 7.0, "Les Pleiades"),
+                            time = "2025-11-02 09:00",
+                            association = association,
+                            tags = setOf("outdoors"),
+                            price = Price(15u),
+                            pictureUrl = null))
+
+                dummyEvents.forEach { event -> EventCard(event = event, onClick = {}) }
+              }
             }
           }
 
