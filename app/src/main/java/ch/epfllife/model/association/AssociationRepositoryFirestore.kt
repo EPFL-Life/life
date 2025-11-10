@@ -65,15 +65,20 @@ class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : Associ
     }
   }
 
-  //
-  override suspend fun getEventsForAssociation(associationId: String): List<Event> {
-    val snapshot =
-        db.collection(FirestoreCollections.EVENTS)
-            .whereEqualTo("associationId", associationId)
-            .get()
-            .await()
+  override suspend fun getEventsForAssociation(associationId: String): Result<List<Event>> {
+    // Result.runCatching will automatically catch any exceptions
+    // from the .await() call and return a Result.Failure.
+    return Result.runCatching {
+      val snapshot =
+          db.collection(FirestoreCollections.EVENTS)
+              .whereEqualTo("associationId", associationId)
+              .get()
+              .await()
 
-    return snapshot.mapNotNull { EventRepositoryFirestore.documentToEvent(it) }
+      // If the code reaches here, it was successful,
+      // and this list will be returned as Result.Success
+      snapshot.mapNotNull { EventRepositoryFirestore.documentToEvent(it) }
+    }
   }
 
   override suspend fun deleteAssociation(associationId: String): Result<Unit> {

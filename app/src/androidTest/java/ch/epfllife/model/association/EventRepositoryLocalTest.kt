@@ -150,7 +150,7 @@ class EventRepositoryLocalTest {
     repositoryEvent.createEvent(event3ForA2)
 
     // Act: Get events for assoc1
-    val eventsForA1 = repositoryAssociation.getEventsForAssociation(assoc1.id)
+    val eventsForA1 = repositoryAssociation.getEventsForAssociation(assoc1.id).getOrThrow()
 
     // Assert: Check only assoc1's events are returned
     assertEquals(2, eventsForA1.size)
@@ -158,7 +158,7 @@ class EventRepositoryLocalTest {
     assert(eventsForA1.contains(event2ForA1))
 
     // Act: Get events for assoc2
-    val eventsForA2 = repositoryAssociation.getEventsForAssociation(assoc2.id)
+    val eventsForA2 = repositoryAssociation.getEventsForAssociation(assoc2.id).getOrThrow()
 
     // Assert: Check only assoc2's events are returned
     assertEquals(1, eventsForA2.size)
@@ -179,7 +179,7 @@ class EventRepositoryLocalTest {
     repositoryEvent.createEvent(eventForA2)
 
     // Act: Get events for assoc1 (which has no events)
-    val eventsForA1 = repositoryAssociation.getEventsForAssociation(assoc1.id)
+    val eventsForA1 = repositoryAssociation.getEventsForAssociation(assoc1.id).getOrThrow()
 
     // Assert: Check that the list is empty
     assertEquals(0, eventsForA1.size)
