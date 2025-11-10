@@ -62,4 +62,9 @@ open class NavigationActions(
   open fun currentRoute(): String {
     return navController.currentDestination?.route ?: ""
   }
+
+  fun navigateToAssociationDetails(associationId: String) {
+    val route = "associationdetails/$associationId"
+    navController.navigate(route)
+  }
 }

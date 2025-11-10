@@ -40,7 +40,7 @@ import coil.request.ImageRequest
  * @param onGoBack Callback when the user presses the back button.
  */
 @Composable
-fun AssociationDetailsScreen(associationId: String, onGoBack: () -> Unit = {}) {
+fun AssociationDetailsScreen(associationId: String, onGoBack: () -> Unit) {
   // For now, we still use a sample association.
   // In the future, you can replace this with a ViewModel fetching the association by ID.
   val sampleAssociation =
@@ -68,7 +68,7 @@ fun AssociationDetailsScreen(associationId: String, onGoBack: () -> Unit = {}) {
 fun AssociationDetailsContent(
     association: Association,
     modifier: Modifier = Modifier,
-    onGoBack: () -> Unit = {}
+    onGoBack: () -> Unit
 ) {
   var isSubscribed by remember { mutableStateOf(false) }
   val scrollState = rememberScrollState()
@@ -163,19 +163,13 @@ fun AssociationDetailsContent(
                     horizontalArrangement = Arrangement.spacedBy(24.dp),
                     verticalAlignment = Alignment.CenterVertically) {
                       association.socialLinks?.forEach { (platform, url) ->
+                        val iconRes =
+                            SocialIcons.ICONS[platform] ?: R.drawable.ic_default // fallback icon
                         IconButton(
                             onClick = {
-                              context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
+                              val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+                              context.startActivity(intent)
                             }) {
-                              val iconRes =
-                                  when (platform) {
-                                    "instagram" -> R.drawable.ic_instagram
-                                    "telegram" -> R.drawable.ic_telegram
-                                    "whatsapp" -> R.drawable.ic_whatsapp
-                                    "linkedin" -> R.drawable.ic_linkedin
-                                    "website" -> R.drawable.ic_google
-                                    else -> R.drawable.ic_google
-                                  }
                               Icon(
                                   painter = painterResource(id = iconRes),
                                   contentDescription = platform,
@@ -227,5 +221,5 @@ fun AssociationDetailsContent(
 @Preview(showBackground = true)
 @Composable
 fun AssociationDetailsPreview() {
-  Theme { AssociationDetailsScreen(associationId = "1") }
+  Theme { AssociationDetailsScreen(associationId = "1", onGoBack = {}) }
 }
