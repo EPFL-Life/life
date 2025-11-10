@@ -32,14 +32,23 @@ interface AssociationRepository {
    *
    * @param association The [Association] object to create.
    */
-  suspend fun createAssociation(association: Association)
+  suspend fun createAssociation(association: Association): Result<Unit>
 
   /**
    * Updates an existing association's data. The ID is retrieved from the passed Association object
    *
    * @param newAssociation The [Association] object with the updated information.
    */
-  suspend fun updateAssociation(newAssociation: Association)
+  suspend fun updateAssociation(associationId: String, newAssociation: Association): Result<Unit>
+
+  /**
+   * Deletes an association from the data source.
+   *
+   * @param associationId The unique ID of the association to delete.
+   * @return [Result.success] if deletion is successful, [Result.failure] if the association was not
+   *   found.
+   */
+  suspend fun deleteAssociation(associationId: String): Result<Unit>
 
   /**
    * Retrieves all events organized by a specific association.
