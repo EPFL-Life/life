@@ -54,7 +54,7 @@ interface AssociationRepository {
    * Retrieves all events organized by a specific association.
    *
    * @param associationId The unique ID of the association.
-   * @return A list of [Event] objects associated with the given ID.
+   * @return A Result object with a list of [Event] objects associated with the given ID.
    */
-  suspend fun getEventsForAssociation(associationId: String): List<Event>
+  suspend fun getEventsForAssociation(associationId: String): Result<List<Event>>
 }

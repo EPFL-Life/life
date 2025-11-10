@@ -74,16 +74,16 @@ class AssociationRepositoryLocal(private val eventRepository: EventRepository) :
     return Result.success(Unit)
   }
 
-  override suspend fun getEventsForAssociation(associationId: String): List<Event> {
+  // In your Repository implementation
+  override suspend fun getEventsForAssociation(associationId: String): Result<List<Event>> {
+    return Result.runCatching {
+      // check association exists
+      if (!associations.any { it.id == associationId }) {
+        throw NoSuchElementException("Association with id $associationId not found!")
+      }
 
-    if (!associations.any() { it.id == associationId }) {
-      // I dont want to throw a exception here but i had no better idea of implementing this because
-      // we dont return a Result<T> where we could pass an Exception
-      throw NoSuchElementException(
-          "Association with id $associationId not found! Can NOT return list of events!")
+      // inefficient but works for testing
+      eventRepository.getAllEvents().filter() { it.association.id == associationId }
     }
-
-    // return list of events
-    return eventRepository.getAllEvents().filter() { it.association.id == associationId }
   }
 }
