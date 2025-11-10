@@ -17,6 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -93,7 +94,8 @@ fun AssociationDetailsContent(
               modifier =
                   Modifier.fillMaxWidth()
                       .height(240.dp)
-                      .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)))
+                      .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
+                      .testTag(AssociationDetailsTestTags.ASSOCIATION_IMAGE))
 
           // Back Button
           IconButton(
@@ -102,7 +104,8 @@ fun AssociationDetailsContent(
                   Modifier.padding(16.dp)
                       .align(Alignment.TopStart)
                       .size(40.dp)
-                      .background(Color.Black.copy(alpha = 0.4f), shape = CircleShape)) {
+                      .background(Color.Black.copy(alpha = 0.4f), shape = CircleShape)
+                      .testTag(AssociationDetailsTestTags.BACK_BUTTON)) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(R.string.back_button_description),
@@ -116,16 +119,19 @@ fun AssociationDetailsContent(
             verticalArrangement = Arrangement.spacedBy(8.dp)) {
               Text(
                   text = association.name,
-                  style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold))
+                  style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                  modifier = Modifier.testTag(AssociationDetailsTestTags.NAME_TEXT))
               Text(
                   text = association.description,
                   style = MaterialTheme.typography.bodyMedium,
-                  color = MaterialTheme.colorScheme.onSurfaceVariant)
+                  color = MaterialTheme.colorScheme.onSurfaceVariant,
+                  modifier = Modifier.testTag(AssociationDetailsTestTags.DESCRIPTION_TEXT))
 
               // Subscribe Button
               Button(
                   onClick = { isSubscribed = !isSubscribed },
-                  modifier = Modifier.fillMaxWidth(),
+                  modifier =
+                      Modifier.fillMaxWidth().testTag(AssociationDetailsTestTags.SUBSCRIBE_BUTTON),
                   shape = RoundedCornerShape(6.dp),
                   colors =
                       ButtonDefaults.buttonColors(
@@ -140,15 +146,18 @@ fun AssociationDetailsContent(
               HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
 
               // About Section
-              Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    stringResource(R.string.about_section_title),
-                    style =
-                        MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold))
-                Text(
-                    association.about ?: stringResource(R.string.about_placeholder),
-                    style = MaterialTheme.typography.bodyMedium)
-              }
+              Column(
+                  verticalArrangement = Arrangement.spacedBy(8.dp),
+                  modifier = Modifier.testTag(AssociationDetailsTestTags.ABOUT_SECTION)) {
+                    Text(
+                        stringResource(R.string.about_section_title),
+                        style =
+                            MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.SemiBold))
+                    Text(
+                        association.about ?: stringResource(R.string.about_placeholder),
+                        style = MaterialTheme.typography.bodyMedium)
+                  }
 
               HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
 
@@ -161,7 +170,8 @@ fun AssociationDetailsContent(
 
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(24.dp),
-                    verticalAlignment = Alignment.CenterVertically) {
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.testTag(AssociationDetailsTestTags.SOCIAL_LINKS_ROW)) {
                       association.socialLinks?.forEach { (platform, url) ->
                         val iconRes =
                             SocialIcons.ICONS[platform] ?: R.drawable.ic_default // fallback icon
@@ -183,37 +193,40 @@ fun AssociationDetailsContent(
               HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
 
               // Upcoming Events (dummy data)
-              Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(
-                    stringResource(R.string.upcoming_events_title),
-                    style =
-                        MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold))
+              Column(
+                  verticalArrangement = Arrangement.spacedBy(12.dp),
+                  modifier = Modifier.testTag(AssociationDetailsTestTags.UPCOMING_EVENTS_COLUMN)) {
+                    Text(
+                        stringResource(R.string.upcoming_events_title),
+                        style =
+                            MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.SemiBold))
 
-                val dummyEvents =
-                    listOf(
-                        Event(
-                            id = "1",
-                            title = "Welcome Party",
-                            description = "Kick off the semester with music and fun.",
-                            location = Location(46.5191, 6.5668, "EPFL Esplanade"),
-                            time = "2025-10-20 18:00",
-                            association = association,
-                            tags = setOf("party"),
-                            price = 0u,
-                            pictureUrl = null),
-                        Event(
-                            id = "2",
-                            title = "Hiking Trip",
-                            description = "Join us for a scenic hike in the mountains.",
-                            location = Location(46.2, 7.0, "Les Pleiades"),
-                            time = "2025-11-02 09:00",
-                            association = association,
-                            tags = setOf("outdoors"),
-                            price = 15u,
-                            pictureUrl = null))
+                    val dummyEvents =
+                        listOf(
+                            Event(
+                                id = "1",
+                                title = "Welcome Party",
+                                description = "Kick off the semester with music and fun.",
+                                location = Location(46.5191, 6.5668, "EPFL Esplanade"),
+                                time = "2025-10-20 18:00",
+                                association = association,
+                                tags = setOf("party"),
+                                price = 0u,
+                                pictureUrl = null),
+                            Event(
+                                id = "2",
+                                title = "Hiking Trip",
+                                description = "Join us for a scenic hike in the mountains.",
+                                location = Location(46.2, 7.0, "Les Pleiades"),
+                                time = "2025-11-02 09:00",
+                                association = association,
+                                tags = setOf("outdoors"),
+                                price = 15u,
+                                pictureUrl = null))
 
-                dummyEvents.forEach { event -> EventCard(event = event, onClick = {}) }
-              }
+                    dummyEvents.forEach { event -> EventCard(event = event, onClick = {}) }
+                  }
             }
       }
 }
@@ -222,4 +235,15 @@ fun AssociationDetailsContent(
 @Composable
 fun AssociationDetailsPreview() {
   Theme { AssociationDetailsScreen(associationId = "1", onGoBack = {}) }
+}
+
+object AssociationDetailsTestTags {
+  const val BACK_BUTTON = "BACK_BUTTON"
+  const val ASSOCIATION_IMAGE = "ASSOCIATION_IMAGE"
+  const val SUBSCRIBE_BUTTON = "SUBSCRIBE_BUTTON"
+  const val NAME_TEXT = "NAME_TEXT"
+  const val DESCRIPTION_TEXT = "DESCRIPTION_TEXT"
+  const val ABOUT_SECTION = "ABOUT_SECTION"
+  const val SOCIAL_LINKS_ROW = "SOCIAL_LINKS_ROW"
+  const val UPCOMING_EVENTS_COLUMN = "UPCOMING_EVENTS_COLUMN"
 }

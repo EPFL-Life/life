@@ -108,7 +108,7 @@ fun App(
           }
 
           composable(Screen.HomeScreen.route) { HomeScreen() }
-          composable(Screen.AssociationBrowser.route) { backStackEntry ->
+          composable(Screen.AssociationBrowser.route) {
             AssociationBrowser(
                 onAssociationClick = { associationId ->
                   navigationActions.navigateToAssociationDetails(associationId)
