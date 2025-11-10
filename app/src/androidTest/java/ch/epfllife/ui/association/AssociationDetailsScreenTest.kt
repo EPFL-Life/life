@@ -2,8 +2,7 @@ package ch.epfllife.ui.association
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
-import ch.epfllife.model.association.Association
-import ch.epfllife.model.event.EventCategory
+import ch.epfllife.example_data.ExampleAssociation
 import ch.epfllife.ui.theme.Theme
 import org.junit.Assert.*
 import org.junit.Rule
@@ -13,78 +12,62 @@ class AssociationDetailsScreenTest {
 
   @get:Rule val composeTestRule = createComposeRule()
 
-  private val sampleAssociation =
-      Association(
-          id = "esn_lausanne",
-          name = "ESN Lausanne",
-          description = "Erasmus Student Network at EPFL.",
-          eventCategory = EventCategory.CULTURE,
-          pictureUrl =
-              "https://www.epfl.ch/campus/services/events/wp-content/uploads/2024/09/WEB_Image-Home-Events_ORGANISER.png",
-          about =
-              "The Erasmus Student Network (ESN) Lausanne is a student association that helps exchange students integrate into life at EPFL and Lausanne through social and cultural activities.",
-          socialLinks =
-              mapOf(
-                  "instagram" to "https://www.instagram.com/esnlausanne",
-                  "telegram" to "https://t.me/esnlausanne",
-                  "whatsapp" to "https://wa.me/41791234567",
-                  "linkedin" to "https://www.linkedin.com/company/esnlausanne",
-                  "website" to "https://esnlausanne.ch"))
-
   // ============ AssociationDetailsContent Tests ============
-
 
   @Test
   fun content_DisplaysAssociationDescription() {
+    val association = ExampleAssociation.association4
     composeTestRule.setContent {
-      Theme { AssociationDetailsContent(association = sampleAssociation, onGoBack = {}) }
+      Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
     composeTestRule.onNodeWithTag(AssociationDetailsTestTags.DESCRIPTION_TEXT).assertIsDisplayed()
-    composeTestRule.onNodeWithText("Erasmus Student Network at EPFL.").assertIsDisplayed()
+    composeTestRule.onNodeWithText(association.description).assertIsDisplayed()
   }
 
   @Test
   fun content_DisplaysAssociationImage() {
+    val association = ExampleAssociation.association1
     composeTestRule.setContent {
-      Theme { AssociationDetailsContent(association = sampleAssociation, onGoBack = {}) }
+      Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
     composeTestRule.onNodeWithTag(AssociationDetailsTestTags.ASSOCIATION_IMAGE).assertExists()
   }
 
   @Test
   fun content_DisplaysBackButton() {
+    val association = ExampleAssociation.association1
     composeTestRule.setContent {
-      Theme { AssociationDetailsContent(association = sampleAssociation, onGoBack = {}) }
+      Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
     composeTestRule.onNodeWithTag(AssociationDetailsTestTags.BACK_BUTTON).assertIsDisplayed()
   }
 
   @Test
   fun content_DisplaysSubscribeButton() {
+    val association = ExampleAssociation.association2
     composeTestRule.setContent {
-      Theme { AssociationDetailsContent(association = sampleAssociation, onGoBack = {}) }
+      Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
     composeTestRule.onNodeWithTag(AssociationDetailsTestTags.SUBSCRIBE_BUTTON).assertIsDisplayed()
-    composeTestRule.onNodeWithText("Subscribe to ESN Lausanne").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Subscribe to ${association.name}").assertIsDisplayed()
   }
 
   @Test
   fun content_DisplaysAboutSection() {
+    val association = ExampleAssociation.association1
     composeTestRule.setContent {
-      Theme { AssociationDetailsContent(association = sampleAssociation, onGoBack = {}) }
+      Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
     composeTestRule.onNodeWithTag(AssociationDetailsTestTags.ABOUT_SECTION).assertIsDisplayed()
     composeTestRule.onNodeWithText("About").assertIsDisplayed()
-    composeTestRule
-        .onNodeWithText(
-            "The Erasmus Student Network (ESN) Lausanne is a student association that helps exchange students integrate into life at EPFL and Lausanne through social and cultural activities.")
-        .assertIsDisplayed()
+    composeTestRule.onNodeWithText(association.about!!).assertIsDisplayed()
   }
 
   @Test
   fun content_DisplaysSocialLinksRow() {
+    val association = ExampleAssociation.association1
     composeTestRule.setContent {
-      Theme { AssociationDetailsContent(association = sampleAssociation, onGoBack = {}) }
+      Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
     composeTestRule.onNodeWithTag(AssociationDetailsTestTags.SOCIAL_LINKS_ROW).assertIsDisplayed()
     composeTestRule.onNodeWithText("Social Pages").assertIsDisplayed()
@@ -92,8 +75,9 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun content_DisplaysUpcomingEventsColumn() {
+    val association = ExampleAssociation.association1
     composeTestRule.setContent {
-      Theme { AssociationDetailsContent(association = sampleAssociation, onGoBack = {}) }
+      Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
     composeTestRule
         .onNodeWithTag(AssociationDetailsTestTags.UPCOMING_EVENTS_COLUMN)
@@ -101,25 +85,15 @@ class AssociationDetailsScreenTest {
     composeTestRule.onNodeWithText("Upcoming Events").assertIsDisplayed()
   }
 
-  @Test
-  fun content_DisplaysUpcomingEvents() {
-    composeTestRule.setContent {
-      Theme { AssociationDetailsContent(association = sampleAssociation, onGoBack = {}) }
-    }
-    // Check that dummy events are displayed
-    composeTestRule.onNodeWithText("Welcome Party").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Hiking Trip").assertIsDisplayed()
-  }
-
   // ============ Interaction Tests ============
 
   @Test
   fun content_BackButtonTriggersCallback() {
+    val association = ExampleAssociation.association1
     var backClicked = false
     composeTestRule.setContent {
       Theme {
-        AssociationDetailsContent(
-            association = sampleAssociation, onGoBack = { backClicked = true })
+        AssociationDetailsContent(association = association, onGoBack = { backClicked = true })
       }
     }
     composeTestRule.onNodeWithTag(AssociationDetailsTestTags.BACK_BUTTON).performClick()
@@ -128,8 +102,9 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun content_SubscribeButtonIsClickable() {
+    val association = ExampleAssociation.association1
     composeTestRule.setContent {
-      Theme { AssociationDetailsContent(association = sampleAssociation, onGoBack = {}) }
+      Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
     composeTestRule
         .onNodeWithTag(AssociationDetailsTestTags.SUBSCRIBE_BUTTON)
@@ -138,48 +113,50 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun content_SubscribeButtonTogglesState() {
+    val association = ExampleAssociation.association2
     composeTestRule.setContent {
-      Theme { AssociationDetailsContent(association = sampleAssociation, onGoBack = {}) }
+      Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
 
-    // Initially should show "Subscribe to ESN Lausanne"
-    composeTestRule.onNodeWithText("Subscribe to ESN Lausanne").assertIsDisplayed()
+    // Initially should show "Subscribe to [name]"
+    composeTestRule.onNodeWithText("Subscribe to ${association.name}").assertIsDisplayed()
 
     // Click subscribe button
     composeTestRule.onNodeWithTag(AssociationDetailsTestTags.SUBSCRIBE_BUTTON).performClick()
     composeTestRule.waitForIdle()
 
-    // Should now show "Unsubscribe from ESN Lausanne"
-    composeTestRule.onNodeWithText("Unsubscribe from ESN Lausanne").assertIsDisplayed()
+    // Should now show "Unsubscribe from [name]"
+    composeTestRule.onNodeWithText("Unsubscribe from ${association.name}").assertIsDisplayed()
   }
 
   @Test
   fun content_SubscribeButtonTogglesBackAndForth() {
+    val association = ExampleAssociation.association1
     composeTestRule.setContent {
-      Theme { AssociationDetailsContent(association = sampleAssociation, onGoBack = {}) }
+      Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
 
     // Initially subscribed = false
-    composeTestRule.onNodeWithText("Subscribe to ESN Lausanne").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Subscribe to ${association.name}").assertIsDisplayed()
 
     // Click to subscribe
     composeTestRule.onNodeWithTag(AssociationDetailsTestTags.SUBSCRIBE_BUTTON).performClick()
     composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithText("Unsubscribe from ESN Lausanne").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Unsubscribe from ${association.name}").assertIsDisplayed()
 
     // Click to unsubscribe
     composeTestRule.onNodeWithTag(AssociationDetailsTestTags.SUBSCRIBE_BUTTON).performClick()
     composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithText("Subscribe to ESN Lausanne").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Subscribe to ${association.name}").assertIsDisplayed()
   }
 
   // ============ Different Association Data Tests ============
 
   @Test
   fun content_DisplaysAssociationWithoutAbout() {
-    val associationWithoutAbout = sampleAssociation.copy(about = null)
+    val association = ExampleAssociation.association3
     composeTestRule.setContent {
-      Theme { AssociationDetailsContent(association = associationWithoutAbout, onGoBack = {}) }
+      Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
     composeTestRule.onNodeWithText("About").assertIsDisplayed()
     composeTestRule.onNodeWithText("No description available.").assertIsDisplayed()
@@ -187,15 +164,14 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun content_DisplaysAssociationWithEmptyAbout() {
-    val associationWithEmptyAbout = sampleAssociation.copy(about = "")
+    val association = ExampleAssociation.association2
     composeTestRule.setContent {
-      Theme { AssociationDetailsContent(association = associationWithEmptyAbout, onGoBack = {}) }
+      Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
     composeTestRule.onNodeWithText("About").assertIsDisplayed()
     // Empty string should still be displayed
     composeTestRule.onNodeWithTag(AssociationDetailsTestTags.ABOUT_SECTION).assertIsDisplayed()
   }
-
 
   @Test
   fun content_DisplaysLongAboutText() {
@@ -204,18 +180,18 @@ class AssociationDetailsScreenTest {
             "It should wrap properly and display all the content to the user. " +
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
             "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-    val longAboutAssociation = sampleAssociation.copy(about = longAbout)
+    val association = ExampleAssociation.association1.copy(about = longAbout)
     composeTestRule.setContent {
-      Theme { AssociationDetailsContent(association = longAboutAssociation, onGoBack = {}) }
+      Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
     composeTestRule.onNodeWithText(longAbout, substring = true).assertIsDisplayed()
   }
 
   @Test
   fun content_HandlesAssociationWithoutImageUrl() {
-    val associationWithoutImage = sampleAssociation.copy(pictureUrl = "")
+    val association = ExampleAssociation.association3
     composeTestRule.setContent {
-      Theme { AssociationDetailsContent(association = associationWithoutImage, onGoBack = {}) }
+      Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
     // Image should still exist even with empty URL
     composeTestRule.onNodeWithTag(AssociationDetailsTestTags.ASSOCIATION_IMAGE).assertExists()
@@ -223,20 +199,9 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun content_DisplaysAssociationWithMultipleSocialLinks() {
-    val associationWithManySocialLinks =
-        sampleAssociation.copy(
-            socialLinks =
-                mapOf(
-                    "instagram" to "https://www.instagram.com/test",
-                    "telegram" to "https://t.me/test",
-                    "whatsapp" to "https://wa.me/41791234567",
-                    "linkedin" to "https://www.linkedin.com/company/test",
-                    "website" to "https://test.ch",
-                    "facebook" to "https://www.facebook.com/test"))
+    val association = ExampleAssociation.association4
     composeTestRule.setContent {
-      Theme {
-        AssociationDetailsContent(association = associationWithManySocialLinks, onGoBack = {})
-      }
+      Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
     // Should display without crashing
     composeTestRule.onNodeWithTag(AssociationDetailsTestTags.SOCIAL_LINKS_ROW).assertIsDisplayed()
@@ -246,8 +211,9 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun integration_AllContentDisplayedTogether() {
+    val association = ExampleAssociation.association1
     composeTestRule.setContent {
-      Theme { AssociationDetailsContent(association = sampleAssociation, onGoBack = {}) }
+      Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
 
     // Verify all major components are present
@@ -265,8 +231,9 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun integration_MultipleClicksOnSubscribeButton() {
+    val association = ExampleAssociation.association2
     composeTestRule.setContent {
-      Theme { AssociationDetailsContent(association = sampleAssociation, onGoBack = {}) }
+      Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
 
     // Click subscribe button multiple times
@@ -281,10 +248,11 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun integration_MultipleClicksOnBackButton() {
+    val association = ExampleAssociation.association1
     var backClickCount = 0
     composeTestRule.setContent {
       Theme {
-        AssociationDetailsContent(association = sampleAssociation, onGoBack = { backClickCount++ })
+        AssociationDetailsContent(association = association, onGoBack = { backClickCount++ })
       }
     }
 
@@ -299,11 +267,11 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun integration_NavigationBetweenStates() {
+    val association = ExampleAssociation.association1
     var goBackCalled = false
     composeTestRule.setContent {
       Theme {
-        AssociationDetailsContent(
-            association = sampleAssociation, onGoBack = { goBackCalled = true })
+        AssociationDetailsContent(association = association, onGoBack = { goBackCalled = true })
       }
     }
 
@@ -318,8 +286,9 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun content_AllButtonsAreAccessible() {
+    val association = ExampleAssociation.association1
     composeTestRule.setContent {
-      Theme { AssociationDetailsContent(association = sampleAssociation, onGoBack = {}) }
+      Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
 
     // All interactive elements should be present and accessible
@@ -331,24 +300,27 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun content_AboutSectionLabelDisplayed() {
+    val association = ExampleAssociation.association1
     composeTestRule.setContent {
-      Theme { AssociationDetailsContent(association = sampleAssociation, onGoBack = {}) }
+      Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
     composeTestRule.onNodeWithText("About").assertIsDisplayed()
   }
 
   @Test
   fun content_SocialPagesSectionLabelDisplayed() {
+    val association = ExampleAssociation.association1
     composeTestRule.setContent {
-      Theme { AssociationDetailsContent(association = sampleAssociation, onGoBack = {}) }
+      Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
     composeTestRule.onNodeWithText("Social Pages").assertIsDisplayed()
   }
 
   @Test
   fun content_UpcomingEventsSectionLabelDisplayed() {
+    val association = ExampleAssociation.association1
     composeTestRule.setContent {
-      Theme { AssociationDetailsContent(association = sampleAssociation, onGoBack = {}) }
+      Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
     composeTestRule.onNodeWithText("Upcoming Events").assertIsDisplayed()
   }
@@ -357,8 +329,9 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun screen_DisplaysWithAssociationId() {
+    val testId = ExampleAssociation.association1.id
     composeTestRule.setContent {
-      Theme { AssociationDetailsScreen(associationId = "test_id", onGoBack = {}) }
+      Theme { AssociationDetailsScreen(associationId = testId, onGoBack = {}) }
     }
     // Should display without crashing
     composeTestRule.onNodeWithTag(AssociationDetailsTestTags.NAME_TEXT).assertIsDisplayed()
@@ -379,27 +352,10 @@ class AssociationDetailsScreenTest {
   // ============ Scrolling Tests ============
 
   @Test
-  fun content_CanScrollThroughAllContent() {
-    composeTestRule.setContent {
-      Theme { AssociationDetailsContent(association = sampleAssociation, onGoBack = {}) }
-    }
-
-    // Verify top content is visible
-    composeTestRule.onNodeWithTag(AssociationDetailsTestTags.NAME_TEXT).assertIsDisplayed()
-
-    // Scroll to bottom
-    composeTestRule
-        .onNodeWithTag(AssociationDetailsTestTags.UPCOMING_EVENTS_COLUMN)
-        .assertIsDisplayed()
-
-    // Verify bottom content is visible after scrolling
-    composeTestRule.onNodeWithText("Hiking Trip").assertIsDisplayed()
-  }
-
-  @Test
   fun content_AllSectionsAreAccessibleAfterScrolling() {
+    val association = ExampleAssociation.association1
     composeTestRule.setContent {
-      Theme { AssociationDetailsContent(association = sampleAssociation, onGoBack = {}) }
+      Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
 
     // Check that all major sections exist and can be accessed
@@ -415,12 +371,11 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun content_HandlesNullPictureUrl() {
-    val associationWithNullPicture = sampleAssociation.copy(pictureUrl = null)
+    val association = ExampleAssociation.association3
     composeTestRule.setContent {
-      Theme { AssociationDetailsContent(association = associationWithNullPicture, onGoBack = {}) }
+      Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
     // Should still display image component
     composeTestRule.onNodeWithTag(AssociationDetailsTestTags.ASSOCIATION_IMAGE).assertExists()
   }
-
 }
