@@ -11,11 +11,11 @@ import kotlinx.coroutines.launch
 
 /** UI state for the EventDetails screen. */
 sealed class EventDetailsUIState {
-    object Loading : EventDetailsUIState()
+  object Loading : EventDetailsUIState()
 
-    data class Success(val event: Event, val isEnrolled: Boolean) : EventDetailsUIState()
+  data class Success(val event: Event, val isEnrolled: Boolean) : EventDetailsUIState()
 
-    data class Error(val message: String) : EventDetailsUIState()
+  data class Error(val message: String) : EventDetailsUIState()
 }
 
 /**
@@ -25,48 +25,48 @@ sealed class EventDetailsUIState {
  */
 class EventDetailsViewModel() : ViewModel() {
 
-    private val repo =
-        EventRepositoryFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance())
-    private val _uiState = MutableStateFlow<EventDetailsUIState>(EventDetailsUIState.Loading)
-    val uiState: StateFlow<EventDetailsUIState> = _uiState.asStateFlow()
+  private val repo =
+      EventRepositoryFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance())
+  private val _uiState = MutableStateFlow<EventDetailsUIState>(EventDetailsUIState.Loading)
+  val uiState: StateFlow<EventDetailsUIState> = _uiState.asStateFlow()
 
-    /** Loads event details by ID using EventRepositoryFirestore.getEvent. */
-    fun loadEvent(eventId: String) {
-        viewModelScope.launch {
-            try {
-                val event = repo.getEvent(eventId)
-                _uiState.value = EventDetailsUIState.Success(event, isEnrolled = isEnrolled(event))
-            } catch (e: Exception) {
-                _uiState.value = EventDetailsUIState.Error("Failed to load event: ${e.message}")
-            }
-        }
+  /** Loads event details by ID using EventRepositoryFirestore.getEvent. */
+  fun loadEvent(eventId: String) {
+    viewModelScope.launch {
+      try {
+        val event = repo.getEvent(eventId)
+        _uiState.value = EventDetailsUIState.Success(event, isEnrolled = isEnrolled(event))
+      } catch (e: Exception) {
+        _uiState.value = EventDetailsUIState.Error("Failed to load event: ${e.message}")
+      }
     }
+  }
 
-    /**
-     * Logic to enroll in an event. Either a redirection to separate signup page or use Firebase to
-     * track enrollment
-     */
-    fun enrollInEvent(event: Event) {
-        viewModelScope.launch {
-            try {
-                // TODO: implement logic
-                _uiState.value = EventDetailsUIState.Success(event, isEnrolled = true)
-            } catch (e: Exception) {
-                _uiState.value = EventDetailsUIState.Error("Failed to enrol: ${e.message}")
-            }
-        }
+  /**
+   * Logic to enroll in an event. Either a redirection to separate signup page or use Firebase to
+   * track enrollment
+   */
+  fun enrollInEvent(event: Event) {
+    viewModelScope.launch {
+      try {
+        // TODO: implement logic
+        _uiState.value = EventDetailsUIState.Success(event, isEnrolled = true)
+      } catch (e: Exception) {
+        _uiState.value = EventDetailsUIState.Error("Failed to enrol: ${e.message}")
+      }
     }
+  }
 
-    /**
-     * Check if user is enrolled, this will be only possible if enrollments are tracked by us (not
-     * implemented for now, as we only do redirection for the MVP)
-     */
-    fun isEnrolled(event: Event): Boolean {
-        // TODO implement actual logic (Firestore / API call)
-        // we need this to decide whether the button should be gray or not ("Enroll in event" or
-        // "Enrolled")
-        if (event.id == event.title) return false
+  /**
+   * Check if user is enrolled, this will be only possible if enrollments are tracked by us (not
+   * implemented for now, as we only do redirection for the MVP)
+   */
+  fun isEnrolled(event: Event): Boolean {
+    // TODO implement actual logic (Firestore / API call)
+    // we need this to decide whether the button should be gray or not ("Enroll in event" or
+    // "Enrolled")
+    if (event.id == event.title) return false
 
-        return false
-    }
+    return false
+  }
 }

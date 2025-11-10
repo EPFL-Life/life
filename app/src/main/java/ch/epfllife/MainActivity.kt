@@ -37,16 +37,16 @@ import ch.epfllife.ui.theme.Theme
 
 class MainActivity : ComponentActivity() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
 
-        setContent { ThemedApp(auth = Auth(CredentialManager.create(LocalContext.current))) }
-    }
+    setContent { ThemedApp(auth = Auth(CredentialManager.create(LocalContext.current))) }
+  }
 }
 
 @Composable
 fun ThemedApp(auth: Auth) {
-    Theme { Surface(modifier = Modifier.fillMaxSize()) { App(auth) } }
+  Theme { Surface(modifier = Modifier.fillMaxSize()) { App(auth) } }
 }
 
 /**
@@ -59,86 +59,85 @@ fun ThemedApp(auth: Auth) {
 fun App(
     auth: Auth,
 ) {
-    val navController = rememberNavController()
-    val navigationActions = NavigationActions(navController)
-    val startDestination =
-        if (auth.auth.currentUser == null) Screen.SignIn.route else Screen.HomeScreen.route
+  val navController = rememberNavController()
+  val navigationActions = NavigationActions(navController)
+  val startDestination =
+      if (auth.auth.currentUser == null) Screen.SignIn.route else Screen.HomeScreen.route
 
-    // keep the current destination of the nav
-    val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = backStackEntry?.destination?.route
+  // keep the current destination of the nav
+  val backStackEntry by navController.currentBackStackEntryAsState()
+  val currentRoute = backStackEntry?.destination?.route
 
-    // list with all the tabs available
-    val allTabs = Tab.tabs
+  // list with all the tabs available
+  val allTabs = Tab.tabs
 
-    // we obtain the current Tab, if we don't find the route, will be redirected to the HomeScreen
-    val selectedTab =
-        remember(currentRoute) {
-            allTabs.firstOrNull { it.destination.route == currentRoute } ?: Tab.HomeScreen
+  // we obtain the current Tab, if we don't find the route, will be redirected to the HomeScreen
+  val selectedTab =
+      remember(currentRoute) {
+        allTabs.firstOrNull { it.destination.route == currentRoute } ?: Tab.HomeScreen
+      }
+
+  val showBottomBar =
+      when (currentRoute) {
+        Screen.HomeScreen.route,
+        Screen.AssociationBrowser.route,
+        Screen.MyEvents.route,
+        Screen.Settings.route -> true
+        else -> false
+      }
+
+  Scaffold(
+      bottomBar = {
+        if (showBottomBar) {
+          BottomNavigationMenu(
+              selectedTab = selectedTab,
+              onTabSelected = { tab -> navigationActions.navigateTo(tab.destination) },
+              modifier = Modifier.testTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU),
+          )
         }
-
-    val showBottomBar =
-        when (currentRoute) {
-            Screen.HomeScreen.route,
-            Screen.AssociationBrowser.route,
-            Screen.MyEvents.route,
-            Screen.Settings.route -> true
-
-            else -> false
-        }
-
-    Scaffold(
-        bottomBar = {
-            if (showBottomBar) {
-                BottomNavigationMenu(
-                    selectedTab = selectedTab,
-                    onTabSelected = { tab -> navigationActions.navigateTo(tab.destination) },
-                    modifier = Modifier.testTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU),
-                )
-            }
-        }) { innerPadding ->
+      }) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = startDestination,
             modifier = Modifier.padding(innerPadding),
         ) {
-            composable(Screen.SignIn.route) {
-                SignInScreen(
-                    auth = auth,
-                    onSignedIn = { navigationActions.navigateTo(Screen.HomeScreen) },
-                )
-            }
+          composable(Screen.SignIn.route) {
+            SignInScreen(
+                auth = auth,
+                onSignedIn = { navigationActions.navigateTo(Screen.HomeScreen) },
+            )
+          }
 
-            // pass navigation callback to HomeScreen
-            composable(Screen.HomeScreen.route) {
-                HomeScreen(onEventClick = { id -> navigationActions.navigateToEventDetails(id) })
-            }
+          // pass navigation callback to HomeScreen
+          composable(Screen.HomeScreen.route) {
+            HomeScreen(onEventClick = { id -> navigationActions.navigateToEventDetails(id) })
+          }
 
-            composable(Screen.AssociationBrowser.route) { AssociationBrowser() }
-            composable(Screen.MyEvents.route) { MyEvents() }
-            composable(
-                route = Screen.AssociationDetails.route + "/{associationId}",
-                arguments = listOf(navArgument("associationId") { type = NavType.StringType })
-            ) { backStackEntry ->
+          composable(Screen.AssociationBrowser.route) { AssociationBrowser() }
+          composable(Screen.MyEvents.route) { MyEvents() }
+          composable(
+              route = Screen.AssociationDetails.route + "/{associationId}",
+              arguments = listOf(navArgument("associationId") { type = NavType.StringType })) {
+                  backStackEntry ->
                 val associationId = backStackEntry.arguments?.getString("associationId") ?: ""
                 AssociationDetailsScreen(associationId = associationId)
-            }
+              }
 
-            // Event details route
-            composable(
-                route = Screen.EventDetails.route + "/{eventId}",
-                arguments = listOf(navArgument("eventId") { type = NavType.StringType })
-            ) { backStackEntry ->
+          // Event details route
+          composable(
+              route = Screen.EventDetails.route + "/{eventId}",
+              arguments = listOf(navArgument("eventId") { type = NavType.StringType })) {
+                  backStackEntry ->
                 val eventId = backStackEntry.arguments?.getString("eventId") ?: ""
                 EventDetailsScreen(eventId = eventId, onGoBack = { navigationActions.goBack() })
-            }
+              }
 
-            composable(Screen.Settings.route) {
-                SettingsScreen(
-                    auth = auth,
-                    onSignedOut = { navigationActions.navigateTo(Screen.SignIn) },
-                )
-            }
+          composable(Screen.Settings.route) {
+            SettingsScreen(
+                auth = auth,
+                onSignedOut = { navigationActions.navigateTo(Screen.SignIn) },
+            )
+          }
         }
-    }
+      }
 }
