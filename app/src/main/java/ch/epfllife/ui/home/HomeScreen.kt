@@ -30,26 +30,34 @@ import ch.epfllife.ui.composables.SearchBar
 import ch.epfllife.ui.navigation.NavigationTestTags
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel = viewModel()) {
-  var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    viewModel: HomeViewModel = viewModel(),
+    onEventClick: (eventId: String) -> Unit = {}
+) {
+    var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
 
-  val myEvents by viewModel.myEvents.collectAsState()
-  val allEvents by viewModel.allEvents.collectAsState()
+    val myEvents by viewModel.myEvents.collectAsState()
+    val allEvents by viewModel.allEvents.collectAsState()
 
-  val shownEvents = if (selected == SubscriptionFilter.Subscribed) myEvents else allEvents
+    val shownEvents = if (selected == SubscriptionFilter.Subscribed) myEvents else allEvents
 
-  Column(
-      modifier =
-          modifier
-              .fillMaxSize()
-              .padding(horizontal = 16.dp, vertical = 12.dp)
-              .testTag(NavigationTestTags.HOMESCREEN_SCREEN)) {
+    Column(
+        modifier =
+            modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp, vertical = 12.dp)
+                .testTag(NavigationTestTags.HOMESCREEN_SCREEN)
+    ) {
         Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-          Image(
-              painter = painterResource(id = R.drawable.epfl_life_logo),
-              contentDescription = "EPFL Life Logo",
-              modifier = modifier.height(40.dp).testTag(HomeScreenTestTags.EPFLLOGO),
-              contentScale = ContentScale.Fit)
+            Image(
+                painter = painterResource(id = R.drawable.epfl_life_logo),
+                contentDescription = "EPFL Life Logo",
+                modifier = modifier
+                    .height(40.dp)
+                    .testTag(HomeScreenTestTags.EPFLLOGO),
+                contentScale = ContentScale.Fit
+            )
         }
 
         Spacer(Modifier.height(12.dp))
@@ -61,62 +69,70 @@ fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel = viewMod
             selected = selected,
             onSelected = { selected = it },
             subscribedLabel = stringResource(id = R.string.subscribed_filter),
-            allLabel = stringResource(id = R.string.all_events_filter))
+            allLabel = stringResource(id = R.string.all_events_filter)
+        )
 
         Spacer(Modifier.height(12.dp))
 
         // If statement to display certain messages for empty screens
         if (shownEvents.isEmpty()) {
-          val (title, description) =
-              if (selected == SubscriptionFilter.Subscribed) {
-                Pair(R.string.home_empty_title, R.string.home_empty_description)
-              } else {
-                Pair(R.string.home_no_events_title, R.string.home_no_events_description)
-              }
-          EmptyEventsMessage(
-              title = stringResource(id = title),
-              description = stringResource(id = description),
-              modifier = modifier.fillMaxSize().padding(horizontal = 24.dp))
-        } else {
-          LazyColumn(
-              verticalArrangement = Arrangement.spacedBy(12.dp),
-              modifier = modifier.fillMaxSize()) {
-                items(shownEvents, key = { it.id }) { ev ->
-                  EventCard(event = ev, onClick = { /* TODO: Navigate to event card */})
+            val (title, description) =
+                if (selected == SubscriptionFilter.Subscribed) {
+                    Pair(R.string.home_empty_title, R.string.home_empty_description)
+                } else {
+                    Pair(R.string.home_no_events_title, R.string.home_no_events_description)
                 }
-              }
+            EmptyEventsMessage(
+                title = stringResource(id = title),
+                description = stringResource(id = description),
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 24.dp)
+            )
+        } else {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = modifier.fillMaxSize()
+            ) {
+                items(shownEvents, key = { it.id }) { ev ->
+                    EventCard(event = ev, onClick = { onEventClick(ev.id) })
+                }
+            }
         }
-      }
+    }
 }
 
 @Composable
 private fun EmptyEventsMessage(title: String, description: String, modifier: Modifier = Modifier) {
-  Column(
-      modifier = modifier,
-      horizontalAlignment = Alignment.CenterHorizontally,
-      verticalArrangement = Arrangement.Center) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface,
-            textAlign = TextAlign.Center)
+            textAlign = TextAlign.Center
+        )
         Spacer(Modifier.height(2.dp))
         Text(
             text = description,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center)
-      }
+            textAlign = TextAlign.Center
+        )
+    }
 }
 
 object HomeScreenTestTags {
-  const val EPFLLOGO = "EPFL_LOGO"
-  const val BOTTON_SUBSCRIBED = "BUTTON_SUBSCRIBED"
-  const val BUTTON_ALL = "BUTTON_ALL"
+    const val EPFLLOGO = "EPFL_LOGO"
+    const val BOTTON_SUBSCRIBED = "BUTTON_SUBSCRIBED"
+    const val BUTTON_ALL = "BUTTON_ALL"
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun HomeScreenPreview() {
-  MaterialTheme { HomeScreen() }
+    MaterialTheme { HomeScreen() }
 }
