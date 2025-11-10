@@ -2,7 +2,7 @@ package ch.epfllife.ui.association
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
-import ch.epfllife.example_data.ExampleAssociation
+import ch.epfllife.example_data.ExampleAssociations
 import ch.epfllife.ui.theme.Theme
 import org.junit.Assert.*
 import org.junit.Rule
@@ -16,7 +16,7 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun content_DisplaysAssociationDescription() {
-    val association = ExampleAssociation.association4
+    val association = ExampleAssociations.association4
     composeTestRule.setContent {
       Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
@@ -26,7 +26,7 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun content_DisplaysAssociationImage() {
-    val association = ExampleAssociation.association1
+    val association = ExampleAssociations.association1
     composeTestRule.setContent {
       Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
@@ -35,7 +35,7 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun content_DisplaysBackButton() {
-    val association = ExampleAssociation.association1
+    val association = ExampleAssociations.association1
     composeTestRule.setContent {
       Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
@@ -44,7 +44,7 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun content_DisplaysSubscribeButton() {
-    val association = ExampleAssociation.association2
+    val association = ExampleAssociations.association2
     composeTestRule.setContent {
       Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
@@ -54,7 +54,7 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun content_DisplaysAboutSection() {
-    val association = ExampleAssociation.association1
+    val association = ExampleAssociations.association1
     composeTestRule.setContent {
       Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
@@ -65,7 +65,7 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun content_DisplaysSocialLinksRow() {
-    val association = ExampleAssociation.association1
+    val association = ExampleAssociations.association1
     composeTestRule.setContent {
       Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
@@ -75,7 +75,7 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun content_DisplaysUpcomingEventsColumn() {
-    val association = ExampleAssociation.association1
+    val association = ExampleAssociations.association1
     composeTestRule.setContent {
       Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
@@ -89,7 +89,7 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun content_BackButtonTriggersCallback() {
-    val association = ExampleAssociation.association1
+    val association = ExampleAssociations.association1
     var backClicked = false
     composeTestRule.setContent {
       Theme {
@@ -102,7 +102,7 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun content_SubscribeButtonIsClickable() {
-    val association = ExampleAssociation.association1
+    val association = ExampleAssociations.association1
     composeTestRule.setContent {
       Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
@@ -113,7 +113,7 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun content_SubscribeButtonTogglesState() {
-    val association = ExampleAssociation.association2
+    val association = ExampleAssociations.association2
     composeTestRule.setContent {
       Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
@@ -131,7 +131,7 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun content_SubscribeButtonTogglesBackAndForth() {
-    val association = ExampleAssociation.association1
+    val association = ExampleAssociations.association1
     composeTestRule.setContent {
       Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
@@ -154,7 +154,7 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun content_DisplaysAssociationWithoutAbout() {
-    val association = ExampleAssociation.association3
+    val association = ExampleAssociations.association3
     composeTestRule.setContent {
       Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
@@ -164,7 +164,7 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun content_DisplaysAssociationWithEmptyAbout() {
-    val association = ExampleAssociation.association2
+    val association = ExampleAssociations.association2
     composeTestRule.setContent {
       Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
@@ -180,7 +180,7 @@ class AssociationDetailsScreenTest {
             "It should wrap properly and display all the content to the user. " +
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
             "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-    val association = ExampleAssociation.association1.copy(about = longAbout)
+    val association = ExampleAssociations.association1.copy(about = longAbout)
     composeTestRule.setContent {
       Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
@@ -189,7 +189,7 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun content_HandlesAssociationWithoutImageUrl() {
-    val association = ExampleAssociation.association3
+    val association = ExampleAssociations.association3
     composeTestRule.setContent {
       Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
@@ -199,7 +199,7 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun content_DisplaysAssociationWithMultipleSocialLinks() {
-    val association = ExampleAssociation.association4
+    val association = ExampleAssociations.association4
     composeTestRule.setContent {
       Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
@@ -211,7 +211,7 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun integration_AllContentDisplayedTogether() {
-    val association = ExampleAssociation.association1
+    val association = ExampleAssociations.association1
     composeTestRule.setContent {
       Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
@@ -231,7 +231,7 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun integration_MultipleClicksOnSubscribeButton() {
-    val association = ExampleAssociation.association2
+    val association = ExampleAssociations.association2
     composeTestRule.setContent {
       Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
@@ -248,7 +248,7 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun integration_MultipleClicksOnBackButton() {
-    val association = ExampleAssociation.association1
+    val association = ExampleAssociations.association1
     var backClickCount = 0
     composeTestRule.setContent {
       Theme {
@@ -267,7 +267,7 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun integration_NavigationBetweenStates() {
-    val association = ExampleAssociation.association1
+    val association = ExampleAssociations.association1
     var goBackCalled = false
     composeTestRule.setContent {
       Theme {
@@ -286,7 +286,7 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun content_AllButtonsAreAccessible() {
-    val association = ExampleAssociation.association1
+    val association = ExampleAssociations.association1
     composeTestRule.setContent {
       Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
@@ -300,7 +300,7 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun content_AboutSectionLabelDisplayed() {
-    val association = ExampleAssociation.association1
+    val association = ExampleAssociations.association1
     composeTestRule.setContent {
       Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
@@ -309,7 +309,7 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun content_SocialPagesSectionLabelDisplayed() {
-    val association = ExampleAssociation.association1
+    val association = ExampleAssociations.association1
     composeTestRule.setContent {
       Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
@@ -318,7 +318,7 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun content_UpcomingEventsSectionLabelDisplayed() {
-    val association = ExampleAssociation.association1
+    val association = ExampleAssociations.association1
     composeTestRule.setContent {
       Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
@@ -329,7 +329,7 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun screen_DisplaysWithAssociationId() {
-    val testId = ExampleAssociation.association1.id
+    val testId = ExampleAssociations.association1.id
     composeTestRule.setContent {
       Theme { AssociationDetailsScreen(associationId = testId, onGoBack = {}) }
     }
@@ -353,7 +353,7 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun content_AllSectionsAreAccessibleAfterScrolling() {
-    val association = ExampleAssociation.association1
+    val association = ExampleAssociations.association1
     composeTestRule.setContent {
       Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
@@ -371,7 +371,7 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun content_HandlesNullPictureUrl() {
-    val association = ExampleAssociation.association3
+    val association = ExampleAssociations.association3
     composeTestRule.setContent {
       Theme { AssociationDetailsContent(association = association, onGoBack = {}) }
     }
