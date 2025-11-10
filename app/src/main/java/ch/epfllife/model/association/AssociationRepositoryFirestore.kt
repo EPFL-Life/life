@@ -26,27 +26,43 @@ class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : Associ
     return snapshot.mapNotNull { documentToAssociation(it) }
   }
 
-  override suspend fun createAssociation(association: Association) {
+  override suspend fun createAssociation(association: Association): Result<Unit> {
     db.collection(FirestoreCollections.ASSOCIATIONS)
         .document(association.id)
         .set(association)
         .await()
+    return Result.success(Unit)
   }
 
-  override suspend fun updateAssociation(newAssociation: Association) {
+  override suspend fun updateAssociation(
+      associationId: String,
+      newAssociation: Association
+  ): Result<Unit> {
 
-    // extract doc reference
-    val docRef = db.collection(FirestoreCollections.ASSOCIATIONS).document(newAssociation.id)
-
-    // check if doc does NOT exist
-    if (!docRef.get().await().exists()) {
-      // Throw an error because we can't update a non-existent document
-      throw NoSuchElementException(
-          "Association with id ${newAssociation.id} not found! Cannot update.")
+    // 1. Check if the object's ID matches the parameter ID
+    if (associationId != newAssociation.id) {
+      return Result.failure(
+          IllegalArgumentException(
+              "Association ID mismatch. Parameter was $associationId but object ID was ${newAssociation.id}"))
     }
 
-    // if it exists update it
-    docRef.set(newAssociation).await()
+    return try {
+      // 2. Get the document reference
+      val docRef = db.collection(FirestoreCollections.ASSOCIATIONS).document(associationId)
+
+      // 3. Check if the association to update even exists
+      if (!docRef.get().await().exists()) {
+        return Result.failure(
+            NoSuchElementException("Cannot update. Association not found with ID: $associationId"))
+      }
+
+      // 4. Perform the update
+      docRef.set(newAssociation).await()
+      Result.success(Unit)
+    } catch (e: Exception) {
+      // Handle any other Firestore or coroutine exceptions
+      Result.failure(e)
+    }
   }
 
   //
@@ -58,6 +74,26 @@ class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : Associ
             .await()
 
     return snapshot.mapNotNull { EventRepositoryFirestore.documentToEvent(it) }
+  }
+
+  override suspend fun deleteAssociation(associationId: String): Result<Unit> {
+    return try {
+      // 1. Get the document reference
+      val docRef = db.collection(FirestoreCollections.ASSOCIATIONS).document(associationId)
+
+      // 2. Check if the association to delete even exists
+      if (!docRef.get().await().exists()) {
+        return Result.failure(
+            NoSuchElementException("Cannot delete. Association not found with ID: $associationId"))
+      }
+
+      // 3. Perform the deletion
+      docRef.delete().await()
+      Result.success(Unit)
+    } catch (e: Exception) {
+      // Handle any other Firestore or coroutine exceptions
+      Result.failure(e)
+    }
   }
 
   // helper function for parsing
