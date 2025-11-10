@@ -1,6 +1,6 @@
 package ch.epfllife.model.association
 
-import ch.epfllife.example_data.ExampleAssociation
+import ch.epfllife.example_data.ExampleAssociations
 import com.google.firebase.firestore.DocumentSnapshot
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -24,7 +24,7 @@ class AssociationRepositoryFirestoreTest {
   fun documentToAssociation_validDocument_returnsAssociation() {
 
     // arrange use example association from ExampleAssociation object
-    val association = ExampleAssociation.association1
+    val association = ExampleAssociations.association1
 
     // arrange: mock the document with all valid fields
     whenever(mockDocument.id).thenReturn(association.id)
@@ -46,7 +46,7 @@ class AssociationRepositoryFirestoreTest {
   fun documentToAssociation_invalidDocument_returnsNull() {
 
     // arrange use example association from ExampleAssociation object
-    val association = ExampleAssociation.association1
+    val association = ExampleAssociations.association1
 
     // arrange: mock the document with invalid name field
     whenever(mockDocument.id).thenReturn(association.id)

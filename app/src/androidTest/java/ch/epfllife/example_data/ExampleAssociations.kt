@@ -4,7 +4,7 @@ import ch.epfllife.model.association.Association
 import ch.epfllife.model.event.EventCategory
 
 /** A singleton object holding sample association data for testing purposes. */
-object ExampleAssociation {
+object ExampleAssociations {
 
   val association1 =
       Association(

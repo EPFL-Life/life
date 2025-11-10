@@ -21,7 +21,7 @@ object ExampleEvents {
           description = "Join us for an exciting symposium on satellite technology.",
           location = satelliteLocation,
           time = "2025-11-20 09:00",
-          association = ExampleAssociation.association1,
+          association = ExampleAssociations.association1,
           tags = setOf("tech", "symposium", "space"),
           price = 25u, // Using UInt
           pictureUrl = "https://actu.epfl.ch/image/76257/original/5616x3744.jpg")
@@ -33,7 +33,7 @@ object ExampleEvents {
           description = "Annual music festival at EPFL. Don't miss out!",
           location = epflCampusLocation,
           time = "2026-05-08 18:00",
-          association = ExampleAssociation.association2,
+          association = ExampleAssociations.association2,
           tags = setOf("music", "festival", "party"),
           price = 45u,
           pictureUrl =
@@ -48,7 +48,7 @@ object ExampleEvents {
           location =
               Location(latitude = 46.5193, longitude = 6.5656, name = "Rolex Learning Center"),
           time = "2025-12-05 12:30",
-          association = ExampleAssociation.association3,
+          association = ExampleAssociations.association3,
           tags = setOf("food", "networking", "free"),
           price = 0u, // Free event
           pictureUrl = null // No image
