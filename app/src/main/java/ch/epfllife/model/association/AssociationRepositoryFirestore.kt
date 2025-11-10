@@ -134,13 +134,22 @@ class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : Associ
         // Convert the String to the EventCategory enum value
         val eventCategory = EventCategory.valueOf(eventCategoryString.uppercase())
 
-        // 5. Construct the Association object
+        // 5. Get the optional about field
+        val about = document.getString("about")
+
+        // 6. Get the optional socialLinks field
+        @Suppress("UNCHECKED_CAST")
+        val socialLinks = document.get("socialLinks") as? Map<String, String>
+
+        // 7. Construct the Association object
         Association(
             id = id,
             name = name,
             description = description,
             pictureUrl = pictureUrl,
-            eventCategory = eventCategory)
+            eventCategory = eventCategory,
+            about = about,
+            socialLinks = socialLinks)
       } catch (e: NullPointerException) {
         // this can happen when one of the required fields is not present
         Log.e("AssociationRepository", "Error converting document to Association", e)

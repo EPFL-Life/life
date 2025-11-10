@@ -32,6 +32,8 @@ class AssociationRepositoryFirestoreTest {
     whenever(mockDocument.getString("description")).thenReturn(association.description)
     whenever(mockDocument.getString("pictureUrl")).thenReturn(association.pictureUrl)
     whenever(mockDocument.getString("eventCategory")).thenReturn(association.eventCategory.name)
+    whenever(mockDocument.getString("about")).thenReturn(association.about)
+    whenever(mockDocument.get("socialLinks")).thenReturn(association.socialLinks)
 
     // action: call the function
     val resultParsed = AssociationRepositoryFirestore.documentToAssociation(mockDocument)
@@ -52,6 +54,8 @@ class AssociationRepositoryFirestoreTest {
     whenever(mockDocument.getString("description")).thenReturn(association.description)
     whenever(mockDocument.getString("pictureUrl")).thenReturn(association.pictureUrl)
     whenever(mockDocument.getString("eventCategory")).thenReturn(association.eventCategory.name)
+    whenever(mockDocument.getString("about")).thenReturn(association.about)
+    whenever(mockDocument.get("socialLinks")).thenReturn(association.socialLinks)
 
     // action: call the function
     val resultParsed = AssociationRepositoryFirestore.documentToAssociation(mockDocument)
