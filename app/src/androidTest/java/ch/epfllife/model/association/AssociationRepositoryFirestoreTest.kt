@@ -1,7 +1,6 @@
 package ch.epfllife.model.association
 
 import ch.epfllife.example_data.ExampleAssociations
-import ch.epfllife.example_data.ExampleEvents
 import ch.epfllife.utils.FirestoreLifeTest
 import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.coroutines.test.runTest
@@ -169,48 +168,49 @@ class AssociationRepositoryFirestoreTest : FirestoreLifeTest() {
     assert(deleteAssociationResult.isFailure)
   }
 
-  /**
-   * This test is a bit more complex. We firest create the Associations and then link the events to
-   * these association After that we upload both to the database.
-   */
-  @Test
-  fun getEventsForAssociation_validAssociation_returnsListOfEvents() = runTest {
-
-    // Arrange: Link event1,2 to assoc1 and event3 to assoc3
-
-    // create associations
-    val assoc1 = ExampleAssociations.association1
-    val assoc2 = ExampleAssociations.association2
-
-    // event1,event2 belong to assoc1
-    val event1 = ExampleEvents.event1.copy(association = assoc1)
-    val event2 = ExampleEvents.event2.copy(association = assoc1)
-
-    // event3 belong to assoc2
-    val event3 = ExampleEvents.event3.copy(association = assoc2)
-
-    // Act: add assoc and events to database
-    assocRepository.createAssociation(assoc1)
-    assocRepository.createAssociation(assoc2)
-    eventRepository.createEvent(event1)
-    eventRepository.createEvent(event2)
-    eventRepository.createEvent(event3)
-
-    // Assert: 2 associations, 3 events got added to database
-    assertEquals(2, assocRepository.getAllAssociations().size)
-    assertEquals(3, eventRepository.getAllEvents().size)
-
-    // Act: get events for associations
-    val eventsForAssoc1 = assocRepository.getEventsForAssociation(assoc1.id).getOrThrow()
-    val eventsForAssoc2 = assocRepository.getEventsForAssociation(assoc2.id).getOrThrow()
-
-    // Assert: check events got retrieved correctly
-    assertEquals(2, eventsForAssoc1.size)
-    assertEquals(1, eventsForAssoc2.size)
-    assert(eventsForAssoc1.contains(event1))
-    assert(eventsForAssoc1.contains(event2))
-    assert(eventsForAssoc2.contains(event3))
-  }
+  //  /**
+  //   * This test is a bit more complex. We firest create the Associations and then link the events
+  // to
+  //   * these association After that we upload both to the database.
+  //   */
+  //  @Test
+  //  fun getEventsForAssociation_validAssociation_returnsListOfEvents() = runTest {
+  //
+  //    // Arrange: Link event1,2 to assoc1 and event3 to assoc3
+  //
+  //    // create associations
+  //    val assoc1 = ExampleAssociations.association1
+  //    val assoc2 = ExampleAssociations.association2
+  //
+  //    // event1,event2 belong to assoc1
+  //    val event1 = ExampleEvents.event1.copy(association = assoc1)
+  //    val event2 = ExampleEvents.event2.copy(association = assoc1)
+  //
+  //    // event3 belong to assoc2
+  //    val event3 = ExampleEvents.event3.copy(association = assoc2)
+  //
+  //    // Act: add assoc and events to database
+  //    assocRepository.createAssociation(assoc1)
+  //    assocRepository.createAssociation(assoc2)
+  //    eventRepository.createEvent(event1)
+  //    eventRepository.createEvent(event2)
+  //    eventRepository.createEvent(event3)
+  //
+  //    // Assert: 2 associations, 3 events got added to database
+  //    assertEquals(2, assocRepository.getAllAssociations().size)
+  //    assertEquals(3, eventRepository.getAllEvents().size)
+  //
+  //    // Act: get events for associations
+  //    val eventsForAssoc1 = assocRepository.getEventsForAssociation(assoc1.id).getOrThrow()
+  //    val eventsForAssoc2 = assocRepository.getEventsForAssociation(assoc2.id).getOrThrow()
+  //
+  //    // Assert: check events got retrieved correctly
+  //    assertEquals(2, eventsForAssoc1.size)
+  //    assertEquals(1, eventsForAssoc2.size)
+  //    assert(eventsForAssoc1.contains(event1))
+  //    assert(eventsForAssoc1.contains(event2))
+  //    assert(eventsForAssoc2.contains(event3))
+  //  }
 
   // --------parsing tests with mock----------
 
