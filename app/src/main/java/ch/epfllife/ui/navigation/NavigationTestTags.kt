@@ -14,6 +14,7 @@ object NavigationTestTags {
   const val MYEVENTS_SCREEN = "MyEvents_Screen"
   const val SIGN_IN_SCREEN = "SignIn_Screen"
   const val SETTINGS_SCREEN = "Settings_Screen"
+  const val MAP_SCREEN = "Map_Screen"
 
   fun getTabTestTag(tab: Tab): String =
       when (tab) {

@@ -190,6 +190,7 @@ dependencies {
 
     // Networking with OkHttp
     implementation(libs.okhttp)
+    implementation(libs.play.services.location)
 
     // Testing Unit
     testImplementation(libs.test.core.ktx)
