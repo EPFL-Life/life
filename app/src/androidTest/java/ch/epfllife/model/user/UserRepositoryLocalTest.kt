@@ -1,6 +1,9 @@
 package ch.epfllife.model.user
 
+import ch.epfllife.example_data.ExampleEvents
 import ch.epfllife.example_data.ExampleUsers
+import ch.epfllife.model.event.EventRepositoryLocal
+import java.lang.IllegalStateException
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.runTest
@@ -11,10 +14,12 @@ class UserRepositoryLocalTest {
 
   // we need this to declare the property for the whole class
   private lateinit var repositoryUser: UserRepositoryLocal
+  private lateinit var repositoryEventLocal: EventRepositoryLocal
 
   @Before
   fun setup() {
-    repositoryUser = UserRepositoryLocal()
+    repositoryEventLocal = EventRepositoryLocal()
+    repositoryUser = UserRepositoryLocal(repositoryEventLocal)
   }
 
   @Test
@@ -161,5 +166,159 @@ class UserRepositoryLocalTest {
     // Ensure no one is logged in by default
     val currentUser = repositoryUser.getCurrentUser()
     assertEquals(null, currentUser)
+  }
+
+  @Test
+  fun subscribeToEvent_success() = runTest {
+    // arrange: add an user
+    repositoryUser.createUser(ExampleUsers.user3)
+    // arrange: add an event
+    val event = ExampleEvents.event3
+    repositoryEventLocal.createEvent(event)
+    // action: simulate login
+    repositoryUser.simulateLogin(ExampleUsers.user3.id)
+
+    // action: subscribe to event
+    val result = repositoryUser.subscribeToEvent(event.id)
+
+    // assert
+    assertTrue(result.isSuccess)
+
+    // ensure that the subscription is updated
+    val updatedUser = repositoryUser.getUser(ExampleUsers.user3.id)
+    assertTrue(updatedUser?.subscriptions?.contains(event.id) ?: false)
+  }
+
+  @Test
+  fun subscribeToEvent_returnsFailure_whenLoggedOut() = runTest {
+    // arrange: add an user
+    repositoryUser.createUser(ExampleUsers.user3)
+    // arrange: add an event
+    val event = ExampleEvents.event3
+    repositoryEventLocal.createEvent(event)
+    // action: subscribe to a event without being logged in
+    val result = repositoryUser.subscribeToEvent(ExampleEvents.event1.id)
+    assertTrue(result.isFailure)
+  }
+
+  @Test
+  fun subscribeToEvent_returnsFailure_whenEventRepoNotInitialized() = runTest {
+    // arrange: initialize a null event repository
+    repositoryUser = UserRepositoryLocal(null)
+    // action: create an user + login
+    repositoryUser.createUser(ExampleUsers.user3)
+    repositoryUser.simulateLogin(ExampleUsers.user3.id)
+
+    // action:subscribe to a event with a null event repository
+    val result = repositoryUser.subscribeToEvent(ExampleEvents.event1.id)
+    assertTrue(result.isFailure)
+  }
+
+  @Test
+  fun subscribeToEvent_returnsFailure_whenEventDoesNotExist() = runTest {
+    // arrange: create user + login
+    repositoryUser.createUser(ExampleUsers.user3)
+    repositoryUser.simulateLogin(ExampleUsers.user3.id)
+
+    // action: subscribe to a non-existent event
+    val result = repositoryUser.subscribeToEvent("nonExistentEventId")
+    // assert
+    assertTrue(result.isFailure)
+  }
+
+  @Test
+  fun subscribeToEvent_returnsFailure_whenAlreadySubscribed() = runTest {
+    // arrange: create an event
+    repositoryUser.createUser(ExampleUsers.user3)
+    val event = ExampleEvents.event1
+    repositoryEventLocal.createEvent(event)
+    repositoryUser.simulateLogin(ExampleUsers.user3.id)
+
+    // action: enroll to event
+    val firstEvent = repositoryUser.subscribeToEvent(event.id)
+    assertTrue(firstEvent.isSuccess)
+
+    // action: enroll to event that user had already subscribed
+    val secondEvent = repositoryUser.subscribeToEvent(event.id)
+    assertTrue(secondEvent.isFailure)
+  }
+
+  @Test
+  fun unsubscribeFromEvent_success() = runTest {
+    // arrange: create user + event, subscribe first
+    repositoryUser.createUser(ExampleUsers.user3)
+    val event = ExampleEvents.event1
+    repositoryEventLocal.createEvent(event)
+    repositoryUser.simulateLogin(ExampleUsers.user3.id)
+    val sub = repositoryUser.subscribeToEvent(event.id)
+    assertTrue(sub.isSuccess)
+
+    // action: unsubscribe
+    val result = repositoryUser.unsubscribeFromEvent(event.id)
+
+    // assert
+    assertTrue(result.isSuccess)
+    val updated = repositoryUser.getUser(ExampleUsers.user3.id)
+    assertTrue(!(updated?.subscriptions?.contains(event.id) ?: false))
+  }
+
+  @Test
+  fun unsubscribeFromEvent_returnsFailure_whenLoggedOut() = runTest {
+    // arrange: add an user
+    repositoryUser.createUser(ExampleUsers.user3)
+    // arrange: add an event
+    repositoryEventLocal.createEvent(ExampleEvents.event1)
+    // (arrange: No user is logged in by default)
+
+    // action: try to unsubscribe from event while logged out
+    val result = repositoryUser.unsubscribeFromEvent(ExampleEvents.event1.id)
+    // assert: the action must fail
+    assertTrue(result.isFailure)
+  }
+
+  @Test
+  fun unsubscribeFromEvent_returnsFailure_whenEventRepoNotInitialized() = runTest {
+    // arrange: initialize the repository with a null event repository
+    repositoryUser = UserRepositoryLocal(null)
+    // arrange: create an user + login
+    repositoryUser.createUser(ExampleUsers.user3)
+    repositoryUser.simulateLogin(ExampleUsers.user3.id)
+
+    // action: try to unsubscribe from event with a null event repository
+    val result = repositoryUser.unsubscribeFromEvent(ExampleEvents.event1.id)
+    // assert: the action must fail and check the type of failure
+    assertTrue(result.isFailure)
+    assertTrue(result.exceptionOrNull() is IllegalStateException)
+  }
+
+  @Test
+  fun unsubscribeFromEvent_returnsFailure_whenEventDoesNotExist() = runTest {
+    // arrange: create user + login
+    repositoryUser.createUser(ExampleUsers.user3)
+    repositoryUser.simulateLogin(ExampleUsers.user3.id)
+    // (arrange: Event does not exist in repositoryEventLocal)
+
+    // action: try to unsubscribe from a non-existent event
+    val result = repositoryUser.unsubscribeFromEvent("nonExistentEventId")
+
+    // assert: the action must fail
+    assertTrue(result.isFailure)
+  }
+
+  @Test
+  fun unsubscribeFromEvent_returnsFailure_whenNotSubscribed() = runTest {
+    // arrange: create user + event
+    repositoryUser.createUser(ExampleUsers.user3)
+    val event = ExampleEvents.event1
+    repositoryEventLocal.createEvent(event)
+    // arrange: login user
+    repositoryUser.simulateLogin(ExampleUsers.user3.id)
+    // (arrange: User is NOT subscribed to this event)
+
+    // action: try to unsubscribe from an event they are not subscribed to
+    val result = repositoryUser.unsubscribeFromEvent(event.id)
+
+    // assert: the action must fail
+    assertTrue(result.isFailure)
   }
 }
