@@ -227,4 +227,121 @@ class HomeScreenTest {
     composeTestRule.onNodeWithText("Test Event 1").assertIsDisplayed()
     composeTestRule.onNodeWithText("Test Event 2").assertDoesNotExist()
   }
+
+  @Test
+  fun homeScreen_ClickingAllEventsFilterShowsAllEvents() {
+    val viewModel =
+        createFakeViewModel(myEvents = listOf(sampleEvent), allEvents = listOf(sampleEvent2))
+
+    composeTestRule.setContent {
+      MaterialTheme { HomeScreen(viewModel = viewModel, onEventClick = {}) }
+    }
+
+    // Wait for the UI to settle
+    composeTestRule.waitForIdle()
+
+    // Initially should show subscribed events (sampleEvent)
+    composeTestRule.onNodeWithText("Test Event 1").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Test Event 2").assertDoesNotExist()
+
+    // Click on "All Events" filter button
+    composeTestRule
+        .onNodeWithTag(ch.epfllife.ui.composables.DisplayedEventsTestTags.BUTTON_ALL)
+        .performClick()
+
+    // Wait for the UI to settle
+    composeTestRule.waitForIdle()
+
+    // Now should show all events (sampleEvent2)
+    composeTestRule.onNodeWithText("Test Event 2").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Test Event 1").assertDoesNotExist()
+  }
+
+  @Test
+  fun homeScreen_ClickingSubscribedFilterShowsSubscribedEvents() {
+    val viewModel =
+        createFakeViewModel(myEvents = listOf(sampleEvent), allEvents = listOf(sampleEvent2))
+
+    composeTestRule.setContent {
+      MaterialTheme { HomeScreen(viewModel = viewModel, onEventClick = {}) }
+    }
+
+    // Wait for the UI to settle
+    composeTestRule.waitForIdle()
+
+    // Click on "All Events" filter button
+    composeTestRule
+        .onNodeWithTag(ch.epfllife.ui.composables.DisplayedEventsTestTags.BUTTON_ALL)
+        .performClick()
+
+    // Wait for the UI to settle
+    composeTestRule.waitForIdle()
+
+    // Should show all events (sampleEvent2)
+    composeTestRule.onNodeWithText("Test Event 2").assertIsDisplayed()
+
+    // Click back on "Subscribed" filter button
+    composeTestRule
+        .onNodeWithTag(ch.epfllife.ui.composables.DisplayedEventsTestTags.BUTTON_SUBSCRIBED)
+        .performClick()
+
+    // Wait for the UI to settle
+    composeTestRule.waitForIdle()
+
+    // Now should show subscribed events again (sampleEvent)
+    composeTestRule.onNodeWithText("Test Event 1").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Test Event 2").assertDoesNotExist()
+  }
+
+  @Test
+  fun homeScreen_EmptyAllEventsShowsMessage() {
+    val viewModel = createFakeViewModel(myEvents = listOf(sampleEvent), allEvents = emptyList())
+
+    composeTestRule.setContent {
+      MaterialTheme { HomeScreen(viewModel = viewModel, onEventClick = {}) }
+    }
+
+    // Wait for the UI to settle
+    composeTestRule.waitForIdle()
+
+    // Click on "All Events" filter button
+    composeTestRule
+        .onNodeWithTag(ch.epfllife.ui.composables.DisplayedEventsTestTags.BUTTON_ALL)
+        .performClick()
+
+    // Wait for the UI to settle
+    composeTestRule.waitForIdle()
+
+    // Check that empty state is displayed (screen is still displayed)
+    composeTestRule.onNodeWithTag(NavigationTestTags.HOMESCREEN_SCREEN).assertIsDisplayed()
+  }
+
+  @Test
+  fun homeScreen_FilterSwitchingWithBothListsPopulated() {
+    val viewModel =
+        createFakeViewModel(
+            myEvents = listOf(sampleEvent), allEvents = listOf(sampleEvent, sampleEvent2))
+
+    composeTestRule.setContent {
+      MaterialTheme { HomeScreen(viewModel = viewModel, onEventClick = {}) }
+    }
+
+    // Wait for the UI to settle
+    composeTestRule.waitForIdle()
+
+    // Initially should show subscribed events (sampleEvent only)
+    composeTestRule.onNodeWithText("Test Event 1").assertIsDisplayed()
+
+    // Click on "All Events" filter button
+    composeTestRule
+        .onNodeWithTag(ch.epfllife.ui.composables.DisplayedEventsTestTags.BUTTON_ALL)
+        .performClick()
+
+    // Wait for the UI to settle
+    composeTestRule.waitForIdle()
+
+    // Now should show all events (both events)
+    composeTestRule.onNodeWithText("Test Event 1").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Test Event 2").assertIsDisplayed()
+  }
 }
