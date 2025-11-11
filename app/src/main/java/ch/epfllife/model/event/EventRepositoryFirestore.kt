@@ -28,7 +28,8 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
   }
 
   override suspend fun createEvent(event: Event): Result<Unit> {
-    TODO("Not yet implemented")
+    db.collection(FirestoreCollections.ASSOCIATIONS).document(event.id).set(event).await()
+    return Result.success(Unit)
   }
 
   override suspend fun updateEvent(eventId: String, newEvent: Event): Result<Unit> {
@@ -40,20 +41,20 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
     TODO("Not yet implemented")
   }
 
-  /**
-   * Safely converts a Firestore [DocumentSnapshot] into an [Event] data class.
-   *
-   * This function performs strict type checking. If any *required* field (e.g., `title`,
-   * `description`, `location`, `price`) is missing, malformed, or of the wrong type, the function
-   * will log an error and return `null`.
-   *
-   * Optional fields like `imageUrl` will be set to `null` if not present. `tags` will default to an
-   * empty set if not present.
-   *
-   * @param document The Firestore [DocumentSnapshot] to parse.
-   * @return A parsed [Event] object, or `null` if conversion fails.
-   */
   companion object {
+    /**
+     * Safely converts a Firestore [DocumentSnapshot] into an [Event] data class.
+     *
+     * This function performs strict type checking. If any *required* field (e.g., `title`,
+     * `description`, `location`, `price`) is missing, malformed, or of the wrong type, the function
+     * will log an error and return `null`.
+     *
+     * Optional fields like `imageUrl` will be set to `null` if not present. `tags` will default to
+     * an empty set if not present.
+     *
+     * @param document The Firestore [DocumentSnapshot] to parse.
+     * @return A parsed [Event] object, or `null` if conversion fails.
+     */
     suspend fun getAssociation(document: DocumentSnapshot): Association? {
       val assocRef = document.get("association") as? DocumentReference ?: return null
       val assocSnap = assocRef.get().await()
