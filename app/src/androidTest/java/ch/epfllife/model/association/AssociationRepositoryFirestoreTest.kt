@@ -169,7 +169,7 @@ class AssociationRepositoryFirestoreTest : FirestoreLifeTest() {
   }
 
   //  /**
-  //   * This test is a bit more complex. We firest create the Associations and then link the events
+  //   * This test is a bit more complex. We first create the Associations and then link the events
   // to
   //   * these association After that we upload both to the database.
   //   */
