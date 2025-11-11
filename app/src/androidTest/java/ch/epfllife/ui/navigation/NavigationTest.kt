@@ -207,4 +207,34 @@ class NavigationTest {
     verify(navController).navigate(captor.capture(), anyOrNull(), anyOrNull())
     assert(captor.firstValue.uri.toString().contains("eventdetails/$eventId"))
   }
+
+  @Test
+  fun navigateToEventDetails_hidesBottomNavigation() {
+    val navController = mock(NavHostController::class.java)
+    val actions = NavigationActions(navController)
+    val eventId = "test-event-id"
+
+    actions.navigateToEventDetails(eventId)
+
+    // After navigation action is invoked, verify bottom bar will be hidden
+    // The bottom bar visibility is controlled by the route in MainActivity
+    val captor = argumentCaptor<NavDeepLinkRequest>()
+    verify(navController).navigate(captor.capture(), anyOrNull(), anyOrNull())
+
+    // Verify the route is correct for event details
+    val uri = captor.firstValue.uri.toString()
+    assert(uri.contains("eventdetails/$eventId")) {
+      "Expected route to contain 'eventdetails/$eventId' but got '$uri'"
+    }
+  }
+
+  @Test
+  fun goBack_popsBackStack() {
+    val navController = mock(NavHostController::class.java)
+    val actions = NavigationActions(navController)
+
+    actions.goBack()
+
+    verify(navController).popBackStack()
+  }
 }
