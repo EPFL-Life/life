@@ -111,6 +111,77 @@ class EventDetailsTest {
   }
 
   @Test
+  fun viewModel_LoadEventNotFound() = runTest {
+    // Create a fake repo that returns null to simulate event not found
+    val fakeRepoReturnsNull =
+        object : EventRepository {
+          override fun getNewUid(): String = "fake-id"
+
+          override suspend fun getAllEvents(): List<Event> = emptyList()
+
+          override suspend fun getEvent(eventId: String): Event? = null
+
+          override suspend fun createEvent(event: Event): Result<Unit> = Result.success(Unit)
+
+          override suspend fun updateEvent(eventId: String, newEvent: Event): Result<Unit> =
+              Result.success(Unit)
+
+          override suspend fun deleteEvent(eventId: String): Result<Unit> = Result.success(Unit)
+        }
+
+    val viewModel = EventDetailsViewModel(fakeRepoReturnsNull)
+    viewModel.loadEvent("nonexistent-event-id")
+
+    // Give the coroutine time to complete
+    withContext(Dispatchers.Main) { Thread.sleep(100) }
+
+    val state = viewModel.uiState.value
+    assertTrue("State should be Error when event is not found", state is EventDetailsUIState.Error)
+    if (state is EventDetailsUIState.Error) {
+      assertEquals("Error message should be 'Event not found'", "Event not found", state.message)
+    }
+  }
+
+  @Test
+  fun viewModel_LoadEventThrowsException() = runTest {
+    // Create a fake repo that throws an exception
+    val fakeRepoThrowsException =
+        object : EventRepository {
+          override fun getNewUid(): String = "fake-id"
+
+          override suspend fun getAllEvents(): List<Event> = emptyList()
+
+          override suspend fun getEvent(eventId: String): Event? {
+            throw RuntimeException("Database connection failed")
+          }
+
+          override suspend fun createEvent(event: Event): Result<Unit> = Result.success(Unit)
+
+          override suspend fun updateEvent(eventId: String, newEvent: Event): Result<Unit> =
+              Result.success(Unit)
+
+          override suspend fun deleteEvent(eventId: String): Result<Unit> = Result.success(Unit)
+        }
+
+    val viewModel = EventDetailsViewModel(fakeRepoThrowsException)
+    viewModel.loadEvent("some-event-id")
+
+    // Give the coroutine time to complete
+    withContext(Dispatchers.Main) { Thread.sleep(100) }
+
+    val state = viewModel.uiState.value
+    assertTrue("State should be Error when exception is thrown", state is EventDetailsUIState.Error)
+    if (state is EventDetailsUIState.Error) {
+      assertTrue(
+          "Error message should contain 'Failed to load event'",
+          state.message.startsWith("Failed to load event"))
+      assertTrue(
+          "Error message should contain exception message",
+          state.message.contains("Database connection failed"))
+    }
+  }
+
+  @Test
   fun viewModel_IsEnrolledReturnsFalse() {
     val viewModel = EventDetailsViewModel()
     val isEnrolled = viewModel.isEnrolled(sampleEvent)
