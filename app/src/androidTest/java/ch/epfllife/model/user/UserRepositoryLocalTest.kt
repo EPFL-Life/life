@@ -186,7 +186,7 @@ class UserRepositoryLocalTest {
 
     // ensure that the subscription is updated
     val updatedUser = repositoryUser.getUser(ExampleUsers.user3.id)
-    assertTrue(updatedUser?.subscriptions?.contains(event.id) ?: false)
+    assertTrue(updatedUser?.enrolledEvents?.contains(event.id) ?: false)
   }
 
   @Test
