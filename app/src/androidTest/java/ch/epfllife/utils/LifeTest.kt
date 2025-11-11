@@ -56,7 +56,7 @@ fun ComposeContentTestRule.navigateToTab(tab: Tab) {
 
 fun setUpEmulatorAuth(auth: Auth, test: String) {
   Assert.assertTrue(
-      "Firebase emulator must be running for local $test tests",
+      "Firebase emulator must be running for local tests in -> $test",
       FirebaseEmulator.isRunning,
   )
   // Reset to signed out state
