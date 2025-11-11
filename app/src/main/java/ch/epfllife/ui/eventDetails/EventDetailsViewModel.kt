@@ -3,6 +3,7 @@ package ch.epfllife.ui.eventDetails
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ch.epfllife.model.event.Event
+import ch.epfllife.model.event.EventRepository
 import ch.epfllife.model.event.EventRepositoryFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,21 +22,28 @@ sealed class EventDetailsUIState {
 /**
  * ViewModel for the EventDetails screen.
  *
- * Uses `EventRepositoryFirestore` to fetch an Event by id.
+ * Uses `EventRepository` to fetch an Event by id.
+ *
+ * @param repo The repository to fetch events from.
  */
-class EventDetailsViewModel() : ViewModel() {
+class EventDetailsViewModel(
+    private val repo: EventRepository =
+        EventRepositoryFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance())
+) : ViewModel() {
 
-  private val repo =
-      EventRepositoryFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance())
   private val _uiState = MutableStateFlow<EventDetailsUIState>(EventDetailsUIState.Loading)
   val uiState: StateFlow<EventDetailsUIState> = _uiState.asStateFlow()
 
-  /** Loads event details by ID using EventRepositoryFirestore.getEvent. */
+  /** Loads event details by ID using EventRepository.getEvent. */
   fun loadEvent(eventId: String) {
     viewModelScope.launch {
       try {
         val event = repo.getEvent(eventId)
-        _uiState.value = EventDetailsUIState.Success(event, isEnrolled = isEnrolled(event))
+        if (event != null) {
+          _uiState.value = EventDetailsUIState.Success(event, isEnrolled = isEnrolled(event))
+        } else {
+          _uiState.value = EventDetailsUIState.Error("Event not found")
+        }
       } catch (e: Exception) {
         _uiState.value = EventDetailsUIState.Error("Failed to load event: ${e.message}")
       }

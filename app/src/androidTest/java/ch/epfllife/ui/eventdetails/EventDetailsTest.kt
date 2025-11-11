@@ -6,13 +6,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.model.association.Association
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventCategory
-import ch.epfllife.model.event.EventRepositoryFirestore
+import ch.epfllife.model.event.EventRepository
 import ch.epfllife.model.map.Location
 import ch.epfllife.ui.eventDetails.EventDetailsContent
 import ch.epfllife.ui.eventDetails.EventDetailsTestTags
 import ch.epfllife.ui.eventDetails.EventDetailsUIState
 import ch.epfllife.ui.eventDetails.EventDetailsViewModel
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -43,17 +42,24 @@ class EventDetailsTest {
           pictureUrl =
               "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")
 
-  // Helper that injects a fake repo returning sampleEvent for any id
+  // Helper that creates a ViewModel with a fake repo returning sampleEvent for any id
   private fun createViewModelWithFakeRepo(): EventDetailsViewModel {
-    val vm = EventDetailsViewModel()
-    val repoField = EventDetailsViewModel::class.java.getDeclaredField("repo")
-    repoField.isAccessible = true
-    repoField.set(
-        vm,
-        object : EventRepositoryFirestore(FirebaseFirestore.getInstance()) {
+    val fakeRepo =
+        object : EventRepository {
+          override fun getNewUid(): String = "fake-id"
+
+          override suspend fun getAllEvents(): List<Event> = listOf(sampleEvent)
+
           override suspend fun getEvent(eventId: String): Event = sampleEvent
-        })
-    return vm
+
+          override suspend fun createEvent(event: Event): Result<Unit> = Result.success(Unit)
+
+          override suspend fun updateEvent(eventId: String, newEvent: Event): Result<Unit> =
+              Result.success(Unit)
+
+          override suspend fun deleteEvent(eventId: String): Result<Unit> = Result.success(Unit)
+        }
+    return EventDetailsViewModel(fakeRepo)
   }
 
   // ============ ViewModel Tests ============

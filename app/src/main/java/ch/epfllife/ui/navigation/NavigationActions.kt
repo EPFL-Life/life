@@ -51,10 +51,15 @@ open class NavigationActions(
     }
   }
 
+  /** Navigate to a screen with an ID parameter (e.g., event details, association details). */
+  open fun navigateToScreenWithId(screen: Screen, id: String) {
+    val route = "${screen.route}/$id"
+    navController.navigate(route)
+  }
+
   /** Convenience helper to navigate to event details with a concrete id. */
   open fun navigateToEventDetails(eventId: String) {
-    val route = "${Screen.EventDetails.route}/$eventId"
-    navController.navigate(route)
+    navigateToScreenWithId(Screen.EventDetails, eventId)
   }
 
   /** Navigate back to the previous screen. */

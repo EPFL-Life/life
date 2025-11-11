@@ -128,7 +128,9 @@ fun App(
               route = Screen.EventDetails.route + "/{eventId}",
               arguments = listOf(navArgument("eventId") { type = NavType.StringType })) {
                   backStackEntry ->
-                val eventId = backStackEntry.arguments?.getString("eventId") ?: ""
+                val eventId =
+                    backStackEntry.arguments?.getString("eventId")
+                        ?: error("eventId is required for EventDetails screen")
                 EventDetailsScreen(eventId = eventId, onGoBack = { navigationActions.goBack() })
               }
 

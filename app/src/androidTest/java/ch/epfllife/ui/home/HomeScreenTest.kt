@@ -22,7 +22,9 @@ class HomeScreenTest {
   @Before
   fun setUp() {
     // Prepare the composable before each test
-    composeTestRule.setContent { HomeScreen() }
+    composeTestRule.setContent {
+      HomeScreen(modifier = TODO(), viewModel = TODO(), onEventClick = TODO())
+    }
   }
 
   @Test

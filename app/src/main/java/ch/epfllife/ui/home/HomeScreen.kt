@@ -33,7 +33,7 @@ import ch.epfllife.ui.navigation.NavigationTestTags
 fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel(),
-    onEventClick: (eventId: String) -> Unit = {}
+    onEventClick: (eventId: String) -> Unit
 ) {
   var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
 
@@ -122,5 +122,5 @@ object HomeScreenTestTags {
 @Preview(showBackground = true)
 @Composable
 private fun HomeScreenPreview() {
-  MaterialTheme { HomeScreen() }
+  MaterialTheme { HomeScreen(onEventClick = {}) }
 }
