@@ -49,4 +49,15 @@
 
     <!-- Settings screen-->
     <string name="signout_successful">Sign out successful</string>
+
+
+    <!-- Settings screen-->
+    <string name="calendar_filter_enrolled">Enrolled</string>
+    <string name="calendar_filter_all_events">All Events</string>
+    <string name="calendar_current_month_format">%1$s</string> <!-- e.g. November -->
+    <string name="calendar_card_date_day_format">%1$s %2$d</string> <!-- e.g. Oct 4 -->
+    <string name="calendar_card_date_range_format">%1$s %2$d-%3$d</string> <!-- e.g. Oct 27-30 -->
+    <string name="calendar_upcoming_events_title">Upcoming Events</string>
+    <string name="calendar_no_events_placeholder">No events found</string>
+    <string name="calendar_search_hint">Search events</string>
 </resources>
