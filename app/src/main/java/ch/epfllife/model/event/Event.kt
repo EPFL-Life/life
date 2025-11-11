@@ -3,6 +3,7 @@ package ch.epfllife.model.event
 import ch.epfllife.model.association.Association
 import ch.epfllife.model.map.Location
 
+/** If this is modified please also fix documentToEvent() parser accordingly! */
 data class Event(
     val id: String,
     val title: String,
