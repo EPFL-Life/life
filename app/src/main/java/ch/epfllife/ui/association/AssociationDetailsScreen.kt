@@ -4,11 +4,8 @@ import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -29,6 +26,7 @@ import ch.epfllife.model.association.Association
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.map.Location
+import ch.epfllife.ui.composables.BackButton
 import ch.epfllife.ui.composables.EventCard
 import ch.epfllife.ui.theme.Theme
 import coil.compose.AsyncImage
@@ -109,20 +107,7 @@ fun AssociationDetailsContent(
                       .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
                       .testTag(AssociationDetailsTestTags.ASSOCIATION_IMAGE))
 
-          // Back Button
-          IconButton(
-              onClick = onGoBack,
-              modifier =
-                  Modifier.padding(16.dp)
-                      .align(Alignment.TopStart)
-                      .size(40.dp)
-                      .background(Color.Black.copy(alpha = 0.4f), shape = CircleShape)
-                      .testTag(AssociationDetailsTestTags.BACK_BUTTON)) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.back_button_description),
-                    tint = Color.White)
-              }
+          BackButton(modifier = Modifier.align(Alignment.TopStart), onGoBack = onGoBack)
         }
 
         // Content Below Header
