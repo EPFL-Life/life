@@ -22,7 +22,7 @@ object ExampleEvents {
           location = satelliteLocation,
           time = "2025-11-20 09:00",
           association = ExampleAssociations.association1,
-          tags = setOf("tech", "symposium", "space"),
+          tags = listOf("tech", "symposium", "space"),
           price = 25u, // Using UInt
           pictureUrl = "https://actu.epfl.ch/image/76257/original/5616x3744.jpg")
 
@@ -34,7 +34,7 @@ object ExampleEvents {
           location = epflCampusLocation,
           time = "2026-05-08 18:00",
           association = ExampleAssociations.association2,
-          tags = setOf("music", "festival", "party"),
+          tags = listOf("music", "festival", "party"),
           price = 45u,
           pictureUrl =
               "https://www.jambase.com/wp-content/uploads/2023/04/332066973_940895027072259_250410373047721675_n-e1680722695547-1480x832.jpg")
@@ -49,7 +49,7 @@ object ExampleEvents {
               Location(latitude = 46.5193, longitude = 6.5656, name = "Rolex Learning Center"),
           time = "2025-12-05 12:30",
           association = ExampleAssociations.association3,
-          tags = setOf("food", "networking", "free"),
+          tags = listOf("food", "networking", "free"),
           price = 0u, // Free event
           pictureUrl = null // No image
           )

@@ -51,7 +51,7 @@ class EventDetailsViewModel : ViewModel() {
                         name = "AéroPoly",
                         description = "The association for drone enthusiasts at EPFL.",
                         eventCategory = EventCategory.ACADEMIC),
-                tags = setOf("workshop"),
+                tags = listOf("workshop"),
                 price = 10u,
                 pictureUrl =
                     "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")

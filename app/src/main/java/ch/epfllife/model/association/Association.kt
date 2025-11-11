@@ -10,6 +10,6 @@ data class Association(
     val pictureUrl: String? = null,
     val eventCategory: EventCategory,
     val about: String? = null,
-    val socialLinks: Map<String, String>? = null
+    val socialLinks: Map<String, String>? = emptyMap()
 )
 // add about, social links
