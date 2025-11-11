@@ -15,6 +15,7 @@ class MapTest {
   // The logic is actually tested by providing a separate callback
   // that just returns true or false
   @get:Rule
+  // This is a nullable platform type, so we need to specify the type explicitly
   val permissionRule: GrantPermissionRule? =
       GrantPermissionRule.grant(
           Manifest.permission.ACCESS_FINE_LOCATION,
