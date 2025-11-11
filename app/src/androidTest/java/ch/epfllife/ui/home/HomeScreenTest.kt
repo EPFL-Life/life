@@ -23,7 +23,8 @@ class HomeScreenTest {
   fun setUp() {
     // Prepare the composable before each test
     composeTestRule.setContent {
-      HomeScreen(modifier = TODO(), viewModel = TODO(), onEventClick = TODO())
+      HomeScreen(
+          modifier = androidx.compose.ui.Modifier, viewModel = HomeViewModel(), onEventClick = {})
     }
   }
 
