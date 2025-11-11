@@ -28,7 +28,7 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
   }
 
   override suspend fun createEvent(event: Event): Result<Unit> {
-    db.collection(FirestoreCollections.ASSOCIATIONS).document(event.id).set(event).await()
+    db.collection(FirestoreCollections.EVENTS).document(event.id).set(event).await()
     return Result.success(Unit)
   }
 
@@ -95,9 +95,9 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
                 latitude = locMap["latitude"] as Double,
                 longitude = locMap["longitude"] as Double)
 
-        // 5. Handle list-to-set conversion for tags
-        // If 'tags' is missing, default to an empty list, which becomes an empty set.
-        val tags: Set<String> = (document["tags"] as List<*>).mapNotNull { it as String }.toSet()
+        // 5. Handle optional List of Strings
+        val tags: List<String> =
+            (document["tags"] as? List<*>)?.mapNotNull { it as? String } ?: emptyList()
 
         // 6. Handle numeric conversion for price (required)
         // Firestore stores all numbers as Long. Fail if 'price' is missing.
