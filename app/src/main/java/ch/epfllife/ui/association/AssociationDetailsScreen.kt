@@ -226,28 +226,28 @@ fun AssociationDetailsContent(
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
             )
 
-                    val dummyEvents =
-                        listOf(
-                            Event(
-                                id = "1",
-                                title = "Welcome Party",
-                                description = "Kick off the semester with music and fun.",
-                                location = Location(46.5191, 6.5668, "EPFL Esplanade"),
-                                time = "2025-10-20 18:00",
-                                association = association,
-                                tags = listOf("party"),
-                                price = 0u,
-                                pictureUrl = null),
-                            Event(
-                                id = "2",
-                                title = "Hiking Trip",
-                                description = "Join us for a scenic hike in the mountains.",
-                                location = Location(46.2, 7.0, "Les Pleiades"),
-                                time = "2025-11-02 09:00",
-                                association = association,
-                                tags = listOf("outdoors"),
-                                price = 15u,
-                                pictureUrl = null))
+            val dummyEvents =
+                listOf(
+                    Event(
+                        id = "1",
+                        title = "Welcome Party",
+                        description = "Kick off the semester with music and fun.",
+                        location = Location(46.5191, 6.5668, "EPFL Esplanade"),
+                        time = "2025-10-20 18:00",
+                        association = association,
+                        tags = listOf("party"),
+                        price = 0u,
+                        pictureUrl = null),
+                    Event(
+                        id = "2",
+                        title = "Hiking Trip",
+                        description = "Join us for a scenic hike in the mountains.",
+                        location = Location(46.2, 7.0, "Les Pleiades"),
+                        time = "2025-11-02 09:00",
+                        association = association,
+                        tags = listOf("outdoors"),
+                        price = 15u,
+                        pictureUrl = null))
 
             dummyEvents.forEach { event -> EventCard(event = event, onClick = {}) }
           }
