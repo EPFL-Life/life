@@ -11,7 +11,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.tasks.await
 
-class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventRepository {
+open class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventRepository {
 
   override fun getNewUid(): String {
     TODO("Not yet implemented")
