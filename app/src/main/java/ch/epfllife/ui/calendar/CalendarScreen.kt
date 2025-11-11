@@ -169,7 +169,7 @@ private fun CalendarScreenPreview() {
             title = "Innovation Week",
             description = "A week-long celebration of creativity and technology.",
             location = location,
-            time = "2025-11-15T09:00:00/2025-12-20T18:00:00", // timespan example
+            time = "2025-11-15T09:00:00/2025-11-20T18:00:00", // timespan example
             association = codingClub,
             tags = setOf("tech", "workshop")
         ),

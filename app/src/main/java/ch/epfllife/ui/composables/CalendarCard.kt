@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ch.epfllife.model.event.Event
 import java.time.LocalDate
@@ -41,18 +42,20 @@ fun CalendarCard(event: Event, modifier: Modifier = Modifier, onClick: () -> Uni
             horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             // Date box on the left
             Box(
-                modifier =
-                    Modifier
-                        .width(64.dp)
-                        .height(56.dp)
-                        .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(8.dp))
-                        .testTag(CalendarTestTags.EVENT_DATE_BOX),
-                contentAlignment = Alignment.Center) {
+                modifier = Modifier
+                    .size(64.dp) // square box: width = height
+                    .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(8.dp))
+                    .testTag(CalendarTestTags.EVENT_DATE_BOX),
+                contentAlignment = Alignment.Center
+            ) {
                 Text(
-                    text = event.formattedDate(),
+                    text = event.formattedDate(), // already handles multi-line formatting
                     color = MaterialTheme.colorScheme.onPrimary,
                     style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Medium)
+                    fontWeight = FontWeight.Medium,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
 
             // Text section (name + association)
@@ -83,30 +86,40 @@ fun CalendarCard(event: Event, modifier: Modifier = Modifier, onClick: () -> Uni
 
 private fun Event.formattedDate(): String {
     val locale = Locale.getDefault()
-    val dateRange = this.time.split("/")
-
+    val parts = this.time.split("/")
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-    return try {
-        val startDate = LocalDate.parse(dateRange[0].substring(0, 10), formatter)
-        val monthShort = startDate.month.getDisplayName(TextStyle.SHORT, locale)
 
-        // If only one date → "Nov 15"
-        if (dateRange.size == 1) {
-            "$monthShort ${startDate.dayOfMonth}"
-        } else {
-            // Range → "Nov 15–20" (if same month) or "Nov 30 – Dec 2" (if across months)
-            val endDate = LocalDate.parse(dateRange[1].substring(0, 10), formatter)
-            val endMonthShort = endDate.month.getDisplayName(TextStyle.SHORT, locale)
-
-            if (startDate.month == endDate.month) {
-                "$monthShort ${startDate.dayOfMonth}–${endDate.dayOfMonth}"
-            } else {
-                "$monthShort ${startDate.dayOfMonth} – $endMonthShort ${endDate.dayOfMonth}"
-            }
-        }
+    val startDate = try {
+        LocalDate.parse(parts.first().substring(0, 10), formatter)
     } catch (_: Exception) {
-        // fallback
-        this.time
+        return this.time
+    }
+
+    val endDate = parts.getOrNull(1)?.let {
+        try {
+            LocalDate.parse(it.substring(0, 10), formatter)
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    val monthShortStart = startDate.month.getDisplayName(TextStyle.SHORT, locale)
+    val monthShortEnd = endDate?.month?.getDisplayName(TextStyle.SHORT, locale)
+
+    return when {
+        endDate == null || endDate == startDate -> {
+            // Single day → "Nov\n15"
+            "$monthShortStart\n${startDate.dayOfMonth}"
+        }
+        startDate.month == endDate.month -> {
+            // Same month → "Nov\n15 - 20"
+            "$monthShortStart\n${startDate.dayOfMonth} - ${endDate.dayOfMonth}"
+        }
+        else -> {
+            // Different months → "Nov 15 -\nDec 20"
+            "$monthShortStart ${startDate.dayOfMonth} -\n$monthShortEnd ${endDate.dayOfMonth}"
+        }
     }
 }
+
 
