@@ -4,6 +4,8 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.navigation.NavDeepLinkRequest
+import androidx.navigation.NavHostController
 import ch.epfllife.ThemedApp
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.ui.home.HomeScreenTestTags
@@ -15,7 +17,10 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argumentCaptor
 
 class NavigationTest {
 
@@ -188,5 +193,18 @@ class NavigationTest {
     composeTestRule
         .onNodeWithTag(HomeScreenTestTags.EPFLLOGO, useUnmergedTree = true)
         .assertIsDisplayed()
+  }
+
+  @Test
+  fun navigateToEventDetails_navigatesToCorrectRoute() {
+    val navController = mock(NavHostController::class.java)
+    val actions = NavigationActions(navController)
+    val eventId = "event-123"
+
+    actions.navigateToEventDetails(eventId)
+
+    val captor = argumentCaptor<NavDeepLinkRequest>()
+    verify(navController).navigate(captor.capture(), anyOrNull(), anyOrNull())
+    assert(captor.firstValue.uri.toString().contains("eventdetails/$eventId"))
   }
 }
