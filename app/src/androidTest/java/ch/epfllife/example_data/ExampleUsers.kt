@@ -24,6 +24,7 @@ object ExampleUsers {
           id = "user303",
           name = "Charlie",
           subscriptions = setOf("asso-robotics"),
+          enrolledEvents = emptySet(),
           userSettings = UserSettings())
 
   // A list of all sample users for convenience
