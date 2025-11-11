@@ -40,6 +40,18 @@ import coil.request.ImageRequest
  * @param associationId The ID of the association to display.
  * @param onGoBack Callback when the user presses the back button.
  */
+object AssociationDetailsTestTags {
+  const val ASSOCIATION_IMAGE = "association_image"
+  const val BACK_BUTTON = "back_button"
+  const val NAME_TEXT = "name_text"
+  const val DESCRIPTION_TEXT = "description_text"
+  const val ABOUT_SECTION = "about_section"
+  const val SOCIAL_LINKS_ROW = "social_links_row"
+  const val UPCOMING_EVENTS_COLUMN = "upcoming_events_column"
+  const val SUBSCRIBE_BUTTON = "subscribe_button"
+  const val UNSUBSCRIBE_BUTTON = "unsubscribe_button"
+}
+
 @Composable
 fun AssociationDetailsScreen(associationId: String, onGoBack: () -> Unit) {
   // For now, we still use a sample association.
@@ -128,19 +140,26 @@ fun AssociationDetailsContent(
                   modifier = Modifier.testTag(AssociationDetailsTestTags.DESCRIPTION_TEXT))
 
               // Subscribe Button
+              val subscribeButtonTag =
+                  if (isSubscribed) {
+                    AssociationDetailsTestTags.UNSUBSCRIBE_BUTTON
+                  } else {
+                    AssociationDetailsTestTags.SUBSCRIBE_BUTTON
+                  }
+
               Button(
                   onClick = { isSubscribed = !isSubscribed },
-                  modifier =
-                      Modifier.fillMaxWidth().testTag(AssociationDetailsTestTags.SUBSCRIBE_BUTTON),
+                  modifier = Modifier.fillMaxWidth().testTag(subscribeButtonTag),
                   shape = RoundedCornerShape(6.dp),
                   colors =
                       ButtonDefaults.buttonColors(
                           containerColor = if (isSubscribed) Color.Gray else Color(0xFFDC2626),
                           contentColor = Color.White)) {
                     Text(
-                        if (isSubscribed)
-                            stringResource(R.string.unsubscribe_from, association.name)
-                        else stringResource(R.string.subscribe_to, association.name))
+                        text =
+                            if (isSubscribed)
+                                stringResource(R.string.unsubscribe_from, association.name)
+                            else stringResource(R.string.subscribe_to, association.name))
                   }
 
               HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
@@ -172,21 +191,27 @@ fun AssociationDetailsContent(
                     horizontalArrangement = Arrangement.spacedBy(24.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.testTag(AssociationDetailsTestTags.SOCIAL_LINKS_ROW)) {
-                      association.socialLinks?.forEach { (platform, url) ->
-                        val iconRes =
-                            SocialIcons.ICONS[platform] ?: R.drawable.ic_default // fallback icon
-                        IconButton(
-                            onClick = {
-                              val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                              context.startActivity(intent)
-                            }) {
-                              Icon(
-                                  painter = painterResource(id = iconRes),
-                                  contentDescription = platform,
-                                  tint = Color.Unspecified,
-                                  modifier = Modifier.size(32.dp))
-                            }
-                      }
+                      association.socialLinks
+                          ?.toList()
+                          ?.sortedBy { (platform, _) ->
+                            SocialIcons.platformOrder.indexOf(platform.lowercase()).takeIf {
+                              it >= 0
+                            } ?: Int.MAX_VALUE
+                          }
+                          ?.forEach { (platform, url) ->
+                            val iconRes = SocialIcons.getIcon(platform) ?: R.drawable.ic_default
+                            IconButton(
+                                onClick = {
+                                  val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+                                  context.startActivity(intent)
+                                }) {
+                                  Icon(
+                                      painter = painterResource(id = iconRes),
+                                      contentDescription = platform,
+                                      tint = Color.Unspecified,
+                                      modifier = Modifier.size(32.dp))
+                                }
+                          }
                     }
               }
 
@@ -235,15 +260,4 @@ fun AssociationDetailsContent(
 @Composable
 fun AssociationDetailsPreview() {
   Theme { AssociationDetailsScreen(associationId = "1", onGoBack = {}) }
-}
-
-object AssociationDetailsTestTags {
-  const val BACK_BUTTON = "BACK_BUTTON"
-  const val ASSOCIATION_IMAGE = "ASSOCIATION_IMAGE"
-  const val SUBSCRIBE_BUTTON = "SUBSCRIBE_BUTTON"
-  const val NAME_TEXT = "NAME_TEXT"
-  const val DESCRIPTION_TEXT = "DESCRIPTION_TEXT"
-  const val ABOUT_SECTION = "ABOUT_SECTION"
-  const val SOCIAL_LINKS_ROW = "SOCIAL_LINKS_ROW"
-  const val UPCOMING_EVENTS_COLUMN = "UPCOMING_EVENTS_COLUMN"
 }

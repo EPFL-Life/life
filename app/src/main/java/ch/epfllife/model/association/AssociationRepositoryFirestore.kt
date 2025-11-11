@@ -138,8 +138,12 @@ class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : Associ
         val about = document.getString("about")
 
         // 6. Get the optional socialLinks field
-        @Suppress("UNCHECKED_CAST")
-        val socialLinks = document.get("socialLinks") as? Map<String, String>
+        val socialLinks =
+            (document.get("socialLinks") as? Map<*, *>)?.let { map ->
+              map.entries
+                  .filter { (k, v) -> k is String && v is String }
+                  .associate { (k, v) -> k as String to v as String }
+            }
 
         // 7. Construct the Association object
         Association(
