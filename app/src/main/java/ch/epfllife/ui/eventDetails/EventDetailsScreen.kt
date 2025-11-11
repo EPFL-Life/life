@@ -268,9 +268,8 @@ fun EventDetailsPreview() {
                   id = "dkjaend38rh",
                   name = "AeroPoly",
                   description = "AéroPoly is the EPFL drone club.",
-                  eventCategory = ch.epfllife.model.event.EventCategory.ACADEMIC,
-              ),
-          tags = setOf("workshop"),
+                  eventCategory = ch.epfllife.model.event.EventCategory.ACADEMIC),
+          tags = listOf("workshop"),
           price = 10u,
           pictureUrl =
               "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg",

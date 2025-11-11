@@ -26,7 +26,7 @@ class EventCardTest {
                   id = "assoc1",
                   description = "This is a test",
                   eventCategory = EventCategory.ACADEMIC),
-          tags = emptySet(),
+          tags = emptyList(),
           price = 0u,
       )
 
