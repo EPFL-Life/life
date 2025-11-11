@@ -27,4 +27,12 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
   override suspend fun deleteUser(userId: String): Result<Unit> {
     TODO("Not yet implemented")
   }
+
+  override suspend fun subscribeToEvent(eventId: String): Result<Unit> {
+    TODO("Not yet implemented")
+  }
+
+  override suspend fun unsubscribeFromEvent(eventId: String): Result<Unit> {
+    TODO("Not yet implemented")
+  }
 }
