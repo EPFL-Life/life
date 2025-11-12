@@ -30,7 +30,7 @@ import ch.epfllife.model.association.Association
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.map.Location
-import ch.epfllife.ui.composables.Price
+import ch.epfllife.model.user.Price
 import ch.epfllife.ui.theme.Theme
 import coil.compose.AsyncImage
 import coil.request.ImageRequest

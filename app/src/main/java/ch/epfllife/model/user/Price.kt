@@ -1,4 +1,4 @@
-package ch.epfllife.ui.composables
+package ch.epfllife.model.user
 
 import android.annotation.SuppressLint
 

@@ -28,9 +28,9 @@ import ch.epfllife.model.enums.SubscriptionFilter
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.map.Location
+import ch.epfllife.model.user.Price
 import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
 import ch.epfllife.ui.composables.EventCard
-import ch.epfllife.ui.composables.Price
 import ch.epfllife.ui.composables.SearchBar
 import ch.epfllife.ui.navigation.NavigationTestTags
 

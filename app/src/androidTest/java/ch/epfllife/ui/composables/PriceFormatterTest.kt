@@ -1,5 +1,6 @@
 package ch.epfllife.ui.composables
 
+import ch.epfllife.model.user.Price
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
