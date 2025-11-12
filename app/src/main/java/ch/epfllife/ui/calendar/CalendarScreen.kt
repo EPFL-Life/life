@@ -19,13 +19,13 @@ import ch.epfllife.model.event.Event
 import ch.epfllife.ui.composables.CalendarCard
 import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
 import ch.epfllife.ui.composables.SearchBar
+import ch.epfllife.ui.navigation.NavigationTestTags
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.*
 
 object CalendarTestTags {
-  const val CALENDAR_SCREEN = "calendar_screen"
   const val MONTH_HEADER = "month_header"
   const val EVENT_CARD = "event_card"
   const val EVENT_DATE_BOX = "event_date_box"
@@ -66,7 +66,7 @@ fun CalendarScreen(
           modifier
               .fillMaxSize()
               .padding(horizontal = 16.dp, vertical = 12.dp)
-              .testTag(CalendarTestTags.CALENDAR_SCREEN),
+              .testTag(NavigationTestTags.CALENDAR_SCREEN),
       horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(Modifier.height(40.dp))
 
