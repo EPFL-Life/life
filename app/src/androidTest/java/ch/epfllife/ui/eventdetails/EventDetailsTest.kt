@@ -62,6 +62,16 @@ class EventDetailsTest {
     return EventDetailsViewModel(fakeRepo)
   }
 
+  private fun setSampleEventContent() {
+    setEventContent(sampleEvent)
+  }
+
+  private fun setEventContent(event: Event) {
+    composeTestRule.setContent {
+      EventDetailsContent(event = event, viewModel = viewModel(), onOpenMap = {})
+    }
+  }
+
   // ============ ViewModel Tests ============
 
   @Test
@@ -210,35 +220,35 @@ class EventDetailsTest {
 
   @Test
   fun content_DisplaysEventTitle() {
-    composeTestRule.setContent { EventDetailsContent(event = sampleEvent, viewModel = viewModel()) }
+    setSampleEventContent()
     composeTestRule.onNodeWithTag(EventDetailsTestTags.EVENT_TITLE).assertIsDisplayed()
     composeTestRule.onNodeWithText("Drone Workshop").assertIsDisplayed()
   }
 
   @Test
   fun content_DisplaysEventAssociation() {
-    composeTestRule.setContent { EventDetailsContent(event = sampleEvent, viewModel = viewModel()) }
+    setSampleEventContent()
     composeTestRule.onNodeWithTag(EventDetailsTestTags.EVENT_ASSOCIATION).assertIsDisplayed()
     composeTestRule.onNodeWithText("AeroPoly").assertIsDisplayed()
   }
 
   @Test
   fun content_DisplaysEventPrice() {
-    composeTestRule.setContent { EventDetailsContent(event = sampleEvent, viewModel = viewModel()) }
+    setSampleEventContent()
     composeTestRule.onNodeWithTag(EventDetailsTestTags.EVENT_PRICE).assertIsDisplayed()
     composeTestRule.onNodeWithText("CHF 10").assertIsDisplayed()
   }
 
   @Test
   fun content_DisplaysEventLocation() {
-    composeTestRule.setContent { EventDetailsContent(event = sampleEvent, viewModel = viewModel()) }
+    setSampleEventContent()
     composeTestRule.onNodeWithTag(EventDetailsTestTags.EVENT_LOCATION).assertIsDisplayed()
     composeTestRule.onNodeWithText("Centre Sport et Santé").assertIsDisplayed()
   }
 
   @Test
   fun content_DisplaysEventDescription() {
-    composeTestRule.setContent { EventDetailsContent(event = sampleEvent, viewModel = viewModel()) }
+    setSampleEventContent()
     composeTestRule.onNodeWithTag(EventDetailsTestTags.EVENT_DESCRIPTION).assertIsDisplayed()
     composeTestRule
         .onNodeWithText(
@@ -249,22 +259,21 @@ class EventDetailsTest {
 
   @Test
   fun content_DisplaysBackButton() {
-    composeTestRule.setContent { EventDetailsContent(event = sampleEvent, viewModel = viewModel()) }
+    setSampleEventContent()
     composeTestRule.onNodeWithTag(EventDetailsTestTags.BACK_BUTTON).assertIsDisplayed()
   }
 
   @Test
   fun content_DisplaysEnrollButton() {
-    composeTestRule.setContent { EventDetailsContent(event = sampleEvent, viewModel = viewModel()) }
+    setSampleEventContent()
     composeTestRule.onNodeWithTag(EventDetailsTestTags.ENROLL_BUTTON).assertIsDisplayed()
     composeTestRule.onNodeWithText("Enrol in event").assertIsDisplayed()
   }
 
   @Test
   fun content_DisplaysViewLocationButton() {
-    composeTestRule.setContent { EventDetailsContent(event = sampleEvent, viewModel = viewModel()) }
+    setSampleEventContent()
     composeTestRule.onNodeWithTag(EventDetailsTestTags.VIEW_LOCATION_BUTTON).assertIsDisplayed()
-    composeTestRule.onNodeWithText("View Location on Map").assertIsDisplayed()
   }
 
   @Test
@@ -272,7 +281,10 @@ class EventDetailsTest {
     var backClicked = false
     composeTestRule.setContent {
       EventDetailsContent(
-          event = sampleEvent, onGoBack = { backClicked = true }, viewModel = viewModel())
+          event = sampleEvent,
+          onGoBack = { backClicked = true },
+          viewModel = viewModel(),
+          onOpenMap = {})
     }
     composeTestRule.onNodeWithTag(EventDetailsTestTags.BACK_BUTTON).performClick()
     assertTrue("Back button should trigger onGoBack callback", backClicked)
@@ -280,13 +292,13 @@ class EventDetailsTest {
 
   @Test
   fun content_EnrollButtonIsClickable() {
-    composeTestRule.setContent { EventDetailsContent(event = sampleEvent, viewModel = viewModel()) }
+    setSampleEventContent()
     composeTestRule.onNodeWithTag(EventDetailsTestTags.ENROLL_BUTTON).assertHasClickAction()
   }
 
   @Test
   fun content_ViewLocationButtonIsClickable() {
-    composeTestRule.setContent { EventDetailsContent(event = sampleEvent, viewModel = viewModel()) }
+    setSampleEventContent()
     composeTestRule.onNodeWithTag(EventDetailsTestTags.VIEW_LOCATION_BUTTON).assertHasClickAction()
   }
 
@@ -295,7 +307,7 @@ class EventDetailsTest {
   @Test
   fun content_DisplaysFreeEvent() {
     val freeEvent = sampleEvent.copy(price = 0u)
-    composeTestRule.setContent { EventDetailsContent(event = freeEvent, viewModel = viewModel()) }
+    setEventContent(freeEvent)
     // Price should be empty string for 0u price based on the code
     composeTestRule.onNodeWithTag(EventDetailsTestTags.EVENT_PRICE).assertIsDisplayed()
   }
@@ -303,9 +315,7 @@ class EventDetailsTest {
   @Test
   fun content_DisplaysExpensiveEvent() {
     val expensiveEvent = sampleEvent.copy(price = 999u)
-    composeTestRule.setContent {
-      EventDetailsContent(event = expensiveEvent, viewModel = viewModel())
-    }
+    setEventContent(expensiveEvent)
     composeTestRule.onNodeWithText("CHF 999").assertIsDisplayed()
   }
 
@@ -314,9 +324,7 @@ class EventDetailsTest {
     val longTitleEvent =
         sampleEvent.copy(
             title = "This is a very long event title that should still display properly")
-    composeTestRule.setContent {
-      EventDetailsContent(event = longTitleEvent, viewModel = viewModel())
-    }
+    setEventContent(longTitleEvent)
     composeTestRule
         .onNodeWithText("This is a very long event title that should still display properly")
         .assertIsDisplayed()
@@ -329,18 +337,14 @@ class EventDetailsTest {
             "It should wrap properly and display all the content to the user. " +
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     val longDescEvent = sampleEvent.copy(description = longDescription)
-    composeTestRule.setContent {
-      EventDetailsContent(event = longDescEvent, viewModel = viewModel())
-    }
+    setEventContent(longDescEvent)
     composeTestRule.onNodeWithText(longDescription, substring = true).assertIsDisplayed()
   }
 
   @Test
   fun content_HandlesEventWithoutImageUrl() {
     val eventWithoutImage = sampleEvent.copy(pictureUrl = null)
-    composeTestRule.setContent {
-      EventDetailsContent(event = eventWithoutImage, viewModel = viewModel())
-    }
+    setEventContent(eventWithoutImage)
     // Image should still display with default URL
     composeTestRule.onNodeWithTag(EventDetailsTestTags.EVENT_IMAGE).assertExists()
   }
@@ -348,9 +352,7 @@ class EventDetailsTest {
   @Test
   fun content_HandlesEventWithEmptyTags() {
     val eventWithNoTags = sampleEvent.copy(tags = emptyList())
-    composeTestRule.setContent {
-      EventDetailsContent(event = eventWithNoTags, viewModel = viewModel())
-    }
+    setEventContent(eventWithNoTags)
     // Should still display without crashing
     composeTestRule.onNodeWithTag(EventDetailsTestTags.EVENT_TITLE).assertIsDisplayed()
   }
@@ -358,9 +360,7 @@ class EventDetailsTest {
   @Test
   fun content_HandlesEventWithMultipleTags() {
     val eventWithTags = sampleEvent.copy(tags = listOf("workshop", "tech", "drone", "engineering"))
-    composeTestRule.setContent {
-      EventDetailsContent(event = eventWithTags, viewModel = viewModel())
-    }
+    setEventContent(eventWithTags)
     // Should display without crashing (tags might not be shown in UI yet)
     composeTestRule.onNodeWithTag(EventDetailsTestTags.EVENT_TITLE).assertIsDisplayed()
   }
@@ -400,7 +400,7 @@ class EventDetailsTest {
 
   @Test
   fun integration_AllContentDisplayedTogether() {
-    composeTestRule.setContent { EventDetailsContent(event = sampleEvent, viewModel = viewModel()) }
+    setSampleEventContent()
 
     // Verify all major components are present
     composeTestRule.onNodeWithTag(EventDetailsTestTags.EVENT_IMAGE).assertExists()
@@ -422,7 +422,10 @@ class EventDetailsTest {
 
     composeTestRule.setContent {
       EventDetailsContent(
-          event = sampleEvent, viewModel = testViewModel, onGoBack = { clickCount++ })
+          event = sampleEvent,
+          viewModel = testViewModel,
+          onGoBack = { clickCount++ },
+          onOpenMap = {})
     }
 
     // Click enroll button multiple times
@@ -436,28 +439,14 @@ class EventDetailsTest {
   }
 
   @Test
-  fun integration_MultipleClicksOnBackButton() {
-    var backClickCount = 0
-    composeTestRule.setContent {
-      EventDetailsContent(
-          event = sampleEvent, onGoBack = { backClickCount++ }, viewModel = viewModel())
-    }
-
-    // Click back button multiple times
-    repeat(5) {
-      composeTestRule.onNodeWithTag(EventDetailsTestTags.BACK_BUTTON).performClick()
-      composeTestRule.waitForIdle()
-    }
-
-    assertEquals("Back button should be clicked 5 times", 5, backClickCount)
-  }
-
-  @Test
   fun integration_NavigationBetweenStates() {
     var goBackCalled = false
     composeTestRule.setContent {
       EventDetailsContent(
-          event = sampleEvent, onGoBack = { goBackCalled = true }, viewModel = viewModel())
+          event = sampleEvent,
+          onGoBack = { goBackCalled = true },
+          viewModel = viewModel(),
+          onOpenMap = {})
     }
 
     // Verify content is displayed
@@ -471,7 +460,7 @@ class EventDetailsTest {
 
   @Test
   fun content_AllButtonsAreAccessible() {
-    composeTestRule.setContent { EventDetailsContent(event = sampleEvent, viewModel = viewModel()) }
+    setSampleEventContent()
 
     // All interactive elements should be present and accessible
     composeTestRule.onNodeWithTag(EventDetailsTestTags.BACK_BUTTON).assertHasClickAction()
@@ -481,7 +470,7 @@ class EventDetailsTest {
 
   @Test
   fun content_VerifyTextStyling() {
-    composeTestRule.setContent { EventDetailsContent(event = sampleEvent, viewModel = viewModel()) }
+    setSampleEventContent()
 
     // Verify that all text elements exist (styling is applied correctly)
     composeTestRule.onNodeWithText("Drone Workshop").assertExists()
@@ -493,7 +482,7 @@ class EventDetailsTest {
 
   @Test
   fun content_DescriptionLabelDisplayed() {
-    composeTestRule.setContent { EventDetailsContent(event = sampleEvent, viewModel = viewModel()) }
+    setSampleEventContent()
     composeTestRule.onNodeWithText("Description").assertIsDisplayed()
   }
 

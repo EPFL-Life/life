@@ -1,11 +1,12 @@
 package ch.epfllife.ui.eventDetails
 
+import android.Manifest
+import android.content.pm.PackageManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material3.*
@@ -20,11 +21,14 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.model.association.Association
 import ch.epfllife.model.event.Event
+import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.map.Location
 import ch.epfllife.ui.composables.BackButton
+import ch.epfllife.ui.composables.Map
 import ch.epfllife.ui.theme.Theme
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -50,6 +54,7 @@ fun EventDetailsScreen(
     eventId: String,
     viewModel: EventDetailsViewModel = viewModel(),
     onGoBack: () -> Unit = {},
+    onOpenMap: (Location) -> Unit,
 ) {
   val uiState by viewModel.uiState.collectAsState()
   LaunchedEffect(eventId) {
@@ -76,7 +81,12 @@ fun EventDetailsScreen(
     }
     is EventDetailsUIState.Success -> {
       // Show event content
-      EventDetailsContent(event = state.event, onGoBack = onGoBack, viewModel = viewModel)
+      EventDetailsContent(
+          event = state.event,
+          onGoBack = onGoBack,
+          onOpenMap = onOpenMap,
+          viewModel = viewModel,
+      )
     }
   }
 }
@@ -86,15 +96,17 @@ fun EventDetailsContent(
     event: Event,
     modifier: Modifier = Modifier,
     onGoBack: () -> Unit = {},
+    onOpenMap: (Location) -> Unit,
     viewModel: EventDetailsViewModel,
 ) {
+  val context = LocalContext.current
   Column(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface)) {
 
     // Header with image and overlayed back button
     Box(modifier = Modifier.fillMaxWidth()) {
       AsyncImage(
           model =
-              ImageRequest.Builder(LocalContext.current)
+              ImageRequest.Builder(context)
                   .data(
                       event.pictureUrl
                           ?: "https://www.epfl.ch/campus/services/events/wp-content/uploads/2024/09/WEB_Image-Home-Events_ORGANISER.png")
@@ -204,27 +216,25 @@ fun EventDetailsContent(
         )
       }
 
-      // View Location
-      Row(
-          modifier =
-              Modifier.fillMaxWidth()
-                  .clip(RoundedCornerShape(8.dp))
-                  .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
-                  .clickable {} // TODO implement navigation to map with params from Event
-                  .padding(horizontal = 16.dp, vertical = 12.dp)
-                  .testTag(EventDetailsTestTags.VIEW_LOCATION_BUTTON),
-          horizontalArrangement = Arrangement.SpaceBetween,
-          verticalAlignment = Alignment.CenterVertically,
-      ) {
-        Text(
-            text = "View Location on Map",
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
-            color = MaterialTheme.colorScheme.primary,
+      Box(modifier = Modifier.fillMaxWidth().height(200.dp).clip(RoundedCornerShape(8.dp))) {
+        Map(
+            target = event.location,
+            enableControls = false,
+            locationPermissionRequest = {
+              val isLocationGranted =
+                  ContextCompat.checkSelfPermission(
+                      context,
+                      Manifest.permission.ACCESS_FINE_LOCATION,
+                  ) == PackageManager.PERMISSION_GRANTED
+              it(isLocationGranted)
+            },
         )
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-            contentDescription = "Arrow",
-            tint = MaterialTheme.colorScheme.primary,
+        // Spacer required to prevent clicks on the map itself
+        Spacer(
+            modifier =
+                Modifier.matchParentSize()
+                    .clickable { onOpenMap(event.location) }
+                    .testTag(EventDetailsTestTags.VIEW_LOCATION_BUTTON),
         )
       }
 
@@ -268,12 +278,13 @@ fun EventDetailsPreview() {
                   id = "dkjaend38rh",
                   name = "AeroPoly",
                   description = "AéroPoly is the EPFL drone club.",
-                  eventCategory = ch.epfllife.model.event.EventCategory.ACADEMIC),
+                  eventCategory = EventCategory.ACADEMIC,
+              ),
           tags = listOf("workshop"),
           price = 10u,
           pictureUrl =
               "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg",
       )
 
-  Theme() { EventDetailsContent(event = sampleEvent, viewModel = viewModel()) }
+  Theme() { EventDetailsContent(event = sampleEvent, viewModel = viewModel(), onOpenMap = {}) }
 }

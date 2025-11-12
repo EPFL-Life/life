@@ -52,7 +52,7 @@ fun Map(
                   if (showLocationControls) MapTestTags.MAP_LOCATION_ENABLED
                   else MapTestTags.MAP_LOCATION_DISABLED),
       cameraPositionState = CameraPositionState(cameraStartPos),
-      properties = MapProperties(isMyLocationEnabled = showLocationControls),
+      properties = MapProperties(isMyLocationEnabled = isLocationGranted),
       uiSettings =
           MapUiSettings(
               myLocationButtonEnabled = showLocationControls,
