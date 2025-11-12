@@ -26,7 +26,7 @@ import ch.epfllife.ui.association.AssociationDetailsScreen
 import ch.epfllife.ui.authentication.SignInScreen
 import ch.epfllife.ui.eventDetails.EventDetailsScreen
 import ch.epfllife.ui.home.HomeScreen
-import ch.epfllife.ui.myevents.MyEvents
+import ch.epfllife.ui.calendar.CalendarScreen
 import ch.epfllife.ui.navigation.BottomNavigationMenu
 import ch.epfllife.ui.navigation.NavigationActions
 import ch.epfllife.ui.navigation.NavigationTestTags
@@ -81,7 +81,7 @@ fun App(
       when (currentRoute) {
         Screen.HomeScreen.route,
         Screen.AssociationBrowser.route,
-        Screen.MyEvents.route,
+        Screen.Calendar.route,
         Screen.Settings.route -> true
         else -> false
       }
@@ -119,7 +119,29 @@ fun App(
                   navigationActions.navigateToAssociationDetails(associationId)
                 })
           }
-          composable(Screen.MyEvents.route) { MyEvents() }
+
+            composable(Screen.Calendar.route) {
+                CalendarScreen(
+                    allEvents = emptyList(),
+                    enrolledEvents = emptyList(),
+                    onEventClick = { eventId ->
+                        navigationActions.navigateToEventDetails(eventId)
+                    }
+                )
+            }
+
+            composable(
+                route = Screen.EventDetails.route + "/{eventId}",
+                arguments = listOf(navArgument("eventId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val eventId = backStackEntry.arguments?.getString("eventId") ?: ""
+                EventDetailsScreen(
+                    eventId = eventId,
+                    onGoBack = { navController.popBackStack() }
+                )
+            }
+
+
           composable(
               route = Screen.AssociationDetails.route + "/{associationId}",
               arguments = listOf(navArgument("associationId") { type = NavType.StringType })) {

@@ -16,12 +16,11 @@ sealed class Screen(
       Screen(
           route = "associationbrowser", name = "AssociationBrowser", isTopLevelDestination = true)
 
-  object MyEvents : Screen(route = "myevents", name = "MyEvents", isTopLevelDestination = true)
+  object Calendar : Screen(route = "calendar", name = "Calendar", isTopLevelDestination = true)
 
   object Settings : Screen(route = "settings", name = "Settings", isTopLevelDestination = true)
 
   object AssociationDetails : Screen(route = "associationdetails", name = "AssociationDetails")
-
   object EventDetails : Screen(route = "eventdetails", name = "EventDetails")
 }
 
@@ -57,9 +56,6 @@ open class NavigationActions(
   }
 
   /** Convenience helper to navigate to event details with a concrete id. */
-  open fun navigateToEventDetails(eventId: String) {
-    navigateToScreenWithId(Screen.EventDetails, eventId)
-  }
 
   /** Navigate back to the previous screen. */
   open fun goBack() {
@@ -75,8 +71,14 @@ open class NavigationActions(
     return navController.currentDestination?.route ?: ""
   }
 
+  fun navigateToEventDetails(eventId: String) {
+    val route = "${Screen.EventDetails.route}/$eventId"
+    navController.navigate(route)
+  }
+
   fun navigateToAssociationDetails(associationId: String) {
     val route = "${Screen.AssociationDetails.route}/$associationId"
     navController.navigate(route)
   }
+
 }
