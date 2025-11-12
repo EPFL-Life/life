@@ -4,7 +4,7 @@ package ch.epfllife.model.user
 data class User(
     val id: String,
     val name: String,
-    val subscriptions: Set<String> = emptySet(),
+    val subscriptions: List<String> = emptyList(),
     val enrolledEvents: List<String> = emptyList(),
     val userSettings: UserSettings = UserSettings()
 )
