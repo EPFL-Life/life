@@ -7,6 +7,11 @@ import org.junit.Assert.*
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
+import ch.epfllife.ui.composables.Price
+import ch.epfllife.model.map.Location
+import ch.epfllife.model.association.Association
+import com.google.firebase.firestore.DocumentReference
+import com.google.android.gms.tasks.Tasks
 
 class EventRepositoryFirestoreTest {
 
@@ -51,7 +56,7 @@ class EventRepositoryFirestoreTest {
     `when`(doc.get("tags")).thenReturn(expected.tags.toList())
 
     // Price as Long (Firestore numeric)
-    `when`(doc.getLong("price")).thenReturn(expected.price.toLong())
+    `when`(doc.getLong("price")).thenReturn(expected.price.price.toLong())
 
     // Mock association reference stored in main document
     val assocRef = mock(DocumentReference::class.java)
