@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ch.epfllife.model.association.Association
 
+
+
 /** UI state for the EventDetails screen. */
 sealed class EventDetailsUIState {
   object Loading : EventDetailsUIState()
