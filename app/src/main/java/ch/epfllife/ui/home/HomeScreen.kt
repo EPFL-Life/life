@@ -62,7 +62,7 @@ fun HomeScreen(
               "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")
 
   val myEvents by viewModel.myEvents.collectAsState()
-  val allEvents = listOf<Event>(exampleEvent)
+  val allEvents by viewModel.allEvents.collectAsState()
 
   val shownEvents = if (selected == SubscriptionFilter.Subscribed) myEvents else allEvents
 
