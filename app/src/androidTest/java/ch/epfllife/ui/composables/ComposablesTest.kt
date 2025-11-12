@@ -8,6 +8,7 @@ import ch.epfllife.model.enums.SubscriptionFilter
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.map.Location
+import ch.epfllife.model.user.Price
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test

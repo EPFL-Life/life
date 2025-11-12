@@ -4,7 +4,7 @@ import android.util.Log
 import ch.epfllife.model.association.Association
 import ch.epfllife.model.firestore.FirestoreCollections
 import ch.epfllife.model.map.Location
-import ch.epfllife.ui.composables.Price
+import ch.epfllife.model.user.Price
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore

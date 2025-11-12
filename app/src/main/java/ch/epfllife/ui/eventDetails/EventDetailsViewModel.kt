@@ -8,7 +8,7 @@ import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.event.EventRepository
 import ch.epfllife.model.event.EventRepositoryFirestore
 import ch.epfllife.model.map.Location
-import ch.epfllife.ui.composables.Price
+import ch.epfllife.model.user.Price
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

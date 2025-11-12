@@ -5,6 +5,7 @@ import ch.epfllife.model.association.Association
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.map.Location
+import ch.epfllife.model.user.Price
 import ch.epfllife.utils.assertClickable
 import com.google.firebase.Timestamp
 import org.junit.Rule

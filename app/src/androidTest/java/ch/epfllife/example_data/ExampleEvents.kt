@@ -2,7 +2,7 @@ package ch.epfllife.example_data
 
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.map.Location
-import ch.epfllife.ui.composables.Price
+import ch.epfllife.model.user.Price
 
 /**
  * A singleton object holding sample event data for testing purposes. We localize these event to

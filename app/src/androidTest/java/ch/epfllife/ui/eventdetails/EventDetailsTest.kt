@@ -8,7 +8,7 @@ import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.event.EventRepository
 import ch.epfllife.model.map.Location
-import ch.epfllife.ui.composables.Price
+import ch.epfllife.model.user.Price
 import ch.epfllife.ui.eventDetails.EventDetailsContent
 import ch.epfllife.ui.eventDetails.EventDetailsTestTags
 import ch.epfllife.ui.eventDetails.EventDetailsUIState
