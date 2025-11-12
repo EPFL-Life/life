@@ -3,11 +3,9 @@ package ch.epfllife.ui.home
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
-import ch.epfllife.model.association.Association
+import ch.epfllife.example_data.ExampleEvents
 import ch.epfllife.model.event.Event
-import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.event.EventRepository
-import ch.epfllife.model.map.Location
 import ch.epfllife.ui.navigation.NavigationTestTags
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -17,42 +15,9 @@ class HomeScreenTest {
 
   @get:Rule val composeTestRule = createComposeRule()
 
-  private val sampleAssociation =
-      Association(
-          id = "test-assoc",
-          name = "Test Association",
-          description = "A test association",
-          eventCategory = EventCategory.ACADEMIC)
-
-  private val sampleEvent =
-      Event(
-          id = "event1",
-          title = "Test Event 1",
-          description = "This is a test event",
-          location = Location(46.5191, 6.5668, "Test Location"),
-          time = "2025-11-15 18:00",
-          association = sampleAssociation,
-          tags = listOf("test"),
-          price = 0u,
-          pictureUrl = null)
-
-  private val sampleEvent2 =
-      Event(
-          id = "event2",
-          title = "Test Event 2",
-          description = "Another test event",
-          location = Location(46.5191, 6.5668, "Test Location 2"),
-          time = "2025-11-16 19:00",
-          association = sampleAssociation,
-          tags = listOf("test"),
-          price = 10u,
-          pictureUrl = null)
-
   // Fake EventRepository for testing
-  private class FakeEventRepository(
-      private val allEventsList: List<Event> = emptyList(),
-      private val myEventsList: List<Event> = emptyList()
-  ) : EventRepository {
+  private class FakeEventRepository(private val allEventsList: List<Event> = emptyList()) :
+      EventRepository {
     override fun getNewUid(): String = "fake-uid"
 
     override suspend fun getAllEvents(): List<Event> = allEventsList
@@ -71,7 +36,7 @@ class HomeScreenTest {
       myEvents: List<Event> = emptyList(),
       allEvents: List<Event> = emptyList()
   ): HomeViewModel {
-    val fakeRepo = FakeEventRepository(allEventsList = allEvents, myEventsList = myEvents)
+    val fakeRepo = FakeEventRepository(allEventsList = allEvents)
     val viewModel = HomeViewModel(repo = fakeRepo)
     // Set myEvents since the real ViewModel doesn't populate it yet
     viewModel.setMyEvents(myEvents)
@@ -80,7 +45,7 @@ class HomeScreenTest {
 
   @Test
   fun homeScreen_DisplaysCorrectly() {
-    val viewModel = createFakeViewModel(myEvents = listOf(sampleEvent))
+    val viewModel = createFakeViewModel(myEvents = listOf(ExampleEvents.event1))
 
     composeTestRule.setContent {
       MaterialTheme { HomeScreen(viewModel = viewModel, onEventClick = {}) }
@@ -99,7 +64,7 @@ class HomeScreenTest {
   @Test
   fun homeScreen_EventCardClickTriggersCallback() {
     var clickedEventId: String? = null
-    val viewModel = createFakeViewModel(myEvents = listOf(sampleEvent))
+    val viewModel = createFakeViewModel(myEvents = listOf(ExampleEvents.event1))
 
     composeTestRule.setContent {
       MaterialTheme {
@@ -111,15 +76,16 @@ class HomeScreenTest {
     composeTestRule.waitForIdle()
 
     // Find and click on the event card
-    composeTestRule.onNodeWithText("Test Event 1").performClick()
+    composeTestRule.onNodeWithText(ExampleEvents.event1.title).performClick()
 
     // Verify that the callback was triggered with the correct event ID
-    assertEquals("event1", clickedEventId)
+    assertEquals(ExampleEvents.event1.id, clickedEventId)
   }
 
   @Test
   fun homeScreen_DisplaysMultipleEvents() {
-    val viewModel = createFakeViewModel(myEvents = listOf(sampleEvent, sampleEvent2))
+    val viewModel =
+        createFakeViewModel(myEvents = listOf(ExampleEvents.event1, ExampleEvents.event2))
 
     composeTestRule.setContent {
       MaterialTheme { HomeScreen(viewModel = viewModel, onEventClick = {}) }
@@ -129,14 +95,15 @@ class HomeScreenTest {
     composeTestRule.waitForIdle()
 
     // Check that both events are displayed
-    composeTestRule.onNodeWithText("Test Event 1").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Test Event 2").assertIsDisplayed()
+    composeTestRule.onNodeWithText(ExampleEvents.event1.title).assertIsDisplayed()
+    composeTestRule.onNodeWithText(ExampleEvents.event2.title).assertIsDisplayed()
   }
 
   @Test
   fun homeScreen_ClickingSecondEventTriggersCorrectCallback() {
     var clickedEventId: String? = null
-    val viewModel = createFakeViewModel(myEvents = listOf(sampleEvent, sampleEvent2))
+    val viewModel =
+        createFakeViewModel(myEvents = listOf(ExampleEvents.event1, ExampleEvents.event2))
 
     composeTestRule.setContent {
       MaterialTheme {
@@ -148,10 +115,10 @@ class HomeScreenTest {
     composeTestRule.waitForIdle()
 
     // Click on the second event
-    composeTestRule.onNodeWithText("Test Event 2").performClick()
+    composeTestRule.onNodeWithText(ExampleEvents.event2.title).performClick()
 
     // Verify that the callback was triggered with the correct event ID
-    assertEquals("event2", clickedEventId)
+    assertEquals(ExampleEvents.event2.id, clickedEventId)
   }
 
   @Test
@@ -185,7 +152,7 @@ class HomeScreenTest {
   fun homeScreen_MultipleClicksOnSameEventWork() {
     var clickCount = 0
     var lastClickedEventId: String? = null
-    val viewModel = createFakeViewModel(myEvents = listOf(sampleEvent))
+    val viewModel = createFakeViewModel(myEvents = listOf(ExampleEvents.event1))
 
     composeTestRule.setContent {
       MaterialTheme {
@@ -202,19 +169,20 @@ class HomeScreenTest {
     composeTestRule.waitForIdle()
 
     // Click the event multiple times
-    composeTestRule.onNodeWithText("Test Event 1").performClick()
-    composeTestRule.onNodeWithText("Test Event 1").performClick()
-    composeTestRule.onNodeWithText("Test Event 1").performClick()
+    composeTestRule.onNodeWithText(ExampleEvents.event1.title).performClick()
+    composeTestRule.onNodeWithText(ExampleEvents.event1.title).performClick()
+    composeTestRule.onNodeWithText(ExampleEvents.event1.title).performClick()
 
     // Verify that all clicks were registered
     assertEquals(3, clickCount)
-    assertEquals("event1", lastClickedEventId)
+    assertEquals(ExampleEvents.event1.id, lastClickedEventId)
   }
 
   @Test
   fun homeScreen_SwitchingBetweenFiltersWorks() {
     val viewModel =
-        createFakeViewModel(myEvents = listOf(sampleEvent), allEvents = listOf(sampleEvent2))
+        createFakeViewModel(
+            myEvents = listOf(ExampleEvents.event1), allEvents = listOf(ExampleEvents.event2))
 
     composeTestRule.setContent {
       MaterialTheme { HomeScreen(viewModel = viewModel, onEventClick = {}) }
@@ -223,15 +191,16 @@ class HomeScreenTest {
     // Wait for the UI to settle
     composeTestRule.waitForIdle()
 
-    // Initially should show subscribed events (sampleEvent)
-    composeTestRule.onNodeWithText("Test Event 1").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Test Event 2").assertDoesNotExist()
+    // Initially should show subscribed events (ExampleEvents.event1)
+    composeTestRule.onNodeWithText(ExampleEvents.event1.title).assertIsDisplayed()
+    composeTestRule.onNodeWithText(ExampleEvents.event2.title).assertDoesNotExist()
   }
 
   @Test
   fun homeScreen_ClickingAllEventsFilterShowsAllEvents() {
     val viewModel =
-        createFakeViewModel(myEvents = listOf(sampleEvent), allEvents = listOf(sampleEvent2))
+        createFakeViewModel(
+            myEvents = listOf(ExampleEvents.event1), allEvents = listOf(ExampleEvents.event2))
 
     composeTestRule.setContent {
       MaterialTheme { HomeScreen(viewModel = viewModel, onEventClick = {}) }
@@ -240,9 +209,9 @@ class HomeScreenTest {
     // Wait for the UI to settle
     composeTestRule.waitForIdle()
 
-    // Initially should show subscribed events (sampleEvent)
-    composeTestRule.onNodeWithText("Test Event 1").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Test Event 2").assertDoesNotExist()
+    // Initially should show subscribed events (ExampleEvents.event1)
+    composeTestRule.onNodeWithText(ExampleEvents.event1.title).assertIsDisplayed()
+    composeTestRule.onNodeWithText(ExampleEvents.event2.title).assertDoesNotExist()
 
     // Click on "All Events" filter button
     composeTestRule
@@ -252,15 +221,16 @@ class HomeScreenTest {
     // Wait for the UI to settle
     composeTestRule.waitForIdle()
 
-    // Now should show all events (sampleEvent2)
-    composeTestRule.onNodeWithText("Test Event 2").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Test Event 1").assertDoesNotExist()
+    // Now should show all events (ExampleEvents.event2)
+    composeTestRule.onNodeWithText(ExampleEvents.event2.title).assertIsDisplayed()
+    composeTestRule.onNodeWithText(ExampleEvents.event1.title).assertDoesNotExist()
   }
 
   @Test
   fun homeScreen_ClickingSubscribedFilterShowsSubscribedEvents() {
     val viewModel =
-        createFakeViewModel(myEvents = listOf(sampleEvent), allEvents = listOf(sampleEvent2))
+        createFakeViewModel(
+            myEvents = listOf(ExampleEvents.event1), allEvents = listOf(ExampleEvents.event2))
 
     composeTestRule.setContent {
       MaterialTheme { HomeScreen(viewModel = viewModel, onEventClick = {}) }
@@ -277,8 +247,8 @@ class HomeScreenTest {
     // Wait for the UI to settle
     composeTestRule.waitForIdle()
 
-    // Should show all events (sampleEvent2)
-    composeTestRule.onNodeWithText("Test Event 2").assertIsDisplayed()
+    // Should show all events (ExampleEvents.event2)
+    composeTestRule.onNodeWithText(ExampleEvents.event2.title).assertIsDisplayed()
 
     // Click back on "Subscribed" filter button
     composeTestRule
@@ -288,14 +258,15 @@ class HomeScreenTest {
     // Wait for the UI to settle
     composeTestRule.waitForIdle()
 
-    // Now should show subscribed events again (sampleEvent)
-    composeTestRule.onNodeWithText("Test Event 1").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Test Event 2").assertDoesNotExist()
+    // Now should show subscribed events again (ExampleEvents.event1)
+    composeTestRule.onNodeWithText(ExampleEvents.event1.title).assertIsDisplayed()
+    composeTestRule.onNodeWithText(ExampleEvents.event2.title).assertDoesNotExist()
   }
 
   @Test
   fun homeScreen_EmptyAllEventsShowsMessage() {
-    val viewModel = createFakeViewModel(myEvents = listOf(sampleEvent), allEvents = emptyList())
+    val viewModel =
+        createFakeViewModel(myEvents = listOf(ExampleEvents.event1), allEvents = emptyList())
 
     composeTestRule.setContent {
       MaterialTheme { HomeScreen(viewModel = viewModel, onEventClick = {}) }
@@ -320,7 +291,8 @@ class HomeScreenTest {
   fun homeScreen_FilterSwitchingWithBothListsPopulated() {
     val viewModel =
         createFakeViewModel(
-            myEvents = listOf(sampleEvent), allEvents = listOf(sampleEvent, sampleEvent2))
+            myEvents = listOf(ExampleEvents.event1),
+            allEvents = listOf(ExampleEvents.event1, ExampleEvents.event2))
 
     composeTestRule.setContent {
       MaterialTheme { HomeScreen(viewModel = viewModel, onEventClick = {}) }
@@ -329,8 +301,8 @@ class HomeScreenTest {
     // Wait for the UI to settle
     composeTestRule.waitForIdle()
 
-    // Initially should show subscribed events (sampleEvent only)
-    composeTestRule.onNodeWithText("Test Event 1").assertIsDisplayed()
+    // Initially should show subscribed events (ExampleEvents.event1 only)
+    composeTestRule.onNodeWithText(ExampleEvents.event1.title).assertIsDisplayed()
 
     // Click on "All Events" filter button
     composeTestRule
@@ -341,7 +313,7 @@ class HomeScreenTest {
     composeTestRule.waitForIdle()
 
     // Now should show all events (both events)
-    composeTestRule.onNodeWithText("Test Event 1").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Test Event 2").assertIsDisplayed()
+    composeTestRule.onNodeWithText(ExampleEvents.event1.title).assertIsDisplayed()
+    composeTestRule.onNodeWithText(ExampleEvents.event2.title).assertIsDisplayed()
   }
 }
