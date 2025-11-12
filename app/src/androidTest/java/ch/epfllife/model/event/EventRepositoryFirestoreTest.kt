@@ -1,6 +1,7 @@
 // Kotlin
 package ch.epfllife.model.event
 
+import ch.epfllife.example_data.ExampleAssociations
 import ch.epfllife.example_data.ExampleEvents
 import ch.epfllife.utils.FirestoreLifeTest
 import com.google.android.gms.tasks.Tasks
@@ -19,8 +20,11 @@ class EventRepositoryFirestoreTest : FirestoreLifeTest() {
 
   @Test
   fun createEventReturnsSuccess() = runTest {
-    val event = ExampleEvents.event1
+    val assoc1 = ExampleAssociations.association1
+    // action: create association in database
+    assocRepository.createAssociation(assoc1)
 
+    val event = ExampleEvents.event1
     // action: create event
     val res = eventRepository.createEvent(event)
 
@@ -39,6 +43,15 @@ class EventRepositoryFirestoreTest : FirestoreLifeTest() {
 
   @Test
   fun getAllEventsReturnsListOfEvents() = runTest {
+    val assoc1 = ExampleAssociations.association1
+    val assoc2 = ExampleAssociations.association2
+    val assoc3 = ExampleAssociations.association3
+
+    // action: create association in database
+    assocRepository.createAssociation(assoc1)
+    assocRepository.createAssociation(assoc2)
+    assocRepository.createAssociation(assoc3)
+
     val e1 = ExampleEvents.event1
     val e2 = ExampleEvents.event2
     val e3 = ExampleEvents.event3
@@ -58,6 +71,13 @@ class EventRepositoryFirestoreTest : FirestoreLifeTest() {
 
   @Test
   fun updateEventReturnsSuccess() = runTest {
+    val assoc1 = ExampleAssociations.association1
+    val assoc2 = ExampleAssociations.association2
+
+    // action: create association in database
+    assocRepository.createAssociation(assoc1)
+    assocRepository.createAssociation(assoc2)
+
     val original = ExampleEvents.event1
     // action: create event
     eventRepository.createEvent(original)
@@ -76,6 +96,13 @@ class EventRepositoryFirestoreTest : FirestoreLifeTest() {
 
   @Test
   fun updateIdMismatchReturnsFailure() = runTest {
+    val assoc1 = ExampleAssociations.association1
+    val assoc2 = ExampleAssociations.association2
+
+    // action: create association in database
+    assocRepository.createAssociation(assoc1)
+    assocRepository.createAssociation(assoc2)
+
     val original = ExampleEvents.event1
     // action: create event
     eventRepository.createEvent(original)
@@ -95,6 +122,10 @@ class EventRepositoryFirestoreTest : FirestoreLifeTest() {
 
   @Test
   fun deleteEventReturnsSuccess() = runTest {
+    val assoc1 = ExampleAssociations.association1
+    // action: create association in database
+    assocRepository.createAssociation(assoc1)
+
     val original = ExampleEvents.event1
     // action: create event
     eventRepository.createEvent(original)
@@ -109,6 +140,10 @@ class EventRepositoryFirestoreTest : FirestoreLifeTest() {
 
   @Test
   fun deleteNonExistentEventEventReturnsFailure() = runTest {
+    val assoc1 = ExampleAssociations.association1
+    // action: create association in database
+    assocRepository.createAssociation(assoc1)
+
     val original = ExampleEvents.event1
     // action: create event
     eventRepository.createEvent(original)
@@ -169,7 +204,8 @@ class EventRepositoryFirestoreTest : FirestoreLifeTest() {
     whenever(assocSnap.getString("pictureUrl")).thenReturn(expected.association.pictureUrl)
     whenever(assocSnap.getString("eventCategory"))
         .thenReturn(expected.association.eventCategory.name)
-
+    whenever(assocSnap.getString("about")).thenReturn(expected.association.about)
+    whenever(assocSnap.get("socialLinks")).thenReturn(expected.association.socialLinks)
     // Return a completed Task for assocRef.get()
     whenever(assocRef.get()).thenReturn(Tasks.forResult(assocSnap))
 
