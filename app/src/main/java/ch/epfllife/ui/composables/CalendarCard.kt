@@ -19,11 +19,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ch.epfllife.model.event.Event
-import ch.epfllife.ui.calendar.CalendarTestTags
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.*
+
+object CalendarTestTags {
+  const val EVENT_CARD = "calendarCard"
+  const val EVENT_DATE_BOX = "eventDateBox"
+  const val EVENT_TITLE = "eventTitle"
+  const val EVENT_ASSOCIATION = "eventAssociation"
+  const val EVENT_ARROW = "eventArrow"
+}
 
 @Composable
 fun CalendarCard(event: Event, modifier: Modifier = Modifier, onClick: () -> Unit) {
@@ -39,12 +46,12 @@ fun CalendarCard(event: Event, modifier: Modifier = Modifier, onClick: () -> Uni
               // Date box on the left
               Box(
                   modifier =
-                      Modifier.size(64.dp) // square box: width = height
+                      Modifier.size(64.dp)
                           .background(Color(0xFF990000), RoundedCornerShape(8.dp))
                           .testTag(CalendarTestTags.EVENT_DATE_BOX),
                   contentAlignment = Alignment.Center) {
                     Text(
-                        text = event.formattedDate(), // already handles multi-line formatting
+                        text = event.formattedDate(),
                         color = MaterialTheme.colorScheme.onPrimary,
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Medium,
@@ -52,7 +59,7 @@ fun CalendarCard(event: Event, modifier: Modifier = Modifier, onClick: () -> Uni
                         modifier = Modifier.fillMaxWidth())
                   }
 
-              // Text section (name + association)
+              // Text section (title + association)
               Column(modifier = Modifier.weight(1f).align(Alignment.CenterVertically)) {
                 Text(
                     text = event.title,
@@ -68,7 +75,7 @@ fun CalendarCard(event: Event, modifier: Modifier = Modifier, onClick: () -> Uni
                     modifier = Modifier.testTag(CalendarTestTags.EVENT_ASSOCIATION))
               }
 
-              // Arrow
+              // Arrow icon on the right
               Icon(
                   imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                   contentDescription = "Go to ${event.title}",
