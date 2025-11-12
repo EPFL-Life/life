@@ -109,7 +109,7 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
 
         // 5. Handle optional List of Strings
         val tags: List<String> =
-            (document["tags"] as? List<*>)?.mapNotNull { it as? String } ?: emptyList()
+            ((document["tags"] as? List<*>)?.mapNotNull { it as? String } ?: emptyList())
 
         // 6. Handle numeric conversion for price (required)
         // Firestore stores all numbers as Long. Fail if 'price' is missing.
