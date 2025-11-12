@@ -2,11 +2,12 @@ package ch.epfllife.ui.eventDetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import ch.epfllife.model.association.Association
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.map.Location
 import ch.epfllife.ui.composables.Price
+import ch.epfllife.model.event.EventRepository
+import ch.epfllife.model.event.EventRepositoryFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,19 +25,21 @@ sealed class EventDetailsUIState {
 /**
  * ViewModel for the EventDetails screen.
  *
- * Handles loading and exposing a single Event object.
+ * Uses `EventRepository` to fetch an Event by id.
+ *
+ * @param repo The repository to fetch events from.
  */
-class EventDetailsViewModel : ViewModel() {
+class EventDetailsViewModel(
+    private val repo: EventRepository =
+        EventRepositoryFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance())
+) : ViewModel() {
 
   private val _uiState = MutableStateFlow<EventDetailsUIState>(EventDetailsUIState.Loading)
   val uiState: StateFlow<EventDetailsUIState> = _uiState.asStateFlow()
 
-  /** Loads event details by ID. In the future this would call a repository. */
+  /** Loads event details by ID using EventRepository.getEvent. */
   fun loadEvent(eventId: String) {
     viewModelScope.launch {
-
-      // note that EventDetailsUIState.Loading is the default value (set before)
-
       try {
         val fakeEvent =
             Event(
@@ -57,6 +60,12 @@ class EventDetailsViewModel : ViewModel() {
                 pictureUrl =
                     "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")
         _uiState.value = EventDetailsUIState.Success(fakeEvent, isEnrolled = false)
+        val event = repo.getEvent(eventId)
+        if (event != null) {
+          _uiState.value = EventDetailsUIState.Success(event, isEnrolled = isEnrolled(event))
+        } else {
+          _uiState.value = EventDetailsUIState.Error("Event not found")
+        }
       } catch (e: Exception) {
         _uiState.value = EventDetailsUIState.Error("Failed to load event: ${e.message}")
       }

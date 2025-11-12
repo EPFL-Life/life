@@ -35,7 +35,11 @@ import ch.epfllife.ui.composables.SearchBar
 import ch.epfllife.ui.navigation.NavigationTestTags
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel = viewModel()) {
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    viewModel: HomeViewModel = viewModel(),
+    onEventClick: (eventId: String) -> Unit
+) {
   var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
 
   val exampleEvent =
@@ -106,7 +110,7 @@ fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel = viewMod
               verticalArrangement = Arrangement.spacedBy(12.dp),
               modifier = modifier.fillMaxSize()) {
                 items(shownEvents, key = { it.id }) { ev ->
-                  EventCard(event = ev, onClick = { /* TODO: Navigate to event card */})
+                  EventCard(event = ev, onClick = { onEventClick(ev.id) })
                 }
               }
         }
@@ -142,5 +146,5 @@ object HomeScreenTestTags {
 @Preview(showBackground = true)
 @Composable
 private fun HomeScreenPreview() {
-  MaterialTheme { HomeScreen() }
+  MaterialTheme { HomeScreen(onEventClick = {}) }
 }
