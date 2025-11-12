@@ -57,6 +57,10 @@ open class NavigationActions(
   }
 
   /** Convenience helper to navigate to event details with a concrete id. */
+  fun navigateToEventDetails(eventId: String) {
+    val route = "${Screen.EventDetails.route}/$eventId"
+    navController.navigate(route)
+  }
 
   /** Navigate back to the previous screen. */
   open fun goBack() {
@@ -70,11 +74,6 @@ open class NavigationActions(
    */
   open fun currentRoute(): String {
     return navController.currentDestination?.route ?: ""
-  }
-
-  fun navigateToEventDetails(eventId: String) {
-    val route = "${Screen.EventDetails.route}/$eventId"
-    navController.navigate(route)
   }
 
   fun navigateToAssociationDetails(associationId: String) {
