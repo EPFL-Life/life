@@ -35,10 +35,15 @@ class EventRepositoryFirestoreTest : FirestoreLifeTest() {
   }
 
   @Test
-  fun getEventReturnsNull() = runTest {
+  fun getEventReturnsExcpetion() = runTest {
     // action gets a nonexistent
-    val result = eventRepository.getEvent("nonExistentId")
-    assertNull(result)
+    val eventId = "nonExistentId"
+    try {
+      eventRepository.getEvent(eventId)
+      fail("Expected NoSuchElementException when document does not exist")
+    } catch (e: NoSuchElementException) {
+      // expected
+    }
   }
 
   @Test
