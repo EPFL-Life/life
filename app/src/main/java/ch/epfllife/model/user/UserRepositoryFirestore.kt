@@ -120,7 +120,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
 
         // 5. Handle nested UserSettings data class (FIXED)
         // Get the userSettings map from Firestore
-        val settingsMap = document.get("userSettings") as? Map<*, *>
+        val settingsMap = document["userSettings"] as? Map<*, *>
         // Get "isDarkMode" from the map, defaulting to 'false' if it or the map doesn't exist
         val isDarkMode = settingsMap?.get("isDarkMode") as? Boolean ?: false
         val userSettings = UserSettings(isDarkMode = isDarkMode)
