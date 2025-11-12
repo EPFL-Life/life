@@ -21,6 +21,7 @@ sealed class Screen(
   object Settings : Screen(route = "settings", name = "Settings", isTopLevelDestination = true)
 
   object AssociationDetails : Screen(route = "associationdetails", name = "AssociationDetails")
+
   object EventDetails : Screen(route = "eventdetails", name = "EventDetails")
 }
 
@@ -80,5 +81,4 @@ open class NavigationActions(
     val route = "${Screen.AssociationDetails.route}/$associationId"
     navController.navigate(route)
   }
-
 }

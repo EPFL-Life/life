@@ -24,9 +24,9 @@ import ch.epfllife.model.authentication.Auth
 import ch.epfllife.ui.association.AssociationBrowser
 import ch.epfllife.ui.association.AssociationDetailsScreen
 import ch.epfllife.ui.authentication.SignInScreen
-import ch.epfllife.ui.eventDetails.EventDetailsScreen
 import ch.epfllife.ui.home.HomeScreen
 import ch.epfllife.ui.calendar.CalendarScreen
+import ch.epfllife.ui.eventDetails.EventDetailsScreen
 import ch.epfllife.ui.navigation.BottomNavigationMenu
 import ch.epfllife.ui.navigation.NavigationActions
 import ch.epfllife.ui.navigation.NavigationTestTags
@@ -120,27 +120,20 @@ fun App(
                 })
           }
 
-            composable(Screen.Calendar.route) {
-                CalendarScreen(
-                    allEvents = emptyList(),
-                    enrolledEvents = emptyList(),
-                    onEventClick = { eventId ->
-                        navigationActions.navigateToEventDetails(eventId)
-                    }
-                )
-            }
+          composable(Screen.Calendar.route) {
+            CalendarScreen(
+                allEvents = emptyList(),
+                enrolledEvents = emptyList(),
+                onEventClick = { eventId -> navigationActions.navigateToEventDetails(eventId) })
+          }
 
-            composable(
-                route = Screen.EventDetails.route + "/{eventId}",
-                arguments = listOf(navArgument("eventId") { type = NavType.StringType })
-            ) { backStackEntry ->
+          composable(
+              route = Screen.EventDetails.route + "/{eventId}",
+              arguments = listOf(navArgument("eventId") { type = NavType.StringType })) {
+                  backStackEntry ->
                 val eventId = backStackEntry.arguments?.getString("eventId") ?: ""
-                EventDetailsScreen(
-                    eventId = eventId,
-                    onGoBack = { navController.popBackStack() }
-                )
-            }
-
+                EventDetailsScreen(eventId = eventId, onGoBack = { navController.popBackStack() })
+              }
 
           composable(
               route = Screen.AssociationDetails.route + "/{associationId}",
@@ -170,4 +163,6 @@ fun App(
           }
         }
       }
+
+
 }

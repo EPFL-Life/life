@@ -21,7 +21,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import ch.epfllife.ui.calendar.CalendarScreen
 
 sealed class Tab(val name: String, val icon: ImageVector, val destination: Screen) {
   object HomeScreen : Tab("HomeScreen", Icons.Outlined.Home, Screen.HomeScreen)
