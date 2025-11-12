@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import ch.epfllife.ui.calendar.CalendarScreen
 
 sealed class Tab(val name: String, val icon: ImageVector, val destination: Screen) {
   object HomeScreen : Tab("HomeScreen", Icons.Outlined.Home, Screen.HomeScreen)
@@ -28,12 +29,12 @@ sealed class Tab(val name: String, val icon: ImageVector, val destination: Scree
   object AssociationBrowser :
       Tab("AssociationBrowser", Icons.Outlined.Groups, Screen.AssociationBrowser)
 
-  object MyEvents : Tab("MyEvents", Icons.Outlined.CalendarToday, Screen.MyEvents)
+  object Calendar : Tab("Calendar", Icons.Outlined.CalendarToday, Screen.Calendar)
 
   object Settings : Tab("Settings", Icons.Outlined.Settings, Screen.Settings)
 
   companion object {
-    val tabs = listOf(HomeScreen, AssociationBrowser, MyEvents, Settings)
+    val tabs = listOf(HomeScreen, AssociationBrowser, Calendar, Settings)
   }
 }
 
