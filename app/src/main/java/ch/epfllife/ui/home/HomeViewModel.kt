@@ -16,7 +16,7 @@ class HomeViewModel(
 ) : ViewModel() {
 
   private val _allEvents = MutableStateFlow<List<Event>>(emptyList())
-  val allEvents = MutableStateFlow<List<Event>>(emptyList())
+  val allEvents: StateFlow<List<Event>> = _allEvents.asStateFlow()
 
   private val _myEvents = MutableStateFlow<List<Event>>(emptyList())
   val myEvents: StateFlow<List<Event>> = _myEvents.asStateFlow()
