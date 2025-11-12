@@ -2,6 +2,7 @@ package ch.epfllife.utils
 
 import ch.epfllife.model.association.AssociationRepositoryFirestore
 import ch.epfllife.model.authentication.Auth
+import ch.epfllife.model.authentication.SignInResult
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventRepositoryFirestore
 import ch.epfllife.model.firestore.FirestoreCollections
@@ -11,6 +12,7 @@ import com.google.firebase.auth.auth
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Assert.*
 import org.junit.Before
 
 /**
@@ -30,11 +32,23 @@ open class FirestoreLifeTest {
 
   @Before
   fun setUp() {
-    // Ensure emulator is running and sign in a test user
-    setUpEmulatorAuth(auth, "FirestoreLifeTest")
+    // We must use runTest here to ensure that both auth and cleanup
+    // are complete before the actual @Test method runs.
+    // There was an Issue with race condition (setUp/login was not done before other tests started)
+    runTest {
+      // Ensure emulator is running and sign in a test user
+      // This MUST be inside runTest to ensure it completes before the test
+      setUpEmulatorAuth(auth, "FirestoreLifeTest")
 
-    // Clear all data before each test
-    runTest { clearFirestore() }
+      // Clear all data before each test
+      clearFirestore()
+
+      // Sign IN a test user for all tests inheriting from this class
+      val signInResult = auth.signInWithCredential(FakeCredentialManager.defaultUserCredentials)
+      assertTrue(
+          "Failed to sign in default test user in FirestoreLifeTest.setUp",
+          signInResult is SignInResult.Success)
+    }
   }
 
   @After
@@ -71,6 +85,11 @@ open class FirestoreLifeTest {
         .get()
         .await()
         .size()
+  }
+
+  /** Helper to get the number of documents in the users collection. */
+  suspend fun getUserCount(): Int {
+    return FirebaseEmulator.firestore.collection(FirestoreCollections.USERS).get().await().size()
   }
 
   /**
