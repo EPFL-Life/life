@@ -21,6 +21,8 @@ sealed class Screen(
   object Settings : Screen(route = "settings", name = "Settings", isTopLevelDestination = true)
 
   object AssociationDetails : Screen(route = "associationdetails", name = "AssociationDetails")
+
+  object EventDetails : Screen(route = "eventdetails", name = "EventDetails")
 }
 
 open class NavigationActions(
@@ -46,6 +48,17 @@ open class NavigationActions(
         restoreState = true
       }
     }
+  }
+
+  /** Navigate to a screen with an ID parameter (e.g., event details, association details). */
+  open fun navigateToScreenWithId(screen: Screen, id: String) {
+    val route = "${screen.route}/$id"
+    navController.navigate(route)
+  }
+
+  /** Convenience helper to navigate to event details with a concrete id. */
+  open fun navigateToEventDetails(eventId: String) {
+    navigateToScreenWithId(Screen.EventDetails, eventId)
   }
 
   /** Navigate back to the previous screen. */
