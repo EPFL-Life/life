@@ -8,8 +8,12 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito.mock
-import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.whenever
+import org.mockito.Mockito.`when`
+import ch.epfllife.ui.composables.Price
+import ch.epfllife.model.map.Location
+import ch.epfllife.model.association.Association
+import com.google.firebase.firestore.DocumentReference
+import com.google.android.gms.tasks.Tasks
 
 class EventRepositoryFirestoreTest : FirestoreLifeTest() {
 
@@ -29,8 +33,8 @@ class EventRepositoryFirestoreTest : FirestoreLifeTest() {
     assertTrue(createResult.isSuccess)
     assertEquals(1, getEventCount())
 
-    // Act: retrieve event by ID
-    val retrieved = eventRepository.getEvent(event.id)
+    // Price as Long (Firestore numeric)
+    `when`(doc.getLong("price")).thenReturn(expected.price.price.toLong())
 
     // Assert: event was retrieved and matches the original
     assertNotNull("Retrieved event should not be null", retrieved)
