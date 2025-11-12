@@ -38,7 +38,7 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
   }
 
   override suspend fun createEvent(event: Event): Result<Unit> {
-    return runCatching {
+    return Result.runCatching {
       db.collection(FirestoreCollections.EVENTS).document(event.id).set(event).await()
     }
   }
