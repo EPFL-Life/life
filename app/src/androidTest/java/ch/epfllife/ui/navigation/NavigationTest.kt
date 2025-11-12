@@ -101,7 +101,7 @@ class NavigationTest {
   @Test
   fun bottomNavigationIsDisplayedForMyEvents() {
 
-    composeTestRule.navigateToTab(Tab.MyEvents)
+    composeTestRule.navigateToTab(Tab.Calendar)
     composeTestRule
         .onNodeWithTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU, useUnmergedTree = true)
         .assertIsDisplayed()
@@ -117,7 +117,7 @@ class NavigationTest {
 
   @Test
   fun canNavigateToMyEvents() {
-    composeTestRule.navigateToTab(Tab.MyEvents)
+    composeTestRule.navigateToTab(Tab.Calendar)
     composeTestRule
         .onNodeWithTag(NavigationTestTags.HOMESCREEN_SCREEN, useUnmergedTree = true)
         .assertDoesNotExist()
@@ -136,7 +136,7 @@ class NavigationTest {
         .onNodeWithTag(NavigationTestTags.ASSOCIATIONBROWSER_SCREEN, useUnmergedTree = true)
         .assertDoesNotExist()
     composeTestRule
-        .onNodeWithTag(NavigationTestTags.MYEVENTS_SCREEN, useUnmergedTree = true)
+        .onNodeWithTag(NavigationTestTags.CALENDAR_SCREEN, useUnmergedTree = true)
         .assertDoesNotExist()
   }
 
@@ -158,7 +158,7 @@ class NavigationTest {
         .assertDoesNotExist()
 
     // AssociationBrowser -> MyEvents
-    composeTestRule.navigateToTab(Tab.MyEvents)
+    composeTestRule.navigateToTab(Tab.Calendar)
     composeTestRule
         .onNodeWithTag(NavigationTestTags.ASSOCIATIONBROWSER_SCREEN, useUnmergedTree = true)
         .assertDoesNotExist()
@@ -166,7 +166,7 @@ class NavigationTest {
     // MyEvents -> Settings
     composeTestRule.navigateToTab(Tab.Settings)
     composeTestRule
-        .onNodeWithTag(NavigationTestTags.MYEVENTS_SCREEN, useUnmergedTree = true)
+        .onNodeWithTag(NavigationTestTags.CALENDAR_SCREEN, useUnmergedTree = true)
         .assertDoesNotExist()
 
     // Settings -> Home
@@ -188,7 +188,7 @@ class NavigationTest {
 
   @Test
   fun returningToHomeRestoresHomeUiElements() {
-    composeTestRule.navigateToTab(Tab.MyEvents)
+    composeTestRule.navigateToTab(Tab.Calendar)
     composeTestRule.navigateToTab(Tab.HomeScreen)
     composeTestRule
         .onNodeWithTag(HomeScreenTestTags.EPFLLOGO, useUnmergedTree = true)

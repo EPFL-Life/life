@@ -86,9 +86,9 @@ class EndToEndTest {
   }
 
   @Test
-  fun canExitWithDoubleBackPressFromMyEvents() {
+  fun canExitWithDoubleBackPressFromCalendar() {
     useLoggedInApp()
-    canExitWithDoublePressFromTab(Tab.MyEvents)
+    canExitWithDoublePressFromTab(Tab.Calendar)
   }
 
   @Test
