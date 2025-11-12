@@ -2,13 +2,7 @@ package ch.epfllife.ui.composables
 
 import android.annotation.SuppressLint
 
-class Price {
-
-  val price: UInt
-
-  constructor(price: UInt) {
-    this.price = price
-  }
+data class Price(val price: UInt) {
 
   @SuppressLint("DefaultLocale")
   fun formatPrice(): String {
