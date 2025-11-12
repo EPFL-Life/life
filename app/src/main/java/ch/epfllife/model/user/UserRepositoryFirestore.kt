@@ -141,10 +141,62 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
   }
 
   override suspend fun subscribeToEvent(eventId: String): Result<Unit> {
-    TODO("Not yet implemented")
+    val currentUser = getCurrentUser()
+
+    // case 1: getCurrentUser() returns a null object
+    if(currentUser==null){
+      return Result.failure(
+        NoSuchElementException("No user is currently logged in"))
+    }
+
+    // case 2: event doesn't exist
+    val event = db.collection(FirestoreCollections.EVENTS).document(eventId).get().await()
+    if(!event.exists()){
+      return Result.failure(
+        NoSuchElementException("Event with ID $eventId does not exist in the repository.")
+      )
+    }
+
+    // case 3: user has already enrolled to event
+    if (currentUser.enrolledEvents.contains(eventId)) {
+      return Result.failure(IllegalArgumentException("User is already subscribed to event with ID: $eventId"))
+    }
+
+    // case 4: user can enroll
+
+    // we proceed to update the list of enrolled events
+    val updatedUser = currentUser.copy(enrolledEvents = currentUser.enrolledEvents + eventId)
+    // finally we update the user with the new list
+    return updateUser(currentUser.id, updatedUser )
   }
 
   override suspend fun unsubscribeFromEvent(eventId: String): Result<Unit> {
-    TODO("Not yet implemented")
+    val currentUser = getCurrentUser()
+
+    // case 1: getCurrentUser() returns a null object
+    if(currentUser==null){
+      return Result.failure(
+        NoSuchElementException("No user is currently logged in"))
+    }
+
+    // case 2: event doesn't exist
+    val event = db.collection(FirestoreCollections.EVENTS).document(eventId).get().await()
+    if(!event.exists()){
+      return Result.failure(
+        NoSuchElementException("Event with ID $eventId does not exist in the repository.")
+      )
+    }
+
+    // case 3: the user is trying to unsubscribe from an event they are not subscribed to
+    if (!currentUser.enrolledEvents.contains(eventId)) {
+      return Result.failure(IllegalArgumentException("User is not subscribed to event with ID: $eventId"))
+    }
+
+    // case 4: user can enroll
+
+    // we proceed to update the list of enrolled events
+    val updatedUser = currentUser.copy(enrolledEvents = currentUser.enrolledEvents - eventId)
+    // finally we update the user with the new list
+    return updateUser(currentUser.id, updatedUser )
   }
 }
