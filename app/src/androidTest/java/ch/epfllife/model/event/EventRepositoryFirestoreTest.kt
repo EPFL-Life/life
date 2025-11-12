@@ -4,6 +4,7 @@ package ch.epfllife.model.event
 import ch.epfllife.model.association.Association
 import ch.epfllife.model.firestore.FirestoreCollections
 import ch.epfllife.model.map.Location
+import ch.epfllife.ui.composables.Price
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
@@ -13,11 +14,6 @@ import org.junit.Assert.*
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
-import ch.epfllife.ui.composables.Price
-import ch.epfllife.model.map.Location
-import ch.epfllife.model.association.Association
-import com.google.firebase.firestore.DocumentReference
-import com.google.android.gms.tasks.Tasks
 
 class EventRepositoryFirestoreTest {
 
@@ -177,7 +173,7 @@ class EventRepositoryFirestoreTest {
             description = "A meetup about Kotlin",
             time = "2025-11-10T18:00:00Z",
             pictureUrl = "https://example.com/pic.png",
-            price = 150u,
+            price = Price(150u),
             location = Location(name = "Main Hall", latitude = 46.5191, longitude = 6.5668),
             tags = listOf("kotlin", "meetup"),
             association =
@@ -204,7 +200,7 @@ class EventRepositoryFirestoreTest {
             "longitude" to expected.location.longitude)
     `when`(doc.get("location")).thenReturn(locMap)
     `when`(doc.get("tags")).thenReturn(expected.tags.toList())
-    `when`(doc.getLong("price")).thenReturn(expected.price.toLong())
+    `when`(doc.getLong("price")).thenReturn(expected.price.price.toLong())
 
     // Association reference -> snapshot
     val assocRef = mock(DocumentReference::class.java)

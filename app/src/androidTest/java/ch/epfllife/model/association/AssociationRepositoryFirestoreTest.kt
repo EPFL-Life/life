@@ -10,11 +10,6 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
-import ch.epfllife.ui.composables.Price
-import ch.epfllife.model.map.Location
-import ch.epfllife.model.association.Association
-import com.google.firebase.firestore.DocumentReference
-import com.google.android.gms.tasks.Tasks
 
 class AssociationRepositoryFirestoreTest : FirestoreLifeTest() {
 
