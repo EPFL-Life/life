@@ -168,7 +168,7 @@ private fun CalendarScreenPreview() {
               location = location,
               time = "2025-11-15T09:00:00/2025-11-20T18:00:00", // timespan example
               association = codingClub,
-              tags = setOf("tech", "workshop")),
+              tags = listOf("tech", "workshop")),
           ch.epfllife.model.event.Event(
               id = "2",
               title = "Cultural Night",
@@ -176,7 +176,7 @@ private fun CalendarScreenPreview() {
               location = location,
               time = "2025-12-05T19:00:00",
               association = esn,
-              tags = setOf("culture", "food")))
+              tags = listOf("culture", "food")))
 
   MaterialTheme {
     CalendarScreen(
