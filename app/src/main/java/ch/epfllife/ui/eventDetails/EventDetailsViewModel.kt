@@ -2,6 +2,7 @@ package ch.epfllife.ui.eventDetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import ch.epfllife.model.association.Association
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.event.EventRepository
@@ -12,9 +13,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import ch.epfllife.model.association.Association
-
-
 
 /** UI state for the EventDetails screen. */
 sealed class EventDetailsUIState {
@@ -32,7 +30,6 @@ sealed class EventDetailsUIState {
  *
  * @param repo The repository to fetch events from.
  */
-
 class EventDetailsViewModel(
     private val repo: EventRepository =
         EventRepositoryFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance())
