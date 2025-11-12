@@ -13,10 +13,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.R
-import ch.epfllife.model.association.Association
 import ch.epfllife.model.enums.SubscriptionFilter
-import ch.epfllife.model.event.EventCategory
 import ch.epfllife.ui.composables.AssociationCard
 import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
 import ch.epfllife.ui.composables.SearchBar
@@ -25,28 +24,14 @@ import ch.epfllife.ui.navigation.NavigationTestTags
 @Composable
 fun AssociationBrowser(
     modifier: Modifier = Modifier,
+    viewModel: AssociationBrowserViewModel = viewModel(),
     onAssociationClick: (associationId: String) -> Unit
 ) {
   var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
-  val subscribedAssociations = remember {
-    emptyList<Association>()
-  } // No Associations to show empty state
 
-  val allAssociations = remember {
-    listOf(
-        Association(
-            id = "1",
-            name = "ESN Lausanne",
-            description = "Erasmus Student Network at EPFL.",
-            pictureUrl = null,
-            eventCategory = EventCategory.CULTURE),
-        Association(
-            id = "2",
-            name = "EPFL Sports Club",
-            description = "Join for weekly sports activities and tournaments.",
-            pictureUrl = null,
-            eventCategory = EventCategory.SPORTS))
-  }
+  // Replaced hardcoded lists with data from ViewModel
+  val subscribedAssociations by viewModel.subscribedAssociations.collectAsState()
+  val allAssociations by viewModel.allAssociations.collectAsState()
 
   val shownAssociations =
       if (selected == SubscriptionFilter.Subscribed) subscribedAssociations else allAssociations
