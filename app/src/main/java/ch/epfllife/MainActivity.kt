@@ -24,6 +24,7 @@ import ch.epfllife.model.authentication.Auth
 import ch.epfllife.ui.association.AssociationBrowser
 import ch.epfllife.ui.association.AssociationDetailsScreen
 import ch.epfllife.ui.authentication.SignInScreen
+import ch.epfllife.ui.eventDetails.EventDetailsScreen
 import ch.epfllife.ui.home.HomeScreen
 import ch.epfllife.ui.myevents.MyEvents
 import ch.epfllife.ui.navigation.BottomNavigationMenu
@@ -107,14 +108,17 @@ fun App(
             )
           }
 
-          composable(Screen.HomeScreen.route) { HomeScreen() }
+          // pass navigation callback to HomeScreen
+          composable(Screen.HomeScreen.route) {
+            HomeScreen(onEventClick = { id -> navigationActions.navigateToEventDetails(id) })
+          }
+
           composable(Screen.AssociationBrowser.route) {
             AssociationBrowser(
                 onAssociationClick = { associationId ->
                   navigationActions.navigateToAssociationDetails(associationId)
                 })
           }
-
           composable(Screen.MyEvents.route) { MyEvents() }
           composable(
               route = Screen.AssociationDetails.route + "/{associationId}",
@@ -124,6 +128,18 @@ fun App(
                 AssociationDetailsScreen(
                     associationId = associationId, onGoBack = { navController.popBackStack() })
               }
+
+          // Event details route
+          composable(
+              route = Screen.EventDetails.route + "/{eventId}",
+              arguments = listOf(navArgument("eventId") { type = NavType.StringType })) {
+                  backStackEntry ->
+                val eventId =
+                    backStackEntry.arguments?.getString("eventId")
+                        ?: error("eventId is required for EventDetails screen")
+                EventDetailsScreen(eventId = eventId, onGoBack = { navigationActions.goBack() })
+              }
+
           composable(Screen.Settings.route) {
             SettingsScreen(
                 auth = auth,

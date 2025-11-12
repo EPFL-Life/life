@@ -7,7 +7,6 @@ import ch.epfllife.model.map.Location
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlin.text.get
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.tasks.await
@@ -24,7 +23,18 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
   }
 
   override suspend fun getEvent(eventId: String): Event {
-    TODO("Not yet implemented")
+    return try {
+      val doc = db.collection(FirestoreCollections.EVENTS).document(eventId).get().await()
+
+      if (!doc.exists()) {
+        throw NoSuchElementException("Event with id $eventId not found")
+      }
+
+      documentToEvent(doc) ?: throw IllegalStateException("Failed to parse event with id $eventId")
+    } catch (e: Exception) {
+      Log.e("EventRepoFirestore", "Error getting event $eventId", e)
+      throw e
+    }
   }
 
   override suspend fun createEvent(event: Event): Result<Unit> {
@@ -99,7 +109,7 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
 
         // 5. Handle optional List of Strings
         val tags: List<String> =
-            (document["tags"] as? List<*>)?.mapNotNull { it as? String } ?: emptyList()
+            ((document["tags"] as? List<*>)?.mapNotNull { it as? String } ?: emptyList())
 
         // 6. Handle numeric conversion for price (required)
         // Firestore stores all numbers as Long. Fail if 'price' is missing.
