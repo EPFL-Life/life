@@ -36,7 +36,7 @@ class EventRepositoryFirestoreTest : FirestoreLifeTest() {
   }
 
   @Test
-  fun getEventReturnsExcpetion() = runTest {
+  fun getEventReturnsException() = runTest {
     // action gets a nonexistent
     val eventId = "nonExistentId"
     try {
