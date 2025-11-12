@@ -16,7 +16,6 @@ import org.mockito.Mockito.mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
 
-
 class EventRepositoryFirestoreTest : FirestoreLifeTest() {
 
   @Test
