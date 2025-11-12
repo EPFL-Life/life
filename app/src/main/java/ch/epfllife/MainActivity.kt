@@ -1,6 +1,5 @@
 package ch.epfllife
 
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -21,7 +20,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import ch.epfllife.model.authentication.AuthRepository
+import ch.epfllife.model.authentication.Auth
 import ch.epfllife.ui.association.AssociationBrowser
 import ch.epfllife.ui.association.AssociationDetailsScreen
 import ch.epfllife.ui.authentication.SignInScreen
@@ -32,59 +31,37 @@ import ch.epfllife.ui.navigation.NavigationActions
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.navigation.Screen
 import ch.epfllife.ui.navigation.Tab
-import ch.epfllife.ui.settings.Settings
+import ch.epfllife.ui.settings.SettingsScreen
 import ch.epfllife.ui.theme.Theme
-import com.google.firebase.auth.FirebaseAuth
-import okhttp3.OkHttpClient
-
-/**
- * *B3 only*:
- *
- * Provide an OkHttpClient client for network requests.
- *
- * Property `client` is mutable for testing purposes.
- */
-object HttpClientProvider {
-  var client: OkHttpClient = OkHttpClient()
-}
 
 class MainActivity : ComponentActivity() {
-
-  private lateinit var auth: FirebaseAuth
-  private lateinit var authRepository: AuthRepository
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    setContent { ThemedApp() }
+    setContent { ThemedApp(auth = Auth(CredentialManager.create(LocalContext.current))) }
   }
 }
 
 @Composable
-fun ThemedApp() {
-  Theme { Surface(modifier = Modifier.fillMaxSize()) { App() } }
+fun ThemedApp(auth: Auth) {
+  Theme { Surface(modifier = Modifier.fillMaxSize()) { App(auth) } }
 }
 
 /**
  * `App` is the main composable function that sets up the whole app UI. It initializes the
- * navigation controller and defines the navigation graph. You can add your app implementation
- * inside this function.
+ * navigation controller and defines the navigation graph.
  *
- * @param navHostController The navigation controller used for navigating between screens.
- *
- * For B3:
- *
- * @param context The context of the application, used for accessing resources and services.
- * @param credentialManager The CredentialManager instance for handling authentication credentials.
+ * @param auth The auth handler.
  */
 @Composable
 fun App(
-    context: Context = LocalContext.current,
-    credentialManager: CredentialManager = CredentialManager.create(context),
+    auth: Auth,
 ) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
-  val startDestination = Screen.HomeScreen.route
+  val startDestination =
+      if (auth.auth.currentUser == null) Screen.SignIn.route else Screen.HomeScreen.route
 
   // keep the current destination of the nav
   val backStackEntry by navController.currentBackStackEntryAsState()
@@ -114,31 +91,45 @@ fun App(
           BottomNavigationMenu(
               selectedTab = selectedTab,
               onTabSelected = { tab -> navigationActions.navigateTo(tab.destination) },
-              modifier = Modifier.testTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU))
+              modifier = Modifier.testTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU),
+          )
         }
       }) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = startDestination,
-            modifier = Modifier.padding(innerPadding)) {
-              composable(Screen.Auth.route) {
-                SignInScreen(
-                    credentialManager = credentialManager,
-                    onSignedIn = { navigationActions.navigateTo(Screen.HomeScreen) })
+            modifier = Modifier.padding(innerPadding),
+        ) {
+          composable(Screen.SignIn.route) {
+            SignInScreen(
+                auth = auth,
+                onSignedIn = { navigationActions.navigateTo(Screen.HomeScreen) },
+            )
+          }
+
+          composable(Screen.HomeScreen.route) { HomeScreen() }
+          composable(Screen.AssociationBrowser.route) {
+            AssociationBrowser(
+                onAssociationClick = { associationId ->
+                  navigationActions.navigateToAssociationDetails(associationId)
+                })
+          }
+
+          composable(Screen.MyEvents.route) { MyEvents() }
+          composable(
+              route = Screen.AssociationDetails.route + "/{associationId}",
+              arguments = listOf(navArgument("associationId") { type = NavType.StringType })) {
+                  backStackEntry ->
+                val associationId = backStackEntry.arguments?.getString("associationId") ?: ""
+                AssociationDetailsScreen(
+                    associationId = associationId, onGoBack = { navController.popBackStack() })
               }
-
-              composable(Screen.HomeScreen.route) { HomeScreen() }
-              composable(Screen.AssociationBrowser.route) { AssociationBrowser() }
-              composable(Screen.MyEvents.route) { MyEvents() }
-              composable(Screen.Settings.route) { Settings() }
-
-              composable(
-                  route = Screen.AssociationDetails.route + "/{associationId}",
-                  arguments = listOf(navArgument("associationId") { type = NavType.StringType })) {
-                      backStackEntry ->
-                    val associationId = backStackEntry.arguments?.getString("associationId") ?: ""
-                    AssociationDetailsScreen(associationId = associationId)
-                  }
-            }
+          composable(Screen.Settings.route) {
+            SettingsScreen(
+                auth = auth,
+                onSignedOut = { navigationActions.navigateTo(Screen.SignIn) },
+            )
+          }
+        }
       }
 }

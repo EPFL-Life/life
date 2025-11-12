@@ -37,7 +37,7 @@ class EventDetailsTest {
                   id = "AeroPoly",
                   description = "Description",
                   eventCategory = EventCategory.ACADEMIC),
-          tags = setOf("workshop"),
+          tags = listOf("workshop"),
           price = Price(10u),
           pictureUrl =
               "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")
@@ -256,7 +256,7 @@ class EventDetailsTest {
 
   @Test
   fun content_HandlesEventWithEmptyTags() {
-    val eventWithNoTags = sampleEvent.copy(tags = emptySet())
+    val eventWithNoTags = sampleEvent.copy(tags = emptyList())
     composeTestRule.setContent {
       EventDetailsContent(event = eventWithNoTags, viewModel = viewModel())
     }
@@ -266,7 +266,7 @@ class EventDetailsTest {
 
   @Test
   fun content_HandlesEventWithMultipleTags() {
-    val eventWithTags = sampleEvent.copy(tags = setOf("workshop", "tech", "drone", "engineering"))
+    val eventWithTags = sampleEvent.copy(tags = listOf("workshop", "tech", "drone", "engineering"))
     composeTestRule.setContent {
       EventDetailsContent(event = eventWithTags, viewModel = viewModel())
     }

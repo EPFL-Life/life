@@ -7,7 +7,7 @@ sealed class Screen(
     val name: String,
     val isTopLevelDestination: Boolean = false
 ) {
-  object Auth : Screen(route = "auth", name = "Authentication")
+  object SignIn : Screen(route = "signin", name = "SignIn")
 
   object HomeScreen :
       Screen(route = "homescreen", name = "HomeScreen", isTopLevelDestination = true)
@@ -20,8 +20,7 @@ sealed class Screen(
 
   object Settings : Screen(route = "settings", name = "Settings", isTopLevelDestination = true)
 
-  object AssociationDetails :
-      Screen(route = "associationdetails/{associationId}", name = "AssociationDetails")
+  object AssociationDetails : Screen(route = "associationdetails", name = "AssociationDetails")
 }
 
 open class NavigationActions(
@@ -42,7 +41,7 @@ open class NavigationActions(
         launchSingleTop = true
         popUpTo(screen.route) { inclusive = true }
       }
-      if (screen !is Screen.Auth) {
+      if (screen !is Screen.SignIn) {
         // Restore state when reselecting a previously selected item
         restoreState = true
       }
@@ -61,5 +60,10 @@ open class NavigationActions(
    */
   open fun currentRoute(): String {
     return navController.currentDestination?.route ?: ""
+  }
+
+  fun navigateToAssociationDetails(associationId: String) {
+    val route = "${Screen.AssociationDetails.route}/$associationId"
+    navController.navigate(route)
   }
 }

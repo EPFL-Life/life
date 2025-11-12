@@ -2,6 +2,7 @@ package ch.epfllife.ui.endToEnd
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -10,8 +11,18 @@ import androidx.test.espresso.NoActivityResumedException
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import ch.epfllife.ThemedApp
+import ch.epfllife.model.authentication.Auth
+import ch.epfllife.model.authentication.SignInResult
+import ch.epfllife.ui.authentication.SignInScreenTestTags
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.navigation.Tab
+import ch.epfllife.ui.settings.SettingsScreenTestTags
+import ch.epfllife.utils.FakeCredentialManager
+import ch.epfllife.utils.setUpEmulatorAuth
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -19,6 +30,7 @@ import org.junit.Test
 class EndToEndTest {
 
   @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+  private val auth = Auth(FakeCredentialManager.withDefaultTestUser)
 
   @Before
   fun setup() {
@@ -29,11 +41,24 @@ class EndToEndTest {
     // https://stackoverflow.com/questions/39457305/android-testing-waited-for-the-root-of-the-view-hierarchy-to-have-window-focus
     UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         .executeShellCommand("am broadcast -a android.intent.action.CLOSE_SYSTEM_DIALOGS")
-    composeTestRule.setContent { ThemedApp() }
+    setUpEmulatorAuth(auth, "EndToEndTest")
+  }
+
+  fun useLoggedInApp() {
+    runTest {
+      val signInResult = auth.signInWithCredential(FakeCredentialManager.defaultUserCredentials)
+      Assert.assertTrue("Sign in must succeed", signInResult is SignInResult.Success)
+    }
+    composeTestRule.setContent { ThemedApp(auth) }
+  }
+
+  fun useLoggedOutApp() {
+    composeTestRule.setContent { ThemedApp(auth) }
   }
 
   @Test
   fun canGoThroughAllTabs() {
+    useLoggedInApp()
     Tab.tabs.forEach { tab ->
       composeTestRule.onNodeWithTag(NavigationTestTags.getTabTestTag(tab)).performClick()
       composeTestRule
@@ -44,16 +69,44 @@ class EndToEndTest {
 
   @Test
   fun canExitWithBackPressFromHome() {
+    useLoggedInApp()
     assertBackPressWouldExit()
   }
 
-  @Test fun canExitWithDoubleBackPressFromSettings() = canExitWithDoublePressFromTab(Tab.Settings)
+  @Test
+  fun canExitWithDoubleBackPressFromSettings() {
+    useLoggedInApp()
+    canExitWithDoublePressFromTab(Tab.Settings)
+  }
 
   @Test
-  fun canExitWithDoubleBackPressFromAssociationBrowser() =
-      canExitWithDoublePressFromTab(Tab.AssociationBrowser)
+  fun canExitWithDoubleBackPressFromAssociationBrowser() {
+    useLoggedInApp()
+    canExitWithDoublePressFromTab(Tab.AssociationBrowser)
+  }
 
-  @Test fun canExitWithDoubleBackPressFromMyEvents() = canExitWithDoublePressFromTab(Tab.MyEvents)
+  @Test
+  fun canExitWithDoubleBackPressFromMyEvents() {
+    useLoggedInApp()
+    canExitWithDoublePressFromTab(Tab.MyEvents)
+  }
+
+  @Test
+  fun canSignInAndOutAgain() {
+    useLoggedOutApp()
+    Assert.assertNull(Firebase.auth.currentUser)
+    composeTestRule.onNodeWithTag(NavigationTestTags.SIGN_IN_SCREEN).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(SignInScreenTestTags.SIGN_IN_BUTTON).performClick()
+    composeTestRule.waitUntil(5000) {
+      composeTestRule.onNodeWithTag(NavigationTestTags.HOMESCREEN_SCREEN).isDisplayed()
+    }
+    Assert.assertNotNull(Firebase.auth.currentUser)
+    composeTestRule.onNodeWithTag(NavigationTestTags.SETTINGS_TAB).performClick()
+    composeTestRule.onNodeWithTag(NavigationTestTags.SETTINGS_SCREEN).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(SettingsScreenTestTags.SIGN_OUT_BUTTON).performClick()
+    composeTestRule.onNodeWithTag(NavigationTestTags.SIGN_IN_SCREEN).assertIsDisplayed()
+    Assert.assertNull(Firebase.auth.currentUser)
+  }
 
   private fun canExitWithDoublePressFromTab(tab: Tab) {
     composeTestRule.onNodeWithTag(NavigationTestTags.getTabTestTag(tab)).performClick()

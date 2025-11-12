@@ -1,6 +1,9 @@
 package ch.epfllife.model.user
 
-class UserRepositoryLocal : UserRepository {
+import ch.epfllife.model.event.EventRepositoryLocal
+
+class UserRepositoryLocal(private var eventRepositoryLocal: EventRepositoryLocal? = null) :
+    UserRepository {
 
   // In-memory storage for users (use this only for testing)
   private val users = mutableMapOf<String, User>()
@@ -73,5 +76,69 @@ class UserRepositoryLocal : UserRepository {
     } else {
       Result.success(Unit)
     }
+  }
+
+  override suspend fun subscribeToEvent(eventId: String): Result<Unit> {
+    val currentUser = getCurrentUser()
+
+    // case 1: getCurrentUser() returns a null object
+    if (currentUser == null) {
+      return Result.failure(NoSuchElementException("No user is currently logged in"))
+    }
+
+    // case 2: check that the event repository is initialized
+    val eventRepo =
+        eventRepositoryLocal
+            ?: return Result.failure(
+                IllegalStateException("EventRepository not initialized in UserRepositoryLocal."))
+
+    // case 3: when user tries to subscribe to an invalid event
+    if (eventRepo.getEvent(eventId) == null) {
+      return Result.failure(
+          NoSuchElementException("Event with ID $eventId does not exist in the repository."))
+    }
+
+    // case 4: the user is already enrolled to event
+    if (currentUser.enrolledEvents.contains(eventId)) {
+      return Result.failure(
+          IllegalArgumentException("User is already subscribed to event with ID: $eventId"))
+    }
+
+    // case 5: user can enroll to event
+    val updatedUser = currentUser.copy(enrolledEvents = currentUser.enrolledEvents + eventId)
+    // reused updateUser() method
+    return updateUser(currentUser.id, updatedUser)
+  }
+
+  override suspend fun unsubscribeFromEvent(eventId: String): Result<Unit> {
+    val currentUser = getCurrentUser()
+
+    // case 1: getCurrentUser() returns a null object
+    if (currentUser == null) {
+      return Result.failure(NoSuchElementException("No user is currently logged in"))
+    }
+
+    // case 2: check that the event repository is initialized
+    val eventRepo =
+        eventRepositoryLocal
+            ?: return Result.failure(
+                IllegalStateException("EventRepository not initialized in UserRepositoryLocal."))
+
+    // case 3: when user tries to unsubscribe to an invalid event
+    if (eventRepo.getEvent(eventId) == null) {
+      return Result.failure(
+          NoSuchElementException("Event with ID $eventId does not exist in the repository."))
+    }
+
+    // case 4: the user is trying to unsubscribe from an event they are not subscribed to
+    if (!currentUser.enrolledEvents.contains(eventId)) {
+      return Result.failure(
+          IllegalArgumentException("User is not subscribed to event with ID: $eventId"))
+    }
+
+    // case 5: user can unsubscribe to event
+    val updatedUser = currentUser.copy(enrolledEvents = currentUser.enrolledEvents - eventId)
+    // reused updateUser() method
+    return updateUser(currentUser.id, updatedUser)
   }
 }

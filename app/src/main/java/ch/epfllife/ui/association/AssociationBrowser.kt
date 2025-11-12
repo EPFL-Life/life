@@ -25,6 +25,7 @@ import ch.epfllife.ui.navigation.NavigationTestTags
 @Composable
 fun AssociationBrowser(
     modifier: Modifier = Modifier,
+    onAssociationClick: (associationId: String) -> Unit
 ) {
   var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
   val subscribedAssociations = remember {
@@ -89,8 +90,7 @@ fun AssociationBrowser(
               verticalArrangement = Arrangement.spacedBy(12.dp),
               modifier = Modifier.fillMaxSize()) {
                 items(shownAssociations, key = { it.id }) { assoc ->
-                  AssociationCard(
-                      association = assoc, onClick = { /* TODO: Navigate to association details */})
+                  AssociationCard(association = assoc, onClick = { onAssociationClick(assoc.id) })
                 }
               }
         }
@@ -124,5 +124,5 @@ private fun EmptyAssociationsMessage(
 @Preview(showBackground = true)
 @Composable
 private fun AssociationBrowserPreview() {
-  MaterialTheme { AssociationBrowser() }
+  MaterialTheme { AssociationBrowser(onAssociationClick = {}) }
 }

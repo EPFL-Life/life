@@ -2,6 +2,15 @@
     <string name="app_name">EPFL Life</string>
     <string name="default_web_client_id">85738580828-ovg7unu9rcn0cckulm8immn9dkv1eu77.apps.googleusercontent.com</string>
 
+    <!-- SignIn Screen -->
+    <string name="signin_welcome">Welcome</string>
+    <string name="signin_epfllife_logo_alt_text">EPFLLife Logo</string>
+    <string name="signin_google_logo_alt_text">Google Logo</string>
+    <string name="signin_success_message">Sign in was successful</string>
+    <string name="signin_failure_message">Sign in failed</string>
+    <string name="signin_cancelled_message">Sign in cancelled by the user</string>
+    <string name="signin_with_google">Sign in with Google</string>
+
     <!-- Home screen -->
     <string name="home_empty_title">There’s nothing here!</string>
     <string name="home_empty_description">
@@ -38,4 +47,6 @@
     <string name="about_placeholder">No description available.</string>
     <string name="upcoming_events_title">Upcoming Events</string>
 
+    <!-- Settings screen-->
+    <string name="signout_successful">Sign out successful</string>
 </resources>

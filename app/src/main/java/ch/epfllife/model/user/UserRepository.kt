@@ -61,4 +61,20 @@ interface UserRepository {
    * @return A [Result] indicating success or failure.
    */
   suspend fun deleteUser(userId: String): Result<Unit>
+
+  /**
+   * Adds a new event to the currently authenticated user's subscriptions.
+   *
+   * @param eventId The unique identifier of the Event to subscribe to.
+   * @return A [Result] indicating success or failure.
+   */
+  suspend fun subscribeToEvent(eventId: String): Result<Unit>
+
+  /**
+   * Removes an event ID from the currently authenticated user's subscriptions.
+   *
+   * @param eventId The unique identifier of the Event to unsubscribe from.
+   * @return A [Result] indicating success or failure.
+   */
+  suspend fun unsubscribeFromEvent(eventId: String): Result<Unit>
 }

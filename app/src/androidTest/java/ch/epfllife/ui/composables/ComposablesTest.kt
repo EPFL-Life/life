@@ -29,7 +29,7 @@ class ComposablesTest {
                   name = "TestAssociation",
                   description = "This is a test",
                   eventCategory = EventCategory.ACADEMIC),
-          tags = emptySet(),
+          tags = emptyList(),
           price = Price(0u),
       )
   // ============ SearchBar Tests ============

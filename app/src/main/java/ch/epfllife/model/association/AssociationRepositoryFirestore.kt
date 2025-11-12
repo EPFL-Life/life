@@ -26,38 +26,79 @@ class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : Associ
     return snapshot.mapNotNull { documentToAssociation(it) }
   }
 
-  override suspend fun createAssociation(association: Association) {
+  override suspend fun createAssociation(association: Association): Result<Unit> {
     db.collection(FirestoreCollections.ASSOCIATIONS)
         .document(association.id)
         .set(association)
         .await()
+    return Result.success(Unit)
   }
 
-  override suspend fun updateAssociation(newAssociation: Association) {
+  override suspend fun updateAssociation(
+      associationId: String,
+      newAssociation: Association
+  ): Result<Unit> {
 
-    // extract doc reference
-    val docRef = db.collection(FirestoreCollections.ASSOCIATIONS).document(newAssociation.id)
-
-    // check if doc does NOT exist
-    if (!docRef.get().await().exists()) {
-      // Throw an error because we can't update a non-existent document
-      throw NoSuchElementException(
-          "Association with id ${newAssociation.id} not found! Cannot update.")
+    // 1. Check if the object's ID matches the parameter ID
+    if (associationId != newAssociation.id) {
+      return Result.failure(
+          IllegalArgumentException(
+              "Association ID mismatch. Parameter was $associationId but object ID was ${newAssociation.id}"))
     }
 
-    // if it exists update it
-    docRef.set(newAssociation).await()
+    return try {
+      // 2. Get the document reference
+      val docRef = db.collection(FirestoreCollections.ASSOCIATIONS).document(associationId)
+
+      // 3. Check if the association to update even exists
+      if (!docRef.get().await().exists()) {
+        return Result.failure(
+            NoSuchElementException("Cannot update. Association not found with ID: $associationId"))
+      }
+
+      // 4. Perform the update
+      docRef.set(newAssociation).await()
+      Result.success(Unit)
+    } catch (e: Exception) {
+      // Handle any other Firestore or coroutine exceptions
+      Result.failure(e)
+    }
   }
 
-  //
-  override suspend fun getEventsForAssociation(associationId: String): List<Event> {
-    val snapshot =
-        db.collection(FirestoreCollections.EVENTS)
-            .whereEqualTo("associationId", associationId)
-            .get()
-            .await()
+  override suspend fun getEventsForAssociation(associationId: String): Result<List<Event>> {
+    // Result.runCatching will automatically catch any exceptions
+    // from the .await() call and return a Result.Failure.
+    return Result.runCatching {
+      val snapshot =
+          db.collection(FirestoreCollections.EVENTS)
+              .whereEqualTo("associationId", associationId)
+              .get()
+              .await()
 
-    return snapshot.mapNotNull { EventRepositoryFirestore.documentToEvent(it) }
+      // If the code reaches here, it was successful,
+      // and this list will be returned as Result.Success
+      snapshot.mapNotNull { EventRepositoryFirestore.documentToEvent(it) }
+    }
+  }
+
+  override suspend fun deleteAssociation(associationId: String): Result<Unit> {
+    return try {
+      // 1. Get the document reference
+      val docRef = db.collection(FirestoreCollections.ASSOCIATIONS).document(associationId)
+
+      // 2. Check if the association to delete even exists
+      if (!docRef.get().await().exists()) {
+        return Result.failure(
+            NoSuchElementException("Cannot delete. Association not found with ID: $associationId"))
+      }
+
+      // 3. Perform the deletion
+      docRef.delete().await()
+      Result.success(Unit)
+    } catch (e: Exception) {
+      // Handle any other Firestore or coroutine exceptions
+      Result.failure(e)
+    }
   }
 
   // helper function for parsing
@@ -93,13 +134,26 @@ class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : Associ
         // Convert the String to the EventCategory enum value
         val eventCategory = EventCategory.valueOf(eventCategoryString.uppercase())
 
-        // 5. Construct the Association object
+        // 5. Get the optional about field
+        val about = document.getString("about")
+
+        // 6. Get the optional socialLinks field
+        val socialLinks =
+            (document.get("socialLinks") as? Map<*, *>)?.let { map ->
+              map.entries
+                  .filter { (k, v) -> k is String && v is String }
+                  .associate { (k, v) -> k as String to v as String }
+            }
+
+        // 7. Construct the Association object
         Association(
             id = id,
             name = name,
             description = description,
             pictureUrl = pictureUrl,
-            eventCategory = eventCategory)
+            eventCategory = eventCategory,
+            about = about,
+            socialLinks = socialLinks)
       } catch (e: NullPointerException) {
         // this can happen when one of the required fields is not present
         Log.e("AssociationRepository", "Error converting document to Association", e)

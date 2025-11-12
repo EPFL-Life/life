@@ -15,7 +15,9 @@ object ExampleUsers {
 
   val user2 =
       User(
-          id = "user202", name = "Bella", subscriptions = setOf("asso-cs", "asso-belec", "asso-sat")
+          id = "user202",
+          name = "Bella",
+          subscriptions = listOf("asso-cs", "asso-belec", "asso-sat")
           // userSettings null by default
           )
 
@@ -23,7 +25,8 @@ object ExampleUsers {
       User(
           id = "user303",
           name = "Charlie",
-          subscriptions = setOf("asso-robotics"),
+          subscriptions = listOf("asso-robotics"),
+          enrolledEvents = listOf("2"),
           userSettings = UserSettings())
 
   // A list of all sample users for convenience

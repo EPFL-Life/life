@@ -2,6 +2,7 @@ package ch.epfllife.model.association
 
 import ch.epfllife.model.event.EventCategory
 
+/** If this is modified please also fix documentToAssociation() parser accordingly! */
 data class Association(
     val id: String,
     val name: String,
@@ -9,6 +10,6 @@ data class Association(
     val pictureUrl: String? = null,
     val eventCategory: EventCategory,
     val about: String? = null,
-    val socialLinks: Map<String, String>? = null
+    val socialLinks: Map<String, String>? = emptyMap()
 )
 // add about, social links

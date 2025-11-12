@@ -23,32 +23,67 @@ class AssociationRepositoryLocal(private val eventRepository: EventRepository) :
     return associations.toList()
   }
 
-  override suspend fun createAssociation(association: Association) {
+  override suspend fun createAssociation(association: Association): Result<Unit> {
+
+    // check if association with associationId already exists
+    if (associations.any { it.id == association.id }) {
+      return Result.failure(
+          IllegalArgumentException("Association with id ${association.id} already exists!"))
+    }
+
+    // add new association
     associations.add(association)
+    return Result.success(Unit)
   }
 
-  override suspend fun updateAssociation(newAssociation: Association) {
-    val toBeUpdatedId = newAssociation.id
+  override suspend fun deleteAssociation(associationId: String): Result<Unit> {
+    // remove association
+    val removedAssociation = associations.removeIf { it.id == associationId }
 
-    // check if id exists
-    if (!associations.any() { it.id == toBeUpdatedId }) {
-      throw NoSuchElementException(
-          "Association with id $toBeUpdatedId not found! Can NOT be updated!")
+    // check if association exists and return failure/success
+    return if (removedAssociation) {
+      Result.success(Unit)
+    } else {
+      Result.failure(NoSuchElementException("Association not found with ID: $associationId"))
     }
-
-    // replace the old association with the new one (based on ID)
-    associations.removeIf { it.id == toBeUpdatedId }
-    associations.add(newAssociation)
   }
 
-  override suspend fun getEventsForAssociation(associationId: String): List<Event> {
+  override suspend fun updateAssociation(
+      associationId: String,
+      newAssociation: Association
+  ): Result<Unit> {
 
-    if (!associations.any() { it.id == associationId }) {
-      throw NoSuchElementException(
-          "Association with id $associationId not found! Can NOT return list of events!")
+    // 1. Find the index of the association to update
+    val existingIndex = associations.indexOfFirst { it.id == associationId }
+
+    // 2. Check if the association to update even exists
+    if (existingIndex == -1) {
+      return Result.failure(
+          NoSuchElementException("Cannot update. Association not found with ID: $associationId"))
     }
 
-    // return list of events
-    return eventRepository.getAllEvents().filter() { it.association.id == associationId }
+    // 3. Check if the object's ID matches the parameter ID
+    if (associationId != newAssociation.id) {
+      return Result.failure(
+          IllegalArgumentException(
+              "Association ID mismatch. Parameter was $associationId but object ID was ${newAssociation.id}"))
+    }
+
+    // 4. Perform the update by replacing the item at its index
+    associations[existingIndex] = newAssociation
+    return Result.success(Unit)
+  }
+
+  // In your Repository implementation
+  override suspend fun getEventsForAssociation(associationId: String): Result<List<Event>> {
+    return Result.runCatching {
+      // check association exists
+      if (!associations.any { it.id == associationId }) {
+        throw NoSuchElementException("Association with id $associationId not found!")
+      }
+
+      // inefficient but works for testing
+      eventRepository.getAllEvents().filter() { it.association.id == associationId }
+    }
   }
 }
