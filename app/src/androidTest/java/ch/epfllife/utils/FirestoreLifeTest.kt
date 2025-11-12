@@ -104,9 +104,7 @@ open class FirestoreLifeTest {
         .await()
   }
 
-  /**
-   * Helper to get the number of events. Used in EventRepositoryFirestoreTest.kt
-   */
+  /** Helper to get the number of events. Used in EventRepositoryFirestoreTest.kt */
   suspend fun getEventCount(): Int {
     return FirebaseEmulator.firestore.collection(FirestoreCollections.EVENTS).get().await().size()
   }
