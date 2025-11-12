@@ -16,6 +16,7 @@ import org.mockito.Mockito.mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
 
+
 class EventRepositoryFirestoreTest : FirestoreLifeTest() {
 
   @Test
@@ -229,5 +230,115 @@ class EventRepositoryFirestoreTest : FirestoreLifeTest() {
 
     val result = EventRepositoryFirestore.documentToEvent(mockDocument)
     assertNull(result)
+  }
+
+  @Test
+  fun getEventReturnsEventWhenDocumentExistsAndValid() = runTest {
+    val eventId = "event123"
+    val expected =
+        Event(
+            id = eventId,
+            title = "Kotlin Meetup",
+            description = "A meetup about Kotlin",
+            time = "2025-11-10T18:00:00Z",
+            pictureUrl = "https://example.com/pic.png",
+            price = 150u,
+            location = Location(name = "Main Hall", latitude = 46.5191, longitude = 6.5668),
+            tags = listOf("kotlin", "meetup"),
+            association =
+                Association(
+                    id = "assoc1",
+                    name = "EPFL Life",
+                    description = "Student association",
+                    pictureUrl = "https://example.com/assoc.png",
+                    eventCategory = EventCategory.SPORTS))
+
+    // Mock document snapshot with fields
+    val doc = mock(DocumentSnapshot::class.java)
+    `when`(doc.exists()).thenReturn(true)
+    `when`(doc.id).thenReturn(expected.id)
+    `when`(doc.getString("title")).thenReturn(expected.title)
+    `when`(doc.getString("description")).thenReturn(expected.description)
+    `when`(doc.getString("time")).thenReturn(expected.time)
+    `when`(doc.getString("pictureUrl")).thenReturn(expected.pictureUrl)
+
+    val locMap =
+        mapOf(
+            "name" to expected.location.name,
+            "latitude" to expected.location.latitude,
+            "longitude" to expected.location.longitude)
+    `when`(doc.get("location")).thenReturn(locMap)
+    `when`(doc.get("tags")).thenReturn(expected.tags.toList())
+    `when`(doc.getLong("price")).thenReturn(expected.price.toLong())
+
+    // Association reference -> snapshot
+    val assocRef = mock(DocumentReference::class.java)
+    `when`(doc.get("association")).thenReturn(assocRef)
+    val assocSnap = mock(DocumentSnapshot::class.java)
+    `when`(assocSnap.id).thenReturn(expected.association.id)
+    `when`(assocSnap.get("name")).thenReturn(expected.association.name)
+    `when`(assocSnap.getString("description")).thenReturn(expected.association.description)
+    `when`(assocSnap.getString("pictureUrl")).thenReturn(expected.association.pictureUrl)
+    `when`(assocSnap.getString("eventCategory")).thenReturn(expected.association.eventCategory.name)
+    `when`(assocRef.get()).thenReturn(Tasks.forResult(assocSnap))
+
+    // Mock Firestore chain: db.collection(...).document(eventId).get()
+    val db = mock(FirebaseFirestore::class.java)
+    val col = mock(com.google.firebase.firestore.CollectionReference::class.java)
+    val docRef = mock(DocumentReference::class.java)
+    `when`(db.collection(FirestoreCollections.EVENTS)).thenReturn(col)
+    `when`(col.document(eventId)).thenReturn(docRef)
+    `when`(docRef.get()).thenReturn(Tasks.forResult(doc))
+
+    val repo = EventRepositoryFirestore(db)
+    val result = repo.getEvent(eventId)
+
+    assertEquals(expected, result)
+  }
+
+  @Test
+  fun getEventThrowsNoSuchElementWhenDocumentMissing() = runTest {
+    val eventId = "missing"
+    val doc = mock(DocumentSnapshot::class.java)
+    `when`(doc.exists()).thenReturn(false)
+
+    val db = mock(FirebaseFirestore::class.java)
+    val col = mock(com.google.firebase.firestore.CollectionReference::class.java)
+    val docRef = mock(DocumentReference::class.java)
+    `when`(db.collection(FirestoreCollections.EVENTS)).thenReturn(col)
+    `when`(col.document(eventId)).thenReturn(docRef)
+    `when`(docRef.get()).thenReturn(Tasks.forResult(doc))
+
+    val repo = EventRepositoryFirestore(db)
+    try {
+      repo.getEvent(eventId)
+      fail("Expected NoSuchElementException when document does not exist")
+    } catch (e: NoSuchElementException) {
+      // expected
+    }
+  }
+
+  @Test
+  fun getEventThrowsIllegalStateWhenParsingFails() = runTest {
+    val eventId = "badparse"
+    val doc = mock(DocumentSnapshot::class.java)
+    `when`(doc.exists()).thenReturn(true)
+    // Missing required field 'title' -> documentToEvent will return null
+    `when`(doc.getString("title")).thenReturn(null)
+
+    val db = mock(FirebaseFirestore::class.java)
+    val col = mock(com.google.firebase.firestore.CollectionReference::class.java)
+    val docRef = mock(DocumentReference::class.java)
+    `when`(db.collection(FirestoreCollections.EVENTS)).thenReturn(col)
+    `when`(col.document(eventId)).thenReturn(docRef)
+    `when`(docRef.get()).thenReturn(Tasks.forResult(doc))
+
+    val repo = EventRepositoryFirestore(db)
+    try {
+      repo.getEvent(eventId)
+      fail("Expected IllegalStateException when parsing fails")
+    } catch (e: IllegalStateException) {
+      // expected
+    }
   }
 }
