@@ -1,14 +1,13 @@
-package ch.epfllife.ui.composables
+package ch.epfllife.model.user
 
-import ch.epfllife.model.user.Price
-import org.junit.Assert.assertEquals
+import org.junit.Assert
 import org.junit.Test
 
 class PriceFormatterTest {
 
   fun assertFormatting(priceInCents: UInt, expected: String) {
     val result = Price(priceInCents).formatPrice()
-    assertEquals(expected, result)
+    Assert.assertEquals(expected, result)
   }
 
   @Test
