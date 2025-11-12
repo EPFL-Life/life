@@ -5,4 +5,5 @@ plugins {
     alias(libs.plugins.ktfmt) apply false
     alias(libs.plugins.gms) apply false
     //id("com.google.gms.google-services") version "4.4.3" apply false
+    kotlin("plugin.serialization") version "1.9.0"
 }

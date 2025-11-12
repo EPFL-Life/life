@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -51,7 +52,10 @@ class EventDetailsScreenTest {
                 "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")
 
     composeTestRule.setContent {
-      Theme { EventDetailsContent(event = sampleEvent, onGoBack = {}, viewModel = viewModel()) }
+      Theme {
+        EventDetailsContent(
+            event = sampleEvent, onGoBack = {}, onOpenMap = {}, viewModel = viewModel())
+      }
     }
   }
 
@@ -86,8 +90,10 @@ class EventDetailsScreenTest {
   /** Checks that the “View Location on Map” section is present and clickable. */
   @Test
   fun viewLocationOnMap_isDisplayedAndClickable() {
-    composeTestRule.onNodeWithText("View Location on Map").assertIsDisplayed()
-    composeTestRule.onNodeWithText("View Location on Map").performClick()
+    composeTestRule
+        .onNodeWithTag(EventDetailsTestTags.VIEW_LOCATION_BUTTON)
+        .assertIsDisplayed()
+        .performClick()
   }
 
   /** Ensures that the enrolment button is visible and can be clicked. */

@@ -21,11 +21,13 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import ch.epfllife.model.authentication.Auth
+import ch.epfllife.model.map.Location
 import ch.epfllife.ui.association.AssociationBrowser
 import ch.epfllife.ui.association.AssociationDetailsScreen
 import ch.epfllife.ui.authentication.SignInScreen
 import ch.epfllife.ui.calendar.CalendarScreen
 import ch.epfllife.ui.eventDetails.EventDetailsScreen
+import ch.epfllife.ui.eventDetails.MapScreen
 import ch.epfllife.ui.home.HomeScreen
 import ch.epfllife.ui.navigation.BottomNavigationMenu
 import ch.epfllife.ui.navigation.NavigationActions
@@ -34,6 +36,8 @@ import ch.epfllife.ui.navigation.Screen
 import ch.epfllife.ui.navigation.Tab
 import ch.epfllife.ui.settings.SettingsScreen
 import ch.epfllife.ui.theme.Theme
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 class MainActivity : ComponentActivity() {
 
@@ -152,7 +156,24 @@ fun App(
                 val eventId =
                     backStackEntry.arguments?.getString("eventId")
                         ?: error("eventId is required for EventDetails screen")
-                EventDetailsScreen(eventId = eventId, onGoBack = { navigationActions.goBack() })
+                EventDetailsScreen(
+                    eventId = eventId,
+                    onGoBack = { navigationActions.goBack() },
+                    onOpenMap = { location ->
+                      val encodedLocation = Json.encodeToString(location)
+                      navigationActions.navigateToScreenWithId(Screen.Map, encodedLocation)
+                    })
+              }
+
+          composable(
+              route = Screen.Map.route + "/{location}",
+              arguments = listOf(navArgument("location") { type = NavType.StringType })) {
+                  backStackEntry ->
+                val encodedLocation =
+                    backStackEntry.arguments?.getString("location")
+                        ?: error("eventId is required for EventDetails screen")
+                val location = Json.decodeFromString<Location>(encodedLocation)
+                MapScreen(location = location, onGoBack = { navigationActions.goBack() })
               }
 
           composable(Screen.Settings.route) {

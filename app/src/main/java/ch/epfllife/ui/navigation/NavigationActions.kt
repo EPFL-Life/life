@@ -23,6 +23,8 @@ sealed class Screen(
   object AssociationDetails : Screen(route = "associationdetails", name = "AssociationDetails")
 
   object EventDetails : Screen(route = "eventdetails", name = "EventDetails")
+
+  object Map : Screen(route = "map", name = "Map")
 }
 
 open class NavigationActions(

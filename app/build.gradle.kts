@@ -1,4 +1,3 @@
-import org.gradle.kotlin.dsl.invoke
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -9,6 +8,7 @@ plugins {
     alias(libs.plugins.ktfmt)
     alias(libs.plugins.gms)
     id("org.sonarqube") version "5.1.0.4882"
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
