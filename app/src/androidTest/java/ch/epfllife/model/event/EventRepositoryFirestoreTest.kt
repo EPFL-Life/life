@@ -28,7 +28,7 @@ class EventRepositoryFirestoreTest {
             pictureUrl = "https://example.com/pic.png",
             price = 150u,
             location = Location(name = "Main Hall", latitude = 46.5191, longitude = 6.5668),
-            tags = setOf("kotlin", "meetup"),
+            tags = listOf("kotlin", "meetup"),
             association =
                 Association(
                     id = "assoc1",

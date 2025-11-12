@@ -113,14 +113,20 @@ fun App(
             HomeScreen(onEventClick = { id -> navigationActions.navigateToEventDetails(id) })
           }
 
-          composable(Screen.AssociationBrowser.route) { AssociationBrowser() }
+          composable(Screen.AssociationBrowser.route) {
+            AssociationBrowser(
+                onAssociationClick = { associationId ->
+                  navigationActions.navigateToAssociationDetails(associationId)
+                })
+          }
           composable(Screen.MyEvents.route) { MyEvents() }
           composable(
               route = Screen.AssociationDetails.route + "/{associationId}",
               arguments = listOf(navArgument("associationId") { type = NavType.StringType })) {
                   backStackEntry ->
                 val associationId = backStackEntry.arguments?.getString("associationId") ?: ""
-                AssociationDetailsScreen(associationId = associationId)
+                AssociationDetailsScreen(
+                    associationId = associationId, onGoBack = { navController.popBackStack() })
               }
 
           // Event details route
