@@ -30,6 +30,7 @@ sealed class EventDetailsUIState {
  *
  * @param repo The repository to fetch events from.
  */
+
 class EventDetailsViewModel(
     private val repo: EventRepository =
         EventRepositoryFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance())
