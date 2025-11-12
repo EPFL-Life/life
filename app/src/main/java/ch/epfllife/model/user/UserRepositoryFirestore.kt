@@ -112,9 +112,13 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
         // 3. Get optional subscriptions list (defaults to empty)
         val subList =
             (document["subscriptions"] as? List<*>)?.mapNotNull { it as? String } ?: emptyList()
-        val subscriptions = subList.toSet()
+        val subscriptions = subList.toList()
 
-        // 4. Handle nested UserSettings data class (FIXED)
+        // 4. Get optional enrolledEvents list (defaults to empty)
+        val enrolledEvents =
+            (document["enrolledEvents"] as? List<*>)?.mapNotNull { it as? String } ?: emptyList()
+
+        // 5. Handle nested UserSettings data class (FIXED)
         // Get the userSettings map from Firestore
         val settingsMap = document.get("userSettings") as? Map<*, *>
         // Get "isDarkMode" from the map, defaulting to 'false' if it or the map doesn't exist
@@ -122,7 +126,12 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
         val userSettings = UserSettings(isDarkMode = isDarkMode)
 
         // 5. Construct the User object
-        User(id = id, name = name, subscriptions = subscriptions, userSettings = userSettings)
+        User(
+            id = id,
+            name = name,
+            subscriptions = subscriptions,
+            enrolledEvents = enrolledEvents,
+            userSettings = userSettings)
       } catch (e: NullPointerException) {
         // this can happen when one of the required fields is not present
         Log.e("UserRepository", "Error converting document to User", e)
