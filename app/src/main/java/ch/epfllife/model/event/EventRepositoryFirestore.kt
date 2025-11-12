@@ -2,6 +2,7 @@ package ch.epfllife.model.event
 
 import android.util.Log
 import ch.epfllife.model.association.Association
+import ch.epfllife.model.association.AssociationRepositoryFirestore
 import ch.epfllife.model.firestore.FirestoreCollections
 import ch.epfllife.model.map.Location
 import com.google.firebase.firestore.DocumentReference
@@ -38,9 +39,10 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
   }
 
   override suspend fun createEvent(event: Event): Result<Unit> {
-    return Result.runCatching {
-      db.collection(FirestoreCollections.EVENTS).document(event.id).set(event).await()
-    }
+    val eventMap = eventToFirestoreMap(event, db)
+
+    db.collection(FirestoreCollections.EVENTS).document(event.id).set(eventMap).await()
+    return Result.success(Unit)
   }
 
   override suspend fun updateEvent(eventId: String, newEvent: Event): Result<Unit> {
@@ -57,7 +59,9 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
       }
 
       // case 3: the event exists and can be updated
-      docRef.set(newEvent).await()
+      val eventMap = eventToFirestoreMap(newEvent, db)
+
+      docRef.set(eventMap).await()
       Result.success(Unit)
     } catch (e: Exception) {
       // Handle any other Firestore or coroutine exceptions
@@ -85,17 +89,36 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
   }
 
   companion object {
+    /**
+     * Converts an [Event] object into a [Map] suitable for Firestore insertion, replacing the full
+     * [Association] object with its [DocumentReference].
+     */
+    private fun eventToFirestoreMap(event: Event, db: FirebaseFirestore): Map<String, Any?> {
+      val associationRef =
+          db.collection(FirestoreCollections.ASSOCIATIONS).document(event.association.id)
+
+      return mapOf(
+          "id" to event.id,
+          "title" to event.title,
+          "description" to event.description,
+          "location" to
+              mapOf(
+                  "name" to event.location.name,
+                  "latitude" to event.location.latitude,
+                  "longitude" to event.location.longitude),
+          "time" to event.time,
+          "association" to associationRef,
+          "tags" to event.tags,
+          "price" to event.price.toLong(),
+          "pictureUrl" to event.pictureUrl,
+      )
+    }
 
     suspend fun getAssociation(document: DocumentSnapshot): Association? {
       val assocRef = document.get("association") as? DocumentReference ?: return null
       val assocSnap = assocRef.get().await()
 
-      return Association(
-          id = assocSnap.id,
-          name = assocSnap.get("name").toString(),
-          description = assocSnap.getString("description")!!,
-          pictureUrl = assocSnap.getString("pictureUrl"),
-          eventCategory = EventCategory.valueOf(assocSnap.getString("eventCategory")!!))
+      return AssociationRepositoryFirestore.documentToAssociation(assocSnap)
     }
 
     /**
