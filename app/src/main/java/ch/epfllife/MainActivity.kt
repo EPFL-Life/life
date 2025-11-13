@@ -24,9 +24,9 @@ import ch.epfllife.model.authentication.Auth
 import ch.epfllife.ui.association.AssociationBrowser
 import ch.epfllife.ui.association.AssociationDetailsScreen
 import ch.epfllife.ui.authentication.SignInScreen
-import ch.epfllife.ui.home.HomeScreen
 import ch.epfllife.ui.calendar.CalendarScreen
 import ch.epfllife.ui.eventDetails.EventDetailsScreen
+import ch.epfllife.ui.home.HomeScreen
 import ch.epfllife.ui.navigation.BottomNavigationMenu
 import ch.epfllife.ui.navigation.NavigationActions
 import ch.epfllife.ui.navigation.NavigationTestTags
@@ -163,6 +163,4 @@ fun App(
           }
         }
       }
-
-
 }
