@@ -19,6 +19,30 @@ import org.mockito.kotlin.whenever
 class EventRepositoryFirestoreTest : FirestoreLifeTest() {
 
   @Test
+  fun uploadAndRetrieveEventWorksCorrectly() = runTest {
+    // Arrange: create an association first (required for event validity)
+    val assoc = ExampleAssociations.association1
+    assocRepository.createAssociation(assoc)
+
+    // Arrange: prepare example event linked to that association
+    val event = ExampleEvents.event1
+
+    // Act: create event in Firestore emulator
+    val createResult = eventRepository.createEvent(event)
+
+    // Assert: creation succeeded
+    assertTrue(createResult.isSuccess)
+    assertEquals(1, getEventCount())
+
+    // Act: retrieve event by ID
+    val retrieved = eventRepository.getEvent(event.id)
+
+    // Assert: event was retrieved and matches the original
+    assertNotNull("Retrieved event should not be null", retrieved)
+    assertEquals(event, retrieved)
+  }
+
+  @Test
   fun createEventReturnsSuccess() = runTest {
     val assoc1 = ExampleAssociations.association1
     // action: create association in database
