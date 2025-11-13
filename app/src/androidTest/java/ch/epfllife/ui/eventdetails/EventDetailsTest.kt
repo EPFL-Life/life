@@ -193,10 +193,10 @@ class EventDetailsTest {
   }
 
   @Test
-  fun viewModel_IsEnrolledReturnsFalse() {
+  fun viewModel_IsEnrolledReturnsFalse() = runTest {
     val viewModel = EventDetailsViewModel()
     val isEnrolled = viewModel.isEnrolled(sampleEvent)
-    assertFalse("isEnrolled should return false (not implemented yet)", isEnrolled)
+    assertFalse("User shouldn't be reported as enrolled in the event", isEnrolled)
   }
 
   @Test

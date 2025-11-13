@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventRepository
 import ch.epfllife.model.event.EventRepositoryFirestore
+import ch.epfllife.model.user.UserRepository
+import ch.epfllife.model.user.UserRepositoryFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,7 +30,9 @@ sealed class EventDetailsUIState {
  */
 class EventDetailsViewModel(
     private val repo: EventRepository =
-        EventRepositoryFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance())
+        EventRepositoryFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance()),
+    private val userRepo: UserRepository =
+        UserRepositoryFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance())
 ) : ViewModel() {
 
   private val _uiState = MutableStateFlow<EventDetailsUIState>(EventDetailsUIState.Loading)
@@ -58,7 +62,13 @@ class EventDetailsViewModel(
     viewModelScope.launch {
       try {
         // TODO: implement logic
-        _uiState.value = EventDetailsUIState.Success(event, isEnrolled = true)
+        userRepo
+            .subscribeToEvent(event.id)
+            .fold(
+                onSuccess = { loadEvent(event.id) },
+                onFailure = { error ->
+                  _uiState.value = EventDetailsUIState.Error("Failed to enrol: ${error.message}")
+                })
       } catch (e: Exception) {
         _uiState.value = EventDetailsUIState.Error("Failed to enrol: ${e.message}")
       }
@@ -69,12 +79,15 @@ class EventDetailsViewModel(
    * Check if user is enrolled, this will be only possible if enrollments are tracked by us (not
    * implemented for now, as we only do redirection for the MVP)
    */
-  fun isEnrolled(event: Event): Boolean {
+  suspend fun isEnrolled(event: Event): Boolean {
     // TODO implement actual logic (Firestore / API call)
     // we need this to decide whether the button should be gray or not ("Enroll in event" or
     // "Enrolled")
-    if (event.id == event.title) return false
-
-    return false
+    return try {
+      val currentUser = userRepo.getCurrentUser()
+      currentUser?.enrolledEvents?.contains(event.id) ?: false
+    } catch (e: Exception) {
+      false
+    }
   }
 }
