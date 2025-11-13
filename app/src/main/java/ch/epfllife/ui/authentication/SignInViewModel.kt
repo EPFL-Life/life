@@ -6,7 +6,12 @@ import androidx.lifecycle.viewModelScope
 import ch.epfllife.R
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.authentication.SignInResult
+import ch.epfllife.model.user.User
+import ch.epfllife.model.user.UserRepository
+import ch.epfllife.model.user.UserRepositoryFirestore
+import ch.epfllife.model.user.UserSettings
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -31,8 +36,13 @@ data class AuthUIState(
  * ViewModel for the Sign-In view.
  *
  * @property auth The auth handler
+ * @property userRepo The user repository to create/check user documents
  */
-class SignInViewModel(private val auth: Auth) : ViewModel() {
+class SignInViewModel(
+    private val auth: Auth,
+    // Add UserRepository, providing a default instance just like in your other ViewModels
+    private val userRepo: UserRepository = UserRepositoryFirestore(FirebaseFirestore.getInstance())
+) : ViewModel() {
 
   private val mutUiState = MutableStateFlow(AuthUIState())
   val uiState: StateFlow<AuthUIState> = mutUiState
@@ -53,9 +63,30 @@ class SignInViewModel(private val auth: Auth) : ViewModel() {
       val newState =
           when (signInResult) {
             is SignInResult.Success -> {
+              // Logic to make sure there is a user object for the user signing in otherwise create
+              // a new user object
+              val firebaseUser = signInResult.user
+              // Check if the user document already exists in Firestore
+              if (userRepo.getUser(firebaseUser.uid) == null) {
+                // It's a new user, create their document
+                val newUser =
+                    User(
+                        id = firebaseUser.uid, // Use Auth UID as document ID
+                        name = firebaseUser.displayName ?: "New User",
+                        subscriptions = emptyList(),
+                        enrolledEvents = emptyList(),
+                        userSettings = UserSettings())
+                try {
+                  userRepo.createUser(newUser)
+                } catch (e: Exception) {
+                  // this should be handled properly but for now we just throw
+                  throw java.lang.Exception("Problem creating new User on first sign-in")
+                }
+              }
+
               AuthUIState(
                   isLoading = false,
-                  user = signInResult.user,
+                  user = firebaseUser,
                   errorMsg = null,
                   signedOut = false,
               )
