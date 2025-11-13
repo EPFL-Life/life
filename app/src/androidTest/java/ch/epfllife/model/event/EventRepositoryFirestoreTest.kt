@@ -1,12 +1,12 @@
 // Kotlin
 package ch.epfllife.model.event
 
+import ch.epfllife.example_data.ExampleAssociations
+import ch.epfllife.example_data.ExampleEvents
 import ch.epfllife.model.association.Association
 import ch.epfllife.model.firestore.FirestoreCollections
 import ch.epfllife.model.map.Location
 import ch.epfllife.model.user.Price
-import ch.epfllife.example_data.ExampleAssociations
-import ch.epfllife.example_data.ExampleEvents
 import ch.epfllife.utils.FirestoreLifeTest
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.DocumentReference
