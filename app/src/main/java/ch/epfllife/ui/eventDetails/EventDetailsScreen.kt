@@ -14,21 +14,23 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import ch.epfllife.R
 import ch.epfllife.model.association.Association
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.map.Location
 import ch.epfllife.ui.composables.BackButton
 import ch.epfllife.ui.composables.Map
+import ch.epfllife.ui.composables.SubscribeButton
 import ch.epfllife.ui.theme.Theme
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -100,6 +102,8 @@ fun EventDetailsContent(
     onOpenMap: (Location) -> Unit,
     viewModel: EventDetailsViewModel,
 ) {
+  val uiState by viewModel.uiState.collectAsState()
+  val isEnrolled = (uiState as EventDetailsUIState.Success).isEnrolled
   val context = LocalContext.current
   Column(
       modifier =
@@ -249,23 +253,16 @@ fun EventDetailsContent(
             )
           }
 
-          // Enroll Button
-          // TODO: button should be gray and say "Enrolled" if user already enrolled -> create a
-          // isEnrolled fun in viewModel
-          Button(
+          SubscribeButton(
+              modifier = Modifier.testTag(EventDetailsTestTags.ENROLL_BUTTON),
               onClick = { viewModel.enrollInEvent(event) },
-              modifier =
-                  Modifier.fillMaxWidth()
-                      .padding(top = 8.dp)
-                      .testTag(EventDetailsTestTags.ENROLL_BUTTON),
-              shape = RoundedCornerShape(6.dp),
-              colors =
-                  ButtonDefaults.buttonColors(
-                      containerColor = Color(0xFFDC2626),
-                      contentColor = Color.White,
-                  ),
+              // TODO: Pass these values as parameters to avoid casts of known states
+              isSubscribed = isEnrolled,
           ) {
-            Text("Enrol in event", style = MaterialTheme.typography.titleMedium)
+            val text =
+                stringResource(
+                    if (isEnrolled) R.string.enrol_in_event else R.string.enrolled_in_event)
+            Text(text, style = MaterialTheme.typography.titleMedium)
           }
         }
       }

@@ -28,6 +28,7 @@ import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.map.Location
 import ch.epfllife.ui.composables.BackButton
 import ch.epfllife.ui.composables.EventCard
+import ch.epfllife.ui.composables.SubscribeButton
 import ch.epfllife.ui.theme.Theme
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -143,15 +144,10 @@ fun AssociationDetailsContent(
                 AssociationDetailsTestTags.SUBSCRIBE_BUTTON
               }
 
-          Button(
+          SubscribeButton(
               onClick = { isSubscribed = !isSubscribed },
-              modifier = Modifier.fillMaxWidth().testTag(subscribeButtonTag),
-              shape = RoundedCornerShape(6.dp),
-              colors =
-                  ButtonDefaults.buttonColors(
-                      containerColor = if (isSubscribed) Color.Gray else Color(0xFFDC2626),
-                      contentColor = Color.White,
-                  ),
+              isSubscribed = isSubscribed,
+              modifier = Modifier.testTag(subscribeButtonTag),
           ) {
             Text(
                 text =
