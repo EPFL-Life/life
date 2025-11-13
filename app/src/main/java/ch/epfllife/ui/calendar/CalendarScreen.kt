@@ -54,7 +54,7 @@ fun CalendarScreen(
                   it.association.name.contains(query, ignoreCase = true)
             }
       }
-            // This excludes any events without a set date!!
+  // This excludes any events without a set date!!
   val grouped =
       shownEvents
           .filter { it.startDateOrNull() != null }
