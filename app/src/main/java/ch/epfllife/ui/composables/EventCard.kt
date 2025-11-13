@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import ch.epfllife.model.event.Event
 
 object EventCardTestTags {
-  const val EVENT_CARD = "eventCard"
+  fun getEventCardTestTag(eventId: String) = "eventCard_$eventId"
 }
 
 @Composable
@@ -31,7 +31,7 @@ fun EventCard(event: Event, modifier: Modifier = Modifier, onClick: () -> Unit) 
       onClick = onClick,
       shape = RoundedCornerShape(12.dp),
       elevation = CardDefaults.elevatedCardElevation(5.dp),
-      modifier = modifier.fillMaxWidth().testTag(EventCardTestTags.EVENT_CARD)) {
+      modifier = modifier.fillMaxWidth().testTag(EventCardTestTags.getEventCardTestTag(event.id))) {
         Column(Modifier.padding(horizontal = 16.dp, vertical = 14.dp)) {
           Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(

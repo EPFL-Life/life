@@ -25,7 +25,8 @@ class EventCardTest {
                   name = "assoc1",
                   id = "assoc1",
                   description = "This is a test",
-                  eventCategory = EventCategory.ACADEMIC),
+                  eventCategory = EventCategory.ACADEMIC,
+              ),
           tags = emptyList(),
           price = 0u,
       )
@@ -34,7 +35,7 @@ class EventCardTest {
   fun isClickable() {
     composeTestRule.assertClickable(
         { clickHandler -> EventCard(event, onClick = clickHandler) },
-        EventCardTestTags.EVENT_CARD,
+        EventCardTestTags.getEventCardTestTag(event.id),
     )
   }
 }

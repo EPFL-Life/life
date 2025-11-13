@@ -12,7 +12,7 @@ import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.utils.FakeCredentialManager
 import ch.epfllife.utils.assertTagIsDisplayed
 import ch.epfllife.utils.assertToastMessage
-import ch.epfllife.utils.setUpEmulatorAuth
+import ch.epfllife.utils.setUpEmulator
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import kotlinx.coroutines.test.runTest
@@ -28,7 +28,7 @@ class SettingsScreenTest {
 
   @Before
   fun setUp() {
-    setUpEmulatorAuth(auth, "SettingsScreenTest")
+    setUpEmulator(auth, "SettingsScreenTest")
     // We need to wait for toasts to disappear before each test,
     // otherwise new toasts might not be displayed.
     composeTestRule.waitForIdle()

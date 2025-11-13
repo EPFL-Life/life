@@ -38,7 +38,7 @@ open class FirestoreLifeTest {
     runTest {
       // Ensure emulator is running and sign in a test user
       // This MUST be inside runTest to ensure it completes before the test
-      setUpEmulatorAuth(auth, "FirestoreLifeTest")
+      setUpEmulator(auth, "FirestoreLifeTest")
 
       // Clear all data before each test
       clearFirestore()
