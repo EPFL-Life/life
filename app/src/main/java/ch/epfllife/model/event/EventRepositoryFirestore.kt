@@ -2,6 +2,7 @@ package ch.epfllife.model.event
 
 import android.util.Log
 import ch.epfllife.model.association.Association
+import ch.epfllife.model.association.AssociationRepositoryFirestore
 import ch.epfllife.model.firestore.FirestoreCollections
 import ch.epfllife.model.map.Location
 import ch.epfllife.model.user.Price
@@ -15,7 +16,7 @@ import kotlinx.coroutines.tasks.await
 class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventRepository {
 
   override fun getNewUid(): String {
-    TODO("Not yet implemented")
+    return db.collection(FirestoreCollections.EVENTS).document().id
   }
 
   override suspend fun getAllEvents(): List<Event> = coroutineScope {
@@ -40,31 +41,85 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
 
   override suspend fun createEvent(event: Event): Result<Unit> {
     return runCatching {
-      db.collection(FirestoreCollections.EVENTS).document(event.id).set(event).await()
+      val eventMap = eventToFirestoreMap(event, db)
+      db.collection(FirestoreCollections.EVENTS).document(event.id).set(eventMap).await()
     }
   }
 
   override suspend fun updateEvent(eventId: String, newEvent: Event): Result<Unit> {
-    // add a check if the eventId is same as newEvent.Id
-    TODO("Not yet implemented")
+    // case 1: ids of the events are different
+    if (eventId != newEvent.id) {
+      return Result.failure(IllegalArgumentException("Provided eventId does not match newEvent.id"))
+    }
+    return try {
+      // case 2: the event doesn't exist
+      val docRef = db.collection(FirestoreCollections.EVENTS).document(eventId)
+      if (!docRef.get().await().exists()) {
+        return Result.failure(
+            NoSuchElementException("Cannot update. Event not found with ID: $eventId"))
+      }
+
+      // case 3: the event exists and can be updated
+      val eventMap = eventToFirestoreMap(newEvent, db)
+
+      docRef.set(eventMap).await()
+      Result.success(Unit)
+    } catch (e: Exception) {
+      // Handle any other Firestore or coroutine exceptions
+      Result.failure(e)
+    }
   }
 
   override suspend fun deleteEvent(eventId: String): Result<Unit> {
-    TODO("Not yet implemented")
+    return try {
+      val docRef = db.collection(FirestoreCollections.EVENTS).document(eventId)
+
+      // case 1: The event to delete doesn't delete exists
+      if (!docRef.get().await().exists()) {
+        return Result.failure(
+            NoSuchElementException("Cannot delete. Event not found with ID: $eventId"))
+      }
+
+      // case 2: the event can be deleted
+      docRef.delete().await()
+      Result.success(Unit)
+    } catch (e: Exception) {
+      // Handle any other Firestore or coroutine exceptions
+      Result.failure(e)
+    }
   }
 
   companion object {
+    /**
+     * Converts an [Event] object into a [Map] suitable for Firestore insertion, replacing the full
+     * [Association] object with its [DocumentReference].
+     */
+    private fun eventToFirestoreMap(event: Event, db: FirebaseFirestore): Map<String, Any?> {
+      val associationRef =
+          db.collection(FirestoreCollections.ASSOCIATIONS).document(event.association.id)
+
+      return mapOf(
+          "id" to event.id,
+          "title" to event.title,
+          "description" to event.description,
+          "location" to
+              mapOf(
+                  "name" to event.location.name,
+                  "latitude" to event.location.latitude,
+                  "longitude" to event.location.longitude),
+          "time" to event.time,
+          "association" to associationRef,
+          "tags" to event.tags,
+          "price" to event.price.toLong(),
+          "pictureUrl" to event.pictureUrl,
+      )
+    }
 
     suspend fun getAssociation(document: DocumentSnapshot): Association? {
       val assocRef = document.get("association") as? DocumentReference ?: return null
       val assocSnap = assocRef.get().await()
 
-      return Association(
-          id = assocSnap.id,
-          name = assocSnap.get("name").toString(),
-          description = assocSnap.getString("description")!!,
-          pictureUrl = assocSnap.getString("pictureUrl"),
-          eventCategory = EventCategory.valueOf(assocSnap.getString("eventCategory")!!))
+      return AssociationRepositoryFirestore.documentToAssociation(assocSnap)
     }
 
     /**
@@ -110,7 +165,7 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
 
         // 5. Handle optional List of Strings
         val tags: List<String> =
-            ((document["tags"] as? List<*>)?.mapNotNull { it as? String } ?: emptyList())
+            (document["tags"] as? List<*>)?.mapNotNull { it as? String } ?: emptyList()
 
         // 6. Handle numeric conversion for price (required)
         // Firestore stores all numbers as Long. Fail if 'price' is missing.
