@@ -342,7 +342,7 @@ class EventRepositoryFirestoreTest : FirestoreLifeTest() {
             "longitude" to expected.location.longitude)
     whenever(doc.get("location")).thenReturn(locMap)
     whenever(doc.get("tags")).thenReturn(expected.tags.toList())
-    whenever(doc.getLong("price")).thenReturn(expected.price.price.toLong())
+    whenever(doc.getLong("price")).thenReturn(expected.price.price.toULong().toLong())
 
     // Association reference -> snapshot
     val assocRef = mock(DocumentReference::class.java)
