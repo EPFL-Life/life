@@ -110,7 +110,7 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
           "time" to event.time,
           "association" to associationRef,
           "tags" to event.tags,
-          "price" to event.price.toLong(),
+          "price" to event.price.price.toLong(),
           "pictureUrl" to event.pictureUrl,
       )
     }
