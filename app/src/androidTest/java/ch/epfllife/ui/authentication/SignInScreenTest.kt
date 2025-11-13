@@ -13,6 +13,7 @@ import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.user.UserRepositoryFirestore
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.utils.FakeCredentialManager
+import ch.epfllife.utils.FirebaseEmulator
 import ch.epfllife.utils.assertTagIsDisplayed
 import ch.epfllife.utils.assertToastMessage
 import ch.epfllife.utils.setUpEmulatorAuth
@@ -25,10 +26,8 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.auth
-import com.google.firebase.firestore.FirebaseFirestore
 import io.mockk.coEvery
 import io.mockk.mockk
-import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
@@ -141,12 +140,7 @@ class SignInScreenTest {
   fun firstSignIn_createsUserInRepository() = runTest {
     var onSignedInCalled = false
 
-    // Arrange
-    val firestore = FirebaseFirestore.getInstance()
-    firestore.useEmulator("10.0.2.2", 8080)
-    firestore.clearPersistence() // optional, start clean
-
-    val repo = UserRepositoryFirestore(firestore)
+    val repo = UserRepositoryFirestore(FirebaseEmulator.firestore)
     val viewModel = SignInViewModel(auth, repo)
 
     // Act
@@ -157,9 +151,10 @@ class SignInScreenTest {
     composeTestRule.waitUntil(5000) { onSignedInCalled }
 
     // Assert
+
     val uid = Firebase.auth.currentUser?.uid!!
-    val snapshot = firestore.collection("users").document(uid).get().await()
-    Assert.assertTrue(snapshot.exists())
+    val user = repo.getUser(uid)
+    Assert.assertNotNull(user)
 
     // cleanup emulator
     repo.deleteUser(uid)
