@@ -12,6 +12,7 @@ import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.GeoPoint
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -332,15 +333,16 @@ class EventRepositoryFirestoreTest : FirestoreLifeTest() {
     whenever(doc.id).thenReturn(expected.id)
     whenever(doc.getString("title")).thenReturn(expected.title)
     whenever(doc.getString("description")).thenReturn(expected.description)
-    whenever(doc.getString("time")).thenReturn(expected.time)
+    val timestamp = com.google.firebase.Timestamp.now()
+    whenever(doc.getTimestamp("time")).thenReturn(timestamp)
     whenever(doc.getString("pictureUrl")).thenReturn(expected.pictureUrl)
 
-    val locMap =
-        mapOf(
-            "name" to expected.location.name,
-            "latitude" to expected.location.latitude,
-            "longitude" to expected.location.longitude)
-    whenever(doc.get("location")).thenReturn(locMap)
+    val geoPoint =
+        com.google.firebase.firestore.GeoPoint(
+            expected.location.latitude, expected.location.longitude)
+    whenever(doc.getGeoPoint("location")).thenReturn(geoPoint)
+    whenever(doc.getString("locationName")).thenReturn(expected.location.name)
+    whenever(doc.get("location")).thenReturn(geoPoint)
     whenever(doc.get("tags")).thenReturn(expected.tags.toList())
     whenever(doc.getLong("price")).thenReturn(expected.price.price.toLong())
 
