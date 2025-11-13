@@ -16,7 +16,7 @@ import ch.epfllife.utils.FakeCredentialManager
 import ch.epfllife.utils.FirebaseEmulator
 import ch.epfllife.utils.assertTagIsDisplayed
 import ch.epfllife.utils.assertToastMessage
-import ch.epfllife.utils.setUpEmulatorAuth
+import ch.epfllife.utils.setUpEmulator
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.Firebase
@@ -51,7 +51,7 @@ class SignInScreenTest {
     composeTestRule.activityRule.scenario.onActivity { activity ->
       decorView = activity.window.decorView
     }
-    setUpEmulatorAuth(auth, "SignInScreenTest")
+    setUpEmulator(auth, "SignInScreenTest")
   }
 
   @Test

@@ -18,7 +18,7 @@ import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.navigation.Tab
 import ch.epfllife.ui.settings.SettingsScreenTestTags
 import ch.epfllife.utils.FakeCredentialManager
-import ch.epfllife.utils.setUpEmulatorAuth
+import ch.epfllife.utils.setUpEmulator
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import kotlinx.coroutines.test.runTest
@@ -41,7 +41,7 @@ class EndToEndTest {
     // https://stackoverflow.com/questions/39457305/android-testing-waited-for-the-root-of-the-view-hierarchy-to-have-window-focus
     UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         .executeShellCommand("am broadcast -a android.intent.action.CLOSE_SYSTEM_DIALOGS")
-    setUpEmulatorAuth(auth, "EndToEndTest")
+    setUpEmulator(auth, "EndToEndTest")
   }
 
   fun useLoggedInApp() {

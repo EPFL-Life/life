@@ -3,6 +3,7 @@ package ch.epfllife.utils
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -12,6 +13,9 @@ import androidx.test.espresso.matcher.RootMatchers.withDecorView
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import ch.epfllife.model.authentication.Auth
+import ch.epfllife.ui.composables.EventCardTestTags
+import ch.epfllife.ui.eventDetails.EventDetailsTestTags
+import ch.epfllife.ui.home.HomeScreenTestTags
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.navigation.Tab
 import org.hamcrest.Matchers.not
@@ -54,13 +58,29 @@ fun ComposeContentTestRule.navigateToTab(tab: Tab) {
   this.onNodeWithTag(screenTag, useUnmergedTree = true).assertIsDisplayed()
 }
 
-fun setUpEmulatorAuth(auth: Auth, test: String) {
+fun ComposeContentTestRule.navigateToEvent(eventId: String) {
+  this.navigateToTab(Tab.HomeScreen)
+  this.onNodeWithTag(HomeScreenTestTags.BUTTON_ALL).performClick()
+  // Wait for event cards to load
+  this.waitUntil(3000) {
+    this.onNodeWithTag(EventCardTestTags.getEventCardTestTag(eventId)).isDisplayed()
+  }
+  this.waitForIdle()
+  this.onNodeWithTag(EventCardTestTags.getEventCardTestTag(eventId)).performClick()
+  // Wait for screen to load
+  this.waitUntil(3000) { this.onNodeWithTag(EventDetailsTestTags.CONTENT).isDisplayed() }
+  this.waitForIdle()
+}
+
+fun setUpEmulator(auth: Auth, test: String) {
   Assert.assertTrue(
       "Firebase emulator must be running for local tests in -> $test",
       FirebaseEmulator.isRunning,
   )
   // Reset to signed out state
   auth.signOut()
+  FirebaseEmulator.clearAuthEmulator() // this does not seem to sign out users though
+  FirebaseEmulator.clearFirestoreEmulator()
 }
 
 fun assertToastMessage(

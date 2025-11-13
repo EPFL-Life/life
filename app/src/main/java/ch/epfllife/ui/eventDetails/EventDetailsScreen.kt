@@ -46,6 +46,7 @@ object EventDetailsTestTags {
   const val EVENT_DESCRIPTION = "eventDescription"
   const val VIEW_LOCATION_BUTTON = "viewLocationButton"
   const val ENROLL_BUTTON = "enrollButton"
+  const val CONTENT = "eventDetailsContent"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -100,164 +101,174 @@ fun EventDetailsContent(
     viewModel: EventDetailsViewModel,
 ) {
   val context = LocalContext.current
-  Column(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface)) {
+  Column(
+      modifier =
+          modifier
+              .fillMaxSize()
+              .background(MaterialTheme.colorScheme.surface)
+              .testTag(EventDetailsTestTags.CONTENT)) {
 
-    // Header with image and overlayed back button
-    Box(modifier = Modifier.fillMaxWidth()) {
-      AsyncImage(
-          model =
-              ImageRequest.Builder(context)
-                  .data(
-                      event.pictureUrl
-                          ?: "https://www.epfl.ch/campus/services/events/wp-content/uploads/2024/09/WEB_Image-Home-Events_ORGANISER.png")
-                  .crossfade(true)
-                  .build(),
-          contentDescription = "Event Image",
-          modifier =
-              Modifier.fillMaxWidth()
-                  .height(260.dp)
-                  .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
-                  .testTag(EventDetailsTestTags.EVENT_IMAGE),
-          contentScale = ContentScale.Crop,
-      )
-
-      // Back Arrow on top of the picture (as in Mockup)
-      BackButton(
-          modifier = Modifier.align(Alignment.TopStart).testTag(EventDetailsTestTags.BACK_BUTTON),
-          onGoBack = onGoBack,
-      )
-    }
-
-    // Start of Text Information
-    Column(
-        modifier =
-            Modifier.fillMaxSize().padding(16.dp).background(MaterialTheme.colorScheme.surface),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-      // Row containing: Title, Club, Price
-      Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Column {
-          Text(
-              text = event.title,
-              style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-              color = MaterialTheme.colorScheme.onSurface,
-              modifier = Modifier.testTag(EventDetailsTestTags.EVENT_TITLE),
+        // Header with image and overlayed back button
+        Box(modifier = Modifier.fillMaxWidth()) {
+          AsyncImage(
+              model =
+                  ImageRequest.Builder(context)
+                      .data(
+                          event.pictureUrl
+                              ?: "https://www.epfl.ch/campus/services/events/wp-content/uploads/2024/09/WEB_Image-Home-Events_ORGANISER.png")
+                      .crossfade(true)
+                      .build(),
+              contentDescription = "Event Image",
+              modifier =
+                  Modifier.fillMaxWidth()
+                      .height(260.dp)
+                      .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
+                      .testTag(EventDetailsTestTags.EVENT_IMAGE),
+              contentScale = ContentScale.Crop,
           )
-          Text(
-              text = event.association.name,
-              style = MaterialTheme.typography.bodyMedium,
-              color = MaterialTheme.colorScheme.onSurfaceVariant,
-              modifier = Modifier.testTag(EventDetailsTestTags.EVENT_ASSOCIATION),
+
+          // Back Arrow on top of the picture (as in Mockup)
+          BackButton(
+              modifier =
+                  Modifier.align(Alignment.TopStart).testTag(EventDetailsTestTags.BACK_BUTTON),
+              onGoBack = onGoBack,
           )
         }
-        Text(
-            text = event.price.let { "CHF $it" },
-            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium),
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.testTag(EventDetailsTestTags.EVENT_PRICE),
-        )
-      }
 
-      // Row containing: Date, Time, Location
-      // TODO-question: make this clickable to be displayed in Calender?
-      Row(
-          modifier =
-              Modifier.fillMaxWidth()
-                  .clip(RoundedCornerShape(8.dp))
-                  .background(MaterialTheme.colorScheme.surfaceVariant)
-                  .padding(12.dp),
-          horizontalArrangement = Arrangement.SpaceBetween,
-          verticalAlignment = Alignment.CenterVertically,
-      ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-          Icon(
-              imageVector = Icons.Default.CalendarToday,
-              contentDescription = "Date",
-              tint = MaterialTheme.colorScheme.onSurfaceVariant,
-          )
-          Spacer(modifier = Modifier.width(8.dp))
-          Column {
+        // Start of Text Information
+        Column(
+            modifier =
+                Modifier.fillMaxSize().padding(16.dp).background(MaterialTheme.colorScheme.surface),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+          // Row containing: Title, Club, Price
+          Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.SpaceBetween) {
+                Column {
+                  Text(
+                      text = event.title,
+                      style =
+                          MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                      color = MaterialTheme.colorScheme.onSurface,
+                      modifier = Modifier.testTag(EventDetailsTestTags.EVENT_TITLE),
+                  )
+                  Text(
+                      text = event.association.name,
+                      style = MaterialTheme.typography.bodyMedium,
+                      color = MaterialTheme.colorScheme.onSurfaceVariant,
+                      modifier = Modifier.testTag(EventDetailsTestTags.EVENT_ASSOCIATION),
+                  )
+                }
+                Text(
+                    text = event.price.let { "CHF $it" },
+                    style =
+                        MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.testTag(EventDetailsTestTags.EVENT_PRICE),
+                )
+              }
+
+          // Row containing: Date, Time, Location
+          // TODO-question: make this clickable to be displayed in Calender?
+          Row(
+              modifier =
+                  Modifier.fillMaxWidth()
+                      .clip(RoundedCornerShape(8.dp))
+                      .background(MaterialTheme.colorScheme.surfaceVariant)
+                      .padding(12.dp),
+              horizontalArrangement = Arrangement.SpaceBetween,
+              verticalAlignment = Alignment.CenterVertically,
+          ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+              Icon(
+                  imageVector = Icons.Default.CalendarToday,
+                  contentDescription = "Date",
+                  tint = MaterialTheme.colorScheme.onSurfaceVariant,
+              )
+              Spacer(modifier = Modifier.width(8.dp))
+              Column {
+                Text(
+                    text = event.time,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.testTag(EventDetailsTestTags.EVENT_TIME),
+                ) // TODO we need some proper time to time-text
+                // formating
+                // (implement in repository)
+                Text(
+                    text = event.location.name,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.testTag(EventDetailsTestTags.EVENT_LOCATION),
+                )
+              }
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+              Icon(
+                  imageVector = Icons.Default.AccessTime,
+                  contentDescription = "Time",
+                  tint = MaterialTheme.colorScheme.onSurfaceVariant,
+              )
+              Spacer(modifier = Modifier.width(8.dp))
+              Text(text = event.time, style = MaterialTheme.typography.bodyMedium)
+            }
+          }
+
+          // Description
+          Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
-                text = event.time,
+                text = "Description",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+            )
+            Text(
+                text = event.description,
                 style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.testTag(EventDetailsTestTags.EVENT_TIME),
-            ) // TODO we need some proper time to time-text
-            // formating
-            // (implement in repository)
-            Text(
-                text = event.location.name,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.testTag(EventDetailsTestTags.EVENT_LOCATION),
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.testTag(EventDetailsTestTags.EVENT_DESCRIPTION),
             )
           }
+
+          Box(modifier = Modifier.fillMaxWidth().height(200.dp).clip(RoundedCornerShape(8.dp))) {
+            Map(
+                target = event.location,
+                enableControls = false,
+                locationPermissionRequest = {
+                  val isLocationGranted =
+                      ContextCompat.checkSelfPermission(
+                          context,
+                          Manifest.permission.ACCESS_FINE_LOCATION,
+                      ) == PackageManager.PERMISSION_GRANTED
+                  it(isLocationGranted)
+                },
+            )
+            // Spacer required to prevent clicks on the map itself
+            Spacer(
+                modifier =
+                    Modifier.matchParentSize()
+                        .clickable { onOpenMap(event.location) }
+                        .testTag(EventDetailsTestTags.VIEW_LOCATION_BUTTON),
+            )
+          }
+
+          // Enroll Button
+          // TODO: button should be gray and say "Enrolled" if user already enrolled -> create a
+          // isEnrolled fun in viewModel
+          Button(
+              onClick = { viewModel.enrollInEvent(event) },
+              modifier =
+                  Modifier.fillMaxWidth()
+                      .padding(top = 8.dp)
+                      .testTag(EventDetailsTestTags.ENROLL_BUTTON),
+              shape = RoundedCornerShape(6.dp),
+              colors =
+                  ButtonDefaults.buttonColors(
+                      containerColor = Color(0xFFDC2626),
+                      contentColor = Color.White,
+                  ),
+          ) {
+            Text("Enrol in event", style = MaterialTheme.typography.titleMedium)
+          }
         }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-          Icon(
-              imageVector = Icons.Default.AccessTime,
-              contentDescription = "Time",
-              tint = MaterialTheme.colorScheme.onSurfaceVariant,
-          )
-          Spacer(modifier = Modifier.width(8.dp))
-          Text(text = event.time, style = MaterialTheme.typography.bodyMedium)
-        }
       }
-
-      // Description
-      Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(
-            text = "Description",
-            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-        )
-        Text(
-            text = event.description,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.testTag(EventDetailsTestTags.EVENT_DESCRIPTION),
-        )
-      }
-
-      Box(modifier = Modifier.fillMaxWidth().height(200.dp).clip(RoundedCornerShape(8.dp))) {
-        Map(
-            target = event.location,
-            enableControls = false,
-            locationPermissionRequest = {
-              val isLocationGranted =
-                  ContextCompat.checkSelfPermission(
-                      context,
-                      Manifest.permission.ACCESS_FINE_LOCATION,
-                  ) == PackageManager.PERMISSION_GRANTED
-              it(isLocationGranted)
-            },
-        )
-        // Spacer required to prevent clicks on the map itself
-        Spacer(
-            modifier =
-                Modifier.matchParentSize()
-                    .clickable { onOpenMap(event.location) }
-                    .testTag(EventDetailsTestTags.VIEW_LOCATION_BUTTON),
-        )
-      }
-
-      // Enroll Button
-      // TODO: button should be gray and say "Enrolled" if user already enrolled -> create a
-      // isEnrolled fun in viewModel
-      Button(
-          onClick = { viewModel.enrollInEvent(event) },
-          modifier =
-              Modifier.fillMaxWidth()
-                  .padding(top = 8.dp)
-                  .testTag(EventDetailsTestTags.ENROLL_BUTTON),
-          shape = RoundedCornerShape(6.dp),
-          colors =
-              ButtonDefaults.buttonColors(
-                  containerColor = Color(0xFFDC2626),
-                  contentColor = Color.White,
-              ),
-      ) {
-        Text("Enrol in event", style = MaterialTheme.typography.titleMedium)
-      }
-    }
-  }
 }
 
 // ------------- Use this for Preview ------------------

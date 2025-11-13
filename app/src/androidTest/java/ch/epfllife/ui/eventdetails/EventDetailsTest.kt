@@ -277,6 +277,20 @@ class EventDetailsTest {
   }
 
   @Test
+  fun clickOnMapTriggersNavigation() {
+    var clicked = false
+    composeTestRule.setContent {
+      EventDetailsContent(
+          sampleEvent, onGoBack = {}, onOpenMap = { clicked = true }, viewModel = viewModel())
+    }
+    composeTestRule
+        .onNodeWithTag(EventDetailsTestTags.VIEW_LOCATION_BUTTON)
+        .assertIsDisplayed()
+        .performClick()
+    assertTrue("View Location button should trigger onOpenMap callback", clicked)
+  }
+
+  @Test
   fun content_BackButtonTriggersCallback() {
     var backClicked = false
     composeTestRule.setContent {
