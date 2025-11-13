@@ -69,7 +69,6 @@ class EndToEndM2Test : FirestoreLifeTest() {
 
     composeTestRule
         .onNodeWithTag(EventDetailsTestTags.ENROLL_BUTTON)
-        .performScrollTo()
         .assertIsDisplayed()
         .performClick()
     composeTestRule.waitForIdle()
