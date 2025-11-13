@@ -39,10 +39,10 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
   }
 
   override suspend fun createEvent(event: Event): Result<Unit> {
-    val eventMap = eventToFirestoreMap(event, db)
-
-    db.collection(FirestoreCollections.EVENTS).document(event.id).set(eventMap).await()
-    return Result.success(Unit)
+    return runCatching {
+      val eventMap = eventToFirestoreMap(event, db)
+      db.collection(FirestoreCollections.EVENTS).document(event.id).set(eventMap).await()
+    }
   }
 
   override suspend fun updateEvent(eventId: String, newEvent: Event): Result<Unit> {
