@@ -1,6 +1,11 @@
 package ch.epfllife.model.user
 
+import ch.epfllife.example_data.ExampleAssociations
+import ch.epfllife.example_data.ExampleEvents
 import ch.epfllife.example_data.ExampleUsers
+import ch.epfllife.model.authentication.Auth
+import ch.epfllife.model.authentication.SignInResult
+import ch.epfllife.utils.FakeCredentialManager
 import ch.epfllife.utils.FirestoreLifeTest
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
@@ -229,5 +234,229 @@ class UserRepositoryFirebaseTest : FirestoreLifeTest() {
     assert(deleteUserResult.isFailure)
     assertTrue(deleteUserResult.exceptionOrNull() is NoSuchElementException)
     assertEquals(1, getUserCount())
+  }
+
+  /** Auxiliary method for sign in in the firebase as an authenticated user */
+  suspend fun signInTestUserUsingAuth(): String {
+    // we are going to ensure fresh session first
+    val authInstance = Auth(FakeCredentialManager.withDefaultTestUser)
+    authInstance.signOut()
+    // fake credentials and sign in
+    val credential = FakeCredentialManager.defaultUserCredentials
+    val result = authInstance.signInWithCredential(credential)
+
+    // return the id of the auth user.
+    return when (result) {
+      is SignInResult.Success -> result.user.uid
+      SignInResult.Cancelled -> error("Sign-in was cancelled in test")
+      SignInResult.Failure -> error("Failed to sign in test user")
+    }
+  }
+
+  @Test
+  fun subscribe_success() = runTest {
+    // Arrange: see that for association and event I don't add asserts (they are covered in the
+    // other tests )
+    val assoc1 = ExampleAssociations.association1
+    assocRepository.createAssociation(assoc1)
+    val event = ExampleEvents.event1
+    eventRepository.createEvent(event)
+
+    // Arrange: need to have an authenticated user
+    val authUid = signInTestUserUsingAuth()
+
+    // to avoid problems, we assign the sample user the UID of the
+    // authenticated user, thus simulating that they are the same.
+    val user1 = ExampleUsers.user1
+    userRepository.createUser(user1.copy(id = authUid))
+    // Assert
+    assertEquals(1, getUserCount())
+
+    // action : subscribe
+    val result = userRepository.subscribeToEvent(event.id)
+
+    // assert
+    assertTrue(result.isSuccess)
+    val updated = userRepository.getUser(authUid)
+    assertTrue(updated?.enrolledEvents?.contains(event.id) ?: false)
+  }
+
+  @Test
+  fun subscribe_fails_when_logged_out() = runTest {
+    // Arrange: see that for association and event I don't add asserts (they are covered in the
+    // other tests )
+    val assoc1 = ExampleAssociations.association1
+    assocRepository.createAssociation(assoc1)
+    val event = ExampleEvents.event1
+    eventRepository.createEvent(event)
+
+    // Arrange: need to have an authenticated user
+    val authUid = signInTestUserUsingAuth()
+
+    // to avoid problems, we assign the sample user the UID of the
+    // authenticated user, thus simulating that they are the same.
+    val user1 = ExampleUsers.user1
+    userRepository.createUser(user1.copy(id = authUid))
+
+    // we sign out, now there is no user logged
+    Firebase.auth.signOut()
+
+    // action: subscribe to event without having a current authenticated user
+    val result = userRepository.subscribeToEvent(event.id)
+    // assert
+    assertTrue(result.isFailure)
+  }
+
+  @Test
+  fun subscribe_fails_when_event_missing() = runTest {
+    // Arrange: see that for association and event I don't add asserts (they are covered in the
+    // other tests )
+    val assoc1 = ExampleAssociations.association1
+    assocRepository.createAssociation(assoc1)
+    val event = ExampleEvents.event1
+    eventRepository.createEvent(event)
+
+    // Arrange: need to have an authenticated user
+    val authUid = signInTestUserUsingAuth()
+
+    // to avoid problems, we assign the sample user the UID of the
+    // authenticated user, thus simulating that they are the same.
+    val user1 = ExampleUsers.user1
+    userRepository.createUser(user1.copy(id = authUid))
+
+    // act: try to subscribe to non-existent event
+    val result = userRepository.subscribeToEvent("nonExistentEventId")
+
+    // assert
+    assertTrue(result.isFailure)
+  }
+
+  @Test
+  fun subscribe_fails_when_subscribed_before() = runTest {
+    // Arrange: see that for association and event I don't add asserts (they are covered in the
+    // other tests )
+    val assoc1 = ExampleAssociations.association1
+    assocRepository.createAssociation(assoc1)
+    val event = ExampleEvents.event1
+    eventRepository.createEvent(event)
+
+    // Arrange: need to have an authenticated user
+    val authUid = signInTestUserUsingAuth()
+
+    // to avoid problems, we assign the sample user the UID of the
+    // authenticated user, thus simulating that they are the same.
+    val user1 = ExampleUsers.user1
+    userRepository.createUser(user1.copy(id = authUid))
+
+    // act: first subscribe
+    val first = userRepository.subscribeToEvent(event.id)
+    assertTrue(first.isSuccess)
+
+    // act: second subscribe should fail
+    val second = userRepository.subscribeToEvent(event.id)
+    // assert
+    assertTrue(second.isFailure)
+  }
+
+  @Test
+  fun unsubscribe_success() = runTest {
+    // Arrange: see that for association and event I don't add asserts (they are covered in the
+    // other tests )
+    val assoc1 = ExampleAssociations.association1
+    assocRepository.createAssociation(assoc1)
+    val event = ExampleEvents.event1
+    eventRepository.createEvent(event)
+
+    // Arrange: need to have an authenticated user
+    val authUid = signInTestUserUsingAuth()
+
+    // to avoid problems, we assign the sample user the UID of the
+    // authenticated user, thus simulating that they are the same.
+    val user1 = ExampleUsers.user1
+    userRepository.createUser(user1.copy(id = authUid))
+
+    val sub = userRepository.subscribeToEvent(event.id)
+    assertTrue(sub.isSuccess)
+
+    // act: unsubscribe
+    val result = userRepository.unsubscribeFromEvent(event.id)
+
+    // assert
+    assertTrue(result.isSuccess)
+    val updated = userRepository.getUser(authUid)
+    assertTrue(!(updated?.enrolledEvents?.contains(event.id) ?: false))
+  }
+
+  @Test
+  fun unsubscribe_fails_when_logged_out() = runTest {
+    // Arrange: see that for association and event I don't add asserts (they are covered in the
+    // other tests )
+    val assoc1 = ExampleAssociations.association1
+    assocRepository.createAssociation(assoc1)
+    val event = ExampleEvents.event1
+    eventRepository.createEvent(event)
+
+    // Arrange: need to have an authenticated user
+    val authUid = signInTestUserUsingAuth()
+
+    // to avoid problems, we assign the sample user the UID of the
+    // authenticated user, thus simulating that they are the same.
+    val user1 = ExampleUsers.user1
+    userRepository.createUser(user1.copy(id = authUid))
+
+    // action: sign out
+    Firebase.auth.signOut()
+    // act
+    val result = userRepository.unsubscribeFromEvent(event.id)
+    // assert
+    assertTrue(result.isFailure)
+  }
+
+  @Test
+  fun unsubscribe_fails_when_event_missing() = runTest {
+    // Arrange: see that for association and event I don't add asserts (they are covered in the
+    // other tests )
+    val assoc1 = ExampleAssociations.association1
+    assocRepository.createAssociation(assoc1)
+    val event = ExampleEvents.event1
+    eventRepository.createEvent(event)
+
+    // Arrange: need to have an authenticated user
+    val authUid = signInTestUserUsingAuth()
+
+    // to avoid problems, we assign the sample user the UID of the
+    // authenticated user, thus simulating that they are the same.
+    val user1 = ExampleUsers.user1
+    userRepository.createUser(user1.copy(id = authUid))
+
+    // act: try to unsubscribe from non-existent event
+    val result = userRepository.unsubscribeFromEvent("nonExistentEventId")
+
+    // assert
+    assertTrue(result.isFailure)
+  }
+
+  @Test
+  fun unsubscribe_fails_when_not_subscribed() = runTest {
+    // Arrange: see that for association and event I don't add asserts (they are covered in the
+    // other tests )
+    val assoc1 = ExampleAssociations.association1
+    assocRepository.createAssociation(assoc1)
+    val event = ExampleEvents.event1
+    eventRepository.createEvent(event)
+
+    // Arrange: need to have an authenticated user
+    val authUid = signInTestUserUsingAuth()
+
+    // to avoid problems, we assign the sample user the UID of the
+    // authenticated user, thus simulating that they are the same.
+    val user1 = ExampleUsers.user1
+    userRepository.createUser(user1.copy(id = authUid))
+
+    // act
+    val result = userRepository.unsubscribeFromEvent(event.id)
+
+    // assert
+    assertTrue(result.isFailure)
   }
 }
