@@ -10,7 +10,7 @@ import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.GetCredentialUnknownException
 import ch.epfllife.R
 import ch.epfllife.model.authentication.Auth
-import ch.epfllife.model.user.UserRepository
+import ch.epfllife.model.user.UserRepositoryFirestore
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.utils.FakeCredentialManager
 import ch.epfllife.utils.assertTagIsDisplayed
@@ -25,8 +25,10 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FirebaseFirestore
 import io.mockk.coEvery
 import io.mockk.mockk
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
@@ -36,8 +38,6 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 class SignInScreenTest {
   @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
@@ -141,14 +141,13 @@ class SignInScreenTest {
   fun firstSignIn_createsUserInRepository() = runTest {
     var onSignedInCalled = false
 
-    // Arrange: mock repository and viewmodel using that mock
-    val mockUserRepo = mock(UserRepository::class.java)
-    val viewModel = SignInViewModel(auth, mockUserRepo)
+    // Arrange
+    val firestore = FirebaseFirestore.getInstance()
+    firestore.useEmulator("10.0.2.2", 8080)
+    firestore.clearPersistence() // optional, start clean
 
-    // Simulate: first-time user (no document in repo)
-    whenever(mockUserRepo.getUser(any())).thenReturn(null)
-    // Simulate: successful user creation
-    whenever(mockUserRepo.createUser(any())).thenReturn(Result.success(Unit))
+    val repo = UserRepositoryFirestore(firestore)
+    val viewModel = SignInViewModel(auth, repo)
 
     // Act
     composeTestRule.setContent {
@@ -157,10 +156,13 @@ class SignInScreenTest {
     composeTestRule.onNodeWithTag(SignInScreenTestTags.SIGN_IN_BUTTON).performClick()
     composeTestRule.waitUntil(5000) { onSignedInCalled }
 
-    // Assert: userRepo interactions
-    verify(mockUserRepo, times(1)).getUser(any())
-    verify(mockUserRepo, times(1)).createUser(any())
-    Assert.assertTrue(onSignedInCalled)
+    // Assert
+    val uid = Firebase.auth.currentUser?.uid!!
+    val snapshot = firestore.collection("users").document(uid).get().await()
+    Assert.assertTrue(snapshot.exists())
+
+    // cleanup emulator
+    repo.deleteUser(uid)
   }
 
   private fun createMockAuthWithCredentialException(exception: Exception): Auth {
