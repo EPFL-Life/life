@@ -10,6 +10,7 @@ import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.GetCredentialUnknownException
 import ch.epfllife.R
 import ch.epfllife.model.authentication.Auth
+import ch.epfllife.model.user.UserRepository
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.utils.FakeCredentialManager
 import ch.epfllife.utils.assertTagIsDisplayed
@@ -26,12 +27,17 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.auth
 import io.mockk.coEvery
 import io.mockk.mockk
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
+import org.mockito.kotlin.any
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class SignInScreenTest {
   @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
@@ -130,6 +136,32 @@ class SignInScreenTest {
           testAuth = createMockAuthWithCredentialException(GetCredentialCancellationException()),
           message = R.string.signin_cancelled_message,
       )
+
+  @Test
+  fun firstSignIn_createsUserInRepository() = runTest {
+    var onSignedInCalled = false
+
+    // Arrange: mock repository and viewmodel using that mock
+    val mockUserRepo = mock(UserRepository::class.java)
+    val viewModel = SignInViewModel(auth, mockUserRepo)
+
+    // Simulate: first-time user (no document in repo)
+    whenever(mockUserRepo.getUser(any())).thenReturn(null)
+    // Simulate: successful user creation
+    whenever(mockUserRepo.createUser(any())).thenReturn(Result.success(Unit))
+
+    // Act
+    composeTestRule.setContent {
+      SignInScreen(auth = auth, authViewModel = viewModel, onSignedIn = { onSignedInCalled = true })
+    }
+    composeTestRule.onNodeWithTag(SignInScreenTestTags.SIGN_IN_BUTTON).performClick()
+    composeTestRule.waitUntil(5000) { onSignedInCalled }
+
+    // Assert: userRepo interactions
+    verify(mockUserRepo, times(1)).getUser(any())
+    verify(mockUserRepo, times(1)).createUser(any())
+    Assert.assertTrue(onSignedInCalled)
+  }
 
   private fun createMockAuthWithCredentialException(exception: Exception): Auth {
     val mockCredentialManager = mockk<FakeCredentialManager>(relaxed = true)
