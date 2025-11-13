@@ -54,12 +54,14 @@ fun CalendarScreen(
                   it.association.name.contains(query, ignoreCase = true)
             }
       }
-
+            // This excludes any events without a set date!!
   val grouped =
-      shownEvents.groupBy { event ->
-        val date = event.startDateOrNull() ?: LocalDate.now()
-        "${date.month.getDisplayName(TextStyle.FULL, Locale.getDefault())} ${date.year}"
-      }
+      shownEvents
+          .filter { it.startDateOrNull() != null }
+          .groupBy { event ->
+            val date = event.startDateOrNull()!!
+            "${date.month.getDisplayName(TextStyle.FULL, Locale.getDefault())} ${date.year}"
+          }
 
   Column(
       modifier =
