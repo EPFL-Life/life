@@ -132,14 +132,6 @@ fun App(
           }
 
           composable(
-              route = Screen.EventDetails.route + "/{eventId}",
-              arguments = listOf(navArgument("eventId") { type = NavType.StringType })) {
-                  backStackEntry ->
-                val eventId = backStackEntry.arguments?.getString("eventId") ?: ""
-                EventDetailsScreen(eventId = eventId, onGoBack = { navController.popBackStack() })
-              }
-
-          composable(
               route = Screen.AssociationDetails.route + "/{associationId}",
               arguments = listOf(navArgument("associationId") { type = NavType.StringType })) {
                   backStackEntry ->
