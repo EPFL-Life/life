@@ -8,6 +8,7 @@ import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.event.EventRepository
 import ch.epfllife.model.map.Location
+import ch.epfllife.model.user.Price
 import ch.epfllife.ui.eventDetails.EventDetailsContent
 import ch.epfllife.ui.eventDetails.EventDetailsTestTags
 import ch.epfllife.ui.eventDetails.EventDetailsUIState
@@ -38,7 +39,7 @@ class EventDetailsTest {
                   description = "Description",
                   eventCategory = EventCategory.ACADEMIC),
           tags = listOf("workshop"),
-          price = 10u,
+          price = Price(10u),
           pictureUrl =
               "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")
 
@@ -320,7 +321,7 @@ class EventDetailsTest {
 
   @Test
   fun content_DisplaysFreeEvent() {
-    val freeEvent = sampleEvent.copy(price = 0u)
+    val freeEvent = sampleEvent.copy(price = Price(0u))
     setEventContent(freeEvent)
     // Price should be empty string for 0u price based on the code
     composeTestRule.onNodeWithTag(EventDetailsTestTags.EVENT_PRICE).assertIsDisplayed()
@@ -328,7 +329,7 @@ class EventDetailsTest {
 
   @Test
   fun content_DisplaysExpensiveEvent() {
-    val expensiveEvent = sampleEvent.copy(price = 999u)
+    val expensiveEvent = sampleEvent.copy(price = Price(999u))
     setEventContent(expensiveEvent)
     composeTestRule.onNodeWithText("CHF 9.99").assertIsDisplayed()
   }

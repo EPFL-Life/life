@@ -2,6 +2,7 @@ package ch.epfllife.example_data
 
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.map.Location
+import ch.epfllife.model.user.Price
 
 /**
  * A singleton object holding sample event data for testing purposes. We localize these event to
@@ -23,7 +24,7 @@ object ExampleEvents {
           time = "2025-11-20 09:00",
           association = ExampleAssociations.association1,
           tags = listOf("tech", "symposium", "space"),
-          price = 25u, // Using UInt
+          price = Price(25u), // Using UInt
           pictureUrl = "https://actu.epfl.ch/image/76257/original/5616x3744.jpg")
 
   val event2 =
@@ -35,7 +36,7 @@ object ExampleEvents {
           time = "2026-05-08 18:00",
           association = ExampleAssociations.association2,
           tags = listOf("music", "festival", "party"),
-          price = 45u,
+          price = Price(45u),
           pictureUrl =
               "https://www.jambase.com/wp-content/uploads/2023/04/332066973_940895027072259_250410373047721675_n-e1680722695547-1480x832.jpg")
 
@@ -50,7 +51,7 @@ object ExampleEvents {
           time = "2025-12-05 12:30",
           association = ExampleAssociations.association3,
           tags = listOf("food", "networking", "free"),
-          price = 0u, // Free event
+          price = Price(0u), // Free event
           pictureUrl = null // No image
           )
 
