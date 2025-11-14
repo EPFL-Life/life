@@ -66,7 +66,7 @@ class EventDetailsScreenTest {
   fun eventInformation_isDisplayedCorrectly() {
     composeTestRule.onNodeWithText("Drone Workshop").assertIsDisplayed()
     composeTestRule.onNodeWithText("AeroPoly").assertIsDisplayed()
-    composeTestRule.onNodeWithText("CHF 10").assertIsDisplayed()
+    composeTestRule.onNodeWithText("CHF 0.10").assertIsDisplayed()
     composeTestRule.onNodeWithText("Description").assertIsDisplayed()
     composeTestRule.onNodeWithText(sampleEvent.description).assertIsDisplayed()
   }

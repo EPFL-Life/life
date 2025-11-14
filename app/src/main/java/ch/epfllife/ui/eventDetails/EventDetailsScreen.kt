@@ -157,7 +157,7 @@ fun EventDetailsContent(
                   )
                 }
                 Text(
-                    text = event.price.let { "CHF ${it.price}" },
+                    text = event.price.let { "$it" },
                     style =
                         MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium),
                     color = MaterialTheme.colorScheme.onSurface,

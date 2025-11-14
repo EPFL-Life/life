@@ -232,7 +232,7 @@ class EventDetailsTest {
   fun content_DisplaysEventPrice() {
     setSampleEventContent()
     composeTestRule.onNodeWithTag(EventDetailsTestTags.EVENT_PRICE).assertIsDisplayed()
-    composeTestRule.onNodeWithText("CHF 10").assertIsDisplayed()
+    composeTestRule.onNodeWithText("CHF 0.10").assertIsDisplayed()
   }
 
   @Test
@@ -325,10 +325,8 @@ class EventDetailsTest {
   @Test
   fun content_DisplaysExpensiveEvent() {
     val expensiveEvent = sampleEvent.copy(price = Price(999u))
-    composeTestRule.setContent {
-      EventDetailsContent(event = expensiveEvent, viewModel = viewModel())
-    }
-    composeTestRule.onNodeWithText("CHF 999").assertIsDisplayed()
+    setEventContent(expensiveEvent)
+    composeTestRule.onNodeWithText("CHF 9.99").assertIsDisplayed()
   }
 
   @Test
@@ -487,7 +485,7 @@ class EventDetailsTest {
     // Verify that all text elements exist (styling is applied correctly)
     composeTestRule.onNodeWithText("Drone Workshop").assertExists()
     composeTestRule.onNodeWithText("AeroPoly").assertExists()
-    composeTestRule.onNodeWithText("CHF 10").assertExists()
+    composeTestRule.onNodeWithText("CHF 0.10").assertExists()
     composeTestRule.onNodeWithText("Centre Sport et Santé").assertExists()
     composeTestRule.onNodeWithText("Description").assertExists()
   }
