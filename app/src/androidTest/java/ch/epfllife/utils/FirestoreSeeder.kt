@@ -77,7 +77,7 @@ class DatabaseSeederTest {
         "time" to event.time,
         "association" to assocRef, // Use the DocumentReference
         "tags" to event.tags,
-        "price" to event.price.price.toLong(), // Store UInt as Long
+        "price" to event.price.cents.toLong(), // Store UInt as Long
         "pictureUrl" to event.pictureUrl)
   }
 

@@ -193,74 +193,56 @@ class EventRepositoryFirestoreTest : FirestoreLifeTest() {
     MockitoAnnotations.openMocks(this)
   }
 
-  // TODO: we will use the test from Daniel (see draft PR #147)
-  //  @Test
-  //  fun documentToEventReturnsEventWhenDocumentIsValid() = runTest {
-  //    // Expected event object
-  //    val expected =
-  //        Event(
-  //            id = "event123",
-  //            title = "Kotlin Meetup",
-  //            description = "A meetup about Kotlin",
-  //            time = "2025-11-10T18:00:00Z",
-  //            pictureUrl = "https://example.com/pic.png",
-  //            price = Price(150u),
-  //            location = Location(name = "Main Hall", latitude = 46.5191, longitude = 6.5668),
-  //            tags = setOf("kotlin", "meetup"),
-  //            association =
-  //                Association(
-  //                    id = "assoc1",
-  //                    name = "EPFL Life",
-  //                    description = "Student association",
-  //                    pictureUrl = "https://example.com/assoc.png",
-  //                    eventCategory = EventCategory.SPORTS))
-  //
-  //    // Mock main document using expected fields
-  //    val doc = mock(DocumentSnapshot::class.java)
-  //    `when`(doc.id).thenReturn(expected.id)
-  //    `when`(doc.getString("title")).thenReturn(expected.title)
-  //    `when`(doc.getString("description")).thenReturn(expected.description)
-  //    `when`(doc.getString("time")).thenReturn(expected.time)
-  //    `when`(doc.getString("pictureUrl")).thenReturn(expected.pictureUrl)
-  //
-  //    // Location map
-  //    val locMap =
-  //        mapOf(
-  //            "name" to expected.location.name,
-  //            "latitude" to expected.location.latitude,
-  //            "longitude" to expected.location.longitude)
-  //    `when`(doc.get("location")).thenReturn(locMap)
-  //
-  //    // Tags list (Firestore stores lists)
-  //    `when`(doc.get("tags")).thenReturn(expected.tags.toList())
-  //
-  //    // Price as Long (Firestore numeric)
-  //    `when`(doc.get("price")).thenReturn(expected.price)
-  //
-  //    // Mock association reference stored in main document
-  //    val assocRef = mock(DocumentReference::class.java)
-  //    `when`(doc.get("association")).thenReturn(assocRef)
-  //
-  //    // Mock association snapshot returned by assocRef.get(), using expected association
-  //    val assocSnap = mock(DocumentSnapshot::class.java)
-  //    `when`(assocSnap.id).thenReturn(expected.association.id)
-  //    `when`(assocSnap.getString("name")).thenReturn(expected.association.name)
-  //    // Also stub get("name") in case production code uses get(...) instead of getString(...)
-  //    `when`(assocSnap.get("name")).thenReturn(expected.association.name)
-  //    `when`(assocSnap.getString("description")).thenReturn(expected.association.description)
-  //    `when`(assocSnap.getString("pictureUrl")).thenReturn(expected.association.pictureUrl)
-  //
-  // `when`(assocSnap.getString("eventCategory")).thenReturn(expected.association.eventCategory.name)
-  //
-  //    // Return a completed Task for assocRef.get()
-  //    `when`(assocRef.get()).thenReturn(Tasks.forResult(assocSnap))
-  //
-  //    // Call the function under test
-  //    val event = EventRepositoryFirestore.documentToEvent(doc)
-  //
-  //    // Single structural equality assertion (data classes)
-  //    assertEquals(expected, event)
-  //  }
+  @Test
+  fun documentToEventReturnsEventWhenDocumentIsValid() = runTest {
+    // Expected event object
+    val expected = ExampleEvents.event1
+    // Mock main document using expected fields
+    whenever(mockDocument.id).thenReturn(expected.id)
+    whenever(mockDocument.getString("title")).thenReturn(expected.title)
+    whenever(mockDocument.getString("description")).thenReturn(expected.description)
+    whenever(mockDocument.getString("time")).thenReturn(expected.time)
+    whenever(mockDocument.getString("pictureUrl")).thenReturn(expected.pictureUrl)
+
+    // Location map
+    val locMap =
+        mapOf(
+            "name" to expected.location.name,
+            "latitude" to expected.location.latitude,
+            "longitude" to expected.location.longitude)
+    whenever(mockDocument.get("location")).thenReturn(locMap)
+
+    // Tags list (Firestore stores lists)
+    whenever(mockDocument.get("tags")).thenReturn(expected.tags.toList())
+
+    // Price as Long (Firestore numeric)
+    whenever(mockDocument.getLong("price")).thenReturn(expected.price.cents.toLong())
+
+    // Mock association reference stored in main document
+    val assocRef = mock(DocumentReference::class.java)
+    whenever(mockDocument.get("association")).thenReturn(assocRef)
+
+    // Mock association snapshot returned by assocRef.get(), using expected association
+    val assocSnap = mock(DocumentSnapshot::class.java)
+    whenever(assocSnap.id).thenReturn(expected.association.id)
+    whenever(assocSnap.getString("name")).thenReturn(expected.association.name)
+    // Also stub get("name") in case production code uses get(...) instead of getString(...)
+    whenever(assocSnap.get("name")).thenReturn(expected.association.name)
+    whenever(assocSnap.getString("description")).thenReturn(expected.association.description)
+    whenever(assocSnap.getString("pictureUrl")).thenReturn(expected.association.pictureUrl)
+    whenever(assocSnap.getString("eventCategory"))
+        .thenReturn(expected.association.eventCategory.name)
+    whenever(assocSnap.getString("about")).thenReturn(expected.association.about)
+    whenever(assocSnap.get("socialLinks")).thenReturn(expected.association.socialLinks)
+    // Return a completed Task for assocRef.get()
+    whenever(assocRef.get()).thenReturn(Tasks.forResult(assocSnap))
+
+    // Call the function under test
+    val event = EventRepositoryFirestore.documentToEvent(mockDocument)
+
+    // Single structural equality assertion (data classes)
+    assertEquals(expected, event)
+  }
 
   @Test
   fun documentToEventReturnsNullWhenRequiredFieldsMissing() = runTest {
