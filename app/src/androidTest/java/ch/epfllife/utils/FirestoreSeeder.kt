@@ -81,6 +81,8 @@ class DatabaseSeederTest {
         "pictureUrl" to event.pictureUrl)
   }
 
+  // IF YOU EVER WANT TO EXECUTE THIS YOU HAVE TO COMMENT OUT @Ignore EVEN IF EXECUTING THE TEST
+  // DIRECTLY
   @Ignore("THIS TEST EDITS THE PROD DATABASE, DO NOT EXECUTE")
   @Test
   fun seedOfficialDatabase() {
