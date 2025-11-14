@@ -217,7 +217,7 @@ class EventRepositoryFirestoreTest : FirestoreLifeTest() {
     whenever(mockDocument.get("tags")).thenReturn(expected.tags.toList())
 
     // Price as Long (Firestore numeric)
-    whenever(mockDocument.getLong("price")).thenReturn(expected.price.toLong())
+    whenever(mockDocument.getLong("price")).thenReturn(expected.price.cents.toLong())
 
     // Mock association reference stored in main document
     val assocRef = mock(DocumentReference::class.java)
