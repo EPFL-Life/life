@@ -5,6 +5,7 @@ import ch.epfllife.model.association.Association
 import ch.epfllife.model.association.AssociationRepositoryFirestore
 import ch.epfllife.model.firestore.FirestoreCollections
 import ch.epfllife.model.map.Location
+import ch.epfllife.model.user.Price
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -109,7 +110,7 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
           "time" to event.time,
           "association" to associationRef,
           "tags" to event.tags,
-          "price" to event.price.toLong(),
+          "price" to event.price.cents.toLong(),
           "pictureUrl" to event.pictureUrl,
       )
     }
@@ -180,7 +181,7 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
             time = time,
             association = association!!,
             tags = tags,
-            price = price,
+            price = Price(price),
             pictureUrl = pictureUrl)
       } catch (e: Exception) {
         // Catch any other errors (e.g., bad casts, toUInt() failure)

@@ -13,6 +13,7 @@ import ch.epfllife.model.association.Association
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.map.Location
+import ch.epfllife.model.user.Price
 import ch.epfllife.ui.theme.Theme
 import org.junit.Before
 import org.junit.Rule
@@ -47,7 +48,7 @@ class EventDetailsScreenTest {
                     description = "Description",
                     eventCategory = EventCategory.ACADEMIC),
             tags = listOf("workshop"),
-            price = 10u,
+            price = Price(10u),
             pictureUrl =
                 "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")
 
@@ -70,7 +71,7 @@ class EventDetailsScreenTest {
   fun eventInformation_isDisplayedCorrectly() {
     composeTestRule.onNodeWithText("Drone Workshop").assertIsDisplayed()
     composeTestRule.onNodeWithText("AeroPoly").assertIsDisplayed()
-    composeTestRule.onNodeWithText("CHF 10").assertIsDisplayed()
+    composeTestRule.onNodeWithText("CHF 0.10").assertIsDisplayed()
     composeTestRule.onNodeWithText("Description").assertIsDisplayed()
     composeTestRule.onNodeWithText(sampleEvent.description).assertIsDisplayed()
   }

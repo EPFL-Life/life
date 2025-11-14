@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import ch.epfllife.R
 import ch.epfllife.model.enums.SubscriptionFilter
 import ch.epfllife.model.event.Event
+import ch.epfllife.model.user.Price
 import ch.epfllife.ui.composables.CalendarCard
 import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
 import ch.epfllife.ui.composables.SearchBar
@@ -170,7 +171,8 @@ private fun CalendarScreenPreview() {
               location = location,
               time = "2025-11-15T09:00:00/2025-11-20T18:00:00", // timespan example
               association = codingClub,
-              tags = listOf("tech", "workshop")),
+              tags = listOf("tech", "workshop"),
+              price = Price(0u)),
           ch.epfllife.model.event.Event(
               id = "2",
               title = "Cultural Night",
@@ -178,7 +180,8 @@ private fun CalendarScreenPreview() {
               location = location,
               time = "2025-12-05T19:00:00",
               association = esn,
-              tags = listOf("culture", "food")))
+              tags = listOf("culture", "food"),
+              price = Price(10u)))
 
   MaterialTheme {
     CalendarScreen(

@@ -27,6 +27,7 @@ import ch.epfllife.model.association.Association
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.map.Location
+import ch.epfllife.model.user.Price
 import ch.epfllife.ui.composables.BackButton
 import ch.epfllife.ui.composables.Map
 import ch.epfllife.ui.theme.Theme
@@ -292,7 +293,7 @@ fun EventDetailsPreview() {
                   eventCategory = EventCategory.ACADEMIC,
               ),
           tags = listOf("workshop"),
-          price = 10u,
+          price = Price(10u),
           pictureUrl =
               "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg",
       )
