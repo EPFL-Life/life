@@ -237,7 +237,7 @@ class EventDetailsTest {
   fun content_DisplaysEventPrice() {
     setSampleEventContent()
     composeTestRule.onNodeWithTag(EventDetailsTestTags.EVENT_PRICE).assertIsDisplayed()
-    composeTestRule.onNodeWithText("CHF 10").assertIsDisplayed()
+    composeTestRule.onNodeWithText("CHF 0.10").assertIsDisplayed()
   }
 
   @Test
