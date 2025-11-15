@@ -1,8 +1,6 @@
 package ch.epfllife.ui.association
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,7 +14,7 @@ import ch.epfllife.R
 import ch.epfllife.model.enums.SubscriptionFilter
 import ch.epfllife.ui.composables.AssociationCard
 import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
-import ch.epfllife.ui.composables.EmptyScreen
+import ch.epfllife.ui.composables.ListView
 import ch.epfllife.ui.composables.SearchBar
 import ch.epfllife.ui.navigation.NavigationTestTags
 
@@ -59,28 +57,21 @@ fun AssociationBrowser(
 
     Spacer(Modifier.height(12.dp))
 
-    // If statement to display certain messages for empty screens
-    if (shownAssociations.isEmpty()) {
-      val (title, description) =
-          if (selected == SubscriptionFilter.Subscribed) {
-            Pair(R.string.associations_empty_title, R.string.associations_empty_description)
-          } else {
-            Pair(R.string.associations_no_all_title, R.string.associations_no_all_description)
-          }
-      EmptyScreen(
-          title = stringResource(id = title),
-          description = stringResource(id = description),
-      )
-    } else {
-      LazyColumn(
-          verticalArrangement = Arrangement.spacedBy(12.dp),
-          modifier = Modifier.fillMaxSize(),
-      ) {
-        items(shownAssociations, key = { it.id }) { assoc ->
-          AssociationCard(association = assoc, onClick = { onAssociationClick(assoc.id) })
+    val (title, description) =
+        if (selected == SubscriptionFilter.Subscribed) {
+          Pair(R.string.associations_empty_title, R.string.associations_empty_description)
+        } else {
+          Pair(R.string.associations_no_all_title, R.string.associations_no_all_description)
         }
-      }
-    }
+    ListView(
+        list = shownAssociations,
+        emptyTitle = stringResource(id = title),
+        emptyDescription = stringResource(id = description),
+        key = { it.id },
+        item = { assoc ->
+          AssociationCard(association = assoc, onClick = { onAssociationClick(assoc.id) })
+        },
+    )
   }
 }
 

@@ -1,10 +1,7 @@
 package ch.epfllife.ui.calendar
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,7 +15,7 @@ import ch.epfllife.model.event.Event
 import ch.epfllife.model.user.Price
 import ch.epfllife.ui.composables.CalendarCard
 import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
-import ch.epfllife.ui.composables.EmptyScreen
+import ch.epfllife.ui.composables.ListView
 import ch.epfllife.ui.composables.SearchBar
 import ch.epfllife.ui.navigation.NavigationTestTags
 import java.time.LocalDate
@@ -87,31 +84,12 @@ fun CalendarScreen(
 
     Spacer(Modifier.height(12.dp))
 
-    if (shownEvents.isEmpty()) {
-      EmptyScreen(title = stringResource(id = R.string.calendar_no_events_placeholder))
-    } else {
-      LazyColumn(
-          verticalArrangement = Arrangement.spacedBy(12.dp),
-          modifier = Modifier.fillMaxSize(),
-      ) {
-        grouped.forEach { (month, events) ->
-          item {
-            Text(
-                text = month,
-                style = MaterialTheme.typography.titleMedium,
-                modifier =
-                    Modifier.padding(vertical = 8.dp)
-                        .align(Alignment.Start)
-                        .testTag(CalendarTestTags.MONTH_HEADER),
-            )
-          }
-
-          items(events, key = { it.id }) { event ->
-            CalendarCard(event = event, onClick = { onEventClick(event.id) })
-          }
-        }
-      }
-    }
+    ListView(
+        list = shownEvents,
+        emptyTitle = stringResource(id = R.string.calendar_no_events_placeholder),
+        key = { it.id },
+        item = { ev -> CalendarCard(event = ev, onClick = { onEventClick(ev.id) }) },
+    )
   }
 }
 
