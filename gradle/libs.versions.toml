@@ -5,7 +5,7 @@ coilCompose = "2.7.0"
 json = "20240303"
 kotlin = "1.9.0"
 gms = "4.4.2"
-ktfmt = "0.17.0"
+ktfmt = "0.25.0"
 
 # UI Compose
 mockitoAndroid = "5.13.0"

@@ -33,6 +33,7 @@ class ComposablesTest {
           tags = emptyList(),
           price = Price(0u),
       )
+
   // ============ SearchBar Tests ============
 
   @Test
