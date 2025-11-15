@@ -22,10 +22,10 @@ class HomeViewModel(
   val myEvents: StateFlow<List<Event>> = _myEvents.asStateFlow()
 
   init {
-    loadAllEvents()
+    refresh()
   }
 
-  private fun loadAllEvents() {
+  fun refresh() {
     viewModelScope.launch {
       _allEvents.value =
           try {

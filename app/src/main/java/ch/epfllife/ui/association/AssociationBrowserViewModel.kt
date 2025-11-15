@@ -29,12 +29,12 @@ class AssociationBrowserViewModel(
   val subscribedAssociations: StateFlow<List<Association>> = _subscribedAssociations.asStateFlow()
 
   init {
-    loadAllAssociations()
+    refresh()
     // TODO: Also load subscribed associations when user data is available
   }
 
   /** Fetches all associations from the repository and updates the [allAssociations] state. */
-  private fun loadAllAssociations() {
+  fun refresh() {
     viewModelScope.launch {
       _allAssociations.value =
           try {
