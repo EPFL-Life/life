@@ -2,8 +2,6 @@ package ch.epfllife.ui.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -23,8 +21,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.R
 import ch.epfllife.model.enums.SubscriptionFilter
 import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
-import ch.epfllife.ui.composables.EmptyScreen
 import ch.epfllife.ui.composables.EventCard
+import ch.epfllife.ui.composables.ListView
 import ch.epfllife.ui.composables.SearchBar
 import ch.epfllife.ui.navigation.NavigationTestTags
 
@@ -70,29 +68,19 @@ fun HomeScreen(
 
         Spacer(Modifier.height(12.dp))
 
-        // If statement to display certain messages for empty screens
-        if (shownEvents.isEmpty()) {
-          val (title, description) =
-              if (selected == SubscriptionFilter.Subscribed) {
-                Pair(R.string.home_empty_title, R.string.home_empty_description)
-              } else {
-                Pair(R.string.home_no_events_title, R.string.home_no_events_description)
-              }
-          EmptyScreen(
-              title = stringResource(id = title),
-              description = stringResource(id = description),
-              modifier = modifier.fillMaxSize().padding(horizontal = 24.dp),
-          )
-        } else {
-          LazyColumn(
-              verticalArrangement = Arrangement.spacedBy(12.dp),
-              modifier = modifier.fillMaxSize(),
-          ) {
-            items(shownEvents, key = { it.id }) { ev ->
-              EventCard(event = ev, onClick = { onEventClick(ev.id) })
+        val (title, description) =
+            if (selected == SubscriptionFilter.Subscribed) {
+              Pair(R.string.home_empty_title, R.string.home_empty_description)
+            } else {
+              Pair(R.string.home_no_events_title, R.string.home_no_events_description)
             }
-          }
-        }
+        ListView(
+            list = shownEvents,
+            emptyTitle = stringResource(title),
+            emptyDescription = stringResource(description),
+            key = { it.id },
+            item = { ev -> EventCard(event = ev, onClick = { onEventClick(ev.id) }) },
+        )
       }
 }
 
