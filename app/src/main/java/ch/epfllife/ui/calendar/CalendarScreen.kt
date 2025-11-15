@@ -10,7 +10,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ch.epfllife.R
@@ -19,6 +18,7 @@ import ch.epfllife.model.event.Event
 import ch.epfllife.model.user.Price
 import ch.epfllife.ui.composables.CalendarCard
 import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
+import ch.epfllife.ui.composables.EmptyScreen
 import ch.epfllife.ui.composables.SearchBar
 import ch.epfllife.ui.navigation.NavigationTestTags
 import java.time.LocalDate
@@ -40,7 +40,7 @@ fun CalendarScreen(
     modifier: Modifier = Modifier,
     allEvents: List<Event>,
     enrolledEvents: List<Event>,
-    onEventClick: (String) -> Unit
+    onEventClick: (String) -> Unit,
 ) {
   var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
   var query by remember { mutableStateOf("") }
@@ -70,61 +70,49 @@ fun CalendarScreen(
               .fillMaxSize()
               .padding(horizontal = 16.dp, vertical = 12.dp)
               .testTag(NavigationTestTags.CALENDAR_SCREEN),
-      horizontalAlignment = Alignment.CenterHorizontally) {
-        Spacer(Modifier.height(40.dp))
+      horizontalAlignment = Alignment.CenterHorizontally,
+  ) {
+    Spacer(Modifier.height(40.dp))
 
-        SearchBar()
+    SearchBar()
 
-        Spacer(Modifier.height(12.dp))
+    Spacer(Modifier.height(12.dp))
 
-        DisplayedSubscriptionFilter(
-            selected = selected,
-            onSelected = { selected = it },
-            subscribedLabel = stringResource(id = R.string.calendar_filter_enrolled),
-            allLabel = stringResource(id = R.string.calendar_filter_all_events))
+    DisplayedSubscriptionFilter(
+        selected = selected,
+        onSelected = { selected = it },
+        subscribedLabel = stringResource(id = R.string.calendar_filter_enrolled),
+        allLabel = stringResource(id = R.string.calendar_filter_all_events),
+    )
 
-        Spacer(Modifier.height(12.dp))
+    Spacer(Modifier.height(12.dp))
 
-        if (shownEvents.isEmpty()) {
-          EmptyCalendarMessage(
-              title = stringResource(id = R.string.calendar_no_events_placeholder),
-              modifier = Modifier.fillMaxSize())
-        } else {
-          LazyColumn(
-              verticalArrangement = Arrangement.spacedBy(12.dp),
-              modifier = Modifier.fillMaxSize()) {
-                grouped.forEach { (month, events) ->
-                  item {
-                    Text(
-                        text = month,
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier =
-                            Modifier.padding(vertical = 8.dp)
-                                .align(Alignment.Start)
-                                .testTag(CalendarTestTags.MONTH_HEADER))
-                  }
+    if (shownEvents.isEmpty()) {
+      EmptyScreen(title = stringResource(id = R.string.calendar_no_events_placeholder))
+    } else {
+      LazyColumn(
+          verticalArrangement = Arrangement.spacedBy(12.dp),
+          modifier = Modifier.fillMaxSize(),
+      ) {
+        grouped.forEach { (month, events) ->
+          item {
+            Text(
+                text = month,
+                style = MaterialTheme.typography.titleMedium,
+                modifier =
+                    Modifier.padding(vertical = 8.dp)
+                        .align(Alignment.Start)
+                        .testTag(CalendarTestTags.MONTH_HEADER),
+            )
+          }
 
-                  items(events, key = { it.id }) { event ->
-                    CalendarCard(event = event, onClick = { onEventClick(event.id) })
-                  }
-                }
-              }
+          items(events, key = { it.id }) { event ->
+            CalendarCard(event = event, onClick = { onEventClick(event.id) })
+          }
         }
       }
-}
-
-@Composable
-private fun EmptyCalendarMessage(title: String, modifier: Modifier = Modifier) {
-  Column(
-      modifier = modifier,
-      horizontalAlignment = Alignment.CenterHorizontally,
-      verticalArrangement = Arrangement.Center) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-            textAlign = TextAlign.Center)
-      }
+    }
+  }
 }
 
 private fun Event.startDateOrNull(): LocalDate? {
@@ -146,7 +134,8 @@ private fun CalendarScreenPreview() {
           name = "ESN Lausanne",
           description = "Erasmus Student Network at EPFL.",
           pictureUrl = null,
-          eventCategory = ch.epfllife.model.event.EventCategory.CULTURE)
+          eventCategory = ch.epfllife.model.event.EventCategory.CULTURE,
+      )
 
   val codingClub =
       ch.epfllife.model.association.Association(
@@ -154,12 +143,16 @@ private fun CalendarScreenPreview() {
           name = "Coding Club",
           description = "Student coding community.",
           pictureUrl = null,
-          eventCategory = ch.epfllife.model.event.EventCategory.TECH)
+          eventCategory = ch.epfllife.model.event.EventCategory.TECH,
+      )
 
   // Mock location
   val location =
       ch.epfllife.model.map.Location(
-          name = "Rolex Learning Center", latitude = 46.5191, longitude = 6.5668)
+          name = "Rolex Learning Center",
+          latitude = 46.5191,
+          longitude = 6.5668,
+      )
 
   // Mock events (include one spanning multiple days)
   val sampleEvents =
@@ -172,7 +165,8 @@ private fun CalendarScreenPreview() {
               time = "2025-11-15T09:00:00/2025-11-20T18:00:00", // timespan example
               association = codingClub,
               tags = listOf("tech", "workshop"),
-              price = Price(0u)),
+              price = Price(0u),
+          ),
           ch.epfllife.model.event.Event(
               id = "2",
               title = "Cultural Night",
@@ -181,12 +175,15 @@ private fun CalendarScreenPreview() {
               time = "2025-12-05T19:00:00",
               association = esn,
               tags = listOf("culture", "food"),
-              price = Price(10u)))
+              price = Price(10u),
+          ),
+      )
 
   MaterialTheme {
     CalendarScreen(
         allEvents = sampleEvents,
         enrolledEvents = emptyList(), // Enrolled tab should be empty → shows placeholder message
-        onEventClick = {})
+        onEventClick = {},
+    )
   }
 }
