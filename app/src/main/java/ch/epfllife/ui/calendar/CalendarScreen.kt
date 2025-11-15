@@ -87,6 +87,7 @@ fun CalendarScreen(
     ListView(
         list = shownEvents,
         emptyTitle = stringResource(id = R.string.calendar_no_events_placeholder),
+        onRefresh = { /* Calendar screen has no viewModel yet */ },
         key = { it.id },
         item = { ev -> CalendarCard(event = ev, onClick = { onEventClick(ev.id) }) },
     )

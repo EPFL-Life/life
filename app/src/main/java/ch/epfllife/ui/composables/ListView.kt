@@ -23,20 +23,23 @@ fun <T> ListView(
     list: List<T>,
     emptyTitle: String,
     emptyDescription: String? = null,
+    onRefresh: () -> Unit,
     key: (T) -> Any,
     item: @Composable (T) -> Unit,
 ) {
-  if (list.isEmpty()) {
-    EmptyListView(
-        title = emptyTitle,
-        description = emptyDescription,
-    )
-  } else {
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier.fillMaxSize(),
-    ) {
-      items(list, key = { key(it) }) { item(it) }
+  Refreshable(onRefresh = onRefresh) {
+    if (list.isEmpty()) {
+      EmptyListView(
+          title = emptyTitle,
+          description = emptyDescription,
+      )
+    } else {
+      LazyColumn(
+          verticalArrangement = Arrangement.spacedBy(12.dp),
+          modifier = Modifier.fillMaxSize(),
+      ) {
+        items(list, key = { key(it) }) { item(it) }
+      }
     }
   }
 }
