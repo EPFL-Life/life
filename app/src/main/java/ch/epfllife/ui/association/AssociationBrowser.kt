@@ -4,13 +4,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -18,6 +16,7 @@ import ch.epfllife.R
 import ch.epfllife.model.enums.SubscriptionFilter
 import ch.epfllife.ui.composables.AssociationCard
 import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
+import ch.epfllife.ui.composables.EmptyScreen
 import ch.epfllife.ui.composables.SearchBar
 import ch.epfllife.ui.navigation.NavigationTestTags
 
@@ -25,7 +24,7 @@ import ch.epfllife.ui.navigation.NavigationTestTags
 fun AssociationBrowser(
     modifier: Modifier = Modifier,
     viewModel: AssociationBrowserViewModel = viewModel(),
-    onAssociationClick: (associationId: String) -> Unit
+    onAssociationClick: (associationId: String) -> Unit,
 ) {
   var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
 
@@ -42,68 +41,47 @@ fun AssociationBrowser(
               .fillMaxSize()
               .padding(horizontal = 16.dp, vertical = 12.dp)
               .testTag(NavigationTestTags.ASSOCIATIONBROWSER_SCREEN),
-      horizontalAlignment = Alignment.CenterHorizontally) {
-        // Empty space where the logo would normally be
-        Spacer(Modifier.height(40.dp))
+      horizontalAlignment = Alignment.CenterHorizontally,
+  ) {
+    // Empty space where the logo would normally be
+    Spacer(Modifier.height(40.dp))
 
-        SearchBar()
+    SearchBar()
 
-        Spacer(Modifier.height(12.dp))
+    Spacer(Modifier.height(12.dp))
 
-        DisplayedSubscriptionFilter(
-            selected = selected,
-            onSelected = { selected = it },
-            subscribedLabel = stringResource(id = R.string.subscribed_filter),
-            allLabel = stringResource(id = R.string.all_associations_filter))
+    DisplayedSubscriptionFilter(
+        selected = selected,
+        onSelected = { selected = it },
+        subscribedLabel = stringResource(id = R.string.subscribed_filter),
+        allLabel = stringResource(id = R.string.all_associations_filter),
+    )
 
-        Spacer(Modifier.height(12.dp))
+    Spacer(Modifier.height(12.dp))
 
-        // If statement to display certain messages for empty screens
-        if (shownAssociations.isEmpty()) {
-          val (title, description) =
-              if (selected == SubscriptionFilter.Subscribed) {
-                Pair(R.string.associations_empty_title, R.string.associations_empty_description)
-              } else {
-                Pair(R.string.associations_no_all_title, R.string.associations_no_all_description)
-              }
-          EmptyAssociationsMessage(
-              title = stringResource(id = title),
-              description = stringResource(id = description),
-              modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp))
-        } else {
-          LazyColumn(
-              verticalArrangement = Arrangement.spacedBy(12.dp),
-              modifier = Modifier.fillMaxSize()) {
-                items(shownAssociations, key = { it.id }) { assoc ->
-                  AssociationCard(association = assoc, onClick = { onAssociationClick(assoc.id) })
-                }
-              }
+    // If statement to display certain messages for empty screens
+    if (shownAssociations.isEmpty()) {
+      val (title, description) =
+          if (selected == SubscriptionFilter.Subscribed) {
+            Pair(R.string.associations_empty_title, R.string.associations_empty_description)
+          } else {
+            Pair(R.string.associations_no_all_title, R.string.associations_no_all_description)
+          }
+      EmptyScreen(
+          title = stringResource(id = title),
+          description = stringResource(id = description),
+      )
+    } else {
+      LazyColumn(
+          verticalArrangement = Arrangement.spacedBy(12.dp),
+          modifier = Modifier.fillMaxSize(),
+      ) {
+        items(shownAssociations, key = { it.id }) { assoc ->
+          AssociationCard(association = assoc, onClick = { onAssociationClick(assoc.id) })
         }
       }
-}
-
-@Composable
-private fun EmptyAssociationsMessage(
-    title: String,
-    description: String,
-    modifier: Modifier = Modifier
-) {
-  Column(
-      modifier = modifier,
-      horizontalAlignment = Alignment.CenterHorizontally,
-      verticalArrangement = Arrangement.Center) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-            textAlign = TextAlign.Center)
-        Spacer(Modifier.height(2.dp))
-        Text(
-            text = description,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center)
-      }
+    }
+  }
 }
 
 @Preview(showBackground = true)
