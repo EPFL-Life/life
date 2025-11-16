@@ -1,6 +1,7 @@
 package ch.epfllife.ui.association
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -68,11 +69,11 @@ fun AssociationBrowser(
         emptyTitle = stringResource(id = title),
         emptyDescription = stringResource(id = description),
         onRefresh = { viewModel.refresh() },
-        key = { it.id },
-        item = { assoc ->
-          AssociationCard(association = assoc, onClick = { onAssociationClick(assoc.id) })
-        },
-    )
+    ) { list ->
+      items(list, key = { assoc -> assoc.id }) { assoc ->
+        AssociationCard(association = assoc, onClick = { onAssociationClick(assoc.id) })
+      }
+    }
   }
 }
 
