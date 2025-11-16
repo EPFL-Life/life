@@ -7,8 +7,10 @@ import ch.epfllife.example_data.ExampleEvents
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventRepositoryLocal
 import ch.epfllife.ui.composables.DisplayedEventsTestTags
+import ch.epfllife.ui.composables.EventCardTestTags
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.theme.Theme
+import ch.epfllife.utils.triggerRefresh
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -229,5 +231,46 @@ class HomeScreenTest {
     // Now should show all events (both events)
     composeTestRule.onNodeWithText(ExampleEvents.event1.title).assertIsDisplayed()
     composeTestRule.onNodeWithText(ExampleEvents.event2.title).assertIsDisplayed()
+  }
+
+  @Test
+  fun refreshShowsUpdatedEvents() {
+    val events = listOf(ExampleEvents.event1, ExampleEvents.event2)
+    val checkEventsDisplayed = {
+      events.forEach { event ->
+        composeTestRule
+            .onNodeWithTag(EventCardTestTags.getEventCardTestTag(event.id))
+            .assertIsDisplayed()
+      }
+    }
+    setUpHomeScreen(
+        allEvents = events,
+    )
+    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_ALL).performClick()
+    composeTestRule.waitForIdle()
+    // Initial Events displayed
+    checkEventsDisplayed()
+
+    runTest { repo.createEvent(ExampleEvents.event3) }
+    composeTestRule.triggerRefresh(EventCardTestTags.getEventCardTestTag(ExampleEvents.event1.id))
+
+    // Initial Events displayed + new event displayed
+    checkEventsDisplayed()
+    composeTestRule.waitUntil {
+      composeTestRule
+          .onNodeWithTag(EventCardTestTags.getEventCardTestTag(ExampleEvents.event3.id))
+          .isDisplayed()
+    }
+
+    runTest { assert(repo.deleteEvent(ExampleEvents.event3.id).isSuccess) }
+    composeTestRule.triggerRefresh(EventCardTestTags.getEventCardTestTag(ExampleEvents.event1.id))
+
+    // Initial Events displayed and new event not displayed anymore
+    checkEventsDisplayed()
+    composeTestRule.waitUntil {
+      composeTestRule
+          .onNodeWithTag(EventCardTestTags.getEventCardTestTag(ExampleEvents.event3.id))
+          .isNotDisplayed()
+    }
   }
 }
