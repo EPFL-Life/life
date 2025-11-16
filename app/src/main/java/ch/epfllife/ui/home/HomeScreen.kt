@@ -2,6 +2,7 @@ package ch.epfllife.ui.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -79,9 +80,11 @@ fun HomeScreen(
             emptyTitle = stringResource(title),
             emptyDescription = stringResource(description),
             onRefresh = { viewModel.refresh() },
-            key = { it.id },
-            item = { ev -> EventCard(event = ev, onClick = { onEventClick(ev.id) }) },
-        )
+        ) { list ->
+          items(list, key = { ev -> ev.id }) { ev ->
+            EventCard(event = ev, onClick = { onEventClick(ev.id) })
+          }
+        }
       }
 }
 

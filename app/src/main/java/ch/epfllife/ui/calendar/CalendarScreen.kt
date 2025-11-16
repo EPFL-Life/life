@@ -1,7 +1,9 @@
 package ch.epfllife.ui.calendar
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -85,12 +87,27 @@ fun CalendarScreen(
     Spacer(Modifier.height(12.dp))
 
     ListView(
-        list = shownEvents,
+        list = grouped.toList(),
         emptyTitle = stringResource(id = R.string.calendar_no_events_placeholder),
         onRefresh = { /* Calendar screen has no viewModel yet */ },
-        key = { it.id },
-        item = { ev -> CalendarCard(event = ev, onClick = { onEventClick(ev.id) }) },
-    )
+    ) { list ->
+      list.forEach { (month, events) ->
+        item {
+          Text(
+              text = month,
+              style = MaterialTheme.typography.titleMedium,
+              modifier =
+                  Modifier.padding(vertical = 8.dp)
+                      .align(Alignment.Start)
+                      .testTag(CalendarTestTags.MONTH_HEADER),
+          )
+        }
+
+        items(events, key = { it.id }) { event ->
+          CalendarCard(event = event, onClick = { onEventClick(event.id) })
+        }
+      }
+    }
   }
 }
 
