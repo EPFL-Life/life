@@ -7,6 +7,8 @@ import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeDown
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.RootMatchers.withDecorView
@@ -92,4 +94,15 @@ fun assertToastMessage(
   Espresso.onView(withText(message))
       .inRoot(withDecorView(not(decorView)))
       .check(matches(isDisplayed()))
+}
+
+fun ComposeContentTestRule.triggerRefresh(tag: String) {
+  this.onNodeWithTag(tag).performTouchInput {
+    swipeDown(
+        startY = 0f,
+        endY = 500f,
+    )
+  }
+  this.waitForIdle()
+  this.mainClock.advanceTimeBy(1000) // make sure the animation completes
 }

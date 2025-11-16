@@ -56,4 +56,9 @@ class EventRepositoryLocal : EventRepository {
       Result.failure(NoSuchElementException("Event with id $eventId not found!"))
     }
   }
+
+  fun setEvents(newEvents: List<Event>) {
+    events.clear()
+    events.addAll(newEvents)
+  }
 }
