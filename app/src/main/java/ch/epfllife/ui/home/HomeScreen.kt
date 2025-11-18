@@ -79,7 +79,7 @@ fun HomeScreen(
             list = shownEvents,
             emptyTitle = stringResource(title),
             emptyDescription = stringResource(description),
-            onRefresh = { viewModel.refresh() },
+            onRefresh = viewModel::refresh,
         ) { list ->
           items(list, key = { ev -> ev.id }) { ev ->
             EventCard(event = ev, onClick = { onEventClick(ev.id) })

@@ -89,7 +89,10 @@ fun CalendarScreen(
     ListView(
         list = grouped.toList(),
         emptyTitle = stringResource(id = R.string.calendar_no_events_placeholder),
-        onRefresh = { /* Calendar screen has no viewModel yet */ },
+        onRefresh = { signalFinished ->
+          /* Calendar screen has no viewModel yet */
+          signalFinished()
+        },
     ) { list ->
       list.forEach { (month, events) ->
         item {
