@@ -25,7 +25,7 @@ class HomeViewModel(
     refresh()
   }
 
-  fun refresh() {
+  fun refresh(signalFinished: () -> Unit = {}) {
     viewModelScope.launch {
       _allEvents.value =
           try {
@@ -33,6 +33,7 @@ class HomeViewModel(
           } catch (_: Exception) {
             emptyList()
           }
+      signalFinished()
     }
   }
 

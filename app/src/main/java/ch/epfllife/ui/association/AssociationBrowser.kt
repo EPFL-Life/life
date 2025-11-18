@@ -68,7 +68,7 @@ fun AssociationBrowser(
         list = shownAssociations,
         emptyTitle = stringResource(id = title),
         emptyDescription = stringResource(id = description),
-        onRefresh = { viewModel.refresh() },
+        onRefresh = viewModel::refresh,
     ) { list ->
       items(list, key = { assoc -> assoc.id }) { assoc ->
         AssociationCard(association = assoc, onClick = { onAssociationClick(assoc.id) })

@@ -34,7 +34,7 @@ class AssociationBrowserViewModel(
   }
 
   /** Fetches all associations from the repository and updates the [allAssociations] state. */
-  fun refresh() {
+  fun refresh(signalFinished: () -> Unit = {}) {
     viewModelScope.launch {
       _allAssociations.value =
           try {
@@ -44,6 +44,7 @@ class AssociationBrowserViewModel(
             // e.g., Log.e("AssociationBrowserVM", "Failed to load associations", e)
             emptyList() // Return an empty list on failure
           }
+      signalFinished()
     }
   }
 
