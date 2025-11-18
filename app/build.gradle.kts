@@ -13,7 +13,7 @@ plugins {
 
 android {
   namespace = "ch.epfllife"
-  compileSdk = 34
+  compileSdk = 35
 
   // Load the API key from local.properties
   val localProperties = Properties()
@@ -27,6 +27,7 @@ android {
   defaultConfig {
     applicationId = "ch.epfllife"
     minSdk = 29
+    targetSdk = 35
     versionCode = 1
     versionName = "1.0"
 
@@ -127,7 +128,12 @@ sonar {
 dependencies {
 
   // Core
-  implementation(libs.core.ktx)
+  implementation("com.google.android.play:app-update:2.1.0")
+  implementation("com.google.android.play:app-update-ktx:2.1.0")
+
+  implementation("com.google.android.play:review:2.0.1")
+  implementation("com.google.android.play:review-ktx:2.0.1")
+
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.lifecycle.runtime.ktx)
   implementation(libs.androidx.activity.compose)
