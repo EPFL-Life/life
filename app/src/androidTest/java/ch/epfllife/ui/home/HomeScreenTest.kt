@@ -26,7 +26,7 @@ class HomeScreenTest {
       myEvents: List<Event> = emptyList(),
       allEvents: List<Event> = emptyList(),
   ): HomeViewModel {
-    repo.setEvents(allEvents)
+    repo.seedEvents(allEvents)
     val viewModel = HomeViewModel(repo = repo)
     // Set myEvents since the real ViewModel doesn't populate it yet
     viewModel.setMyEvents(myEvents)

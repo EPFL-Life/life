@@ -57,7 +57,7 @@ class EventRepositoryLocal : EventRepository {
     }
   }
 
-  fun setEvents(newEvents: List<Event>) {
+  fun seedEvents(newEvents: List<Event>) {
     events.clear()
     events.addAll(newEvents)
   }
