@@ -90,7 +90,6 @@ fun AssociationDetailsScreen(
       AssociationDetailsContent(
           association = state.association,
           onGoBack = onGoBack,
-          viewModel = viewModel,
       )
     }
   }
@@ -101,7 +100,6 @@ fun AssociationDetailsContent(
     association: Association,
     modifier: Modifier = Modifier,
     onGoBack: () -> Unit,
-    viewModel: AssociationDetailsViewModel = viewModel(),
 ) {
   var isSubscribed by remember { mutableStateOf(false) }
   val scrollState = rememberScrollState()
