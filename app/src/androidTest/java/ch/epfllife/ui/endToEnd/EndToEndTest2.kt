@@ -51,7 +51,7 @@ class EndToEndTest2 : FirestoreLifeTest() {
     runTest { prepareData() }
     setUpApp()
 
-    // 4. we click on the first event card
+    // 2. we click on the first event card
     composeTestRule.navigateToEvent(ExampleEvents.event1.id)
 
     composeTestRule
@@ -63,12 +63,12 @@ class EndToEndTest2 : FirestoreLifeTest() {
     // IMPORTANT: ensure the asynchronous Firestore write operation completes in the emulator before
     // reading the updated data
     Thread.sleep(1000)
-    // 6. go back to home screen
+    // 3. go back to home screen
     composeTestRule.onNodeWithTag(EventDetailsTestTags.BACK_BUTTON).performClick()
     composeTestRule.waitForIdle()
     composeTestRule.assertTagIsDisplayed(tag = DisplayedEventsTestTags.BUTTON_ALL)
 
-    // 7. check if the numbers of events have increased
+    // 4. check if the numbers of events have increased
     runTest {
       val updated = userRepository.getUser(Firebase.auth.uid!!)
       assertTrue(updated?.enrolledEvents?.contains(ExampleEvents.event1.id) ?: false)

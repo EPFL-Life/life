@@ -257,8 +257,6 @@ fun EventDetailsContent(
           }
 
           // Enroll Button
-          // TODO: button should be gray and say "Enrolled" if user already enrolled -> create a
-          // isEnrolled fun in viewModel
           Button(
               onClick = { viewModel.enrollInEvent(event) },
               modifier =

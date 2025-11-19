@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventRepository
 import ch.epfllife.model.event.EventRepositoryFirestore
+import ch.epfllife.model.user.User
 import ch.epfllife.model.user.UserRepository
 import ch.epfllife.model.user.UserRepositoryFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,12 +38,14 @@ class EventDetailsViewModel(
 
   private val _uiState = MutableStateFlow<EventDetailsUIState>(EventDetailsUIState.Loading)
   val uiState: StateFlow<EventDetailsUIState> = _uiState.asStateFlow()
+  private var currentUser: User? = null
 
   /** Loads event details by ID using EventRepository.getEvent. */
   fun loadEvent(eventId: String) {
     viewModelScope.launch {
       try {
         val event = repo.getEvent(eventId)
+        currentUser = userRepo.getCurrentUser()
         if (event != null) {
           _uiState.value = EventDetailsUIState.Success(event, isEnrolled = isEnrolled(event))
         } else {
@@ -61,7 +64,6 @@ class EventDetailsViewModel(
   fun enrollInEvent(event: Event) {
     viewModelScope.launch {
       try {
-        // TODO: implement logic
         userRepo
             .subscribeToEvent(event.id)
             .fold(
@@ -79,12 +81,10 @@ class EventDetailsViewModel(
    * Check if user is enrolled, this will be only possible if enrollments are tracked by us (not
    * implemented for now, as we only do redirection for the MVP)
    */
-  suspend fun isEnrolled(event: Event): Boolean {
-    // TODO implement actual logic (Firestore / API call)
+  fun isEnrolled(event: Event): Boolean {
     // we need this to decide whether the button should be gray or not ("Enroll in event" or
     // "Enrolled")
     return try {
-      val currentUser = userRepo.getCurrentUser()
       currentUser?.enrolledEvents?.contains(event.id) ?: false
     } catch (e: Exception) {
       false
