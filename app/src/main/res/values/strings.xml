@@ -49,9 +49,11 @@
 
     <!-- Settings screen-->
     <string name="signout_successful">Sign out successful</string>
+    <string name="settings_title">Settings</string>
+    <string name="sign_out">Sign Out</string>
 
 
-    <!-- Settings screen-->
+    <!-- Calendar screen-->
     <string name="calendar_filter_enrolled">Enrolled</string>
     <string name="calendar_filter_all_events">All Events</string>
     <string name="calendar_current_month_format">%1$s</string> <!-- e.g. November -->
