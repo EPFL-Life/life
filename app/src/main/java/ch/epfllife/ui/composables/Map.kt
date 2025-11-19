@@ -37,6 +37,7 @@ fun Map(
     target: Location,
     enableControls: Boolean,
     locationPermissionRequest: @Composable ((Boolean) -> Unit) -> Unit,
+    compassEnabled: Boolean = enableControls,
 ) {
   val targetPos = LatLng(target.latitude, target.longitude)
   val cameraStartPos = CameraPosition.fromLatLngZoom(targetPos, 15f)
@@ -56,7 +57,7 @@ fun Map(
       uiSettings =
           MapUiSettings(
               myLocationButtonEnabled = showLocationControls,
-              compassEnabled = enableControls,
+              compassEnabled = compassEnabled,
               zoomControlsEnabled = enableControls,
               scrollGesturesEnabled = enableControls,
               zoomGesturesEnabled = enableControls,
