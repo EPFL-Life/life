@@ -2,7 +2,6 @@ package ch.epfllife.ui.eventdetails
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.model.association.Association
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventCategory
@@ -68,7 +67,7 @@ class EventDetailsTest {
 
   private fun setEventContent(event: Event) {
     composeTestRule.setContent {
-      EventDetailsContent(event = event, viewModel = viewModel(), onOpenMap = {})
+      EventDetailsContent(event = event, onOpenMap = {}, onGoBack = {}, onEnrollClick = {})
     }
   }
 
@@ -192,7 +191,7 @@ class EventDetailsTest {
     var clicked = false
     composeTestRule.setContent {
       EventDetailsContent(
-          sampleEvent, onGoBack = {}, onOpenMap = { clicked = true }, viewModel = viewModel())
+          sampleEvent, onGoBack = {}, onOpenMap = { clicked = true }, onEnrollClick = {})
     }
     composeTestRule
         .onNodeWithTag(EventDetailsTestTags.VIEW_LOCATION_BUTTON)
@@ -208,7 +207,7 @@ class EventDetailsTest {
       EventDetailsContent(
           event = sampleEvent,
           onGoBack = { backClicked = true },
-          viewModel = viewModel(),
+          onEnrollClick = {},
           onOpenMap = {})
     }
     composeTestRule.onNodeWithTag(EventDetailsTestTags.BACK_BUTTON).performClick()
@@ -343,14 +342,10 @@ class EventDetailsTest {
   @Test
   fun integration_MultipleClicksOnEnrollButton() {
     var clickCount = 0
-    val testViewModel = EventDetailsViewModel()
 
     composeTestRule.setContent {
       EventDetailsContent(
-          event = sampleEvent,
-          viewModel = testViewModel,
-          onGoBack = { clickCount++ },
-          onOpenMap = {})
+          event = sampleEvent, onEnrollClick = {}, onGoBack = { clickCount++ }, onOpenMap = {})
     }
 
     // Click enroll button multiple times
@@ -370,7 +365,7 @@ class EventDetailsTest {
       EventDetailsContent(
           event = sampleEvent,
           onGoBack = { goBackCalled = true },
-          viewModel = viewModel(),
+          onEnrollClick = {},
           onOpenMap = {})
     }
 
