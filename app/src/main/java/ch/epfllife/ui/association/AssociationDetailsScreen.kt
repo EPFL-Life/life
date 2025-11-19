@@ -29,6 +29,7 @@ import ch.epfllife.model.map.Location
 import ch.epfllife.model.user.Price
 import ch.epfllife.ui.composables.BackButton
 import ch.epfllife.ui.composables.EventCard
+import ch.epfllife.ui.theme.LifeRed
 import ch.epfllife.ui.theme.Theme
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -150,7 +151,7 @@ fun AssociationDetailsContent(
               shape = RoundedCornerShape(6.dp),
               colors =
                   ButtonDefaults.buttonColors(
-                      containerColor = if (isSubscribed) Color.Gray else Color(0xFFDC2626),
+                      containerColor = if (isSubscribed) Color.Gray else LifeRed,
                       contentColor = Color.White,
                   ),
           ) {
