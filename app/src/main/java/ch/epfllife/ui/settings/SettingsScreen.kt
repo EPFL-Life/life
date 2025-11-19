@@ -30,6 +30,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.R
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.ui.navigation.NavigationTestTags
+import ch.epfllife.ui.theme.LifeRed
 
 object SettingsScreenTestTags {
   const val SIGN_OUT_BUTTON = "signOutButton"
@@ -74,7 +75,7 @@ fun SettingsScreen(
             shape = RoundedCornerShape(6.dp),
             colors =
                 ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFDC2626), contentColor = Color.White)) {
+                    containerColor = LifeRed, contentColor = Color.White)) {
               Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart) {
                 Text(
                     text = stringResource(R.string.sign_out),
