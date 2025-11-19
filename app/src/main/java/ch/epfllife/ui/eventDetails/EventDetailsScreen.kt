@@ -88,7 +88,7 @@ fun EventDetailsScreen(
           event = state.event,
           onGoBack = onGoBack,
           onOpenMap = onOpenMap,
-          viewModel = viewModel,
+          onEnrollClick = { viewModel.enrollInEvent(state.event) },
       )
     }
   }
@@ -98,9 +98,9 @@ fun EventDetailsScreen(
 fun EventDetailsContent(
     event: Event,
     modifier: Modifier = Modifier,
-    onGoBack: () -> Unit = {},
+    onGoBack: () -> Unit,
     onOpenMap: (Location) -> Unit,
-    viewModel: EventDetailsViewModel,
+    onEnrollClick: () -> Unit,
 ) {
   val context = LocalContext.current
   Column(
@@ -255,7 +255,7 @@ fun EventDetailsContent(
           // TODO: button should be gray and say "Enrolled" if user already enrolled -> create a
           // isEnrolled fun in viewModel
           Button(
-              onClick = { viewModel.enrollInEvent(event) },
+              onClick = onEnrollClick,
               modifier =
                   Modifier.fillMaxWidth()
                       .padding(top = 8.dp)
@@ -299,5 +299,7 @@ fun EventDetailsPreview() {
               "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg",
       )
 
-  Theme() { EventDetailsContent(event = sampleEvent, viewModel = viewModel(), onOpenMap = {}) }
+  Theme() {
+    EventDetailsContent(event = sampleEvent, onOpenMap = {}, onGoBack = {}, onEnrollClick = {})
+  }
 }

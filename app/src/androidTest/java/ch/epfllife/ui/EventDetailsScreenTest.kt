@@ -8,7 +8,6 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.model.association.Association
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventCategory
@@ -54,8 +53,7 @@ class EventDetailsScreenTest {
 
     composeTestRule.setContent {
       Theme {
-        EventDetailsContent(
-            event = sampleEvent, onGoBack = {}, onOpenMap = {}, viewModel = viewModel())
+        EventDetailsContent(event = sampleEvent, onGoBack = {}, onOpenMap = {}, onEnrollClick = {})
       }
     }
   }
