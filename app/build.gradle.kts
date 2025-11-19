@@ -13,7 +13,7 @@ plugins {
 
 android {
   namespace = "ch.epfllife"
-  compileSdk = 34
+  compileSdk = 35
 
   // Load the API key from local.properties
   val localProperties = Properties()
