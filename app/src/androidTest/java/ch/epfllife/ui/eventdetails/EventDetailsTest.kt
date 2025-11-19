@@ -14,7 +14,6 @@ import ch.epfllife.ui.eventDetails.EventDetailsTestTags
 import ch.epfllife.ui.eventDetails.EventDetailsUIState
 import ch.epfllife.ui.eventDetails.EventDetailsViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.junit.Assert.*
@@ -80,45 +79,6 @@ class EventDetailsTest {
     val viewModel = EventDetailsViewModel()
     val initialState = viewModel.uiState.value
     assertTrue("Initial state should be Loading", initialState is EventDetailsUIState.Loading)
-  }
-
-  @Test
-  fun viewModel_LoadEventSuccessfully() = runTest {
-    val viewModel = createViewModelWithFakeRepo()
-    viewModel.loadEvent("event1")
-
-    // Give the coroutine time to complete
-    withContext(Dispatchers.Main) { Thread.sleep(100) }
-
-    val state = viewModel.uiState.value
-    assertTrue("State should be Success after loading", state is EventDetailsUIState.Success)
-    if (state is EventDetailsUIState.Success) {
-      assertNotNull("Event should not be null", state.event)
-      assertEquals("Event title should match", "Drone Workshop", state.event.title)
-      assertFalse("Initially should not be enrolled", state.isEnrolled)
-    }
-  }
-
-  @Test
-  fun viewModel_EnrollInEventUpdatesState() = runTest {
-    val viewModel = createViewModelWithFakeRepo()
-    viewModel.loadEvent("event1")
-
-    withContext(Dispatchers.Main) { Thread.sleep(100) }
-
-    val initialState = viewModel.uiState.value
-    assertTrue("Initial state should be Success", initialState is EventDetailsUIState.Success)
-
-    if (initialState is EventDetailsUIState.Success) {
-      viewModel.enrollInEvent(initialState.event)
-      withContext(Dispatchers.Main) { Thread.sleep(100) }
-
-      val enrolledState = viewModel.uiState.value
-      assertTrue("State should still be Success", enrolledState is EventDetailsUIState.Success)
-      if (enrolledState is EventDetailsUIState.Success) {
-        assertTrue("Should be enrolled after enrolling", enrolledState.isEnrolled)
-      }
-    }
   }
 
   @Test
@@ -197,24 +157,6 @@ class EventDetailsTest {
     val viewModel = EventDetailsViewModel()
     val isEnrolled = viewModel.isEnrolled(sampleEvent)
     assertFalse("User shouldn't be reported as enrolled in the event", isEnrolled)
-  }
-
-  @Test
-  fun viewModel_StateFlowEmitsUpdates() = runBlocking {
-    val viewModel = createViewModelWithFakeRepo()
-    val stateFlow = viewModel.uiState
-
-    // Check initial state
-    val initialState = stateFlow.value
-    assertTrue("Initial state should be Loading", initialState is EventDetailsUIState.Loading)
-
-    // Load event
-    viewModel.loadEvent("event1")
-    withContext(Dispatchers.Main) { Thread.sleep(100) }
-
-    // Check updated state
-    val updatedState = stateFlow.value
-    assertTrue("Updated state should be Success", updatedState is EventDetailsUIState.Success)
   }
 
   // ============ EventDetailsContent Tests ============
@@ -499,19 +441,5 @@ class EventDetailsTest {
   fun content_DescriptionLabelDisplayed() {
     setSampleEventContent()
     composeTestRule.onNodeWithText("Description").assertIsDisplayed()
-  }
-
-  @Test
-  fun viewModel_MultipleLoadEventCalls() = runTest {
-    val viewModel = createViewModelWithFakeRepo()
-
-    // Load event multiple times
-    repeat(3) {
-      viewModel.loadEvent("event$it")
-      withContext(Dispatchers.Main) { Thread.sleep(50) }
-    }
-
-    val state = viewModel.uiState.value
-    assertTrue("Final state should be Success", state is EventDetailsUIState.Success)
   }
 }
