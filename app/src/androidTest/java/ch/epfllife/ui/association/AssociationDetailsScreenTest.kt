@@ -231,7 +231,7 @@ class AssociationDetailsScreenTest {
   @Test
   fun screenDisplaysWithAssociationId() {
     val testId = ExampleAssociations.association1.id
-    setAssociationDetailsScreen(testId)
+    setAssociationDetailsContent(ExampleAssociations.association1)
     // Should display without crashing
     composeTestRule.onNodeWithTag(AssociationDetailsTestTags.NAME_TEXT).assertIsDisplayed()
   }
@@ -240,7 +240,10 @@ class AssociationDetailsScreenTest {
   fun screenCallsOnGoBackWhenBackButtonClicked() {
     composeTestRule.assertClickable(
         composable = { onClick ->
-          Theme { AssociationDetailsScreen(associationId = "test_id", onGoBack = onClick) }
+          Theme {
+            AssociationDetailsContent(
+                association = ExampleAssociations.association1, onGoBack = onClick)
+          }
         },
         tag = AssociationDetailsTestTags.BACK_BUTTON,
     )
