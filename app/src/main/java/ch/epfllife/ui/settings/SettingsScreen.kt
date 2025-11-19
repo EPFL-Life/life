@@ -74,8 +74,7 @@ fun SettingsScreen(
             onClick = { viewModel.signOut() },
             shape = RoundedCornerShape(6.dp),
             colors =
-                ButtonDefaults.buttonColors(
-                    containerColor = LifeRed, contentColor = Color.White)) {
+                ButtonDefaults.buttonColors(containerColor = LifeRed, contentColor = Color.White)) {
               Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart) {
                 Text(
                     text = stringResource(R.string.sign_out),
