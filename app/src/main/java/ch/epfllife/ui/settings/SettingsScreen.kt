@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -23,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.R
@@ -51,7 +53,11 @@ fun SettingsScreen(
   }
 
   Column(
-      modifier = modifier.fillMaxSize().testTag(NavigationTestTags.SETTINGS_SCREEN),
+      modifier =
+          modifier
+              .fillMaxSize()
+              .padding(horizontal = 15.dp)
+              .testTag(NavigationTestTags.SETTINGS_SCREEN),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Top) {
         Spacer(Modifier.height(24.dp))
@@ -70,7 +76,10 @@ fun SettingsScreen(
                 ButtonDefaults.buttonColors(
                     containerColor = Color(0xFFDC2626), contentColor = Color.White)) {
               Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart) {
-                Text(text = stringResource(R.string.sign_out))
+                Text(
+                    text = stringResource(R.string.sign_out),
+                    style =
+                        MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold))
               }
             }
       }
