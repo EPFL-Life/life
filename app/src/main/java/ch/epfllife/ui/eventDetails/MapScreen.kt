@@ -23,7 +23,6 @@ fun MapScreen(location: Location, onGoBack: () -> Unit) {
         target = location,
         enableControls = true,
         locationPermissionRequest = { LocationPermissionRequest(it) },
-        compassEnabled = false, // Disable compass to avoid overlap with back button
     )
     BackButton(
         modifier = Modifier.align(Alignment.TopStart).testTag(MapScreenTestTags.BACK_BUTTON),
