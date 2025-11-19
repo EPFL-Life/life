@@ -2,12 +2,10 @@ package ch.epfllife.ui.eventDetails
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.unit.dp
 import ch.epfllife.model.map.Location
 import ch.epfllife.ui.composables.BackButton
 import ch.epfllife.ui.composables.LocationPermissionRequest
@@ -25,12 +23,10 @@ fun MapScreen(location: Location, onGoBack: () -> Unit) {
         target = location,
         enableControls = true,
         locationPermissionRequest = { LocationPermissionRequest(it) },
+        compassEnabled = false, // Disable compass to avoid overlap with back button
     )
     BackButton(
-        modifier =
-            Modifier.align(Alignment.TopStart)
-                .padding(top = 64.dp) // Move down to avoid overlap with compass
-                .testTag(MapScreenTestTags.BACK_BUTTON),
+        modifier = Modifier.align(Alignment.TopStart).testTag(MapScreenTestTags.BACK_BUTTON),
         onGoBack = onGoBack,
     )
   }
