@@ -27,8 +27,9 @@ android {
   defaultConfig {
     applicationId = "ch.epfllife"
     minSdk = 29
-    versionCode = 1
-    versionName = "1.0"
+    targetSdk = 35
+    versionCode = 14
+    versionName = "1.0.14"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     vectorDrawables { useSupportLibrary = true }
@@ -58,10 +59,10 @@ android {
     }
   }
   compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
   }
-  kotlinOptions { jvmTarget = "11" }
+  kotlinOptions { jvmTarget = "17" }
   buildFeatures { compose = true }
   composeOptions { kotlinCompilerExtensionVersion = "1.5.1" }
   packaging {
@@ -92,8 +93,6 @@ android {
     compose = true
     buildConfig = true
   }
-
-  kotlinOptions { jvmTarget = "11" }
 
   // Robolectric needs to be run only in debug. But its tests are placed in the shared source set
   // (test)
@@ -127,7 +126,10 @@ sonar {
 dependencies {
 
   // Core
-  implementation(libs.core.ktx)
+  implementation("com.google.android.play:app-update:2.1.0")
+  implementation("com.google.android.play:app-update-ktx:2.1.0")
+  implementation("com.google.android.play:review:2.0.1")
+  implementation("com.google.android.play:review-ktx:2.0.1")
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.lifecycle.runtime.ktx)
   implementation(libs.androidx.activity.compose)
