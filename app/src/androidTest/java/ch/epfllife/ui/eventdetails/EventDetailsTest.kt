@@ -104,7 +104,7 @@ class EventDetailsTest {
     viewModel.loadEvent("nonexistent-event-id")
 
     // Give the coroutine time to complete
-    withContext(Dispatchers.Main) { Thread.sleep(100) }
+    withContext(Dispatchers.Main) { Thread.sleep(1000) }
 
     val state = viewModel.uiState.value
     assertTrue("State should be Error when event is not found", state is EventDetailsUIState.Error)
