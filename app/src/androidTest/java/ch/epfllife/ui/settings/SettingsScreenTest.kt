@@ -10,8 +10,8 @@ import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.authentication.SignInResult
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.utils.FakeCredentialManager
+import ch.epfllife.utils.FakeToastHelper
 import ch.epfllife.utils.assertTagIsDisplayed
-import ch.epfllife.utils.assertToastMessage
 import ch.epfllife.utils.setUpEmulator
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
@@ -25,6 +25,7 @@ class SettingsScreenTest {
   @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
   private val auth = Auth(FakeCredentialManager.withDefaultTestUser)
   private lateinit var decorView: View
+  private val fakeToastHelper = FakeToastHelper()
 
   @Before
   fun setUp() {
@@ -54,11 +55,16 @@ class SettingsScreenTest {
   @Test
   fun canSignOut() {
     Assert.assertNotNull(Firebase.auth.currentUser)
+    fakeToastHelper.lastMessage = null
     var clicked = false
-    composeTestRule.setContent { SettingsScreen(auth = auth, onSignedOut = { clicked = true }) }
+    composeTestRule.setContent {
+      SettingsScreen(auth = auth, onSignedOut = { clicked = true }, toastHelper = fakeToastHelper)
+    }
     composeTestRule.onNodeWithTag(SettingsScreenTestTags.SIGN_OUT_BUTTON).performClick()
     composeTestRule.waitUntil(5000) { clicked }
     Assert.assertNull(Firebase.auth.currentUser)
-    assertToastMessage(decorView, R.string.signout_successful)
+    Assert.assertEquals(
+        composeTestRule.activity.getString(R.string.signout_successful),
+        fakeToastHelper.lastMessage)
   }
 }
