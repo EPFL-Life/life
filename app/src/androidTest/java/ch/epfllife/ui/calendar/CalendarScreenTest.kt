@@ -1,6 +1,5 @@
 package ch.epfllife.ui.calendar
 
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import ch.epfllife.example_data.ExampleEvents
@@ -14,34 +13,26 @@ import org.junit.Test
 
 class CalendarScreenTest {
 
-
   private fun setUpCalendarScreen(
-    allEvents: List<ch.epfllife.model.event.Event> = emptyList(),
-    enrolledEvents: List<ch.epfllife.model.event.Event> = emptyList(),
-    onEventClick: (String) -> Unit = {}
+      allEvents: List<ch.epfllife.model.event.Event> = emptyList(),
+      enrolledEvents: List<ch.epfllife.model.event.Event> = emptyList(),
+      onEventClick: (String) -> Unit = {}
   ) {
     composeTestRule.setContent {
       Theme {
         CalendarScreen(
-          allEvents = allEvents,
-          enrolledEvents = enrolledEvents,
-          onEventClick = onEventClick
-        )
+            allEvents = allEvents, enrolledEvents = enrolledEvents, onEventClick = onEventClick)
       }
     }
     composeTestRule.waitForIdle()
   }
-
 
   @get:Rule val composeTestRule = createComposeRule()
 
   @Test
   fun calendarScreen_DisplaysCorrectly() {
     setUpCalendarScreen(
-      allEvents = listOf(ExampleEvents.event1),
-      enrolledEvents = listOf(ExampleEvents.event1)
-    )
-
+        allEvents = listOf(ExampleEvents.event1), enrolledEvents = listOf(ExampleEvents.event1))
 
     composeTestRule.waitForIdle()
 
@@ -58,10 +49,9 @@ class CalendarScreenTest {
     var clickedEventId: String? = null
 
     setUpCalendarScreen(
-      allEvents = listOf(ExampleEvents.event1),
-      enrolledEvents = listOf(ExampleEvents.event1),
-      onEventClick = { eventId -> clickedEventId = eventId }
-    )
+        allEvents = listOf(ExampleEvents.event1),
+        enrolledEvents = listOf(ExampleEvents.event1),
+        onEventClick = { eventId -> clickedEventId = eventId })
 
     // Find and click on the event card
     composeTestRule.onNodeWithText(ExampleEvents.event1.title).performClick()
@@ -70,15 +60,13 @@ class CalendarScreenTest {
     assertEquals(ExampleEvents.event1.id, clickedEventId)
   }
 
-
   @Test
   fun calendarScreen_FilterSwitchingWorks() {
     var clickedEventId: String? = null
     setUpCalendarScreen(
-      allEvents = listOf(ExampleEvents.event1, ExampleEvents.event2),
-      enrolledEvents = listOf(ExampleEvents.event1),
-      onEventClick = { eventId -> clickedEventId = eventId }
-    )
+        allEvents = listOf(ExampleEvents.event1, ExampleEvents.event2),
+        enrolledEvents = listOf(ExampleEvents.event1),
+        onEventClick = { eventId -> clickedEventId = eventId })
 
     composeTestRule.waitForIdle()
 
@@ -107,10 +95,7 @@ class CalendarScreenTest {
 
   @Test
   fun calendarScreen_EmptyStateShowsMessage() {
-    setUpCalendarScreen(
-      allEvents = emptyList(),
-      enrolledEvents = emptyList()
-    )
+    setUpCalendarScreen(allEvents = emptyList(), enrolledEvents = emptyList())
 
     composeTestRule.waitForIdle()
 
@@ -124,9 +109,8 @@ class CalendarScreenTest {
   @Test
   fun calendarScreen_DisplaysMultipleEventsFromDifferentMonths() {
     setUpCalendarScreen(
-      allEvents = listOf(ExampleEvents.event1, ExampleEvents.event2, ExampleEvents.event3),
-      enrolledEvents = listOf(ExampleEvents.event1, ExampleEvents.event2, ExampleEvents.event3)
-    )
+        allEvents = listOf(ExampleEvents.event1, ExampleEvents.event2, ExampleEvents.event3),
+        enrolledEvents = listOf(ExampleEvents.event1, ExampleEvents.event2, ExampleEvents.event3))
 
     composeTestRule.waitForIdle()
 
@@ -144,15 +128,12 @@ class CalendarScreenTest {
         monthHeaders.fetchSemanticsNodes().size >= 2)
   }
 
-
   @Test
   fun calendarScreen_handlesEventsWithInvalidDateFormat() {
     val invalidDateEvent = ExampleEvents.event1.copy(time = "invalid-date-format")
 
     setUpCalendarScreen(
-      allEvents = listOf(invalidDateEvent),
-      enrolledEvents = listOf(invalidDateEvent)
-    )
+        allEvents = listOf(invalidDateEvent), enrolledEvents = listOf(invalidDateEvent))
 
     composeTestRule.waitForIdle()
     // Should not crash with invalid date format
@@ -167,26 +148,20 @@ class CalendarScreenTest {
             ExampleEvents.event2.copy(time = "2025-02-01T10:00:00/2025-02-28T17:00:00"),
             ExampleEvents.event3.copy(time = "2025-03-10T14:00:00/2025-03-12T16:00:00"))
 
-    setUpCalendarScreen(
-      allEvents = multiMonthEvents,
-      enrolledEvents = multiMonthEvents
-    )
+    setUpCalendarScreen(allEvents = multiMonthEvents, enrolledEvents = multiMonthEvents)
 
     composeTestRule.waitForIdle()
     // Should group events by month correctly
     val monthHeaders = composeTestRule.onAllNodesWithTag(CalendarTestTags.MONTH_HEADER)
     assertEquals(
-      "Should have exactly 3 month headers for 3 different months",
-      3,
-      monthHeaders.fetchSemanticsNodes().size)
+        "Should have exactly 3 month headers for 3 different months",
+        3,
+        monthHeaders.fetchSemanticsNodes().size)
   }
 
   @Test
   fun calendarScreen_handlesEmptyEventListsInBothFilters() {
-    setUpCalendarScreen(
-      allEvents = emptyList(),
-      enrolledEvents = emptyList()
-    )
+    setUpCalendarScreen(allEvents = emptyList(), enrolledEvents = emptyList())
 
     composeTestRule.waitForIdle()
     // Should display empty state for both filters
