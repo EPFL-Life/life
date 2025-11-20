@@ -89,172 +89,167 @@ fun AssociationDetailsContent(
   val scrollState = rememberScrollState()
   val context = LocalContext.current
 
-  Column(
-      modifier =
-          modifier
-              .fillMaxSize()
-              .verticalScroll(scrollState)
-              .background(MaterialTheme.colorScheme.surface)) {
-        // Header Image
-        Box(modifier = Modifier.fillMaxWidth()) {
-          AsyncImage(
-              model =
-                  ImageRequest.Builder(LocalContext.current)
-                      .data(association.pictureUrl)
-                      .crossfade(true)
-                      .build(),
-              contentDescription = stringResource(R.string.association_image_description),
-              contentScale = ContentScale.Crop,
-              modifier =
-                  Modifier.fillMaxWidth()
-                      .height(240.dp)
-                      .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
-                      .testTag(AssociationDetailsTestTags.ASSOCIATION_IMAGE),
-          )
+  Box(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface)) {
+    // Header Image
+    Column(modifier = Modifier.fillMaxWidth().verticalScroll(scrollState)) {
+      Box(modifier = Modifier.fillMaxWidth()) {
+        AsyncImage(
+            model =
+                ImageRequest.Builder(LocalContext.current)
+                    .data(association.pictureUrl)
+                    .crossfade(true)
+                    .build(),
+            contentDescription = stringResource(R.string.association_image_description),
+            contentScale = ContentScale.Crop,
+            modifier =
+                Modifier.fillMaxWidth()
+                    .height(240.dp)
+                    .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
+                    .testTag(AssociationDetailsTestTags.ASSOCIATION_IMAGE),
+        )
+      }
 
-          BackButton(
-              modifier =
-                  Modifier.align(Alignment.TopStart)
-                      .testTag(AssociationDetailsTestTags.BACK_BUTTON),
-              onGoBack = onGoBack,
-          )
-        }
+      // Content Below Header
+      Column(
+          modifier = Modifier.fillMaxWidth().padding(16.dp),
+          verticalArrangement = Arrangement.spacedBy(8.dp),
+      ) {
+        Text(
+            text = association.name,
+            style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+            modifier = Modifier.testTag(AssociationDetailsTestTags.NAME_TEXT),
+        )
+        Text(
+            text = association.description,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.testTag(AssociationDetailsTestTags.DESCRIPTION_TEXT),
+        )
 
-        // Content Below Header
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+        // Subscribe Button
+        val subscribeButtonTag =
+            if (isSubscribed) {
+              AssociationDetailsTestTags.UNSUBSCRIBE_BUTTON
+            } else {
+              AssociationDetailsTestTags.SUBSCRIBE_BUTTON
+            }
+
+        Button(
+            onClick = { isSubscribed = !isSubscribed },
+            modifier = Modifier.fillMaxWidth().testTag(subscribeButtonTag),
+            shape = RoundedCornerShape(6.dp),
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = if (isSubscribed) Color.Gray else LifeRed,
+                    contentColor = Color.White,
+                ),
         ) {
           Text(
-              text = association.name,
-              style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-              modifier = Modifier.testTag(AssociationDetailsTestTags.NAME_TEXT),
+              text =
+                  if (isSubscribed) stringResource(R.string.unsubscribe_from, association.name)
+                  else stringResource(R.string.subscribe_to, association.name))
+        }
+
+        HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
+
+        // About Section
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.testTag(AssociationDetailsTestTags.ABOUT_SECTION),
+        ) {
+          Text(
+              stringResource(R.string.about_section_title),
+              style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
           )
           Text(
-              text = association.description,
+              association.about ?: stringResource(R.string.about_placeholder),
               style = MaterialTheme.typography.bodyMedium,
-              color = MaterialTheme.colorScheme.onSurfaceVariant,
-              modifier = Modifier.testTag(AssociationDetailsTestTags.DESCRIPTION_TEXT),
+          )
+        }
+
+        HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
+
+        // Social Pages
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+          Text(
+              stringResource(R.string.social_pages_title),
+              style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
           )
 
-          // Subscribe Button
-          val subscribeButtonTag =
-              if (isSubscribed) {
-                AssociationDetailsTestTags.UNSUBSCRIBE_BUTTON
-              } else {
-                AssociationDetailsTestTags.SUBSCRIBE_BUTTON
-              }
-
-          Button(
-              onClick = { isSubscribed = !isSubscribed },
-              modifier = Modifier.fillMaxWidth().testTag(subscribeButtonTag),
-              shape = RoundedCornerShape(6.dp),
-              colors =
-                  ButtonDefaults.buttonColors(
-                      containerColor = if (isSubscribed) Color.Gray else LifeRed,
-                      contentColor = Color.White,
-                  ),
+          Row(
+              horizontalArrangement = Arrangement.spacedBy(24.dp),
+              verticalAlignment = Alignment.CenterVertically,
+              modifier = Modifier.testTag(AssociationDetailsTestTags.SOCIAL_LINKS_ROW),
           ) {
-            Text(
-                text =
-                    if (isSubscribed) stringResource(R.string.unsubscribe_from, association.name)
-                    else stringResource(R.string.subscribe_to, association.name))
-          }
-
-          HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
-
-          // About Section
-          Column(
-              verticalArrangement = Arrangement.spacedBy(8.dp),
-              modifier = Modifier.testTag(AssociationDetailsTestTags.ABOUT_SECTION),
-          ) {
-            Text(
-                stringResource(R.string.about_section_title),
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-            )
-            Text(
-                association.about ?: stringResource(R.string.about_placeholder),
-                style = MaterialTheme.typography.bodyMedium,
-            )
-          }
-
-          HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
-
-          // Social Pages
-          Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(
-                stringResource(R.string.social_pages_title),
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-            )
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(24.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.testTag(AssociationDetailsTestTags.SOCIAL_LINKS_ROW),
-            ) {
-              association.socialLinks
-                  ?.toList()
-                  ?.sortedBy { (platform, _) ->
-                    SocialIcons.platformOrder.indexOf(platform.lowercase()).takeIf { it >= 0 }
-                        ?: Int.MAX_VALUE
-                  }
-                  ?.forEach { (platform, url) ->
-                    val iconRes = SocialIcons.getIcon(platform) ?: R.drawable.ic_default
-                    IconButton(
-                        onClick = {
-                          val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                          context.startActivity(intent)
-                        }) {
-                          Icon(
-                              painter = painterResource(id = iconRes),
-                              contentDescription = platform,
-                              tint = Color.Unspecified,
-                              modifier = Modifier.size(32.dp),
-                          )
-                        }
-                  }
-            }
-          }
-
-          HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
-
-          // Upcoming Events (dummy data)
-          Column(
-              verticalArrangement = Arrangement.spacedBy(12.dp),
-              modifier = Modifier.testTag(AssociationDetailsTestTags.UPCOMING_EVENTS_COLUMN),
-          ) {
-            Text(
-                stringResource(R.string.upcoming_events_title),
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-            )
-
-            val dummyEvents =
-                listOf(
-                    Event(
-                        id = "1",
-                        title = "Welcome Party",
-                        description = "Kick off the semester with music and fun.",
-                        location = Location(46.5191, 6.5668, "EPFL Esplanade"),
-                        time = "2025-10-20 18:00",
-                        association = association,
-                        tags = listOf("party"),
-                        price = Price(0u),
-                        pictureUrl = null),
-                    Event(
-                        id = "2",
-                        title = "Hiking Trip",
-                        description = "Join us for a scenic hike in the mountains.",
-                        location = Location(46.2, 7.0, "Les Pleiades"),
-                        time = "2025-11-02 09:00",
-                        association = association,
-                        tags = listOf("outdoors"),
-                        price = Price(15u),
-                        pictureUrl = null))
-
-            dummyEvents.forEach { event -> EventCard(event = event, onClick = {}) }
+            association.socialLinks
+                ?.toList()
+                ?.sortedBy { (platform, _) ->
+                  SocialIcons.platformOrder.indexOf(platform.lowercase()).takeIf { it >= 0 }
+                      ?: Int.MAX_VALUE
+                }
+                ?.forEach { (platform, url) ->
+                  val iconRes = SocialIcons.getIcon(platform) ?: R.drawable.ic_default
+                  IconButton(
+                      onClick = {
+                        val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+                        context.startActivity(intent)
+                      }) {
+                        Icon(
+                            painter = painterResource(id = iconRes),
+                            contentDescription = platform,
+                            tint = Color.Unspecified,
+                            modifier = Modifier.size(32.dp),
+                        )
+                      }
+                }
           }
         }
+
+        HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
+
+        // Upcoming Events (dummy data)
+        Column(
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.testTag(AssociationDetailsTestTags.UPCOMING_EVENTS_COLUMN),
+        ) {
+          Text(
+              stringResource(R.string.upcoming_events_title),
+              style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+          )
+
+          val dummyEvents =
+              listOf(
+                  Event(
+                      id = "1",
+                      title = "Welcome Party",
+                      description = "Kick off the semester with music and fun.",
+                      location = Location(46.5191, 6.5668, "EPFL Esplanade"),
+                      time = "2025-10-20 18:00",
+                      association = association,
+                      tags = listOf("party"),
+                      price = Price(0u),
+                      pictureUrl = null),
+                  Event(
+                      id = "2",
+                      title = "Hiking Trip",
+                      description = "Join us for a scenic hike in the mountains.",
+                      location = Location(46.2, 7.0, "Les Pleiades"),
+                      time = "2025-11-02 09:00",
+                      association = association,
+                      tags = listOf("outdoors"),
+                      price = Price(15u),
+                      pictureUrl = null))
+
+          dummyEvents.forEach { event -> EventCard(event = event, onClick = {}) }
+        }
       }
+    }
+    BackButton(
+        modifier =
+            Modifier.align(Alignment.TopStart).testTag(AssociationDetailsTestTags.BACK_BUTTON),
+        onGoBack = onGoBack,
+    )
+  }
 }
 
 @Preview(showBackground = true)
