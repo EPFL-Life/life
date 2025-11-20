@@ -82,8 +82,6 @@ class EventDetailsViewModel(
    * implemented for now, as we only do redirection for the MVP)
    */
   fun isEnrolled(event: Event): Boolean {
-    // we need this to decide whether the button should be gray or not ("Enroll in event" or
-    // "Enrolled")
     return currentUser?.enrolledEvents?.contains(event.id) ?: false
   }
 }
