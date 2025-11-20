@@ -276,9 +276,7 @@ class HomeScreenTest {
 
   @Test
   fun homeScreen_handlesNullEventDataGracefully() = runTest {
-    val viewModel = createFakeViewModel(myEvents = listOf(), allEvents = listOf())
-
-    composeTestRule.setContent { Theme { HomeScreen(viewModel = viewModel, onEventClick = {}) } }
+    setUpHomeScreen(myEvents = emptyList(), allEvents = emptyList())
 
     composeTestRule.waitForIdle()
     // Should display empty state without crashing
@@ -293,7 +291,7 @@ class HomeScreenTest {
                 "This is an extremely long event title that might cause layout issues if not handled properly in the UI components and should be truncated correctly")
     val viewModel = createFakeViewModel(myEvents = listOf(longTitleEvent))
 
-    composeTestRule.setContent { Theme { HomeScreen(viewModel = viewModel, onEventClick = {}) } }
+    setUpHomeScreen(myEvents = listOf(longTitleEvent))
 
     composeTestRule.waitForIdle()
 
@@ -304,9 +302,8 @@ class HomeScreenTest {
   fun homeScreen_handlesSpecialCharactersInEventTitles() = runTest {
     val specialCharEvent =
         ExampleEvents.event1.copy(title = "Event with spéciäl chàräctérs & symbols! @#$%^&*()")
-    val viewModel = createFakeViewModel(myEvents = listOf(specialCharEvent))
 
-    composeTestRule.setContent { Theme { HomeScreen(viewModel = viewModel, onEventClick = {}) } }
+    setUpHomeScreen(myEvents = listOf(specialCharEvent))
 
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithText(specialCharEvent.title).assertIsDisplayed()
