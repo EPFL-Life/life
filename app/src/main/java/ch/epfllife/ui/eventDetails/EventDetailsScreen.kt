@@ -5,7 +5,9 @@ import android.content.pm.PackageManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.CalendarToday
@@ -108,6 +110,7 @@ fun EventDetailsContent(
           modifier
               .fillMaxSize()
               .background(MaterialTheme.colorScheme.surface)
+              .verticalScroll(rememberScrollState())
               .testTag(EventDetailsTestTags.CONTENT)) {
 
         // Header with image and overlayed back button
@@ -140,7 +143,9 @@ fun EventDetailsContent(
         // Start of Text Information
         Column(
             modifier =
-                Modifier.fillMaxSize().padding(16.dp).background(MaterialTheme.colorScheme.surface),
+                Modifier.fillMaxWidth()
+                    .padding(16.dp)
+                    .background(MaterialTheme.colorScheme.surface),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
           // Row containing: Title, Club, Price
