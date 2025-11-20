@@ -30,8 +30,7 @@ class SettingsScreenTest {
   @Before
   fun setUp() {
     setUpEmulator(auth, "SettingsScreenTest")
-    // We need to wait for toasts to disappear before each test,
-    // otherwise new toasts might not be displayed.
+    fakeToastHelper.lastMessage = null
     composeTestRule.waitForIdle()
     composeTestRule.activityRule.scenario.onActivity { activity ->
       decorView = activity.window.decorView
@@ -55,7 +54,6 @@ class SettingsScreenTest {
   @Test
   fun canSignOut() {
     Assert.assertNotNull(Firebase.auth.currentUser)
-    fakeToastHelper.lastMessage = null
     var clicked = false
     composeTestRule.setContent {
       SettingsScreen(auth = auth, onSignedOut = { clicked = true }, toastHelper = fakeToastHelper)

@@ -47,12 +47,7 @@ class SignInScreenTest {
 
   @Before
   fun setUp() {
-    // We need to wait for toasts to disappear before each test,
-    // otherwise new toasts might not be displayed.
-    // composeTestRule.waitForIdle()
-    // composeTestRule.activityRule.scenario.onActivity { activity ->
-    //  decorView = activity.window.decorView
-    // }
+    fakeToastHelper.lastMessage = null
     setUpEmulator(auth, "SignInScreenTest")
   }
 
@@ -190,8 +185,6 @@ class SignInScreenTest {
   }
 
   private fun assertSignInProblem(testAuth: Auth, message: Int) {
-    // 1. Reset the fake helper state
-    fakeToastHelper.lastMessage = null
 
     var onSignedInCalled = false
     composeTestRule.setContent {
