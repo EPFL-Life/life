@@ -27,4 +27,23 @@ class PriceTest {
   @Test fun smallPrices() = assertFormatting(priceInCents = 7u, expected = "CHF 0.07")
 
   @Test fun completePrice() = assertFormatting(priceInCents = 123456u, expected = "CHF 1234.56")
+
+  // Just ensure it doesn't crash with extremely large values
+  @Test
+  fun edgeCase_maxUIntValue() {
+    val price = Price(UInt.MAX_VALUE)
+    price.formatPrice()
+  }
+
+  @Test
+  fun toCents_returnsCorrectValue() {
+    val price = Price(150u)
+    Assert.assertEquals(150u, price.toCents())
+  }
+
+  @Test
+  fun toCentsLong_returnsCorrectValue() {
+    val price = Price(150u)
+    Assert.assertEquals(150L, price.toCentsLong())
+  }
 }
