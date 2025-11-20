@@ -1,6 +1,5 @@
 package ch.epfllife.ui.authentication
 
-import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -37,6 +36,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.R
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.ui.navigation.NavigationTestTags
+import ch.epfllife.utils.SystemToastHelper
+import ch.epfllife.utils.ToastHelper
 
 object SignInScreenTestTags {
   const val SIGN_IN_APP_LOGO = "signInAppLogo"
@@ -50,6 +51,7 @@ fun SignInScreen(
     auth: Auth,
     authViewModel: SignInViewModel = viewModel { SignInViewModel(auth) },
     onSignedIn: () -> Unit,
+    toastHelper: ToastHelper = SystemToastHelper(),
 ) {
 
   val context = LocalContext.current
@@ -58,7 +60,7 @@ fun SignInScreen(
   // Show error message if login fails
   LaunchedEffect(uiState.errorMsg) {
     uiState.errorMsg?.let {
-      Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+      toastHelper.show(context, it)
       authViewModel.clearErrorMsg()
     }
   }
@@ -66,7 +68,7 @@ fun SignInScreen(
   // Navigate to home screen on successful login
   LaunchedEffect(uiState.user) {
     uiState.user?.let {
-      Toast.makeText(context, R.string.signin_success_message, Toast.LENGTH_SHORT).show()
+      toastHelper.show(context, R.string.signin_success_message)
       onSignedIn()
     }
   }

@@ -2,6 +2,7 @@ package ch.epfllife.ui.authentication
 
 import android.view.View
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -13,9 +14,9 @@ import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.user.UserRepositoryFirestore
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.utils.FakeCredentialManager
+import ch.epfllife.utils.FakeToastHelper
 import ch.epfllife.utils.FirebaseEmulator
 import ch.epfllife.utils.assertTagIsDisplayed
-import ch.epfllife.utils.assertToastMessage
 import ch.epfllife.utils.setUpEmulator
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
@@ -42,21 +43,24 @@ class SignInScreenTest {
   @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
   private val auth = Auth(FakeCredentialManager.withDefaultTestUser)
   private lateinit var decorView: View
+  private val fakeToastHelper = FakeToastHelper()
 
   @Before
   fun setUp() {
     // We need to wait for toasts to disappear before each test,
     // otherwise new toasts might not be displayed.
-    composeTestRule.waitForIdle()
-    composeTestRule.activityRule.scenario.onActivity { activity ->
-      decorView = activity.window.decorView
-    }
+    // composeTestRule.waitForIdle()
+    // composeTestRule.activityRule.scenario.onActivity { activity ->
+    //  decorView = activity.window.decorView
+    // }
     setUpEmulator(auth, "SignInScreenTest")
   }
 
   @Test
   fun contentIsDisplayed() {
-    composeTestRule.setContent { SignInScreen(auth, onSignedIn = {}) }
+    composeTestRule.setContent {
+      SignInScreen(auth, onSignedIn = {}, toastHelper = fakeToastHelper)
+    }
     listOf(
             NavigationTestTags.SIGN_IN_SCREEN,
             SignInScreenTestTags.SIGN_IN_APP_LOGO,
@@ -71,11 +75,16 @@ class SignInScreenTest {
   fun canSignIn() {
     Assert.assertNull(Firebase.auth.currentUser)
     var clicked = false
-    composeTestRule.setContent { SignInScreen(auth, onSignedIn = { clicked = true }) }
+    composeTestRule.setContent {
+      SignInScreen(auth, onSignedIn = { clicked = true }, toastHelper = fakeToastHelper)
+    }
     composeTestRule.onNodeWithTag(SignInScreenTestTags.SIGN_IN_BUTTON).performClick()
     composeTestRule.waitUntil(5000) { clicked }
     Assert.assertNotNull(Firebase.auth.currentUser)
-    assertToastMessage(decorView, R.string.signin_success_message)
+    Assert.assertEquals(
+        "Sign in success", // Or whatever your string resource resolves to
+        composeTestRule.activity.getString(R.string.signin_success_message),
+        fakeToastHelper.lastMessage)
   }
 
   @Test
@@ -181,11 +190,24 @@ class SignInScreenTest {
   }
 
   private fun assertSignInProblem(testAuth: Auth, message: Int) {
+    // 1. Reset the fake helper state
+    fakeToastHelper.lastMessage = null
+
     var onSignedInCalled = false
-    composeTestRule.setContent { SignInScreen(testAuth, onSignedIn = { onSignedInCalled = true }) }
+    composeTestRule.setContent {
+      SignInScreen(
+          testAuth, onSignedIn = { onSignedInCalled = true }, toastHelper = fakeToastHelper)
+    }
     composeTestRule.onNodeWithTag(SignInScreenTestTags.SIGN_IN_BUTTON).performClick()
-    composeTestRule.waitForIdle()
+
+    // 3. Wait for the button to reappear (indicating loading is done and error is set)
+    composeTestRule.waitUntil(timeoutMillis = 5000) {
+      composeTestRule.onNodeWithTag(SignInScreenTestTags.SIGN_IN_BUTTON).isDisplayed()
+    }
+
     Assert.assertFalse(onSignedInCalled)
-    assertToastMessage(decorView, message)
+
+    // 4. Assert the message stored in the fake helper
+    Assert.assertEquals(composeTestRule.activity.getString(message), fakeToastHelper.lastMessage)
   }
 }

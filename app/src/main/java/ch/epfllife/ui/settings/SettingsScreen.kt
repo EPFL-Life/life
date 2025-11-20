@@ -1,6 +1,5 @@
 package ch.epfllife.ui.settings
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +30,8 @@ import ch.epfllife.R
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.theme.LifeRed
+import ch.epfllife.utils.SystemToastHelper
+import ch.epfllife.utils.ToastHelper
 
 object SettingsScreenTestTags {
   const val SIGN_OUT_BUTTON = "signOutButton"
@@ -42,6 +43,7 @@ fun SettingsScreen(
     auth: Auth,
     viewModel: SettingsViewModel = viewModel { SettingsViewModel(auth) },
     onSignedOut: () -> Unit,
+    toastHelper: ToastHelper = SystemToastHelper()
 ) {
   val context = LocalContext.current
   val uiState by viewModel.uiState.collectAsState()
@@ -49,7 +51,7 @@ fun SettingsScreen(
   LaunchedEffect(uiState.signInState) {
     if (uiState.signInState is SignInState.SignedOut) {
       onSignedOut()
-      Toast.makeText(context, R.string.signout_successful, Toast.LENGTH_SHORT).show()
+      toastHelper.show(context, R.string.signout_successful)
     }
   }
 

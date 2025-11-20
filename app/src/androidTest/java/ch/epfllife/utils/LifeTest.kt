@@ -9,11 +9,11 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeDown
-import androidx.test.espresso.Espresso
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.RootMatchers.withDecorView
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.uiautomator.By
+import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.Until
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.ui.composables.EventCardTestTags
 import ch.epfllife.ui.eventDetails.EventDetailsTestTags
@@ -89,11 +89,14 @@ fun assertToastMessage(
     decorView: android.view.View,
     message: Int,
 ) {
-  // Got this technique from:
-  // https://stackoverflow.com/questions/28390574/checking-toast-message-in-android-espresso
-  Espresso.onView(withText(message))
-      .inRoot(withDecorView(not(decorView)))
-      .check(matches(isDisplayed()))
+  val messageString = decorView.context.getString(message)
+  val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+
+  // 1. Use textContains (handles partial matches/whitespace)
+  // 2. Increase wait to 5000ms (emulators can be slow)
+  val toastAppeared = device.wait(Until.hasObject(By.textContains(messageString)), 5000)
+
+  Assert.assertTrue("Toast containing '$messageString' not found", toastAppeared)
 }
 
 fun ComposeContentTestRule.triggerRefresh(tag: String) {
