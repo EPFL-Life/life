@@ -69,10 +69,10 @@ class EventDetailsViewModel(
             .fold(
                 onSuccess = { loadEvent(event.id) },
                 onFailure = { error ->
-                  _uiState.value = EventDetailsUIState.Error("Failed to enrol: ${error.message}")
+                  _uiState.value = EventDetailsUIState.Error("Failed to enrol: Please try again.")
                 })
       } catch (e: Exception) {
-        _uiState.value = EventDetailsUIState.Error("Failed to enrol: ${e.message}")
+        _uiState.value = EventDetailsUIState.Error("Failed to enrol: Please try again.")
       }
     }
   }
@@ -84,10 +84,6 @@ class EventDetailsViewModel(
   fun isEnrolled(event: Event): Boolean {
     // we need this to decide whether the button should be gray or not ("Enroll in event" or
     // "Enrolled")
-    return try {
-      currentUser?.enrolledEvents?.contains(event.id) ?: false
-    } catch (e: Exception) {
-      false
-    }
+    return currentUser?.enrolledEvents?.contains(event.id) ?: false
   }
 }
