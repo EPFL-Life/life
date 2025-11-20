@@ -7,6 +7,7 @@ import ch.epfllife.example_data.ExampleEvents
 import ch.epfllife.ui.composables.DisplayedEventsTestTags
 import ch.epfllife.ui.navigation.NavigationTestTags
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -135,5 +136,62 @@ class CalendarScreenTest {
     org.junit.Assert.assertTrue(
         "Should have multiple month headers for events from different months",
         monthHeaders.fetchSemanticsNodes().size >= 2)
+  }
+
+  // ADD THESE TESTS TO THE EXISTING CalendarScreenTest.kt
+
+  @Test
+  fun calendarScreen_handlesEventsWithInvalidDateFormat() {
+    val invalidDateEvent = ExampleEvents.event1.copy(time = "invalid-date-format")
+
+    composeTestRule.setContent {
+      MaterialTheme {
+        CalendarScreen(
+            allEvents = listOf(invalidDateEvent),
+            enrolledEvents = listOf(invalidDateEvent),
+            onEventClick = {})
+      }
+    }
+
+    composeTestRule.waitForIdle()
+    // Should not crash with invalid date format
+    composeTestRule.onNodeWithTag(NavigationTestTags.CALENDAR_SCREEN).assertIsDisplayed()
+  }
+
+  @Test
+  fun calendarScreen_handlesEventsSpanningMultipleMonths() {
+    val multiMonthEvents =
+        listOf(
+            ExampleEvents.event1.copy(time = "2025-01-15T09:00:00/2025-01-20T18:00:00"),
+            ExampleEvents.event2.copy(time = "2025-02-01T10:00:00/2025-02-28T17:00:00"),
+            ExampleEvents.event3.copy(time = "2025-03-10T14:00:00/2025-03-12T16:00:00"))
+
+    composeTestRule.setContent {
+      MaterialTheme {
+        CalendarScreen(
+            allEvents = multiMonthEvents, enrolledEvents = multiMonthEvents, onEventClick = {})
+      }
+    }
+
+    composeTestRule.waitForIdle()
+    // Should group events by month correctly
+    val monthHeaders = composeTestRule.onAllNodesWithTag(CalendarTestTags.MONTH_HEADER)
+    assertTrue("Should have multiple month headers", monthHeaders.fetchSemanticsNodes().size >= 3)
+  }
+
+  @Test
+  fun calendarScreen_handlesEmptyEventListsInBothFilters() {
+    composeTestRule.setContent {
+      MaterialTheme {
+        CalendarScreen(allEvents = emptyList(), enrolledEvents = emptyList(), onEventClick = {})
+      }
+    }
+
+    composeTestRule.waitForIdle()
+    // Should display empty state for both filters
+    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_ALL).performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_SUBSCRIBED).performClick()
+    composeTestRule.waitForIdle()
   }
 }
