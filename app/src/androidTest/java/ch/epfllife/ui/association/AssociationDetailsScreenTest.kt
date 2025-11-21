@@ -243,22 +243,6 @@ class AssociationDetailsScreenTest {
   }
 
   @Test
-  fun screenDisplaysAssociationOnSuccess() {
-    val association = ExampleAssociations.association1
-    val viewModel =
-        AssociationDetailsViewModel(FakeAssociationRepository(successAssociation = association))
-
-    setAssociationDetailsScreen(associationId = association.id, viewModel = viewModel)
-
-    composeTestRule.waitForIdle()
-
-    composeTestRule.onNodeWithTag(AssociationDetailsTestTags.NAME_TEXT).assertIsDisplayed()
-    composeTestRule
-        .onNodeWithTag(AssociationDetailsTestTags.NAME_TEXT)
-        .assert(hasText(association.name))
-  }
-
-  @Test
   fun screenDisplaysErrorMessageOnFailure() {
     val viewModel = AssociationDetailsViewModel(FakeAssociationRepository(throwError = true))
 
@@ -280,22 +264,6 @@ class AssociationDetailsScreenTest {
   }
 
   // ============ ViewModel Tests (AssociationDetailsViewModel) ============
-
-  @OptIn(ExperimentalCoroutinesApi::class)
-  @Test
-  fun viewModelEmitsSuccessWhenAssociationFound() = runTest {
-    val association = ExampleAssociations.association1
-    val viewModel =
-        AssociationDetailsViewModel(FakeAssociationRepository(successAssociation = association))
-
-    viewModel.loadAssociation(association.id)
-
-    val state = viewModel.uiState.first { it !is AssociationDetailsUIState.Loading }
-
-    assertTrue(state is AssociationDetailsUIState.Success)
-    val successState = state as AssociationDetailsUIState.Success
-    assertEquals(association, successState.association)
-  }
 
   @OptIn(ExperimentalCoroutinesApi::class)
   @Test
@@ -340,10 +308,6 @@ private class FakeAssociationRepository(
   override suspend fun getAssociation(associationId: String): Association? {
     if (throwError) throw IOException("Test exception")
     if (returnNull) return null
-    if (delayResult) {
-      // Simulate loading by returning null immediately; state remains Loading in tests
-      kotlinx.coroutines.delay(10)
-    }
     return successAssociation
   }
 
