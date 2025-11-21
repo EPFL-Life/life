@@ -333,6 +333,6 @@ private class FakeAssociationRepository(
   override suspend fun getEventsForAssociation(
       associationId: String
   ): Result<List<ch.epfllife.model.event.Event>> {
-    throw UnsupportedOperationException("Not used in these tests")
+    throw UnsupportedOperationException("Not used in these tests.")
   }
 }
