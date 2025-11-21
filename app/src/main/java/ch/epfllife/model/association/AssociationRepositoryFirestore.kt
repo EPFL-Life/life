@@ -71,7 +71,7 @@ class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : Associ
     return Result.runCatching {
       val snapshot =
           db.collection(FirestoreCollections.EVENTS)
-              .whereEqualTo("associationId", associationId)
+              .whereEqualTo("association", "associations/$associationId")
               .get()
               .await()
 

@@ -21,12 +21,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.R
 import ch.epfllife.model.association.Association
 import ch.epfllife.model.event.Event
-import ch.epfllife.model.event.EventCategory
-import ch.epfllife.model.map.Location
-import ch.epfllife.model.user.Price
 import ch.epfllife.ui.composables.BackButton
 import ch.epfllife.ui.composables.EventCard
 import ch.epfllife.ui.theme.LifeRed
@@ -50,39 +48,58 @@ object AssociationDetailsTestTags {
   const val UPCOMING_EVENTS_COLUMN = "upcoming_events_column"
   const val SUBSCRIBE_BUTTON = "subscribe_button"
   const val UNSUBSCRIBE_BUTTON = "unsubscribe_button"
+  const val LOADING_INDICATOR = "loading_indicator"
+  const val ERROR_MESSAGE = "error_message"
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AssociationDetailsScreen(associationId: String, onGoBack: () -> Unit) {
-  // For now, we still use a sample association.
-  // In the future, you can replace this with a ViewModel fetching the association by ID.
-  val sampleAssociation =
-      Association(
-          id = associationId, // Now we actually use the passed associationId
-          name = "ESN Lausanne",
-          description = "Erasmus Student Network at EPFL.",
-          eventCategory = EventCategory.CULTURE,
-          pictureUrl =
-              "https://www.epfl.ch/campus/services/events/wp-content/uploads/2024/09/WEB_Image-Home-Events_ORGANISER.png",
-          about =
-              "The Erasmus Student Network (ESN) Lausanne is a student association that helps exchange students integrate into life at EPFL and Lausanne through social and cultural activities.",
-          socialLinks =
-              mapOf(
-                  "instagram" to "https://www.instagram.com/esnlausanne",
-                  "telegram" to "https://t.me/esnlausanne",
-                  "whatsapp" to "https://wa.me/41791234567",
-                  "linkedin" to "https://www.linkedin.com/company/esnlausanne",
-                  "website" to "https://esnlausanne.ch",
-              ),
-      )
+fun AssociationDetailsScreen(
+    associationId: String,
+    viewModel: AssociationDetailsViewModel = viewModel(),
+    onGoBack: () -> Unit = {},
+) {
+  val uiState by viewModel.uiState.collectAsState()
+  LaunchedEffect(associationId) {
+    viewModel.loadAssociation(associationId)
+  } // this is triggered once the screen opens
 
-  AssociationDetailsContent(association = sampleAssociation, onGoBack = onGoBack)
+  when (val state = uiState) {
+    is AssociationDetailsUIState.Loading -> {
+      // Show loading spinner
+      Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator(
+            modifier = Modifier.testTag(AssociationDetailsTestTags.LOADING_INDICATOR))
+      }
+    }
+
+    is AssociationDetailsUIState.Error -> {
+      // Show error message
+      Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text(
+            text = state.message,
+            color = MaterialTheme.colorScheme.error,
+            modifier = Modifier.testTag(AssociationDetailsTestTags.ERROR_MESSAGE),
+        )
+      }
+    }
+
+    is AssociationDetailsUIState.Success -> {
+      // Show event content
+      AssociationDetailsContent(
+          association = state.association,
+          events = state.events ?: emptyList(),
+          onGoBack = onGoBack,
+      )
+    }
+  }
 }
 
 @Composable
 fun AssociationDetailsContent(
     association: Association,
     modifier: Modifier = Modifier,
+    events: List<Event> = emptyList(),
     onGoBack: () -> Unit,
 ) {
   var isSubscribed by remember { mutableStateOf(false) }
@@ -217,30 +234,7 @@ fun AssociationDetailsContent(
               style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
           )
 
-          val dummyEvents =
-              listOf(
-                  Event(
-                      id = "1",
-                      title = "Welcome Party",
-                      description = "Kick off the semester with music and fun.",
-                      location = Location(46.5191, 6.5668, "EPFL Esplanade"),
-                      time = "2025-10-20 18:00",
-                      association = association,
-                      tags = listOf("party"),
-                      price = Price(0u),
-                      pictureUrl = null),
-                  Event(
-                      id = "2",
-                      title = "Hiking Trip",
-                      description = "Join us for a scenic hike in the mountains.",
-                      location = Location(46.2, 7.0, "Les Pleiades"),
-                      time = "2025-11-02 09:00",
-                      association = association,
-                      tags = listOf("outdoors"),
-                      price = Price(15u),
-                      pictureUrl = null))
-
-          dummyEvents.forEach { event -> EventCard(event = event, onClick = {}) }
+          events.forEach { event -> EventCard(event = event, onClick = {}) }
         }
       }
     }
