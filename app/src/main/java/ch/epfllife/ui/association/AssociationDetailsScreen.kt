@@ -25,8 +25,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.R
 import ch.epfllife.model.association.Association
 import ch.epfllife.model.event.Event
-import ch.epfllife.model.map.Location
-import ch.epfllife.model.user.Price
 import ch.epfllife.ui.composables.BackButton
 import ch.epfllife.ui.composables.EventCard
 import ch.epfllife.ui.theme.Theme
@@ -89,6 +87,7 @@ fun AssociationDetailsScreen(
       // Show event content
       AssociationDetailsContent(
           association = state.association,
+          events = state.events ?: emptyList(),
           onGoBack = onGoBack,
       )
     }
@@ -99,6 +98,7 @@ fun AssociationDetailsScreen(
 fun AssociationDetailsContent(
     association: Association,
     modifier: Modifier = Modifier,
+    events: List<Event> = emptyList(),
     onGoBack: () -> Unit,
 ) {
   var isSubscribed by remember { mutableStateOf(false) }
@@ -244,30 +244,7 @@ fun AssociationDetailsContent(
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
             )
 
-            val dummyEvents =
-                listOf(
-                    Event(
-                        id = "1",
-                        title = "Welcome Party",
-                        description = "Kick off the semester with music and fun.",
-                        location = Location(46.5191, 6.5668, "EPFL Esplanade"),
-                        time = "2025-10-20 18:00",
-                        association = association,
-                        tags = listOf("party"),
-                        price = Price(0u),
-                        pictureUrl = null),
-                    Event(
-                        id = "2",
-                        title = "Hiking Trip",
-                        description = "Join us for a scenic hike in the mountains.",
-                        location = Location(46.2, 7.0, "Les Pleiades"),
-                        time = "2025-11-02 09:00",
-                        association = association,
-                        tags = listOf("outdoors"),
-                        price = Price(15u),
-                        pictureUrl = null))
-
-            dummyEvents.forEach { event -> EventCard(event = event, onClick = {}) }
+            events.forEach { event -> EventCard(event = event, onClick = {}) }
           }
         }
       }
