@@ -137,7 +137,9 @@ fun App(
                   backStackEntry ->
                 val associationId = backStackEntry.arguments?.getString("associationId") ?: ""
                 AssociationDetailsScreen(
-                    associationId = associationId, onGoBack = { navController.popBackStack() })
+                    associationId = associationId,
+                    onGoBack = { navController.popBackStack() },
+                    onEventClick = { id -> navigationActions.navigateToEventDetails(id) })
               }
 
           // Event details route

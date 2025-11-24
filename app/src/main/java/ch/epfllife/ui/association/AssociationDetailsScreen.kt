@@ -58,6 +58,7 @@ fun AssociationDetailsScreen(
     associationId: String,
     viewModel: AssociationDetailsViewModel = viewModel(),
     onGoBack: () -> Unit = {},
+    onEventClick: (String) -> Unit = {},
 ) {
   val uiState by viewModel.uiState.collectAsState()
   LaunchedEffect(associationId) {
@@ -90,6 +91,7 @@ fun AssociationDetailsScreen(
           association = state.association,
           events = state.events ?: emptyList(),
           onGoBack = onGoBack,
+          onEventClick = onEventClick,
       )
     }
   }
@@ -101,6 +103,7 @@ fun AssociationDetailsContent(
     modifier: Modifier = Modifier,
     events: List<Event> = emptyList(),
     onGoBack: () -> Unit,
+    onEventClick: (String) -> Unit = {},
 ) {
   var isSubscribed by remember { mutableStateOf(false) }
   val scrollState = rememberScrollState()
@@ -234,7 +237,7 @@ fun AssociationDetailsContent(
               style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
           )
 
-          events.forEach { event -> EventCard(event = event, onClick = {}) }
+          events.forEach { event -> EventCard(event = event, onClick = { onEventClick(event.id) }) }
         }
       }
     }
