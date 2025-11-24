@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import io.mockk.InternalPlatformDsl.toArray
 import okhttp3.MediaType.Companion.toMediaType
@@ -21,8 +22,13 @@ object FirebaseEmulator {
   val auth
     get() = Firebase.auth
 
-  val firestore
-    get() = Firebase.firestore
+  val firestore: FirebaseFirestore
+    get() {
+      check(isRunning) {
+        "Firebase Firestore emulator is NOT running but FirebaseEmulator.firestore was accessed. Start the Firebase emulator suite (or use a non-Firestore test) before running these tests."
+      }
+      return Firebase.firestore
+    }
 
   const val HOST = "10.0.2.2"
   const val EMULATORS_PORT = 4400
