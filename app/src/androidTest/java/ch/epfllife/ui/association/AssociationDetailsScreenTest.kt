@@ -5,11 +5,10 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.platform.app.InstrumentationRegistry
 import ch.epfllife.R
 import ch.epfllife.example_data.ExampleAssociations
+import ch.epfllife.example_data.ExampleEvents
 import ch.epfllife.model.association.Association
 import ch.epfllife.model.association.AssociationRepository
 import ch.epfllife.model.event.Event
-import ch.epfllife.model.map.Location
-import ch.epfllife.model.user.Price
 import ch.epfllife.ui.theme.Theme
 import ch.epfllife.utils.assertClickable
 import java.io.IOException
@@ -41,6 +40,7 @@ class AssociationDetailsScreenTest {
       associationId: String,
       viewModel: AssociationDetailsViewModel = AssociationDetailsViewModel(),
       onGoBack: () -> Unit = {},
+      onEventClick: (String) -> Unit = {},
   ) {
     composeTestRule.setContent {
       Theme {
@@ -48,6 +48,7 @@ class AssociationDetailsScreenTest {
             associationId = associationId,
             viewModel = viewModel,
             onGoBack = onGoBack,
+            onEventClick = onEventClick,
         )
       }
     }
@@ -300,8 +301,9 @@ class AssociationDetailsScreenTest {
   @Test
   fun viewModelEmitsErrorWhenAssociationNotFound() = runTest {
     val viewModel = AssociationDetailsViewModel(FakeAssociationRepository(returnNull = true))
+    val context = InstrumentationRegistry.getInstrumentation().targetContext
 
-    viewModel.loadAssociation("non_existing_id")
+    viewModel.loadAssociation("non_existing_id", context)
 
     val state = viewModel.uiState.first { it !is AssociationDetailsUIState.Loading }
 
@@ -314,8 +316,9 @@ class AssociationDetailsScreenTest {
   @Test
   fun viewModelEmitsErrorOnException() = runTest {
     val viewModel = AssociationDetailsViewModel(FakeAssociationRepository(throwError = true))
+    val context = InstrumentationRegistry.getInstrumentation().targetContext
 
-    viewModel.loadAssociation("any")
+    viewModel.loadAssociation("any", context)
 
     val state = viewModel.uiState.first { it !is AssociationDetailsUIState.Loading }
 
@@ -328,24 +331,7 @@ class AssociationDetailsScreenTest {
   @Test
   fun viewModelEmitsSuccessWithAssociationAndEventsList() = runTest {
     val association = ExampleAssociations.association1
-    val eventsList =
-        listOf(
-            Event(
-                id = "e1",
-                title = "Event 1",
-                description = "Description 1",
-                location =
-                    Location(
-                        latitude = 0.0,
-                        longitude = 0.0,
-                        name = "Test location",
-                    ),
-                time = "2025-01-01T10:00:00",
-                association = association,
-                tags = listOf("tag1"),
-                price = Price(0U),
-                pictureUrl = null,
-            ))
+    val eventsList = listOf(ExampleEvents.event1)
 
     val viewModel =
         AssociationDetailsViewModel(
@@ -353,12 +339,13 @@ class AssociationDetailsScreenTest {
                 successAssociation = association,
                 eventsResult = Result.success(eventsList),
             ))
+    val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     // Initial state should be Loading due to default initialization of _uiState/uiState
     val initialState = viewModel.uiState.value
     assertTrue(initialState is AssociationDetailsUIState.Loading)
 
-    viewModel.loadAssociation(association.id)
+    viewModel.loadAssociation(association.id, context)
 
     val state = viewModel.uiState.first { it !is AssociationDetailsUIState.Loading }
 
@@ -379,17 +366,19 @@ class AssociationDetailsScreenTest {
                 eventsResult = Result.failure(Exception("test")),
             ))
 
+    val context = InstrumentationRegistry.getInstrumentation().targetContext
+
     // Initial state should be Loading
     assertTrue(viewModel.uiState.value is AssociationDetailsUIState.Loading)
 
-    viewModel.loadAssociation(association.id)
+    viewModel.loadAssociation(association.id, context)
 
     val state = viewModel.uiState.first { it !is AssociationDetailsUIState.Loading }
 
     assertTrue(state is AssociationDetailsUIState.Success)
     val successState = state as AssociationDetailsUIState.Success
     assertEquals(association, successState.association)
-    assertNull(successState.events)
+    assertEquals(emptyList<Event>(), successState.events)
   }
 
   @OptIn(ExperimentalCoroutinesApi::class)
@@ -403,11 +392,12 @@ class AssociationDetailsScreenTest {
                 successAssociation = association,
                 eventsResult = Result.success(emptyEvents),
             ))
+    val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     // Initial state should be Loading
     assertTrue(viewModel.uiState.value is AssociationDetailsUIState.Loading)
 
-    viewModel.loadAssociation(association.id)
+    viewModel.loadAssociation(association.id, context)
 
     val state = viewModel.uiState.first { it !is AssociationDetailsUIState.Loading }
 
@@ -422,7 +412,6 @@ private class FakeAssociationRepository(
     private val successAssociation: Association? = null,
     private val returnNull: Boolean = false,
     private val throwError: Boolean = false,
-    private val delayResult: Boolean = false,
     private val eventsResult: Result<List<Event>>? = null,
 ) : AssociationRepository {
 
