@@ -62,4 +62,9 @@
     <string name="calendar_upcoming_events_title">Upcoming Events</string>
     <string name="calendar_no_events_placeholder">No events found</string>
     <string name="calendar_search_hint">Search events</string>
+
+    <!-- Resource errors -->
+    <string name="error_association_not_found">Association not found</string>
+    <string name="error_loading_association">Failed to load association</string>
+
 </resources>

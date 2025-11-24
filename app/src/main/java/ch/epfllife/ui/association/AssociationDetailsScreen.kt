@@ -57,12 +57,13 @@ object AssociationDetailsTestTags {
 fun AssociationDetailsScreen(
     associationId: String,
     viewModel: AssociationDetailsViewModel = viewModel(),
-    onGoBack: () -> Unit = {},
-    onEventClick: (String) -> Unit = {},
+    onGoBack: () -> Unit,
+    onEventClick: (String) -> Unit,
 ) {
   val uiState by viewModel.uiState.collectAsState()
+  val context = LocalContext.current
   LaunchedEffect(associationId) {
-    viewModel.loadAssociation(associationId)
+    viewModel.loadAssociation(associationId, context)
   } // this is triggered once the screen opens
 
   when (val state = uiState) {
@@ -89,7 +90,7 @@ fun AssociationDetailsScreen(
       // Show event content
       AssociationDetailsContent(
           association = state.association,
-          events = state.events ?: emptyList(),
+          events = state.events,
           onGoBack = onGoBack,
           onEventClick = onEventClick,
       )
@@ -252,5 +253,5 @@ fun AssociationDetailsContent(
 @Preview(showBackground = true)
 @Composable
 fun AssociationDetailsPreview() {
-  Theme { AssociationDetailsScreen(associationId = "1", onGoBack = {}) }
+  Theme { AssociationDetailsScreen(associationId = "1", onGoBack = {}, onEventClick = {}) }
 }

@@ -1,7 +1,9 @@
 package ch.epfllife.ui.association
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import ch.epfllife.R
 import ch.epfllife.model.association.Association
 import ch.epfllife.model.association.AssociationRepository
 import ch.epfllife.model.association.AssociationRepositoryFirestore
@@ -14,7 +16,7 @@ import kotlinx.coroutines.launch
 sealed class AssociationDetailsUIState {
   object Loading : AssociationDetailsUIState()
 
-  data class Success(val association: Association, val events: List<Event>?) :
+  data class Success(val association: Association, val events: List<Event>) :
       AssociationDetailsUIState()
 
   data class Error(val message: String) : AssociationDetailsUIState()
@@ -31,18 +33,22 @@ class AssociationDetailsViewModel(
   val uiState: StateFlow<AssociationDetailsUIState> = _uiState.asStateFlow()
 
   /** Loads association details by ID using AssociationRepository.getAssociation. */
-  fun loadAssociation(associationId: String) {
+  fun loadAssociation(associationId: String, context: Context) {
     viewModelScope.launch {
       try {
         val association = repo.getAssociation(associationId)
         if (association != null) {
           val events = repo.getEventsForAssociation(associationId)
-          _uiState.value = AssociationDetailsUIState.Success(association, events.getOrNull())
+          _uiState.value =
+              AssociationDetailsUIState.Success(association, events.getOrNull() ?: emptyList())
         } else {
-          _uiState.value = AssociationDetailsUIState.Error("Association not found")
+          _uiState.value =
+              AssociationDetailsUIState.Error(
+                  context.getString(R.string.error_association_not_found))
         }
-      } catch (e: Exception) {
-        _uiState.value = AssociationDetailsUIState.Error("Failed to load association: ${e.message}")
+      } catch (_: Exception) {
+        _uiState.value =
+            AssociationDetailsUIState.Error(context.getString(R.string.error_loading_association))
       }
     }
   }
