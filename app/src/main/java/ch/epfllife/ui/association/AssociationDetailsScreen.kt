@@ -102,9 +102,9 @@ fun AssociationDetailsScreen(
 fun AssociationDetailsContent(
     association: Association,
     modifier: Modifier = Modifier,
-    events: List<Event> = emptyList(),
+    events: List<Event>,
     onGoBack: () -> Unit,
-    onEventClick: (String) -> Unit = {},
+    onEventClick: (String) -> Unit,
 ) {
   var isSubscribed by remember { mutableStateOf(false) }
   val scrollState = rememberScrollState()

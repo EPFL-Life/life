@@ -31,7 +31,10 @@ class AssociationDetailsScreenTest {
       onGoBack: () -> Unit = {}
   ) {
     composeTestRule.setContent {
-      Theme { AssociationDetailsContent(association = association, onGoBack = onGoBack) }
+      Theme {
+        AssociationDetailsContent(
+            association = association, onGoBack = onGoBack, onEventClick = {}, events = emptyList())
+      }
     }
   }
 
@@ -106,7 +109,13 @@ class AssociationDetailsScreenTest {
     val association = ExampleAssociations.association1
     composeTestRule.assertClickable(
         composable = { onClick ->
-          Theme { AssociationDetailsContent(association = association, onGoBack = onClick) }
+          Theme {
+            AssociationDetailsContent(
+                association = association,
+                onGoBack = onClick,
+                onEventClick = {},
+                events = emptyList())
+          }
         },
         tag = AssociationDetailsTestTags.BACK_BUTTON,
     )
