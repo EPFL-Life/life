@@ -256,6 +256,34 @@ class AssociationDetailsScreenTest {
     composeTestRule.onNodeWithTag(AssociationDetailsTestTags.ERROR_MESSAGE).assertIsDisplayed()
   }
 
+  @Test
+  fun screenDisplaysContentOnSuccessWhenEventsNull() {
+    val association = ExampleAssociations.association1
+
+    // ViewModel configured so eventsResult is a failure -> Success with null events
+    val viewModel =
+        AssociationDetailsViewModel(
+            FakeAssociationRepository(
+                successAssociation = association,
+                eventsResult = Result.failure(Exception("test")),
+            ))
+
+    setAssociationDetailsScreen(associationId = association.id, viewModel = viewModel)
+
+    composeTestRule.waitForIdle()
+
+    // Ensure we're not in loading or error state
+    composeTestRule.onNodeWithTag(AssociationDetailsTestTags.LOADING_INDICATOR).assertDoesNotExist()
+    composeTestRule.onNodeWithTag(AssociationDetailsTestTags.ERROR_MESSAGE).assertDoesNotExist()
+
+    // Content should be displayed even when events are null (handled as empty list)
+    composeTestRule.onNodeWithTag(AssociationDetailsTestTags.NAME_TEXT).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(AssociationDetailsTestTags.ASSOCIATION_IMAGE).assertExists()
+    composeTestRule
+        .onNodeWithTag(AssociationDetailsTestTags.UPCOMING_EVENTS_COLUMN)
+        .assertIsDisplayed()
+  }
+
   // ============ Edge Case Tests ============
 
   @Test
