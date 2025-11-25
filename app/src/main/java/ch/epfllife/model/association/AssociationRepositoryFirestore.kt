@@ -131,6 +131,8 @@ class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : Associ
         // 3. Get the nullable String field (no check needed, defaults to null)
         val pictureUrl = document.getString("pictureUrl")
 
+        val logoUrl = document.getString("logoUrl")
+
         // 4. Handle the Enum (EventCategory)
         // Get the category name as a String from Firestore
         val eventCategoryString = document.getString("eventCategory")!!
@@ -154,6 +156,7 @@ class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : Associ
             name = name,
             description = description,
             pictureUrl = pictureUrl,
+            logoUrl = logoUrl,
             eventCategory = eventCategory,
             about = about,
             socialLinks = socialLinks)
