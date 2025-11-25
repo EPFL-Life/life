@@ -5,14 +5,17 @@ import androidx.lifecycle.viewModelScope
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventRepository
 import ch.epfllife.model.event.EventRepositoryFirestore
+import ch.epfllife.model.user.UserRepository
+import ch.epfllife.model.user.UserRepositoryFirestore
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
-    private val repo: EventRepository =
-        EventRepositoryFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance())
+    private val repo: EventRepository = EventRepositoryFirestore(FirebaseFirestore.getInstance()),
+    private val userRepo: UserRepository = UserRepositoryFirestore(FirebaseFirestore.getInstance()),
 ) : ViewModel() {
 
   private val _allEvents = MutableStateFlow<List<Event>>(emptyList())
@@ -33,6 +36,10 @@ class HomeViewModel(
           } catch (_: Exception) {
             emptyList()
           }
+      userRepo.getCurrentUser()?.let { user ->
+        _myEvents.value =
+            _allEvents.value.filter { event -> user.enrolledEvents.contains(event.id) }
+      }
       signalFinished()
     }
   }
