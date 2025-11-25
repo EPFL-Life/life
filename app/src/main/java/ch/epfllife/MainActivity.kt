@@ -126,8 +126,6 @@ fun App(
 
           composable(Screen.Calendar.route) {
             CalendarScreen(
-                allEvents = emptyList(),
-                enrolledEvents = emptyList(),
                 onEventClick = { eventId -> navigationActions.navigateToEventDetails(eventId) })
           }
 
