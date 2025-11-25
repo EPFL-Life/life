@@ -9,16 +9,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.R
 import ch.epfllife.model.enums.SubscriptionFilter
 import ch.epfllife.model.event.Event
-import ch.epfllife.model.user.Price
 import ch.epfllife.ui.composables.CalendarCard
 import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
 import ch.epfllife.ui.composables.ListView
 import ch.epfllife.ui.composables.SearchBar
+import ch.epfllife.ui.home.HomeViewModel
 import ch.epfllife.ui.navigation.NavigationTestTags
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -37,12 +37,14 @@ object CalendarTestTags {
 @Composable
 fun CalendarScreen(
     modifier: Modifier = Modifier,
-    allEvents: List<Event>,
-    enrolledEvents: List<Event>,
+    viewModel: HomeViewModel = viewModel(),
     onEventClick: (String) -> Unit,
 ) {
   var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
   var query by remember { mutableStateOf("") }
+
+  val enrolledEvents by viewModel.myEvents.collectAsState()
+  val allEvents by viewModel.allEvents.collectAsState()
 
   val shownEvents =
       remember(selected, query, allEvents, enrolledEvents) {
@@ -58,6 +60,7 @@ fun CalendarScreen(
   val grouped =
       shownEvents
           .filter { it.startDateOrNull() != null }
+          .sortedBy { it.startDateOrNull() }
           .groupBy { event ->
             val date = event.startDateOrNull()!!
             "${date.month.getDisplayName(TextStyle.FULL, Locale.getDefault())} ${date.year}"
@@ -120,69 +123,5 @@ private fun Event.startDateOrNull(): LocalDate? {
     LocalDate.parse(this.time.substring(0, 10), formatter)
   } catch (_: Exception) {
     null
-  }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun CalendarScreenPreview() {
-  // Mock associations
-  val esn =
-      ch.epfllife.model.association.Association(
-          id = "a1",
-          name = "ESN Lausanne",
-          description = "Erasmus Student Network at EPFL.",
-          pictureUrl = null,
-          eventCategory = ch.epfllife.model.event.EventCategory.CULTURE,
-      )
-
-  val codingClub =
-      ch.epfllife.model.association.Association(
-          id = "a2",
-          name = "Coding Club",
-          description = "Student coding community.",
-          pictureUrl = null,
-          eventCategory = ch.epfllife.model.event.EventCategory.TECH,
-      )
-
-  // Mock location
-  val location =
-      ch.epfllife.model.map.Location(
-          name = "Rolex Learning Center",
-          latitude = 46.5191,
-          longitude = 6.5668,
-      )
-
-  // Mock events (include one spanning multiple days)
-  val sampleEvents =
-      listOf(
-          ch.epfllife.model.event.Event(
-              id = "1",
-              title = "Innovation Week",
-              description = "A week-long celebration of creativity and technology.",
-              location = location,
-              time = "2025-11-15T09:00:00/2025-11-20T18:00:00", // timespan example
-              association = codingClub,
-              tags = listOf("tech", "workshop"),
-              price = Price(0u),
-          ),
-          ch.epfllife.model.event.Event(
-              id = "2",
-              title = "Cultural Night",
-              description = "Join us for an evening of performances and food!",
-              location = location,
-              time = "2025-12-05T19:00:00",
-              association = esn,
-              tags = listOf("culture", "food"),
-              price = Price(10u),
-          ),
-      )
-
-  MaterialTheme {
-    CalendarScreen(
-        allEvents = sampleEvents,
-        enrolledEvents = emptyList(), // Enrolled tab should be empty → shows placeholder message
-        onEventClick = {},
-    )
   }
 }

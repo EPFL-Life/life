@@ -2,8 +2,11 @@ package ch.epfllife.ui.calendar
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.example_data.ExampleEvents
+import ch.epfllife.model.event.EventRepositoryLocal
 import ch.epfllife.ui.composables.DisplayedEventsTestTags
+import ch.epfllife.ui.home.HomeViewModel
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.theme.Theme
 import org.junit.Assert.assertEquals
@@ -18,10 +21,13 @@ class CalendarScreenTest {
       enrolledEvents: List<ch.epfllife.model.event.Event> = emptyList(),
       onEventClick: (String) -> Unit = {}
   ) {
+    val repo = EventRepositoryLocal()
+    repo.seedEvents(allEvents)
     composeTestRule.setContent {
       Theme {
         CalendarScreen(
-            allEvents = allEvents, enrolledEvents = enrolledEvents, onEventClick = onEventClick)
+            viewModel = viewModel { HomeViewModel(repo).also { it.setMyEvents(enrolledEvents) } },
+            onEventClick = onEventClick)
       }
     }
     composeTestRule.waitForIdle()
