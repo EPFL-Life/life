@@ -1,6 +1,5 @@
 package ch.epfllife.ui.composables
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -13,12 +12,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ch.epfllife.R
 import ch.epfllife.model.association.Association
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 
 @Composable
 fun AssociationCard(association: Association, modifier: Modifier = Modifier, onClick: () -> Unit) {
@@ -33,13 +35,19 @@ fun AssociationCard(association: Association, modifier: Modifier = Modifier, onC
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)) {
               // Club/association icon
-              Image(
-                  painter = painterResource(id = R.drawable.placeholder),
+              AsyncImage(
+                  model =
+                      ImageRequest.Builder(LocalContext.current)
+                          .data(association.logoUrl ?: association.pictureUrl)
+                          .crossfade(true)
+                          .build(),
                   contentDescription = "${association.name} logo",
                   modifier =
                       Modifier.size(56.dp)
                           .align(Alignment.CenterVertically)
-                          .testTag(AssociationCardTestTags.ASSOCIATION_LOGO))
+                          .testTag(AssociationCardTestTags.ASSOCIATION_LOGO),
+                  placeholder = painterResource(R.drawable.placeholder),
+                  error = painterResource(R.drawable.placeholder))
 
               // Text section (name + description)
               Column(modifier = Modifier.weight(1f).align(Alignment.CenterVertically)) {

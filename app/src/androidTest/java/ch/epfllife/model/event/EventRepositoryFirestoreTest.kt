@@ -231,6 +231,7 @@ class EventRepositoryFirestoreTest : FirestoreLifeTest() {
     whenever(assocSnap.get("name")).thenReturn(expected.association.name)
     whenever(assocSnap.getString("description")).thenReturn(expected.association.description)
     whenever(assocSnap.getString("pictureUrl")).thenReturn(expected.association.pictureUrl)
+    whenever(assocSnap.getString("logoUrl")).thenReturn(expected.association.logoUrl)
     whenever(assocSnap.getString("eventCategory"))
         .thenReturn(expected.association.eventCategory.name)
     whenever(assocSnap.getString("about")).thenReturn(expected.association.about)

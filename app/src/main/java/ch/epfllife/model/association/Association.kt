@@ -8,6 +8,7 @@ data class Association(
     val name: String,
     val description: String,
     val pictureUrl: String? = null,
+    val logoUrl: String? = null,
     val eventCategory: EventCategory,
     val about: String? = null,
     val socialLinks: Map<String, String>? = emptyMap()
