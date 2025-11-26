@@ -67,9 +67,9 @@ class CalendarScreenTest {
         enrolledEvents = listOf(ExampleEvents.event1),
         onEventClick = { eventId -> clickedEventId = eventId })
 
-    composeTestRule.waitUntil(timeoutMillis = 3000) {
-      composeTestRule.onAllNodesWithText(ExampleEvents.event2.title).fetchSemanticsNodes().isEmpty()
-    }
+    composeTestRule.waitForIdle()
+    Thread.sleep(500)
+
     // Initially should show subscribed events
     composeTestRule.onNodeWithText(ExampleEvents.event1.title).assertIsDisplayed()
     composeTestRule.onNodeWithText(ExampleEvents.event2.title).assertDoesNotExist()
@@ -77,12 +77,9 @@ class CalendarScreenTest {
     // Click on "All Events" filter button
     composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_ALL).performClick()
 
-    composeTestRule.waitUntil(timeoutMillis = 3000) {
-      composeTestRule
-          .onAllNodesWithText(ExampleEvents.event2.title)
-          .fetchSemanticsNodes()
-          .isNotEmpty()
-    }
+    composeTestRule.waitForIdle()
+    Thread.sleep(500)
+
     // Now should show all events
     composeTestRule.onNodeWithText(ExampleEvents.event1.title).assertIsDisplayed()
     composeTestRule.onNodeWithText(ExampleEvents.event2.title).assertIsDisplayed()
@@ -90,9 +87,9 @@ class CalendarScreenTest {
     // Click back on "Subscribed" filter button
     composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_SUBSCRIBED).performClick()
 
-    composeTestRule.waitUntil(timeoutMillis = 3000) {
-      composeTestRule.onAllNodesWithText(ExampleEvents.event2.title).fetchSemanticsNodes().isEmpty()
-    }
+    composeTestRule.waitForIdle()
+    Thread.sleep(500)
+
     // Should show only subscribed events again
     composeTestRule.onNodeWithText(ExampleEvents.event1.title).assertIsDisplayed()
     composeTestRule.onNodeWithText(ExampleEvents.event2.title).assertDoesNotExist()
