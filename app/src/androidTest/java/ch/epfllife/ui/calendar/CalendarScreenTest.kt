@@ -7,7 +7,6 @@ import ch.epfllife.ui.composables.DisplayedEventsTestTags
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.theme.Theme
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -68,8 +67,9 @@ class CalendarScreenTest {
         enrolledEvents = listOf(ExampleEvents.event1),
         onEventClick = { eventId -> clickedEventId = eventId })
 
-    composeTestRule.waitForIdle()
-
+    composeTestRule.waitUntil(timeoutMillis = 3000) {
+      composeTestRule.onAllNodesWithText(ExampleEvents.event2.title).fetchSemanticsNodes().isEmpty()
+    }
     // Initially should show subscribed events
     composeTestRule.onNodeWithText(ExampleEvents.event1.title).assertIsDisplayed()
     composeTestRule.onNodeWithText(ExampleEvents.event2.title).assertDoesNotExist()
@@ -77,8 +77,12 @@ class CalendarScreenTest {
     // Click on "All Events" filter button
     composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_ALL).performClick()
 
-    composeTestRule.waitForIdle()
-
+    composeTestRule.waitUntil(timeoutMillis = 3000) {
+      composeTestRule
+          .onAllNodesWithText(ExampleEvents.event2.title)
+          .fetchSemanticsNodes()
+          .isNotEmpty()
+    }
     // Now should show all events
     composeTestRule.onNodeWithText(ExampleEvents.event1.title).assertIsDisplayed()
     composeTestRule.onNodeWithText(ExampleEvents.event2.title).assertIsDisplayed()
@@ -86,8 +90,9 @@ class CalendarScreenTest {
     // Click back on "Subscribed" filter button
     composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_SUBSCRIBED).performClick()
 
-    composeTestRule.waitForIdle()
-
+    composeTestRule.waitUntil(timeoutMillis = 3000) {
+      composeTestRule.onAllNodesWithText(ExampleEvents.event2.title).fetchSemanticsNodes().isEmpty()
+    }
     // Should show only subscribed events again
     composeTestRule.onNodeWithText(ExampleEvents.event1.title).assertIsDisplayed()
     composeTestRule.onNodeWithText(ExampleEvents.event2.title).assertDoesNotExist()
