@@ -46,13 +46,14 @@ class EventDetailsViewModel(
       try {
         val event = repo.getEvent(eventId)
         currentUser = userRepo.getCurrentUser()
+
         if (event != null) {
           _uiState.value = EventDetailsUIState.Success(event, isEnrolled = isEnrolled(event))
         } else {
           _uiState.value = EventDetailsUIState.Error("Event not found")
         }
-      } catch (e: Exception) {
-        _uiState.value = EventDetailsUIState.Error("Failed to load event: ${e.message}")
+      } catch (_: Exception) {
+        _uiState.value = EventDetailsUIState.Error("Failed to load event")
       }
     }
   }
@@ -64,6 +65,13 @@ class EventDetailsViewModel(
   fun enrollInEvent(event: Event) {
     viewModelScope.launch {
       try {
+        // TODO: Change enroll button to "Unsubscribe" when enrolled to prevent double subscription
+        // attempts
+        if (isEnrolled(event)) {
+          _uiState.value = EventDetailsUIState.Success(event, isEnrolled = true)
+          return@launch
+        }
+
         userRepo
             .subscribeToEvent(event.id)
             .fold(
@@ -71,7 +79,7 @@ class EventDetailsViewModel(
                 onFailure = { error ->
                   _uiState.value = EventDetailsUIState.Error("Failed to enrol: Please try again.")
                 })
-      } catch (e: Exception) {
+      } catch (_: Exception) {
         _uiState.value = EventDetailsUIState.Error("Failed to enrol: Please try again.")
       }
     }
