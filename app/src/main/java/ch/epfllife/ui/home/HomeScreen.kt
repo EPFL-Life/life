@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,6 +34,8 @@ fun HomeScreen(
     viewModel: HomeViewModel = viewModel(),
     onEventClick: (eventId: String) -> Unit,
 ) {
+  LaunchedEffect(Unit) { viewModel.refresh() }
+
   var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
 
   val myEvents by viewModel.myEvents.collectAsState()
