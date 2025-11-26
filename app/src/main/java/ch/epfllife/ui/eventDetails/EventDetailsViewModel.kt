@@ -52,8 +52,8 @@ class EventDetailsViewModel(
         } else {
           _uiState.value = EventDetailsUIState.Error("Event not found")
         }
-      } catch (_: Exception) {
-        _uiState.value = EventDetailsUIState.Error("Failed to load event")
+      } catch (e: Exception) {
+        _uiState.value = EventDetailsUIState.Error("Failed to load event: ${e.message}")
       }
     }
   }
