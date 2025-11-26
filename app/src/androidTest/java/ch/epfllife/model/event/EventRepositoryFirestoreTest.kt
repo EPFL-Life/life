@@ -22,20 +22,20 @@ class EventRepositoryFirestoreTest : FirestoreLifeTest() {
   fun uploadAndRetrieveEventWorksCorrectly() = runTest {
     // Arrange: create an association first (required for event validity)
     val assoc = ExampleAssociations.association1
-    assocRepository.createAssociation(assoc)
+    db.assocRepo.createAssociation(assoc)
 
     // Arrange: prepare example event linked to that association
     val event = ExampleEvents.event1
 
     // Act: create event in Firestore emulator
-    val createResult = eventRepository.createEvent(event)
+    val createResult = db.eventRepo.createEvent(event)
 
     // Assert: creation succeeded
     assertTrue(createResult.isSuccess)
     assertEquals(1, getEventCount())
 
     // Act: retrieve event by ID
-    val retrieved = eventRepository.getEvent(event.id)
+    val retrieved = db.eventRepo.getEvent(event.id)
 
     // Assert: event was retrieved and matches the original
     assertNotNull("Retrieved event should not be null", retrieved)
@@ -46,16 +46,16 @@ class EventRepositoryFirestoreTest : FirestoreLifeTest() {
   fun createEventReturnsSuccess() = runTest {
     val assoc1 = ExampleAssociations.association1
     // action: create association in database
-    assocRepository.createAssociation(assoc1)
+    db.assocRepo.createAssociation(assoc1)
 
     val event = ExampleEvents.event1
     // action: create event
-    val res = eventRepository.createEvent(event)
+    val res = db.eventRepo.createEvent(event)
 
     // asserts: event has been created successfully
     assertTrue(res.isSuccess)
     assertEquals(1, getEventCount())
-    assertEquals(event, eventRepository.getEvent(event.id))
+    assertEquals(event, db.eventRepo.getEvent(event.id))
   }
 
   @Test
@@ -63,7 +63,7 @@ class EventRepositoryFirestoreTest : FirestoreLifeTest() {
     // action gets a nonexistent
     val eventId = "nonExistentId"
     try {
-      eventRepository.getEvent(eventId)
+      db.eventRepo.getEvent(eventId)
       fail("Expected NoSuchElementException when document does not exist")
     } catch (e: NoSuchElementException) {
       // expected
@@ -77,21 +77,21 @@ class EventRepositoryFirestoreTest : FirestoreLifeTest() {
     val assoc3 = ExampleAssociations.association3
 
     // action: create association in database
-    assocRepository.createAssociation(assoc1)
-    assocRepository.createAssociation(assoc2)
-    assocRepository.createAssociation(assoc3)
+    db.assocRepo.createAssociation(assoc1)
+    db.assocRepo.createAssociation(assoc2)
+    db.assocRepo.createAssociation(assoc3)
 
     val e1 = ExampleEvents.event1
     val e2 = ExampleEvents.event2
     val e3 = ExampleEvents.event3
 
     // action: create the 3 events
-    eventRepository.createEvent(e1)
-    eventRepository.createEvent(e2)
-    eventRepository.createEvent(e3)
+    db.eventRepo.createEvent(e1)
+    db.eventRepo.createEvent(e2)
+    db.eventRepo.createEvent(e3)
 
     // asserts: check that the event repository contains the 3 events added
-    val all = eventRepository.getAllEvents()
+    val all = db.eventRepo.getAllEvents()
     assertEquals(3, all.size)
     assert(all.contains(e1))
     assert(all.contains(e2))
@@ -104,23 +104,23 @@ class EventRepositoryFirestoreTest : FirestoreLifeTest() {
     val assoc2 = ExampleAssociations.association2
 
     // action: create association in database
-    assocRepository.createAssociation(assoc1)
-    assocRepository.createAssociation(assoc2)
+    db.assocRepo.createAssociation(assoc1)
+    db.assocRepo.createAssociation(assoc2)
 
     val original = ExampleEvents.event1
     // action: create event
-    eventRepository.createEvent(original)
+    db.eventRepo.createEvent(original)
     // assert: check that the total number of events has increased
     assertEquals(1, getEventCount())
 
     // action: update event 1 with event 2
     val updated = ExampleEvents.event2.copy(id = original.id)
-    val res = eventRepository.updateEvent(original.id, updated)
+    val res = db.eventRepo.updateEvent(original.id, updated)
 
     // asserts: teh event has been successfully updated
     assertTrue(res.isSuccess)
     assertEquals(1, getEventCount())
-    assertEquals(updated, eventRepository.getEvent(original.id))
+    assertEquals(updated, db.eventRepo.getEvent(original.id))
   }
 
   @Test
@@ -129,23 +129,23 @@ class EventRepositoryFirestoreTest : FirestoreLifeTest() {
     val assoc2 = ExampleAssociations.association2
 
     // action: create association in database
-    assocRepository.createAssociation(assoc1)
-    assocRepository.createAssociation(assoc2)
+    db.assocRepo.createAssociation(assoc1)
+    db.assocRepo.createAssociation(assoc2)
 
     val original = ExampleEvents.event1
     // action: create event
-    eventRepository.createEvent(original)
+    db.eventRepo.createEvent(original)
     // assert: check that the total numbers of events has increased
     assertEquals(1, getEventCount())
 
     // action: create a nonexistent event and updated to force failure
     val updated = ExampleEvents.event2.copy(id = "notExistentId")
-    val res = eventRepository.updateEvent("notExistentId", updated)
+    val res = db.eventRepo.updateEvent("notExistentId", updated)
 
     // assert: the event hasn't been updated
     assertTrue(res.isFailure)
     // assert: original stays unchanged
-    assertEquals(original, eventRepository.getEvent(original.id))
+    assertEquals(original, db.eventRepo.getEvent(original.id))
     assertEquals(1, getEventCount())
   }
 
@@ -153,15 +153,15 @@ class EventRepositoryFirestoreTest : FirestoreLifeTest() {
   fun deleteEventReturnsSuccess() = runTest {
     val assoc1 = ExampleAssociations.association1
     // action: create association in database
-    assocRepository.createAssociation(assoc1)
+    db.assocRepo.createAssociation(assoc1)
 
     val original = ExampleEvents.event1
     // action: create event
-    eventRepository.createEvent(original)
+    db.eventRepo.createEvent(original)
     // assert: check that the total numbers of events has increased
     assertEquals(1, getEventCount())
     // action: delete the added event
-    val res = eventRepository.deleteEvent(original.id)
+    val res = db.eventRepo.deleteEvent(original.id)
     // asserts: the event has been successfully deleted and the total number of events decrease
     assertTrue(res.isSuccess)
     assertEquals(0, getEventCount())
@@ -171,15 +171,15 @@ class EventRepositoryFirestoreTest : FirestoreLifeTest() {
   fun deleteNonExistentEventEventReturnsFailure() = runTest {
     val assoc1 = ExampleAssociations.association1
     // action: create association in database
-    assocRepository.createAssociation(assoc1)
+    db.assocRepo.createAssociation(assoc1)
 
     val original = ExampleEvents.event1
     // action: create event
-    eventRepository.createEvent(original)
+    db.eventRepo.createEvent(original)
     // assert: check that the total numbers of events has increased
     assertEquals(1, getEventCount())
     // action: try to delete an event with an nonexistent id
-    val res = eventRepository.deleteEvent("nonExistentId")
+    val res = db.eventRepo.deleteEvent("nonExistentId")
 
     // assert: the event can't be deleted
     assertTrue(res.isFailure)
