@@ -66,6 +66,8 @@ class CalendarScreenTest {
     assertEquals(ExampleEvents.event1.id, clickedEventId)
   }
 
+  // new comment
+
   @Test
   fun calendarScreen_FilterSwitchingWorks() {
     var clickedEventId: String? = null
