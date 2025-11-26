@@ -21,6 +21,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import ch.epfllife.model.authentication.Auth
+import ch.epfllife.model.db.Db
 import ch.epfllife.model.map.Location
 import ch.epfllife.ui.association.AssociationBrowser
 import ch.epfllife.ui.association.AssociationDetailsScreen
@@ -44,13 +45,15 @@ class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    setContent { ThemedApp(auth = Auth(CredentialManager.create(LocalContext.current))) }
+    setContent {
+      ThemedApp(auth = Auth(CredentialManager.create(LocalContext.current)), db = Db.firestore)
+    }
   }
 }
 
 @Composable
-fun ThemedApp(auth: Auth) {
-  Theme { Surface(modifier = Modifier.fillMaxSize()) { App(auth) } }
+fun ThemedApp(auth: Auth, db: Db) {
+  Theme { Surface(modifier = Modifier.fillMaxSize()) { App(auth, db) } }
 }
 
 /**
@@ -62,6 +65,7 @@ fun ThemedApp(auth: Auth) {
 @Composable
 fun App(
     auth: Auth,
+    db: Db,
 ) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
@@ -131,42 +135,44 @@ fun App(
 
           composable(
               route = Screen.AssociationDetails.route + "/{associationId}",
-              arguments = listOf(navArgument("associationId") { type = NavType.StringType })) {
-                  backStackEntry ->
-                val associationId = backStackEntry.arguments?.getString("associationId") ?: ""
-                AssociationDetailsScreen(
-                    associationId = associationId,
-                    onGoBack = { navController.popBackStack() },
-                    onEventClick = { id -> navigationActions.navigateToEventDetails(id) })
-              }
+              arguments = listOf(navArgument("associationId") { type = NavType.StringType }),
+          ) { backStackEntry ->
+            val associationId = backStackEntry.arguments?.getString("associationId") ?: ""
+            AssociationDetailsScreen(
+                associationId = associationId,
+                onGoBack = { navController.popBackStack() },
+                onEventClick = { id -> navigationActions.navigateToEventDetails(id) },
+            )
+          }
 
           // Event details route
           composable(
               route = Screen.EventDetails.route + "/{eventId}",
-              arguments = listOf(navArgument("eventId") { type = NavType.StringType })) {
-                  backStackEntry ->
-                val eventId =
-                    backStackEntry.arguments?.getString("eventId")
-                        ?: error("eventId is required for EventDetails screen")
-                EventDetailsScreen(
-                    eventId = eventId,
-                    onGoBack = { navigationActions.goBack() },
-                    onOpenMap = { location ->
-                      val encodedLocation = Json.encodeToString(location)
-                      navigationActions.navigateToScreenWithId(Screen.Map, encodedLocation)
-                    })
-              }
+              arguments = listOf(navArgument("eventId") { type = NavType.StringType }),
+          ) { backStackEntry ->
+            val eventId =
+                backStackEntry.arguments?.getString("eventId")
+                    ?: error("eventId is required for EventDetails screen")
+            EventDetailsScreen(
+                eventId = eventId,
+                onGoBack = { navigationActions.goBack() },
+                onOpenMap = { location ->
+                  val encodedLocation = Json.encodeToString(location)
+                  navigationActions.navigateToScreenWithId(Screen.Map, encodedLocation)
+                },
+            )
+          }
 
           composable(
               route = Screen.Map.route + "/{location}",
-              arguments = listOf(navArgument("location") { type = NavType.StringType })) {
-                  backStackEntry ->
-                val encodedLocation =
-                    backStackEntry.arguments?.getString("location")
-                        ?: error("eventId is required for EventDetails screen")
-                val location = Json.decodeFromString<Location>(encodedLocation)
-                MapScreen(location = location, onGoBack = { navigationActions.goBack() })
-              }
+              arguments = listOf(navArgument("location") { type = NavType.StringType }),
+          ) { backStackEntry ->
+            val encodedLocation =
+                backStackEntry.arguments?.getString("location")
+                    ?: error("eventId is required for EventDetails screen")
+            val location = Json.decodeFromString<Location>(encodedLocation)
+            MapScreen(location = location, onGoBack = { navigationActions.goBack() })
+          }
 
           composable(Screen.Settings.route) {
             SettingsScreen(
