@@ -31,16 +31,16 @@ class EndToEndTest2 : FirestoreLifeTest() {
 
   private suspend fun prepareData() {
     val assoc1 = ExampleAssociations.association1
-    assocRepository.createAssociation(assoc1)
+    db.assocRepo.createAssociation(assoc1)
     val event = ExampleEvents.event1
-    eventRepository.createEvent(event)
+    db.eventRepo.createEvent(event)
 
     val authUid = Firebase.auth.uid!!
 
     // to avoid problems, we assign the sample user the UID of the
     // authenticated user, thus simulating that they are the same.
     val user1 = ExampleUsers.user1
-    userRepository.createUser(user1.copy(id = authUid))
+    db.userRepo.createUser(user1.copy(id = authUid))
   }
 
   @Test

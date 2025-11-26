@@ -1,12 +1,10 @@
 package ch.epfllife.utils
 
-import ch.epfllife.model.association.AssociationRepositoryFirestore
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.authentication.SignInResult
+import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.Event
-import ch.epfllife.model.event.EventRepositoryFirestore
 import ch.epfllife.model.firestore.FirestoreCollections
-import ch.epfllife.model.user.UserRepositoryFirestore
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import kotlinx.coroutines.tasks.await
@@ -23,9 +21,7 @@ import org.junit.Before
 open class FirestoreLifeTest {
 
   // Repositories pointing to the emulator
-  protected val assocRepository = AssociationRepositoryFirestore(FirebaseEmulator.firestore)
-  protected val eventRepository = EventRepositoryFirestore(FirebaseEmulator.firestore)
-  protected val userRepository = UserRepositoryFirestore(FirebaseEmulator.firestore)
+  protected val db = Db.firestore
 
   // Use a fake auth instance for testing
   protected val auth = Auth(FakeCredentialManager.withDefaultTestUser)
@@ -47,7 +43,8 @@ open class FirestoreLifeTest {
       val signInResult = auth.signInWithCredential(FakeCredentialManager.defaultUserCredentials)
       assertTrue(
           "Failed to sign in default test user in FirestoreLifeTest.setUp",
-          signInResult is SignInResult.Success)
+          signInResult is SignInResult.Success,
+      )
     }
   }
 

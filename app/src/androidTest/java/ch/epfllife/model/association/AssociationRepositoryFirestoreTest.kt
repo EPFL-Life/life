@@ -25,12 +25,12 @@ class AssociationRepositoryFirestoreTest : FirestoreLifeTest() {
     val assoc1 = ExampleAssociations.association1
 
     // Act: create association in database
-    val createAssociationResult = assocRepository.createAssociation(assoc1)
+    val createAssociationResult = db.assocRepo.createAssociation(assoc1)
 
     // Assert: check association got created successfully and can be retrieved
     assert(createAssociationResult.isSuccess)
     assertEquals(1, getAssociationCount())
-    assertEquals(assoc1, assocRepository.getAssociation(assoc1.id))
+    assertEquals(assoc1, db.assocRepo.getAssociation(assoc1.id))
   }
 
   @Test
@@ -38,7 +38,7 @@ class AssociationRepositoryFirestoreTest : FirestoreLifeTest() {
     val assoc1 = ExampleAssociations.association1
 
     // Act: get association that doesn't exist
-    val getAssociationResult = assocRepository.getAssociation(assoc1.id)
+    val getAssociationResult = db.assocRepo.getAssociation(assoc1.id)
 
     // Assert: check association doesn't exist
     assertEquals(null, getAssociationResult)
@@ -51,15 +51,15 @@ class AssociationRepositoryFirestoreTest : FirestoreLifeTest() {
     val assoc3 = ExampleAssociations.association3
 
     // Act: create associations in database
-    assocRepository.createAssociation(assoc1)
-    assocRepository.createAssociation(assoc2)
-    assocRepository.createAssociation(assoc3)
+    db.assocRepo.createAssociation(assoc1)
+    db.assocRepo.createAssociation(assoc2)
+    db.assocRepo.createAssociation(assoc3)
 
     // Assert: 3 associations got added to database
-    assertEquals(3, assocRepository.getAllAssociations().size)
+    assertEquals(3, db.assocRepo.getAllAssociations().size)
 
     // Act: retrieve all associations
-    val allAssociations = assocRepository.getAllAssociations()
+    val allAssociations = db.assocRepo.getAllAssociations()
 
     // Assert: retrieved associations are the same as the ones added (in order)
     // we are not checking the order here as its not relevant
@@ -74,7 +74,7 @@ class AssociationRepositoryFirestoreTest : FirestoreLifeTest() {
     val assoc1 = ExampleAssociations.association1
 
     // Act: add association to database
-    assocRepository.createAssociation(assoc1)
+    db.assocRepo.createAssociation(assoc1)
 
     // Assert: added correctly
     assertEquals(1, getAssociationCount())
@@ -84,12 +84,12 @@ class AssociationRepositoryFirestoreTest : FirestoreLifeTest() {
     val updatedAssociation = ExampleAssociations.association2.copy(id = assoc1.id)
 
     // Act: update association in database
-    val updateAssociationResult = assocRepository.updateAssociation(assoc1.id, updatedAssociation)
+    val updateAssociationResult = db.assocRepo.updateAssociation(assoc1.id, updatedAssociation)
 
     // Assert: check association got updated successfully and can be retrieved
     assert(updateAssociationResult.isSuccess)
     assertEquals(1, getAssociationCount())
-    assertEquals(updatedAssociation, assocRepository.getAssociation(assoc1.id))
+    assertEquals(updatedAssociation, db.assocRepo.getAssociation(assoc1.id))
   }
 
   @Test
@@ -97,7 +97,7 @@ class AssociationRepositoryFirestoreTest : FirestoreLifeTest() {
     val assoc1 = ExampleAssociations.association1
 
     // Act: add association to database
-    assocRepository.createAssociation(assoc1)
+    db.assocRepo.createAssociation(assoc1)
 
     // Assert: added correctly
     assertEquals(1, getAssociationCount())
@@ -105,11 +105,11 @@ class AssociationRepositoryFirestoreTest : FirestoreLifeTest() {
     // Act: try to update association with non-existent ID
     val updatedAssociation = ExampleAssociations.association2.copy(id = "notExistentId")
     val updateAssociationResult =
-        assocRepository.updateAssociation("notExistentId", updatedAssociation)
+        db.assocRepo.updateAssociation("notExistentId", updatedAssociation)
 
     // Assert: update failed and association was not affected
     assert(updateAssociationResult.isFailure)
-    assertEquals(assoc1, assocRepository.getAssociation(assoc1.id))
+    assertEquals(assoc1, db.assocRepo.getAssociation(assoc1.id))
     assertEquals(1, getAssociationCount())
   }
 
@@ -118,18 +118,18 @@ class AssociationRepositoryFirestoreTest : FirestoreLifeTest() {
     val assoc1 = ExampleAssociations.association1
 
     // Act: add association to database
-    assocRepository.createAssociation(assoc1)
+    db.assocRepo.createAssociation(assoc1)
 
     // Assert: added correctly
     assertEquals(1, getAssociationCount())
 
     // Act: try to update event but with mismatched id to update (newEvent.id != given id)
     val updatedAssociation = ExampleAssociations.association2.copy(id = "notExistentId")
-    val updateAssociationResult = assocRepository.updateAssociation(assoc1.id, updatedAssociation)
+    val updateAssociationResult = db.assocRepo.updateAssociation(assoc1.id, updatedAssociation)
 
     // Assert: update failed and association was not affected
     assert(updateAssociationResult.isFailure)
-    assertEquals(assoc1, assocRepository.getAssociation(assoc1.id))
+    assertEquals(assoc1, db.assocRepo.getAssociation(assoc1.id))
     assertEquals(1, getAssociationCount())
   }
 
@@ -138,13 +138,13 @@ class AssociationRepositoryFirestoreTest : FirestoreLifeTest() {
     val assoc1 = ExampleAssociations.association1
 
     // Act: add association to database
-    assocRepository.createAssociation(assoc1)
+    db.assocRepo.createAssociation(assoc1)
 
     // Assert: added correctly
     assertEquals(1, getAssociationCount())
 
     // Act: delete association from database
-    val deleteAssociationResult = assocRepository.deleteAssociation(assoc1.id)
+    val deleteAssociationResult = db.assocRepo.deleteAssociation(assoc1.id)
 
     // Assert: check association got deleted successfully
     assert(deleteAssociationResult.isSuccess)
@@ -156,13 +156,13 @@ class AssociationRepositoryFirestoreTest : FirestoreLifeTest() {
     val assoc1 = ExampleAssociations.association1
 
     // Act: add association to database to check database works
-    assocRepository.createAssociation(assoc1)
+    db.assocRepo.createAssociation(assoc1)
 
     // Assert: added correctly
     assertEquals(1, getAssociationCount())
 
     // Act: delete association that doesn't exist
-    val deleteAssociationResult = assocRepository.deleteAssociation("nonExistentId")
+    val deleteAssociationResult = db.assocRepo.deleteAssociation("nonExistentId")
 
     // Assert: check association doesn't exist
     assert(deleteAssociationResult.isFailure)
@@ -190,19 +190,19 @@ class AssociationRepositoryFirestoreTest : FirestoreLifeTest() {
   //    val event3 = ExampleEvents.event3.copy(association = assoc2)
   //
   //    // Act: add assoc and events to database
-  //    assocRepository.createAssociation(assoc1)
-  //    assocRepository.createAssociation(assoc2)
+  //    db.assocRepo.createAssociation(assoc1)
+  //    db.assocRepo.createAssociation(assoc2)
   //    eventRepository.createEvent(event1)
   //    eventRepository.createEvent(event2)
   //    eventRepository.createEvent(event3)
   //
   //    // Assert: 2 associations, 3 events got added to database
-  //    assertEquals(2, assocRepository.getAllAssociations().size)
+  //    assertEquals(2, db.assocRepo.getAllAssociations().size)
   //    assertEquals(3, eventRepository.getAllEvents().size)
   //
   //    // Act: get events for associations
-  //    val eventsForAssoc1 = assocRepository.getEventsForAssociation(assoc1.id).getOrThrow()
-  //    val eventsForAssoc2 = assocRepository.getEventsForAssociation(assoc2.id).getOrThrow()
+  //    val eventsForAssoc1 = db.assocRepo.getEventsForAssociation(assoc1.id).getOrThrow()
+  //    val eventsForAssoc2 = db.assocRepo.getEventsForAssociation(assoc2.id).getOrThrow()
   //
   //    // Assert: check events got retrieved correctly
   //    assertEquals(2, eventsForAssoc1.size)
