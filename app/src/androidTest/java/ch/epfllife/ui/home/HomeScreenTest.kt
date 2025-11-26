@@ -4,8 +4,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import ch.epfllife.example_data.ExampleEvents
+import ch.epfllife.example_data.ExampleUsers
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventRepositoryLocal
+import ch.epfllife.model.user.UserRepositoryLocal
 import ch.epfllife.ui.composables.DisplayedEventsTestTags
 import ch.epfllife.ui.composables.EventCardTestTags
 import ch.epfllife.ui.navigation.NavigationTestTags
@@ -21,15 +23,31 @@ class HomeScreenTest {
   @get:Rule val composeTestRule = createComposeRule()
 
   val repo = EventRepositoryLocal()
+  private val userRepo = UserRepositoryLocal(repo)
 
   private fun createFakeViewModel(
       myEvents: List<Event> = emptyList(),
       allEvents: List<Event> = emptyList(),
   ): HomeViewModel {
-    repo.seedEvents(allEvents)
-    val viewModel = HomeViewModel(repo = repo)
-    // Set myEvents since the real ViewModel doesn't populate it yet
+    val combinedEvents = (allEvents + myEvents).distinctBy { it.id }
+    repo.seedEvents(combinedEvents)
+
+    runTest {
+      userRepo.createUser(ExampleUsers.user1)
+      userRepo.simulateLogin(ExampleUsers.user1.id)
+
+      myEvents.forEach { event ->
+        if (repo.getEvent(event.id) == null) {
+          repo.createEvent(event)
+        }
+        userRepo.subscribeToEvent(event.id)
+      }
+    }
+
+    val viewModel = HomeViewModel(repo = repo, userRepo = userRepo)
+
     viewModel.setMyEvents(myEvents)
+
     return viewModel
   }
 
@@ -159,7 +177,7 @@ class HomeScreenTest {
 
     // Now should show all events (ExampleEvents.event2)
     composeTestRule.onNodeWithText(ExampleEvents.event2.title).assertIsDisplayed()
-    composeTestRule.onNodeWithText(ExampleEvents.event1.title).assertDoesNotExist()
+    composeTestRule.onNodeWithText(ExampleEvents.event1.title).assertIsDisplayed()
   }
 
   @Test
@@ -289,7 +307,6 @@ class HomeScreenTest {
         ExampleEvents.event1.copy(
             title =
                 "This is an extremely long event title that might cause layout issues if not handled properly in the UI components and should be truncated correctly")
-    val viewModel = createFakeViewModel(myEvents = listOf(longTitleEvent))
 
     setUpHomeScreen(myEvents = listOf(longTitleEvent))
 
