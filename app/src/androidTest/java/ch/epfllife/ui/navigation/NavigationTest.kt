@@ -10,15 +10,13 @@ import androidx.navigation.NavHostController
 import androidx.test.rule.GrantPermissionRule
 import ch.epfllife.ThemedApp
 import ch.epfllife.example_data.ExampleEvents
-import ch.epfllife.model.association.AssociationRepositoryFirestore
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.authentication.SignInResult
-import ch.epfllife.model.event.EventRepositoryFirestore
+import ch.epfllife.model.db.Db
 import ch.epfllife.ui.eventDetails.EventDetailsTestTags
 import ch.epfllife.ui.eventDetails.MapScreenTestTags
 import ch.epfllife.ui.home.HomeScreenTestTags
 import ch.epfllife.utils.FakeCredentialManager
-import ch.epfllife.utils.FirebaseEmulator
 import ch.epfllife.utils.navigateToEvent
 import ch.epfllife.utils.navigateToTab
 import ch.epfllife.utils.setUpEmulator
@@ -43,8 +41,7 @@ class NavigationTest {
           Manifest.permission.ACCESS_FINE_LOCATION,
       )
   private val auth = Auth(FakeCredentialManager.withDefaultTestUser)
-  private val eventRepository = EventRepositoryFirestore(FirebaseEmulator.firestore)
-  private val assocRepository = AssociationRepositoryFirestore(FirebaseEmulator.firestore)
+  private lateinit var db: Db
 
   @Before
   fun setUp() {
@@ -53,10 +50,11 @@ class NavigationTest {
       val signInResult = auth.signInWithCredential(FakeCredentialManager.defaultUserCredentials)
       Assert.assertTrue("Sign in must succeed", signInResult is SignInResult.Success)
     }
+    db = Db.freshLocal()
   }
 
   private fun setUpApp() {
-    composeTestRule.setContent { ThemedApp(auth) }
+    composeTestRule.setContent { ThemedApp(auth, db) }
   }
 
   @Test
@@ -280,12 +278,14 @@ class NavigationTest {
   fun canGoToEventMapAndBackHome() {
     val testEvent = ExampleEvents.event1
     runTest {
-      Assert.assertTrue(assocRepository.createAssociation(testEvent.association).isSuccess)
+      Assert.assertTrue(db.assocRepo.createAssociation(testEvent.association).isSuccess)
       Assert.assertEquals(
-          testEvent.association, assocRepository.getAssociation(testEvent.association.id))
-      Assert.assertTrue(eventRepository.createEvent(testEvent).isSuccess)
-      Assert.assertEquals(testEvent, eventRepository.getEvent(testEvent.id))
-      Assert.assertEquals(1, eventRepository.getAllEvents().size)
+          testEvent.association,
+          db.assocRepo.getAssociation(testEvent.association.id),
+      )
+      Assert.assertTrue(db.eventRepo.createEvent(testEvent).isSuccess)
+      Assert.assertEquals(testEvent, db.eventRepo.getEvent(testEvent.id))
+      Assert.assertEquals(1, db.eventRepo.getAllEvents().size)
     }
     setUpApp()
     composeTestRule.navigateToEvent(testEvent.id)

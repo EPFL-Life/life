@@ -13,6 +13,7 @@ import androidx.test.uiautomator.UiDevice
 import ch.epfllife.ThemedApp
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.authentication.SignInResult
+import ch.epfllife.model.db.Db
 import ch.epfllife.ui.authentication.SignInScreenTestTags
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.navigation.Tab
@@ -49,11 +50,11 @@ class EndToEndTest {
       val signInResult = auth.signInWithCredential(FakeCredentialManager.defaultUserCredentials)
       Assert.assertTrue("Sign in must succeed", signInResult is SignInResult.Success)
     }
-    composeTestRule.setContent { ThemedApp(auth) }
+    composeTestRule.setContent { ThemedApp(auth, Db.firestore) }
   }
 
   fun useLoggedOutApp() {
-    composeTestRule.setContent { ThemedApp(auth) }
+    composeTestRule.setContent { ThemedApp(auth, Db.firestore) }
   }
 
   @Test
