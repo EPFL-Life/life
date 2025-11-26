@@ -74,30 +74,29 @@ class CalendarScreenTest {
         onEventClick = { eventId -> clickedEventId = eventId })
 
     composeTestRule.waitForIdle()
-    Thread.sleep(500)
+    Thread.sleep(1000)
 
     // Initially should show subscribed events
-    composeTestRule.onNodeWithText(ExampleEvents.event1.title).assertIsDisplayed()
+    composeTestRule.onNodeWithText(ExampleEvents.event1.title).performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithText(ExampleEvents.event2.title).assertDoesNotExist()
 
     // Click on "All Events" filter button
     composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_ALL).performClick()
 
+    Thread.sleep(1000)
     composeTestRule.waitForIdle()
-    Thread.sleep(500)
 
     // Now should show all events
-    composeTestRule.onNodeWithText(ExampleEvents.event1.title).assertIsDisplayed()
-    composeTestRule.onNodeWithText(ExampleEvents.event2.title).assertIsDisplayed()
-
+    composeTestRule.onNodeWithText(ExampleEvents.event1.title).performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithText(ExampleEvents.event2.title).performScrollTo().assertIsDisplayed()
     // Click back on "Subscribed" filter button
     composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_SUBSCRIBED).performClick()
 
+    Thread.sleep(1000)
     composeTestRule.waitForIdle()
-    Thread.sleep(500)
 
     // Should show only subscribed events again
-    composeTestRule.onNodeWithText(ExampleEvents.event1.title).assertIsDisplayed()
+    composeTestRule.onNodeWithText(ExampleEvents.event1.title).performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithText(ExampleEvents.event2.title).assertDoesNotExist()
   }
 
