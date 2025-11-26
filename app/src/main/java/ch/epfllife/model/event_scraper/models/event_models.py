@@ -1,4 +1,3 @@
-# models/event_model.py
 from dataclasses import dataclass
 from typing import Optional, Dict, Any, List
 from enum import Enum
@@ -14,8 +13,16 @@ class EventCategory(Enum):
     TECH = "Tech"
     SOCIAL = "Social" 
     ACADEMIC = "Academic"
-    CAREER = "Carrer"
+    CAREER = "Career"  
     OTHER = "Other"
+    
+    def display_string(self) -> str:
+        """Return display string for the category"""
+        return self.value
+    
+    def to_firestore_value(self) -> str:
+        """Convert to Firestore-compatible value"""
+        return self.name
 
 @dataclass
 class Price:
@@ -39,6 +46,10 @@ class Price:
             francs = self.cents // 100
             rappen = self.cents % 100
             return f"CHF {francs}.{rappen:02d}"
+    
+    def __str__(self) -> str:
+        """String representation"""
+        return self.format_for_display()
 
 @dataclass
 class Location:
@@ -65,12 +76,15 @@ class Association:
     Association data class - represents student associations
     This ensures seamless data integration with the mobile app
     """
+    
     id: str
     name: str
     description: str
+    eventCategory: EventCategory  
+    
+    
     pictureUrl: Optional[str] = None  
     logoUrl: Optional[str] = None  
-    eventCategory: EventCategory  
     about: Optional[str] = None  
     socialLinks: Optional[Dict[str, str]] = None 
     
@@ -82,9 +96,9 @@ class Association:
             "id": self.id,
             "name": self.name,
             "description": self.description,
+            "eventCategory": self.eventCategory.name,  # Store enum as string
             "pictureUrl": self.pictureUrl,
             "logoUrl": self.logoUrl,
-            "eventCategory": self.eventCategory.name,  # Store enum as string
             "about": self.about,
             "socialLinks": self.socialLinks or {}  # Ensure never null
         }
@@ -95,6 +109,7 @@ class Event:
     Event data class - represents university events
     This ensures the mobile app can parse data without issues
     """
+    # Campos SIN valor por defecto primero
     id: str
     title: str
     description: str
@@ -103,6 +118,8 @@ class Event:
     association: Association
     tags: List[str]
     price: Price
+    
+    # Campos CON valor por defecto después
     pictureUrl: Optional[str] = None  
     
     def to_firestore_dict(self) -> Dict[str, Any]:
