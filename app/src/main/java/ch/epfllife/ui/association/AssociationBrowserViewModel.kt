@@ -3,23 +3,14 @@ package ch.epfllife.ui.association
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ch.epfllife.model.association.Association
-import ch.epfllife.model.association.AssociationRepository
-import ch.epfllife.model.association.AssociationRepositoryFirestore
-import com.google.firebase.firestore.FirebaseFirestore
+import ch.epfllife.model.db.Db
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-/**
- * ViewModel for the AssociationBrowser screen.
- *
- * @param repo The repository to fetch associations from.
- */
-class AssociationBrowserViewModel(
-    private val repo: AssociationRepository =
-        AssociationRepositoryFirestore(FirebaseFirestore.getInstance())
-) : ViewModel() {
+/** ViewModel for the AssociationBrowser screen. */
+class AssociationBrowserViewModel(private val db: Db) : ViewModel() {
 
   private val _allAssociations = MutableStateFlow<List<Association>>(emptyList())
   val allAssociations: StateFlow<List<Association>> = _allAssociations.asStateFlow()
@@ -38,7 +29,7 @@ class AssociationBrowserViewModel(
     viewModelScope.launch {
       _allAssociations.value =
           try {
-            repo.getAllAssociations()
+            db.assocRepo.getAllAssociations()
           } catch (e: Exception) {
             // Log the error or handle it as needed
             // e.g., Log.e("AssociationBrowserVM", "Failed to load associations", e)

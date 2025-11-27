@@ -118,14 +118,16 @@ fun App(
 
           // pass navigation callback to HomeScreen
           composable(Screen.HomeScreen.route) {
-            HomeScreen(onEventClick = { id -> navigationActions.navigateToEventDetails(id) })
+            HomeScreen(
+                onEventClick = { id -> navigationActions.navigateToEventDetails(id) }, db = db)
           }
 
           composable(Screen.AssociationBrowser.route) {
             AssociationBrowser(
                 onAssociationClick = { associationId ->
                   navigationActions.navigateToAssociationDetails(associationId)
-                })
+                },
+                db = db)
           }
 
           composable(Screen.Calendar.route) {
@@ -142,6 +144,7 @@ fun App(
                 associationId = associationId,
                 onGoBack = { navController.popBackStack() },
                 onEventClick = { id -> navigationActions.navigateToEventDetails(id) },
+                db = db,
             )
           }
 
@@ -160,6 +163,7 @@ fun App(
                   val encodedLocation = Json.encodeToString(location)
                   navigationActions.navigateToScreenWithId(Screen.Map, encodedLocation)
                 },
+                db = db,
             )
           }
 

@@ -21,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.R
+import ch.epfllife.model.db.Db
 import ch.epfllife.model.enums.SubscriptionFilter
 import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
 import ch.epfllife.ui.composables.EventCard
@@ -31,7 +32,8 @@ import ch.epfllife.ui.navigation.NavigationTestTags
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = viewModel(),
+    db: Db,
+    viewModel: HomeViewModel = viewModel { HomeViewModel(db) },
     onEventClick: (eventId: String) -> Unit,
 ) {
   LaunchedEffect(Unit) { viewModel.refresh() }
@@ -100,5 +102,5 @@ object HomeScreenTestTags {
 @Preview(showBackground = true)
 @Composable
 private fun HomeScreenPreview() {
-  MaterialTheme { HomeScreen(onEventClick = {}) }
+  MaterialTheme { HomeScreen(onEventClick = {}, db = Db.freshLocal()) }
 }

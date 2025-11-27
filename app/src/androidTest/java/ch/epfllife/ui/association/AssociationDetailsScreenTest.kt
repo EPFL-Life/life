@@ -8,6 +8,7 @@ import ch.epfllife.example_data.ExampleAssociations
 import ch.epfllife.example_data.ExampleEvents
 import ch.epfllife.model.association.Association
 import ch.epfllife.model.association.AssociationRepository
+import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.Event
 import ch.epfllife.ui.theme.Theme
 import ch.epfllife.utils.assertClickable
@@ -27,13 +28,17 @@ class AssociationDetailsScreenTest {
 
   // Helper to set up AssociationDetailsContent inside a Theme.
   private fun setAssociationDetailsContent(
-      association: ch.epfllife.model.association.Association,
-      onGoBack: () -> Unit = {}
+      association: Association,
+      onGoBack: () -> Unit = {},
   ) {
     composeTestRule.setContent {
       Theme {
         AssociationDetailsContent(
-            association = association, onGoBack = onGoBack, onEventClick = {}, events = emptyList())
+            association = association,
+            onGoBack = onGoBack,
+            onEventClick = {},
+            events = emptyList(),
+        )
       }
     }
   }
@@ -41,7 +46,7 @@ class AssociationDetailsScreenTest {
   // Helper to set up AssociationDetailsScreen inside a Theme.
   private fun setAssociationDetailsScreen(
       associationId: String,
-      viewModel: AssociationDetailsViewModel = AssociationDetailsViewModel(),
+      db: Db = Db.freshLocal(),
       onGoBack: () -> Unit = {},
       onEventClick: (String) -> Unit = {},
   ) {
@@ -49,12 +54,16 @@ class AssociationDetailsScreenTest {
       Theme {
         AssociationDetailsScreen(
             associationId = associationId,
-            viewModel = viewModel,
             onGoBack = onGoBack,
             onEventClick = onEventClick,
+            db = db,
         )
       }
     }
+  }
+
+  private fun dbWithFakeAssoc(assocRepo: AssociationRepository): Db {
+    return Db.freshLocal().copy(assocRepo = assocRepo)
   }
 
   private fun getString(resId: Int, vararg args: Any): String {
@@ -114,7 +123,8 @@ class AssociationDetailsScreenTest {
                 association = association,
                 onGoBack = onClick,
                 onEventClick = {},
-                events = emptyList())
+                events = emptyList(),
+            )
           }
         },
         tag = AssociationDetailsTestTags.BACK_BUTTON,
@@ -257,9 +267,10 @@ class AssociationDetailsScreenTest {
 
   @Test
   fun screenDisplaysErrorMessageOnFailure() {
-    val viewModel = AssociationDetailsViewModel(FakeAssociationRepository(throwError = true))
-
-    setAssociationDetailsScreen(associationId = "any", viewModel = viewModel)
+    setAssociationDetailsScreen(
+        associationId = "any",
+        db = dbWithFakeAssoc(FakeAssociationRepository(throwError = true)),
+    )
 
     composeTestRule.waitForIdle()
 
@@ -270,15 +281,15 @@ class AssociationDetailsScreenTest {
   fun screenDisplaysContentOnSuccessWhenEventsNull() {
     val association = ExampleAssociations.association1
 
-    // ViewModel configured so eventsResult is a failure -> Success with null events
-    val viewModel =
-        AssociationDetailsViewModel(
-            FakeAssociationRepository(
-                successAssociation = association,
-                eventsResult = Result.failure(Exception("test")),
-            ))
-
-    setAssociationDetailsScreen(associationId = association.id, viewModel = viewModel)
+    setAssociationDetailsScreen(
+        associationId = association.id,
+        db =
+            dbWithFakeAssoc(
+                FakeAssociationRepository(
+                    successAssociation = association,
+                    eventsResult = Result.failure(Exception("test")),
+                )),
+    )
 
     composeTestRule.waitForIdle()
 
@@ -309,7 +320,7 @@ class AssociationDetailsScreenTest {
   @OptIn(ExperimentalCoroutinesApi::class)
   @Test
   fun viewModelEmitsErrorWhenAssociationNotFound() = runTest {
-    val viewModel = AssociationDetailsViewModel(FakeAssociationRepository(returnNull = true))
+    val viewModel = AssociationDetailsViewModel(db = Db.freshLocal())
     val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     viewModel.loadAssociation("non_existing_id", context)
@@ -324,7 +335,9 @@ class AssociationDetailsScreenTest {
   @OptIn(ExperimentalCoroutinesApi::class)
   @Test
   fun viewModelEmitsErrorOnException() = runTest {
-    val viewModel = AssociationDetailsViewModel(FakeAssociationRepository(throwError = true))
+    val viewModel =
+        AssociationDetailsViewModel(
+            db = dbWithFakeAssoc(FakeAssociationRepository(throwError = true)))
     val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     viewModel.loadAssociation("any", context)
@@ -344,10 +357,12 @@ class AssociationDetailsScreenTest {
 
     val viewModel =
         AssociationDetailsViewModel(
-            FakeAssociationRepository(
-                successAssociation = association,
-                eventsResult = Result.success(eventsList),
-            ))
+            db =
+                dbWithFakeAssoc(
+                    FakeAssociationRepository(
+                        successAssociation = association,
+                        eventsResult = Result.success(eventsList),
+                    )))
     val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     // Initial state should be Loading due to default initialization of _uiState/uiState
@@ -370,10 +385,12 @@ class AssociationDetailsScreenTest {
     val association = ExampleAssociations.association1
     val viewModel =
         AssociationDetailsViewModel(
-            FakeAssociationRepository(
-                successAssociation = association,
-                eventsResult = Result.failure(Exception("test")),
-            ))
+            db =
+                dbWithFakeAssoc(
+                    FakeAssociationRepository(
+                        successAssociation = association,
+                        eventsResult = Result.failure(Exception("test")),
+                    )))
 
     val context = InstrumentationRegistry.getInstrumentation().targetContext
 
@@ -397,10 +414,12 @@ class AssociationDetailsScreenTest {
     val emptyEvents: List<Event> = emptyList()
     val viewModel =
         AssociationDetailsViewModel(
-            FakeAssociationRepository(
-                successAssociation = association,
-                eventsResult = Result.success(emptyEvents),
-            ))
+            db =
+                dbWithFakeAssoc(
+                    FakeAssociationRepository(
+                        successAssociation = association,
+                        eventsResult = Result.success(emptyEvents),
+                    )))
     val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     // Initial state should be Loading

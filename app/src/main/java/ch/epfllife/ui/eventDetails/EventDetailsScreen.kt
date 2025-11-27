@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.model.association.Association
+import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.map.Location
@@ -57,7 +58,8 @@ object EventDetailsTestTags {
 @Composable
 fun EventDetailsScreen(
     eventId: String,
-    viewModel: EventDetailsViewModel = viewModel(),
+    db: Db,
+    viewModel: EventDetailsViewModel = viewModel { EventDetailsViewModel(db) },
     onGoBack: () -> Unit = {},
     onOpenMap: (Location) -> Unit,
 ) {
