@@ -3,20 +3,39 @@ package ch.epfllife.ui.calendar
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import ch.epfllife.example_data.ExampleEvents
+import ch.epfllife.example_data.ExampleUsers
+import ch.epfllife.model.event.EventRepositoryLocal
+import ch.epfllife.model.user.UserRepositoryLocal
 import ch.epfllife.ui.composables.DisplayedEventsTestTags
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.theme.Theme
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 
 class CalendarScreenTest {
+  val repo = EventRepositoryLocal()
+  private val userRepo = UserRepositoryLocal(repo)
 
   private fun setUpCalendarScreen(
       allEvents: List<ch.epfllife.model.event.Event> = emptyList(),
       enrolledEvents: List<ch.epfllife.model.event.Event> = emptyList(),
       onEventClick: (String) -> Unit = {}
   ) {
+    val combinedEvents = (allEvents + enrolledEvents).distinctBy { it.id }
+    repo.seedEvents(combinedEvents)
+
+    runTest {
+      userRepo.createUser(ExampleUsers.user1)
+      userRepo.simulateLogin(ExampleUsers.user1.id)
+      enrolledEvents.forEach { event ->
+        if (repo.getEvent(event.id) == null) {
+          repo.createEvent(event)
+        }
+        userRepo.subscribeToEvent(event.id)
+      }
+    }
     composeTestRule.setContent {
       Theme {
         CalendarScreen(
@@ -68,7 +87,6 @@ class CalendarScreenTest {
         onEventClick = { eventId -> clickedEventId = eventId })
 
     composeTestRule.waitForIdle()
-    Thread.sleep(1000)
 
     // Initially should show subscribed events
     composeTestRule.onNodeWithText(ExampleEvents.event1.title).assertIsDisplayed()
@@ -77,7 +95,6 @@ class CalendarScreenTest {
     // Click on "All Events" filter button
     composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_ALL).performClick()
 
-    Thread.sleep(1000)
     composeTestRule.waitForIdle()
 
     // Now should show all events
@@ -86,7 +103,6 @@ class CalendarScreenTest {
     // Click back on "Subscribed" filter button
     composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_SUBSCRIBED).performClick()
 
-    Thread.sleep(1000)
     composeTestRule.waitForIdle()
 
     // Should show only subscribed events again
