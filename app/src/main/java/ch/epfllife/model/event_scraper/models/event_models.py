@@ -80,13 +80,13 @@ class Association:
     id: str
     name: str
     description: str
-    eventCategory: EventCategory  
+    event_category: EventCategory  
     
     
-    pictureUrl: Optional[str] = None  
-    logoUrl: Optional[str] = None  
+    picture_url: Optional[str] = None  
+    logo_url: Optional[str] = None  
     about: Optional[str] = None  
-    socialLinks: Optional[Dict[str, str]] = None 
+    social_links: Optional[Dict[str, str]] = None 
     
     def to_firestore_dict(self) -> Dict[str, Any]:
         """
@@ -109,7 +109,7 @@ class Event:
     Event data class - represents university events
     This ensures the mobile app can parse data without issues
     """
-    # Campos SIN valor por defecto primero
+    #Whithout default values
     id: str
     title: str
     description: str
@@ -119,8 +119,8 @@ class Event:
     tags: List[str]
     price: Price
     
-    # Campos CON valor por defecto después
-    pictureUrl: Optional[str] = None  
+    #With default values
+    picture_url: Optional[str] = None  
     
     def to_firestore_dict(self) -> Dict[str, Any]:
         """

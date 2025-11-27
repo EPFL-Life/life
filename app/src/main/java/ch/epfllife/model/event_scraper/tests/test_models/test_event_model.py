@@ -3,7 +3,7 @@ import pytest
 import sys
 import os
 
-# Añade el directorio raíz al path de Python
+# Adds the parent directory to the system path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../..'))
 
 
@@ -121,7 +121,7 @@ class TestEventModel:
         assert firestore_dict["id"] == "test_assoc"
         assert firestore_dict["name"] == "Test Association"
         assert firestore_dict["description"] == "Test description"
-        assert firestore_dict["eventCategory"] == "ACADEMIC"  # Corregido: nombre del enum, no valor
+        assert firestore_dict["eventCategory"] == "Academic"  
         assert firestore_dict["pictureUrl"] == "https://example.com/picture.jpg"
         assert firestore_dict["logoUrl"] == "https://example.com/logo.png"
         assert firestore_dict["about"] == "This is a test association for testing purposes"
@@ -209,7 +209,7 @@ class TestEventModel:
         assert EventCategory.TECH.value == "Tech"
         assert EventCategory.SOCIAL.value == "Social"
         assert EventCategory.ACADEMIC.value == "Academic"
-        assert EventCategory.CAREER.value == "Career"  # Corregido
+        assert EventCategory.CAREER.value == "Career"  
         assert EventCategory.OTHER.value == "Other"
         
         # Test display string conversion
@@ -218,7 +218,7 @@ class TestEventModel:
         assert EventCategory.TECH.display_string() == "Tech"
         assert EventCategory.SOCIAL.display_string() == "Social"
         assert EventCategory.ACADEMIC.display_string() == "Academic"
-        assert EventCategory.CAREER.display_string() == "Career"  # Corregido
+        assert EventCategory.CAREER.display_string() == "Career"  
         assert EventCategory.OTHER.display_string() == "Other"
         
         # Test Firestore conversion
