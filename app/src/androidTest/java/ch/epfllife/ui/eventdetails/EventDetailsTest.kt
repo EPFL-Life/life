@@ -218,7 +218,7 @@ class EventDetailsTest {
     var clicked = false
     composeTestRule.setContent {
       EventDetailsContent(
-          sampleEvent, onGoBack = {}, onOpenMap = { clicked = true }, onEnrollClick = {})
+          event = sampleEvent, onGoBack = {}, onOpenMap = { clicked = true }, onEnrollClick = {})
     }
     composeTestRule
         .onNodeWithTag(EventDetailsTestTags.VIEW_LOCATION_BUTTON)
