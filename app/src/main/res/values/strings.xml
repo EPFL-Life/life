@@ -66,5 +66,8 @@
     <!-- Resource errors -->
     <string name="error_association_not_found">Association not found</string>
     <string name="error_loading_association">Failed to load association</string>
+    <string name="error_enroll_failed">Failed to enrol: Please try again.</string>
+    <string name="error_unenroll_failed">Failed to unenroll: Please try again.</string>
+    <string name="error_event_not_found">Failed to unenroll: Please try again.</string>
 
 </resources>
