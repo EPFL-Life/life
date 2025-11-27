@@ -38,18 +38,7 @@ class Price:
         """
         return self.cents
     
-    def format_for_display(self) -> str:
-        """Format price for display - matches Android's formatting logic"""
-        if self.cents == 0:
-            return "Free"
-        else:
-            francs = self.cents // 100
-            rappen = self.cents % 100
-            return f"CHF {francs}.{rappen:02d}"
-    
-    def __str__(self) -> str:
-        """String representation"""
-        return self.format_for_display()
+
 
 @dataclass
 class Location:
