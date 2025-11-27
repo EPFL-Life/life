@@ -63,12 +63,13 @@
     <string name="calendar_no_events_placeholder">No events found</string>
     <string name="calendar_search_hint">Search events</string>
 
-    <!-- Resource errors -->
+    <!-- Errors -->
     <string name="error_association_not_found">Association not found</string>
     <string name="error_loading_association">Failed to load association</string>
     <string name="error_enroll_failed">Failed to enrol: Please try again.</string>
     <string name="error_unenroll_failed">Failed to unenroll: Please try again.</string>
     <string name="error_event_not_found">Failed to unenroll: Please try again.</string>
     <string name="error_loading_event">Failed to load event</string>
+    <string name="error_failed_to_enroll_event">Failed to enrol: Please try again.</string>
 
 </resources>
