@@ -8,7 +8,6 @@ import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.EventRepositoryLocal
 import ch.epfllife.model.user.UserRepositoryLocal
 import ch.epfllife.ui.composables.DisplayedEventsTestTags
-import ch.epfllife.ui.home.HomeViewModel
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.theme.Theme
 import kotlinx.coroutines.test.runTest
@@ -21,7 +20,7 @@ class CalendarScreenTest {
   private fun setUpCalendarScreen(
       allEvents: List<ch.epfllife.model.event.Event> = emptyList(),
       enrolledEvents: List<ch.epfllife.model.event.Event> = emptyList(),
-      onEventClick: (String) -> Unit = {}
+      onEventClick: (String) -> Unit = {},
   ) {
     val eventRepo = EventRepositoryLocal()
     val userRepo = UserRepositoryLocal(eventRepo)
@@ -42,14 +41,9 @@ class CalendarScreenTest {
       }
     }
 
-    // HomeViewModel changed, we need the userRepo
-    val viewModel =
-        HomeViewModel(db = Db.freshLocal().copy(eventRepo = eventRepo, userRepo = userRepo))
-    viewModel.setMyEvents(enrolledEvents)
+    val db = Db.freshLocal().copy(eventRepo = eventRepo, userRepo = userRepo)
 
-    composeTestRule.setContent {
-      Theme { CalendarScreen(viewModel = viewModel, onEventClick = onEventClick) }
-    }
+    composeTestRule.setContent { Theme { CalendarScreen(db = db, onEventClick = onEventClick) } }
     composeTestRule.waitForIdle()
   }
 
@@ -58,7 +52,9 @@ class CalendarScreenTest {
   @Test
   fun calendarScreen_DisplaysCorrectly() {
     setUpCalendarScreen(
-        allEvents = listOf(ExampleEvents.event1), enrolledEvents = listOf(ExampleEvents.event1))
+        allEvents = listOf(ExampleEvents.event1),
+        enrolledEvents = listOf(ExampleEvents.event1),
+    )
 
     composeTestRule.waitForIdle()
 
@@ -77,7 +73,8 @@ class CalendarScreenTest {
     setUpCalendarScreen(
         allEvents = listOf(ExampleEvents.event1),
         enrolledEvents = listOf(ExampleEvents.event1),
-        onEventClick = { eventId -> clickedEventId = eventId })
+        onEventClick = { eventId -> clickedEventId = eventId },
+    )
 
     // Find and click on the event card
     composeTestRule.onNodeWithText(ExampleEvents.event1.title).performClick()
@@ -92,7 +89,8 @@ class CalendarScreenTest {
     setUpCalendarScreen(
         allEvents = listOf(ExampleEvents.event1, ExampleEvents.event2),
         enrolledEvents = listOf(ExampleEvents.event1),
-        onEventClick = { eventId -> clickedEventId = eventId })
+        onEventClick = { eventId -> clickedEventId = eventId },
+    )
 
     composeTestRule.waitForIdle()
     Thread.sleep(1000)
@@ -138,7 +136,8 @@ class CalendarScreenTest {
   fun calendarScreen_DisplaysMultipleEventsFromDifferentMonths() {
     setUpCalendarScreen(
         allEvents = listOf(ExampleEvents.event1, ExampleEvents.event2, ExampleEvents.event3),
-        enrolledEvents = listOf(ExampleEvents.event1, ExampleEvents.event2, ExampleEvents.event3))
+        enrolledEvents = listOf(ExampleEvents.event1, ExampleEvents.event2, ExampleEvents.event3),
+    )
 
     composeTestRule.waitForIdle()
 
@@ -153,7 +152,8 @@ class CalendarScreenTest {
     monthHeaders.onFirst().assertIsDisplayed()
     org.junit.Assert.assertTrue(
         "Should have multiple month headers for events from different months",
-        monthHeaders.fetchSemanticsNodes().size >= 2)
+        monthHeaders.fetchSemanticsNodes().size >= 2,
+    )
   }
 
   @Test
@@ -161,7 +161,9 @@ class CalendarScreenTest {
     val invalidDateEvent = ExampleEvents.event1.copy(time = "invalid-date-format")
 
     setUpCalendarScreen(
-        allEvents = listOf(invalidDateEvent), enrolledEvents = listOf(invalidDateEvent))
+        allEvents = listOf(invalidDateEvent),
+        enrolledEvents = listOf(invalidDateEvent),
+    )
 
     composeTestRule.waitForIdle()
     // Should not crash with invalid date format
@@ -174,7 +176,8 @@ class CalendarScreenTest {
         listOf(
             ExampleEvents.event1.copy(time = "2025-01-15T09:00:00/2025-01-20T18:00:00"),
             ExampleEvents.event2.copy(time = "2025-02-01T10:00:00/2025-02-28T17:00:00"),
-            ExampleEvents.event3.copy(time = "2025-03-10T14:00:00/2025-03-12T16:00:00"))
+            ExampleEvents.event3.copy(time = "2025-03-10T14:00:00/2025-03-12T16:00:00"),
+        )
 
     setUpCalendarScreen(allEvents = multiMonthEvents, enrolledEvents = multiMonthEvents)
 
@@ -184,7 +187,8 @@ class CalendarScreenTest {
     assertEquals(
         "Should have exactly 3 month headers for 3 different months",
         3,
-        monthHeaders.fetchSemanticsNodes().size)
+        monthHeaders.fetchSemanticsNodes().size,
+    )
   }
 
   @Test

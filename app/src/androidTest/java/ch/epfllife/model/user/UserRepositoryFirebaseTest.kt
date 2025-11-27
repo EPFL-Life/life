@@ -279,15 +279,18 @@ class UserRepositoryFirebaseTest : FirestoreLifeTest() {
   fun subscribe_success() = runTest {
     val (user, _, event) = setUpSimple()
     // Assert
-    assertEquals(1, getUserCount())
+    assertEquals("User count must be 1", 1, getUserCount())
 
     // action : subscribe
     val result = db.userRepo.subscribeToEvent(event.id)
 
     // assert
-    assertTrue(result.isSuccess)
+    assertTrue("Event subscription must succeed", result.isSuccess)
     val updated = db.userRepo.getUser(user.id)
-    assertTrue(updated?.enrolledEvents?.contains(event.id) ?: false)
+    assertTrue(
+        "Enrolled events must be updated",
+        updated?.enrolledEvents?.contains(event.id) ?: false,
+    )
   }
 
   @Test

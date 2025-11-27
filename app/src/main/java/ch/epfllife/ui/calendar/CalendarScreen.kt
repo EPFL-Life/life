@@ -12,6 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.R
+import ch.epfllife.model.db.Db
 import ch.epfllife.model.enums.SubscriptionFilter
 import ch.epfllife.model.event.Event
 import ch.epfllife.ui.composables.CalendarCard
@@ -37,7 +38,8 @@ object CalendarTestTags {
 @Composable
 fun CalendarScreen(
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = viewModel(),
+    db: Db,
+    viewModel: HomeViewModel = viewModel { HomeViewModel(db) },
     onEventClick: (String) -> Unit,
 ) {
   LaunchedEffect(Unit) { viewModel.refresh() }
