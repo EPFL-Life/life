@@ -1,4 +1,4 @@
-package ch.epfllife.ui.eventdetails
+package ch.epfllife.ui.eventDetails
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -8,10 +8,6 @@ import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.event.EventRepository
 import ch.epfllife.model.map.Location
 import ch.epfllife.model.user.Price
-import ch.epfllife.ui.eventDetails.EventDetailsContent
-import ch.epfllife.ui.eventDetails.EventDetailsTestTags
-import ch.epfllife.ui.eventDetails.EventDetailsUIState
-import ch.epfllife.ui.eventDetails.EventDetailsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
@@ -69,6 +65,37 @@ class EventDetailsTest {
     composeTestRule.setContent {
       EventDetailsContent(event = event, onOpenMap = {}, onGoBack = {}, onEnrollClick = {})
     }
+  }
+
+  @Test
+  fun content_DisplaysUnenrollButton_WhenEnrolled() {
+    composeTestRule.setContent {
+      EventDetailsContent(
+          event = sampleEvent,
+          isEnrolled = true,
+          onGoBack = {},
+          onOpenMap = {},
+          onEnrollClick = {},
+          onUnenrollClick = {})
+    }
+    composeTestRule.onNodeWithTag(EventDetailsTestTags.ENROLL_BUTTON).assertIsDisplayed()
+    composeTestRule.onNodeWithText("Unenroll").assertIsDisplayed()
+  }
+
+  @Test
+  fun content_UnenrollButtonTriggersCallback() {
+    var unenrollClicked = false
+    composeTestRule.setContent {
+      EventDetailsContent(
+          event = sampleEvent,
+          isEnrolled = true,
+          onGoBack = {},
+          onOpenMap = {},
+          onEnrollClick = {},
+          onUnenrollClick = { unenrollClicked = true })
+    }
+    composeTestRule.onNodeWithTag(EventDetailsTestTags.ENROLL_BUTTON).performClick()
+    assertTrue("Unenroll button should trigger callback", unenrollClicked)
   }
 
   // ============ ViewModel Tests ============
