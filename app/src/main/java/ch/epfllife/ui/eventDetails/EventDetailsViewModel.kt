@@ -1,7 +1,9 @@
 package ch.epfllife.ui.eventDetails
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import ch.epfllife.R
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventRepository
 import ch.epfllife.model.event.EventRepositoryFirestore
@@ -41,7 +43,7 @@ class EventDetailsViewModel(
   private var currentUser: User? = null
 
   /** Loads event details by ID using EventRepository.getEvent. */
-  fun loadEvent(eventId: String) {
+  fun loadEvent(eventId: String, context: Context) {
     viewModelScope.launch {
       try {
         val event = repo.getEvent(eventId)
@@ -51,10 +53,10 @@ class EventDetailsViewModel(
           _uiState.value = EventDetailsUIState.Success(event, isEnrolled = isEnrolled(event))
         } else {
           _uiState.value =
-              EventDetailsUIState.Error(ch.epfllife.R.string.error_event_not_found.toString())
+              EventDetailsUIState.Error(context.getString(R.string.error_event_not_found))
         }
       } catch (e: Exception) {
-        _uiState.value = EventDetailsUIState.Error("Failed to load event: ${e.message}")
+        _uiState.value = EventDetailsUIState.Error(context.getString(R.string.error_loading_event))
       }
     }
   }
@@ -63,7 +65,7 @@ class EventDetailsViewModel(
    * Logic to enroll in an event. Either a redirection to separate signup page or use Firebase to
    * track enrollment
    */
-  fun enrollInEvent(event: Event) {
+  fun enrollInEvent(event: Event, context: Context) {
     viewModelScope.launch {
       try {
         if (isEnrolled(event)) {
@@ -74,7 +76,7 @@ class EventDetailsViewModel(
         userRepo
             .subscribeToEvent(event.id)
             .fold(
-                onSuccess = { loadEvent(event.id) },
+                onSuccess = { loadEvent(event.id, context) },
                 onFailure = { _ ->
                   _uiState.value =
                       EventDetailsUIState.Error(ch.epfllife.R.string.error_enroll_failed.toString())
@@ -86,7 +88,7 @@ class EventDetailsViewModel(
     }
   }
 
-  fun unenrollFromEvent(event: Event) {
+  fun unenrollFromEvent(event: Event, context: Context) {
     viewModelScope.launch {
       try {
         if (!isEnrolled(event)) {
@@ -97,15 +99,13 @@ class EventDetailsViewModel(
         userRepo
             .unsubscribeFromEvent(event.id)
             .fold(
-                onSuccess = { loadEvent(event.id) },
+                onSuccess = { loadEvent(event.id, context) },
                 onFailure = { _ ->
                   _uiState.value =
-                      EventDetailsUIState.Error(
-                          ch.epfllife.R.string.error_unenroll_failed.toString())
+                      EventDetailsUIState.Error(R.string.error_unenroll_failed.toString())
                 })
       } catch (_: Exception) {
-        _uiState.value =
-            EventDetailsUIState.Error(ch.epfllife.R.string.error_unenroll_failed.toString())
+        _uiState.value = EventDetailsUIState.Error(R.string.error_unenroll_failed.toString())
       }
     }
   }
