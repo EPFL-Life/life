@@ -15,3 +15,10 @@ venv/
 **/*.egg
 **/*.spec
 **/__pycache__/   
+
+# Coverage reports
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+htmlcov/
