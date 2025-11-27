@@ -1,0 +1,17 @@
+# Created by pytest automatically.
+
+# Virtual and Cache
+
+venv/
+.pytest_cache/
+.vscode/          
+.mypy_cache/       
+
+# Python compiled files and temporary files
+
+**/*.pyc           
+**/*.pyo
+**/*.pyd
+**/*.egg
+**/*.spec
+**/__pycache__/   
