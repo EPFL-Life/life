@@ -50,7 +50,8 @@ class EventDetailsViewModel(
         if (event != null) {
           _uiState.value = EventDetailsUIState.Success(event, isEnrolled = isEnrolled(event))
         } else {
-          _uiState.value = EventDetailsUIState.Error("Event not found")
+          _uiState.value =
+              EventDetailsUIState.Error(ch.epfllife.R.string.error_event_not_found.toString())
         }
       } catch (e: Exception) {
         _uiState.value = EventDetailsUIState.Error("Failed to load event: ${e.message}")
@@ -75,10 +76,12 @@ class EventDetailsViewModel(
             .fold(
                 onSuccess = { loadEvent(event.id) },
                 onFailure = { error ->
-                  _uiState.value = EventDetailsUIState.Error("Failed to enrol: Please try again.")
+                  _uiState.value =
+                      EventDetailsUIState.Error(ch.epfllife.R.string.error_enroll_failed.toString())
                 })
       } catch (_: Exception) {
-        _uiState.value = EventDetailsUIState.Error("Failed to enrol: Please try again.")
+        _uiState.value =
+            EventDetailsUIState.Error(ch.epfllife.R.string.error_enroll_failed.toString())
       }
     }
   }
@@ -97,10 +100,12 @@ class EventDetailsViewModel(
                 onSuccess = { loadEvent(event.id) },
                 onFailure = { error ->
                   _uiState.value =
-                      EventDetailsUIState.Error("Failed to unenroll: Please try again.")
+                      EventDetailsUIState.Error(
+                          ch.epfllife.R.string.error_unenroll_failed.toString())
                 })
       } catch (_: Exception) {
-        _uiState.value = EventDetailsUIState.Error("Failed to unenroll: Please try again.")
+        _uiState.value =
+            EventDetailsUIState.Error(ch.epfllife.R.string.error_unenroll_failed.toString())
       }
     }
   }
