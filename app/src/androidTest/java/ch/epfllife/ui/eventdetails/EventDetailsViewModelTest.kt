@@ -92,7 +92,7 @@ class EventDetailsViewModelTest : FirestoreLifeTest() {
     val state = viewModel.uiState.first { it !is EventDetailsUIState.Loading }
     assertTrue(state is EventDetailsUIState.Error)
     val errorState = state as EventDetailsUIState.Error
-    assertEquals(context.getString(R.string.error_failed_to_enroll_event), errorState.message)
+    assertEquals(context.getString(R.string.error_enroll_failed), errorState.message)
   }
 
   @Test
@@ -112,6 +112,6 @@ class EventDetailsViewModelTest : FirestoreLifeTest() {
     val state = viewModel.uiState.first { it !is EventDetailsUIState.Loading }
     assertTrue(state is EventDetailsUIState.Error)
     val errorState = state as EventDetailsUIState.Error
-    assertEquals(context.getString(R.string.error_failed_to_enroll_event), errorState.message)
+    assertEquals(context.getString(R.string.error_enroll_failed), errorState.message)
   }
 }
