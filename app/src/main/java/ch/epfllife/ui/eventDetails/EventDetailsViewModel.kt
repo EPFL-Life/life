@@ -75,7 +75,7 @@ class EventDetailsViewModel(
             .subscribeToEvent(event.id)
             .fold(
                 onSuccess = { loadEvent(event.id) },
-                onFailure = { error ->
+                onFailure = { _ ->
                   _uiState.value =
                       EventDetailsUIState.Error(ch.epfllife.R.string.error_enroll_failed.toString())
                 })
@@ -98,7 +98,7 @@ class EventDetailsViewModel(
             .unsubscribeFromEvent(event.id)
             .fold(
                 onSuccess = { loadEvent(event.id) },
-                onFailure = { error ->
+                onFailure = { _ ->
                   _uiState.value =
                       EventDetailsUIState.Error(
                           ch.epfllife.R.string.error_unenroll_failed.toString())
