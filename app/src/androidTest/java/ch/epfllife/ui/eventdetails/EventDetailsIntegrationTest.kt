@@ -19,10 +19,10 @@ class EventDetailsIntegrationTest : FirestoreLifeTest() {
     val association = event.association
 
     // Seed association first (required for event parsing)
-    val assocResult = assocRepository.createAssociation(association)
+    val assocResult = db.assocRepo.createAssociation(association)
     assertTrue("Failed to seed association", assocResult.isSuccess)
 
-    val eventResult = eventRepository.createEvent(event)
+    val eventResult = db.eventRepo.createEvent(event)
     assertTrue("Failed to create event", eventResult.isSuccess)
 
     val currentUser = auth.auth.currentUser
@@ -32,11 +32,11 @@ class EventDetailsIntegrationTest : FirestoreLifeTest() {
     val user =
         User(id = currentUser.uid, name = "Integration Test User", enrolledEvents = emptyList())
 
-    val result = userRepository.createUser(user)
+    val result = db.userRepo.createUser(user)
     assertTrue("Failed to create user", result.isSuccess)
 
     // 2. Initialize ViewModel with real repositories (connected to emulator)
-    val viewModel = EventDetailsViewModel(repo = eventRepository, userRepo = userRepository)
+    val viewModel = EventDetailsViewModel(db = db)
 
     // 3. Load Event and Verify Initial State (Not Enrolled)
     val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -66,7 +66,7 @@ class EventDetailsIntegrationTest : FirestoreLifeTest() {
     assertTrue("UI should show user as enrolled", (state as EventDetailsUIState.Success).isEnrolled)
 
     // 6. Verify Firestore Update (Enrolled)
-    var updatedUser = userRepository.getUser(currentUser.uid)
+    var updatedUser = db.userRepo.getUser(currentUser.uid)
     checkNotNull(updatedUser)
     assertTrue(
         "User should be added to enrolledEvents in Firestore",
@@ -87,7 +87,7 @@ class EventDetailsIntegrationTest : FirestoreLifeTest() {
         "UI should show user as unenrolled", (state as EventDetailsUIState.Success).isEnrolled)
 
     // 9. Verify Firestore Update (Unenrolled)
-    updatedUser = userRepository.getUser(currentUser.uid)
+    updatedUser = db.userRepo.getUser(currentUser.uid)
     checkNotNull(updatedUser)
     assertFalse(
         "User should be removed from enrolledEvents in Firestore",
