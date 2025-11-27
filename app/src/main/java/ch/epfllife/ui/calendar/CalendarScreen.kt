@@ -40,6 +40,7 @@ fun CalendarScreen(
     viewModel: HomeViewModel = viewModel(),
     onEventClick: (String) -> Unit,
 ) {
+  LaunchedEffect(Unit) { viewModel.refresh() }
   var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
   var query by remember { mutableStateOf("") }
 
@@ -92,10 +93,7 @@ fun CalendarScreen(
     ListView(
         list = grouped.toList(),
         emptyTitle = stringResource(id = R.string.calendar_no_events_placeholder),
-        onRefresh = { signalFinished ->
-          /* Calendar screen has no viewModel yet */
-          signalFinished()
-        },
+        onRefresh = { signalFinished -> viewModel.refresh(signalFinished) },
     ) { list ->
       list.forEach { (month, events) ->
         item {
