@@ -85,11 +85,11 @@ class Association:
             "id": self.id,
             "name": self.name,
             "description": self.description,
-            "eventCategory": self.eventCategory.name,  # Store enum as string
-            "pictureUrl": self.pictureUrl,
-            "logoUrl": self.logoUrl,
+            "eventCategory": self.event_category.name,  # Store enum as string
+            "pictureUrl": self.picture_url,
+            "logoUrl": self.logo_url,
             "about": self.about,
-            "socialLinks": self.socialLinks or {}  # Ensure never null
+            "socialLinks": self.social_links or {}  # Ensure never null
         }
 
 @dataclass
@@ -125,7 +125,7 @@ class Event:
             "association": self.association.to_firestore_dict(),
             "tags": self.tags,
             "price": self.price.to_firestore_value(),
-            "pictureUrl": self.pictureUrl
+            "pictureUrl": self.picture_url
         }
     
     @classmethod
