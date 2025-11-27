@@ -100,9 +100,9 @@ fun EventDetailsScreen(
 
 @Composable
 fun EventDetailsContent(
+    modifier: Modifier = Modifier,
     event: Event,
     isEnrolled: Boolean = false,
-    modifier: Modifier = Modifier,
     onGoBack: () -> Unit,
     onOpenMap: (Location) -> Unit,
     onEnrollClick: () -> Unit,
