@@ -28,7 +28,7 @@ data class Db(
     fun freshLocal(): Db {
       val eventRepo = EventRepositoryLocal()
       return Db(
-          userRepo = UserRepositoryLocal(),
+          userRepo = UserRepositoryLocal(eventRepo),
           eventRepo = eventRepo,
           assocRepo = AssociationRepositoryLocal(eventRepo),
       )
