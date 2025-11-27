@@ -2,15 +2,14 @@ package ch.epfllife.ui.eventDetails
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.test.core.app.ApplicationProvider
 import ch.epfllife.model.association.Association
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.event.EventRepository
 import ch.epfllife.model.map.Location
 import ch.epfllife.model.user.Price
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.withContext
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
@@ -129,20 +128,19 @@ class EventDetailsTest {
         }
 
     val viewModel = EventDetailsViewModel(fakeRepoThrowsException)
-    viewModel.loadEvent("some-event-id")
+    viewModel.loadEvent("some-event-id", ApplicationProvider.getApplicationContext())
 
-    // Give the coroutine time to complete
-    withContext(Dispatchers.Main) { Thread.sleep(100) }
+    // Wait for the StateFlow to be updated
+    composeTestRule.waitForIdle()
 
     val state = viewModel.uiState.value
     assertTrue("State should be Error when exception is thrown", state is EventDetailsUIState.Error)
     if (state is EventDetailsUIState.Error) {
-      assertTrue(
-          "Error message should contain 'Failed to load event'",
-          state.message.startsWith("Failed to load event"))
-      assertTrue(
-          "Error message should contain exception message",
-          state.message.contains("Database connection failed"))
+      // The ViewModel returns the localized string resource, not the exception message
+      assertEquals(
+          "Error message should be the localized error string",
+          "Failed to load event",
+          state.message)
     }
   }
 
