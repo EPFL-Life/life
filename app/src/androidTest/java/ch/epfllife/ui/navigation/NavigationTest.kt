@@ -35,6 +35,7 @@ import org.mockito.kotlin.argumentCaptor
 class NavigationTest {
 
   @get:Rule val composeTestRule = createComposeRule()
+
   // This is a nullable platform type, so we need to specify the type explicitly
   @get:Rule
   val permissionRule: GrantPermissionRule? =
@@ -301,5 +302,77 @@ class NavigationTest {
         .performClick()
     composeTestRule.onNodeWithTag(NavigationTestTags.HOMESCREEN_SCREEN).assertIsDisplayed()
     // back home
+  }
+
+  @Test
+  fun navigateToEventDetails_showsEventDetailsScreen() {
+    val testEvent = ExampleEvents.event1
+    runTest {
+      Assert.assertTrue(assocRepository.createAssociation(testEvent.association).isSuccess)
+      Assert.assertTrue(eventRepository.createEvent(testEvent).isSuccess)
+    }
+
+    setUpApp()
+    composeTestRule.navigateToEvent(testEvent.id)
+
+    // Verify we're on the event details screen by checking for content
+    composeTestRule
+        .onNodeWithTag(EventDetailsTestTags.CONTENT, useUnmergedTree = true)
+        .assertIsDisplayed()
+  }
+
+  @Test
+  fun navigateToEventDetails_hidesBottomNavigationBar() {
+    val testEvent = ExampleEvents.event1
+    runTest {
+      Assert.assertTrue(assocRepository.createAssociation(testEvent.association).isSuccess)
+      Assert.assertTrue(eventRepository.createEvent(testEvent).isSuccess)
+    }
+
+    setUpApp()
+
+    // Bottom bar should be visible on home screen
+    composeTestRule
+        .onNodeWithTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU, useUnmergedTree = true)
+        .assertIsDisplayed()
+
+    composeTestRule.navigateToEvent(testEvent.id)
+
+    // Bottom bar should be hidden on event details screen
+    composeTestRule
+        .onNodeWithTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU, useUnmergedTree = true)
+        .assertDoesNotExist()
+  }
+
+  @Test
+  fun navigateToEventDetails_backButtonReturnsToHomeScreen() {
+    val testEvent = ExampleEvents.event1
+    runTest {
+      Assert.assertTrue(assocRepository.createAssociation(testEvent.association).isSuccess)
+      Assert.assertTrue(eventRepository.createEvent(testEvent).isSuccess)
+    }
+
+    setUpApp()
+    composeTestRule.navigateToEvent(testEvent.id)
+
+    // Verify we're on event details by checking for back button
+    composeTestRule
+        .onNodeWithTag(EventDetailsTestTags.BACK_BUTTON, useUnmergedTree = true)
+        .assertIsDisplayed()
+
+    // Click back button
+    composeTestRule
+        .onNodeWithTag(EventDetailsTestTags.BACK_BUTTON, useUnmergedTree = true)
+        .performClick()
+
+    // Verify we're back on home screen
+    composeTestRule
+        .onNodeWithTag(NavigationTestTags.HOMESCREEN_SCREEN, useUnmergedTree = true)
+        .assertIsDisplayed()
+
+    // Bottom bar should be visible again
+    composeTestRule
+        .onNodeWithTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU, useUnmergedTree = true)
+        .assertIsDisplayed()
   }
 }
