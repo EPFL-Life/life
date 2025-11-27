@@ -79,11 +79,10 @@ class EventDetailsViewModel(
                 onSuccess = { loadEvent(event.id, context) },
                 onFailure = { _ ->
                   _uiState.value =
-                      EventDetailsUIState.Error(ch.epfllife.R.string.error_enroll_failed.toString())
+                      EventDetailsUIState.Error(context.getString(R.string.error_enroll_failed))
                 })
       } catch (_: Exception) {
-        _uiState.value =
-            EventDetailsUIState.Error(ch.epfllife.R.string.error_enroll_failed.toString())
+        _uiState.value = EventDetailsUIState.Error(context.getString(R.string.error_enroll_failed))
       }
     }
   }
@@ -102,10 +101,11 @@ class EventDetailsViewModel(
                 onSuccess = { loadEvent(event.id, context) },
                 onFailure = { _ ->
                   _uiState.value =
-                      EventDetailsUIState.Error(R.string.error_unenroll_failed.toString())
+                      EventDetailsUIState.Error(context.getString(R.string.error_unenroll_failed))
                 })
       } catch (_: Exception) {
-        _uiState.value = EventDetailsUIState.Error(R.string.error_unenroll_failed.toString())
+        _uiState.value =
+            EventDetailsUIState.Error(context.getString(R.string.error_unenroll_failed))
       }
     }
   }
