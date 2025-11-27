@@ -62,8 +62,9 @@ fun EventDetailsScreen(
     onOpenMap: (Location) -> Unit,
 ) {
   val uiState by viewModel.uiState.collectAsState()
+  val context = LocalContext.current
   LaunchedEffect(eventId) {
-    viewModel.loadEvent(eventId)
+    viewModel.loadEvent(eventId, context)
   } // this is triggered once the screen opens
 
   when (val state = uiState) {
@@ -74,6 +75,7 @@ fun EventDetailsScreen(
             modifier = Modifier.testTag(EventDetailsTestTags.LOADING_INDICATOR))
       }
     }
+
     is EventDetailsUIState.Error -> {
       // Show error message
       Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -84,6 +86,7 @@ fun EventDetailsScreen(
         )
       }
     }
+
     is EventDetailsUIState.Success -> {
       // Show event content
       EventDetailsContent(
@@ -91,8 +94,8 @@ fun EventDetailsScreen(
           isEnrolled = state.isEnrolled,
           onGoBack = onGoBack,
           onOpenMap = onOpenMap,
-          onEnrollClick = { viewModel.enrollInEvent(state.event) },
-          onUnenrollClick = { viewModel.unenrollFromEvent(state.event) },
+          onEnrollClick = { viewModel.enrollInEvent(state.event, context) },
+          onUnenrollClick = { viewModel.unenrollFromEvent(state.event, context) },
       )
     }
   }
