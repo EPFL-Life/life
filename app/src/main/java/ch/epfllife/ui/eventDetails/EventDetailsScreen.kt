@@ -88,9 +88,11 @@ fun EventDetailsScreen(
       // Show event content
       EventDetailsContent(
           event = state.event,
+          isEnrolled = state.isEnrolled,
           onGoBack = onGoBack,
           onOpenMap = onOpenMap,
           onEnrollClick = { viewModel.enrollInEvent(state.event) },
+          onUnenrollClick = { viewModel.unenrollFromEvent(state.event) },
       )
     }
   }
@@ -99,10 +101,12 @@ fun EventDetailsScreen(
 @Composable
 fun EventDetailsContent(
     event: Event,
+    isEnrolled: Boolean = false,
     modifier: Modifier = Modifier,
     onGoBack: () -> Unit,
     onOpenMap: (Location) -> Unit,
     onEnrollClick: () -> Unit,
+    onUnenrollClick: () -> Unit = {},
 ) {
   val context = LocalContext.current
   Box(
@@ -252,7 +256,7 @@ fun EventDetailsContent(
 
             // Enroll Button
             Button(
-                onClick = onEnrollClick,
+                onClick = if (isEnrolled) onUnenrollClick else onEnrollClick,
                 modifier =
                     Modifier.fillMaxWidth()
                         .padding(top = 8.dp)
@@ -260,11 +264,13 @@ fun EventDetailsContent(
                 shape = RoundedCornerShape(6.dp),
                 colors =
                     ButtonDefaults.buttonColors(
-                        containerColor = LifeRed,
+                        containerColor = if (isEnrolled) Color.Gray else LifeRed,
                         contentColor = Color.White,
                     ),
             ) {
-              Text("Enrol in event", style = MaterialTheme.typography.titleMedium)
+              Text(
+                  if (isEnrolled) "Unenroll" else "Enrol in event",
+                  style = MaterialTheme.typography.titleMedium)
             }
           }
         }

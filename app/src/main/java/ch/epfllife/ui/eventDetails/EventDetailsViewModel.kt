@@ -65,8 +65,6 @@ class EventDetailsViewModel(
   fun enrollInEvent(event: Event) {
     viewModelScope.launch {
       try {
-        // TODO: Change enroll button to "Unsubscribe" when enrolled to prevent double subscription
-        // attempts
         if (isEnrolled(event)) {
           _uiState.value = EventDetailsUIState.Success(event, isEnrolled = true)
           return@launch
@@ -81,6 +79,28 @@ class EventDetailsViewModel(
                 })
       } catch (_: Exception) {
         _uiState.value = EventDetailsUIState.Error("Failed to enrol: Please try again.")
+      }
+    }
+  }
+
+  fun unenrollFromEvent(event: Event) {
+    viewModelScope.launch {
+      try {
+        if (!isEnrolled(event)) {
+          _uiState.value = EventDetailsUIState.Success(event, isEnrolled = false)
+          return@launch
+        }
+
+        userRepo
+            .unsubscribeFromEvent(event.id)
+            .fold(
+                onSuccess = { loadEvent(event.id) },
+                onFailure = { error ->
+                  _uiState.value =
+                      EventDetailsUIState.Error("Failed to unenroll: Please try again.")
+                })
+      } catch (_: Exception) {
+        _uiState.value = EventDetailsUIState.Error("Failed to unenroll: Please try again.")
       }
     }
   }
