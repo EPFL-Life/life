@@ -25,9 +25,12 @@ class CalendarScreenTest {
     val repo = EventRepositoryLocal()
     val userRepo = UserRepositoryLocal(repo)
 
+    // Add this part to ensure that the seed contains all the unique events
     val combinedEvents = (allEvents + enrolledEvents).distinctBy { it.id }
     repo.seedEvents(combinedEvents)
 
+    // now theHomeViewModel use the user repository, so for avoiding internal exception
+    // i will simulate the log in
     runTest {
       userRepo.createUser(ExampleUsers.user1)
       userRepo.simulateLogin(ExampleUsers.user1.id)
@@ -38,6 +41,7 @@ class CalendarScreenTest {
       }
     }
 
+    // HomeViewModel changed, we need the userRepo
     val viewModel = HomeViewModel(repo = repo, userRepo = userRepo)
     viewModel.setMyEvents(enrolledEvents)
 
