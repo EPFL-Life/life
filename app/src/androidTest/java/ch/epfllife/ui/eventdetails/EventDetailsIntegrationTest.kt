@@ -1,5 +1,6 @@
 package ch.epfllife.ui.eventDetails
 
+import androidx.test.platform.app.InstrumentationRegistry
 import ch.epfllife.example_data.ExampleEvents
 import ch.epfllife.model.user.User
 import ch.epfllife.utils.FirestoreLifeTest
@@ -38,7 +39,8 @@ class EventDetailsIntegrationTest : FirestoreLifeTest() {
     val viewModel = EventDetailsViewModel(repo = eventRepository, userRepo = userRepository)
 
     // 3. Load Event and Verify Initial State (Not Enrolled)
-    viewModel.loadEvent(event.id)
+    val context = InstrumentationRegistry.getInstrumentation().targetContext
+    viewModel.loadEvent(event.id, context)
 
     var state =
         viewModel.uiState.first {
@@ -51,7 +53,7 @@ class EventDetailsIntegrationTest : FirestoreLifeTest() {
         "User should NOT be enrolled initially", (state as EventDetailsUIState.Success).isEnrolled)
 
     // 4. Perform Action: Enroll
-    viewModel.enrollInEvent(event)
+    viewModel.enrollInEvent(event, context)
 
     // 5. Verify UI State Update (Enrolled)
     state =
@@ -71,7 +73,7 @@ class EventDetailsIntegrationTest : FirestoreLifeTest() {
         updatedUser.enrolledEvents.contains(event.id))
 
     // 7. Perform Action: Unenroll
-    viewModel.unenrollFromEvent(event)
+    viewModel.unenrollFromEvent(event, context)
 
     // 8. Verify UI State Update (Unenrolled)
     state =
