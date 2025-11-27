@@ -4,6 +4,7 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.core.app.ApplicationProvider
 import ch.epfllife.model.association.Association
+import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.event.EventRepository
@@ -35,26 +36,6 @@ class EventDetailsTest {
           price = Price(10u),
           pictureUrl =
               "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")
-
-  // Helper that creates a ViewModel with a fake repo returning sampleEvent for any id
-  private fun createViewModelWithFakeRepo(): EventDetailsViewModel {
-    val fakeRepo =
-        object : EventRepository {
-          override fun getNewUid(): String = "fake-id"
-
-          override suspend fun getAllEvents(): List<Event> = listOf(sampleEvent)
-
-          override suspend fun getEvent(eventId: String): Event = sampleEvent
-
-          override suspend fun createEvent(event: Event): Result<Unit> = Result.success(Unit)
-
-          override suspend fun updateEvent(eventId: String, newEvent: Event): Result<Unit> =
-              Result.success(Unit)
-
-          override suspend fun deleteEvent(eventId: String): Result<Unit> = Result.success(Unit)
-        }
-    return EventDetailsViewModel(fakeRepo)
-  }
 
   private fun setSampleEventContent() {
     setEventContent(sampleEvent)
@@ -101,7 +82,7 @@ class EventDetailsTest {
 
   @Test
   fun viewModel_InitialStateIsLoading() = runTest {
-    val viewModel = EventDetailsViewModel()
+    val viewModel = EventDetailsViewModel(db = Db.freshLocal())
     val initialState = viewModel.uiState.value
     assertTrue("Initial state should be Loading", initialState is EventDetailsUIState.Loading)
   }
@@ -127,7 +108,7 @@ class EventDetailsTest {
           override suspend fun deleteEvent(eventId: String): Result<Unit> = Result.success(Unit)
         }
 
-    val viewModel = EventDetailsViewModel(fakeRepoThrowsException)
+    val viewModel = EventDetailsViewModel(Db.freshLocal().copy(eventRepo = fakeRepoThrowsException))
     viewModel.loadEvent("some-event-id", ApplicationProvider.getApplicationContext())
 
     // Wait for the StateFlow to be updated
@@ -146,7 +127,7 @@ class EventDetailsTest {
 
   @Test
   fun viewModel_IsEnrolledReturnsFalse() = runTest {
-    val viewModel = EventDetailsViewModel()
+    val viewModel = EventDetailsViewModel(db = Db.freshLocal())
     val isEnrolled = viewModel.isEnrolled(sampleEvent)
     assertFalse("User shouldn't be reported as enrolled in the event", isEnrolled)
   }

@@ -4,6 +4,7 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import ch.epfllife.example_data.ExampleEvents
 import ch.epfllife.example_data.ExampleUsers
+import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.EventRepositoryLocal
 import ch.epfllife.model.user.UserRepositoryLocal
 import ch.epfllife.ui.composables.DisplayedEventsTestTags
@@ -22,12 +23,12 @@ class CalendarScreenTest {
       enrolledEvents: List<ch.epfllife.model.event.Event> = emptyList(),
       onEventClick: (String) -> Unit = {}
   ) {
-    val repo = EventRepositoryLocal()
-    val userRepo = UserRepositoryLocal(repo)
+    val eventRepo = EventRepositoryLocal()
+    val userRepo = UserRepositoryLocal(eventRepo)
 
     // Add this part to ensure that the seed contains all the unique events
     val combinedEvents = (allEvents + enrolledEvents).distinctBy { it.id }
-    repo.seedEvents(combinedEvents)
+    eventRepo.seedEvents(combinedEvents)
 
     // now theHomeViewModel use the user repository, so for avoiding internal exception
     // i will simulate the log in
@@ -36,13 +37,14 @@ class CalendarScreenTest {
       userRepo.simulateLogin(ExampleUsers.user1.id)
 
       enrolledEvents.forEach { event ->
-        if (repo.getEvent(event.id) == null) repo.createEvent(event)
+        if (eventRepo.getEvent(event.id) == null) eventRepo.createEvent(event)
         userRepo.subscribeToEvent(event.id)
       }
     }
 
     // HomeViewModel changed, we need the userRepo
-    val viewModel = HomeViewModel(repo = repo, userRepo = userRepo)
+    val viewModel =
+        HomeViewModel(db = Db.freshLocal().copy(eventRepo = eventRepo, userRepo = userRepo))
     viewModel.setMyEvents(enrolledEvents)
 
     composeTestRule.setContent {

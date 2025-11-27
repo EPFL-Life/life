@@ -24,6 +24,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.R
 import ch.epfllife.model.association.Association
+import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.Event
 import ch.epfllife.ui.composables.BackButton
 import ch.epfllife.ui.composables.EventCard
@@ -56,7 +57,8 @@ object AssociationDetailsTestTags {
 @Composable
 fun AssociationDetailsScreen(
     associationId: String,
-    viewModel: AssociationDetailsViewModel = viewModel(),
+    db: Db,
+    viewModel: AssociationDetailsViewModel = viewModel { AssociationDetailsViewModel(db = db) },
     onGoBack: () -> Unit,
     onEventClick: (String) -> Unit,
 ) {
@@ -253,5 +255,8 @@ fun AssociationDetailsContent(
 @Preview(showBackground = true)
 @Composable
 fun AssociationDetailsPreview() {
-  Theme { AssociationDetailsScreen(associationId = "1", onGoBack = {}, onEventClick = {}) }
+  Theme {
+    AssociationDetailsScreen(
+        associationId = "1", onGoBack = {}, onEventClick = {}, db = Db.freshLocal())
+  }
 }

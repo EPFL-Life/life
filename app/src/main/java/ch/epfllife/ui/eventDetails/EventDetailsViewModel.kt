@@ -4,12 +4,9 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ch.epfllife.R
+import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.Event
-import ch.epfllife.model.event.EventRepository
-import ch.epfllife.model.event.EventRepositoryFirestore
 import ch.epfllife.model.user.User
-import ch.epfllife.model.user.UserRepository
-import ch.epfllife.model.user.UserRepositoryFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,14 +25,9 @@ sealed class EventDetailsUIState {
  * ViewModel for the EventDetails screen.
  *
  * Uses `EventRepository` to fetch an Event by id.
- *
- * @param repo The repository to fetch events from.
  */
 class EventDetailsViewModel(
-    private val repo: EventRepository =
-        EventRepositoryFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance()),
-    private val userRepo: UserRepository =
-        UserRepositoryFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance())
+    private val db: Db,
 ) : ViewModel() {
 
   private val _uiState = MutableStateFlow<EventDetailsUIState>(EventDetailsUIState.Loading)
@@ -46,8 +38,8 @@ class EventDetailsViewModel(
   fun loadEvent(eventId: String, context: Context) {
     viewModelScope.launch {
       try {
-        val event = repo.getEvent(eventId)
-        currentUser = userRepo.getCurrentUser()
+        val event = db.eventRepo.getEvent(eventId)
+        currentUser = db.userRepo.getCurrentUser()
 
         if (event != null) {
           _uiState.value = EventDetailsUIState.Success(event, isEnrolled = isEnrolled(event))
@@ -73,7 +65,7 @@ class EventDetailsViewModel(
           return@launch
         }
 
-        userRepo
+        db.userRepo
             .subscribeToEvent(event.id)
             .fold(
                 onSuccess = { loadEvent(event.id, context) },
@@ -95,7 +87,7 @@ class EventDetailsViewModel(
           return@launch
         }
 
-        userRepo
+        db.userRepo
             .unsubscribeFromEvent(event.id)
             .fold(
                 onSuccess = { loadEvent(event.id, context) },

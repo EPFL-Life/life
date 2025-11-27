@@ -5,6 +5,8 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import ch.epfllife.example_data.ExampleEvents
 import ch.epfllife.example_data.ExampleUsers
+import ch.epfllife.model.association.AssociationRepositoryLocal
+import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventRepositoryLocal
 import ch.epfllife.model.user.UserRepositoryLocal
@@ -22,42 +24,35 @@ class HomeScreenTest {
 
   @get:Rule val composeTestRule = createComposeRule()
 
-  val repo = EventRepositoryLocal()
-  private val userRepo = UserRepositoryLocal(repo)
+  private lateinit var db: Db
 
-  private fun createFakeViewModel(
+  private fun setUpDb(
       myEvents: List<Event> = emptyList(),
       allEvents: List<Event> = emptyList(),
-  ): HomeViewModel {
+  ) = runTest {
     val combinedEvents = (allEvents + myEvents).distinctBy { it.id }
-    repo.seedEvents(combinedEvents)
-
-    runTest {
-      userRepo.createUser(ExampleUsers.user1)
-      userRepo.simulateLogin(ExampleUsers.user1.id)
-
-      myEvents.forEach { event ->
-        if (repo.getEvent(event.id) == null) {
-          repo.createEvent(event)
+    val eventRepo = EventRepositoryLocal().apply { seedEvents(combinedEvents) }
+    val userRepo =
+        UserRepositoryLocal(eventRepo).apply {
+          this.createUser(ExampleUsers.user1)
+          this.simulateLogin(ExampleUsers.user1.id)
+          myEvents.forEach { event ->
+            if (eventRepo.getEvent(event.id) == null) {
+              eventRepo.createEvent(event)
+            }
+            this.subscribeToEvent(event.id)
+          }
         }
-        userRepo.subscribeToEvent(event.id)
-      }
-    }
-
-    val viewModel = HomeViewModel(repo = repo, userRepo = userRepo)
-
-    viewModel.setMyEvents(myEvents)
-
-    return viewModel
+    val assocRepo = AssociationRepositoryLocal(eventRepo)
+    db = Db(userRepo, eventRepo, assocRepo)
   }
 
   private fun setUpHomeScreen(
       myEvents: List<Event> = emptyList(),
       allEvents: List<Event> = emptyList(),
-  ) = runTest {
-    val viewModel = createFakeViewModel(myEvents = myEvents, allEvents = allEvents)
-
-    composeTestRule.setContent { Theme { HomeScreen(viewModel = viewModel, onEventClick = {}) } }
+  ) {
+    setUpDb(myEvents, allEvents)
+    composeTestRule.setContent { Theme { HomeScreen(db = db, onEventClick = {}) } }
   }
 
   @Test
@@ -77,12 +72,10 @@ class HomeScreenTest {
   @Test
   fun homeScreen_EventCardClickTriggersCallback() {
     var clickedEventId: String? = null
-    val viewModel = createFakeViewModel(myEvents = listOf(ExampleEvents.event1))
+    setUpDb(myEvents = listOf(ExampleEvents.event1))
 
     composeTestRule.setContent {
-      MaterialTheme {
-        HomeScreen(viewModel = viewModel, onEventClick = { eventId -> clickedEventId = eventId })
-      }
+      MaterialTheme { HomeScreen(db = db, onEventClick = { eventId -> clickedEventId = eventId }) }
     }
 
     // Wait for the UI to settle
@@ -110,13 +103,10 @@ class HomeScreenTest {
   @Test
   fun homeScreen_ClickingSecondEventTriggersCorrectCallback() {
     var clickedEventId: String? = null
-    val viewModel =
-        createFakeViewModel(myEvents = listOf(ExampleEvents.event1, ExampleEvents.event2))
+    setUpDb(myEvents = listOf(ExampleEvents.event1, ExampleEvents.event2))
 
     composeTestRule.setContent {
-      MaterialTheme {
-        HomeScreen(viewModel = viewModel, onEventClick = { eventId -> clickedEventId = eventId })
-      }
+      MaterialTheme { HomeScreen(db = db, onEventClick = { eventId -> clickedEventId = eventId }) }
     }
 
     // Wait for the UI to settle
@@ -269,7 +259,7 @@ class HomeScreenTest {
     // Initial Events displayed
     checkEventsDisplayed()
 
-    runTest { repo.createEvent(ExampleEvents.event3) }
+    runTest { db.eventRepo.createEvent(ExampleEvents.event3) }
     composeTestRule.triggerRefresh(EventCardTestTags.getEventCardTestTag(ExampleEvents.event1.id))
 
     // Initial Events displayed + new event displayed
@@ -280,7 +270,7 @@ class HomeScreenTest {
           .isDisplayed()
     }
 
-    runTest { assert(repo.deleteEvent(ExampleEvents.event3.id).isSuccess) }
+    runTest { assert(db.eventRepo.deleteEvent(ExampleEvents.event3.id).isSuccess) }
     composeTestRule.triggerRefresh(EventCardTestTags.getEventCardTestTag(ExampleEvents.event1.id))
 
     // Initial Events displayed and new event not displayed anymore

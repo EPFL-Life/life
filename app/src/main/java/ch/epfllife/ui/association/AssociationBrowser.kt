@@ -12,6 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.R
+import ch.epfllife.model.db.Db
 import ch.epfllife.model.enums.SubscriptionFilter
 import ch.epfllife.ui.composables.AssociationCard
 import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
@@ -22,7 +23,8 @@ import ch.epfllife.ui.navigation.NavigationTestTags
 @Composable
 fun AssociationBrowser(
     modifier: Modifier = Modifier,
-    viewModel: AssociationBrowserViewModel = viewModel(),
+    db: Db,
+    viewModel: AssociationBrowserViewModel = viewModel { AssociationBrowserViewModel(db) },
     onAssociationClick: (associationId: String) -> Unit,
 ) {
   var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
@@ -80,5 +82,5 @@ fun AssociationBrowser(
 @Preview(showBackground = true)
 @Composable
 private fun AssociationBrowserPreview() {
-  MaterialTheme { AssociationBrowser(onAssociationClick = {}) }
+  MaterialTheme { AssociationBrowser(onAssociationClick = {}, db = Db.freshLocal()) }
 }

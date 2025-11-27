@@ -5,8 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ch.epfllife.R
 import ch.epfllife.model.association.Association
-import ch.epfllife.model.association.AssociationRepository
-import ch.epfllife.model.association.AssociationRepositoryFirestore
+import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.Event
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,11 +21,7 @@ sealed class AssociationDetailsUIState {
   data class Error(val message: String) : AssociationDetailsUIState()
 }
 
-class AssociationDetailsViewModel(
-    private val repo: AssociationRepository =
-        AssociationRepositoryFirestore(
-            com.google.firebase.firestore.FirebaseFirestore.getInstance())
-) : ViewModel() {
+class AssociationDetailsViewModel(private val db: Db) : ViewModel() {
 
   private val _uiState =
       MutableStateFlow<AssociationDetailsUIState>(AssociationDetailsUIState.Loading)
@@ -36,9 +31,9 @@ class AssociationDetailsViewModel(
   fun loadAssociation(associationId: String, context: Context) {
     viewModelScope.launch {
       try {
-        val association = repo.getAssociation(associationId)
+        val association = db.assocRepo.getAssociation(associationId)
         if (association != null) {
-          val events = repo.getEventsForAssociation(associationId)
+          val events = db.assocRepo.getEventsForAssociation(associationId)
           _uiState.value =
               AssociationDetailsUIState.Success(association, events.getOrNull() ?: emptyList())
         } else {
