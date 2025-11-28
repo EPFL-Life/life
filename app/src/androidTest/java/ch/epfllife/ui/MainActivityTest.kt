@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import ch.epfllife.ThemedApp
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.authentication.SignInResult
+import ch.epfllife.model.db.Db
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.navigation.Tab
 import ch.epfllife.utils.FakeCredentialManager
@@ -22,9 +23,11 @@ class MainActivityTest {
   @get:Rule val composeTestRule = createComposeRule()
 
   private val auth = Auth(FakeCredentialManager.withDefaultTestUser)
+  private lateinit var db: Db
 
   @Before
   fun setUp() {
+    db = Db.freshLocal()
     setUpEmulator(auth, "MainActivityTest")
     runTest {
       val signInResult = auth.signInWithCredential(FakeCredentialManager.defaultUserCredentials)
@@ -34,7 +37,7 @@ class MainActivityTest {
 
   @Test
   fun themedApp_startsWithHomeScreen() {
-    composeTestRule.setContent { ThemedApp(auth) }
+    composeTestRule.setContent { ThemedApp(auth, db) }
 
     composeTestRule.waitForIdle()
 
@@ -46,7 +49,7 @@ class MainActivityTest {
 
   @Test
   fun themedApp_showsBottomNavigationOnMainScreens() {
-    composeTestRule.setContent { ThemedApp(auth) }
+    composeTestRule.setContent { ThemedApp(auth, db) }
 
     composeTestRule.waitForIdle()
 
@@ -74,7 +77,7 @@ class MainActivityTest {
 
   @Test
   fun themedApp_hasAllBottomNavigationTabs() {
-    composeTestRule.setContent { ThemedApp(auth) }
+    composeTestRule.setContent { ThemedApp(auth, db) }
 
     composeTestRule.waitForIdle()
 

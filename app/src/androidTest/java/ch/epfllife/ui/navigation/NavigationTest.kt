@@ -308,8 +308,8 @@ class NavigationTest {
   fun navigateToEventDetails_showsEventDetailsScreen() {
     val testEvent = ExampleEvents.event1
     runTest {
-      Assert.assertTrue(assocRepository.createAssociation(testEvent.association).isSuccess)
-      Assert.assertTrue(eventRepository.createEvent(testEvent).isSuccess)
+      Assert.assertTrue(db.assocRepo.createAssociation(testEvent.association).isSuccess)
+      Assert.assertTrue(db.eventRepo.createEvent(testEvent).isSuccess)
     }
 
     setUpApp()
@@ -325,8 +325,8 @@ class NavigationTest {
   fun navigateToEventDetails_hidesBottomNavigationBar() {
     val testEvent = ExampleEvents.event1
     runTest {
-      Assert.assertTrue(assocRepository.createAssociation(testEvent.association).isSuccess)
-      Assert.assertTrue(eventRepository.createEvent(testEvent).isSuccess)
+      Assert.assertTrue(db.assocRepo.createAssociation(testEvent.association).isSuccess)
+      Assert.assertTrue(db.eventRepo.createEvent(testEvent).isSuccess)
     }
 
     setUpApp()
@@ -348,8 +348,8 @@ class NavigationTest {
   fun navigateToEventDetails_backButtonReturnsToHomeScreen() {
     val testEvent = ExampleEvents.event1
     runTest {
-      Assert.assertTrue(assocRepository.createAssociation(testEvent.association).isSuccess)
-      Assert.assertTrue(eventRepository.createEvent(testEvent).isSuccess)
+      Assert.assertTrue(db.assocRepo.createAssociation(testEvent.association).isSuccess)
+      Assert.assertTrue(db.eventRepo.createEvent(testEvent).isSuccess)
     }
 
     setUpApp()
