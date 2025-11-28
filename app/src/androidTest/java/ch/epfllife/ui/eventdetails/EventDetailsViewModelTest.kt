@@ -36,9 +36,9 @@ class EventDetailsViewModelTest : FirestoreLifeTest() {
 
     val authUid = Firebase.auth.currentUser!!.uid
     val user = ExampleUsers.user1.copy(id = authUid)
-    userRepository.createUser(user)
+    db.userRepo.createUser(user)
 
-    val viewModel = EventDetailsViewModel(repo = eventRepository, userRepo = userRepository)
+    val viewModel = EventDetailsViewModel(db)
 
     // Act: Try to load a non-existent event
     viewModel.loadEvent("nonexistent-event-id", context)
@@ -54,15 +54,15 @@ class EventDetailsViewModelTest : FirestoreLifeTest() {
   fun loadEvent_repositoryThrowsException_returnsErrorWithCorrectMessage() = runTest {
     // Arrange: Create event and user, then delete event to trigger exception path
     val event = ExampleEvents.event1
-    eventRepository.createEvent(event)
+    db.eventRepo.createEvent(event)
 
     val authUid = Firebase.auth.currentUser!!.uid
     val user = ExampleUsers.user1.copy(id = authUid)
-    userRepository.createUser(user)
+    db.userRepo.createUser(user)
 
-    val viewModel = EventDetailsViewModel(repo = eventRepository, userRepo = userRepository)
+    val viewModel = EventDetailsViewModel(db)
 
-    eventRepository.deleteEvent(event.id)
+    db.eventRepo.deleteEvent(event.id)
 
     // Act: Load deleted event to trigger catch block
     viewModel.loadEvent(event.id, context)
@@ -78,9 +78,9 @@ class EventDetailsViewModelTest : FirestoreLifeTest() {
   fun enrollInEvent_subscriptionFails_returnsErrorWithCorrectMessage() = runTest {
     // Arrange: Create event
     val event = ExampleEvents.event1
-    eventRepository.createEvent(event)
+    db.eventRepo.createEvent(event)
 
-    val viewModel = EventDetailsViewModel(repo = eventRepository, userRepo = userRepository)
+    val viewModel = EventDetailsViewModel(db)
 
     // Arrange: Sign out to cause subscribeToEvent to fail
     Firebase.auth.signOut()
@@ -99,9 +99,9 @@ class EventDetailsViewModelTest : FirestoreLifeTest() {
   fun enrollInEvent_exceptionDuringEnrollment_returnsErrorWithCorrectMessage() = runTest {
     // Arrange: Create event but no user document
     val event = ExampleEvents.event1
-    eventRepository.createEvent(event)
+    db.eventRepo.createEvent(event)
 
-    val viewModel = EventDetailsViewModel(repo = eventRepository, userRepo = userRepository)
+    val viewModel = EventDetailsViewModel(db)
 
     // Note: Authenticated but no user document exists, causing subscribeToEvent to fail
 
