@@ -1,4 +1,4 @@
-package ch.epfllife.ui.eventdetails
+package ch.epfllife.ui.eventDetails
 
 import android.Manifest
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -6,8 +6,6 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.rule.GrantPermissionRule
 import ch.epfllife.model.map.Location
 import ch.epfllife.ui.composables.MapTestTags
-import ch.epfllife.ui.eventDetails.MapScreen
-import ch.epfllife.ui.eventDetails.MapScreenTestTags
 import ch.epfllife.ui.navigation.NavigationTestTags
 import org.junit.Rule
 import org.junit.Test
