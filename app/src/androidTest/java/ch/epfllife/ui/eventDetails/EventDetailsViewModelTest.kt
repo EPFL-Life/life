@@ -1,12 +1,10 @@
-package ch.epfllife.ui.eventdetails
+package ch.epfllife.ui.eventDetails
 
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import ch.epfllife.R
 import ch.epfllife.example_data.ExampleEvents
 import ch.epfllife.example_data.ExampleUsers
-import ch.epfllife.ui.eventDetails.EventDetailsUIState
-import ch.epfllife.ui.eventDetails.EventDetailsViewModel
 import ch.epfllife.utils.FirestoreLifeTest
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
