@@ -25,7 +25,8 @@ object ExampleEvents {
           association = ExampleAssociations.association1,
           tags = listOf("tech", "symposium", "space"),
           price = Price(25u), // Using UInt
-          pictureUrl = "https://actu.epfl.ch/image/76257/original/5616x3744.jpg")
+          pictureUrl = "https://actu.epfl.ch/image/76257/original/5616x3744.jpg",
+      )
 
   val event2 =
       Event(
@@ -38,7 +39,8 @@ object ExampleEvents {
           tags = listOf("music", "festival", "party"),
           price = Price(45u),
           pictureUrl =
-              "https://www.jambase.com/wp-content/uploads/2023/04/332066973_940895027072259_250410373047721675_n-e1680722695547-1480x832.jpg")
+              "https://www.jambase.com/wp-content/uploads/2023/04/332066973_940895027072259_250410373047721675_n-e1680722695547-1480x832.jpg",
+      )
 
   val event3 =
       Event(
@@ -52,8 +54,22 @@ object ExampleEvents {
           association = ExampleAssociations.association3,
           tags = listOf("food", "networking", "free"),
           price = Price(0u), // Free event
-          pictureUrl = null // No image
-          )
+          pictureUrl = null, // No image
+      )
+
+  val sampleEvent =
+      Event(
+          id = "AeroPoly",
+          title = "Drone Workshop",
+          description = "The Drone Workshop is a multi-evening workshop organized by AéroPoly...",
+          location = Location(46.5191, 6.5668, "Centre Sport et Santé"),
+          time = "2025-10-12 18:00",
+          association = ExampleAssociations.sampleAssociation,
+          tags = listOf("workshop"),
+          price = Price(10u),
+          pictureUrl =
+              "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg",
+      )
 
   // A list of all sample events for convenience
   val allEvents = listOf(event1, event2, event3)
