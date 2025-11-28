@@ -3,12 +3,10 @@ package ch.epfllife.ui.eventDetails
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.core.app.ApplicationProvider
-import ch.epfllife.model.association.Association
+import ch.epfllife.example_data.ExampleEvents
 import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.Event
-import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.event.EventRepository
-import ch.epfllife.model.map.Location
 import ch.epfllife.model.user.Price
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -19,23 +17,7 @@ class EventDetailsTest {
 
   @get:Rule val composeTestRule = createComposeRule()
 
-  private val sampleEvent =
-      Event(
-          id = "AeroPoly",
-          title = "Drone Workshop",
-          description = "The Drone Workshop is a multi-evening workshop organized by AéroPoly...",
-          location = Location(46.5191, 6.5668, "Centre Sport et Santé"),
-          time = "2025-10-12 18:00",
-          association =
-              Association(
-                  name = "AeroPoly",
-                  id = "AeroPoly",
-                  description = "Description",
-                  eventCategory = EventCategory.ACADEMIC),
-          tags = listOf("workshop"),
-          price = Price(10u),
-          pictureUrl =
-              "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")
+  private val sampleEvent = ExampleEvents.sampleEvent
 
   private fun setSampleEventContent() {
     setEventContent(sampleEvent)
@@ -56,7 +38,8 @@ class EventDetailsTest {
           onGoBack = {},
           onOpenMap = {},
           onEnrollClick = {},
-          onUnenrollClick = {})
+          onUnenrollClick = {},
+      )
     }
     composeTestRule.onNodeWithTag(EventDetailsTestTags.ENROLL_BUTTON).assertIsDisplayed()
     composeTestRule.onNodeWithText("Unenroll").assertIsDisplayed()
@@ -72,7 +55,8 @@ class EventDetailsTest {
           onGoBack = {},
           onOpenMap = {},
           onEnrollClick = {},
-          onUnenrollClick = { unenrollClicked = true })
+          onUnenrollClick = { unenrollClicked = true },
+      )
     }
     composeTestRule.onNodeWithTag(EventDetailsTestTags.ENROLL_BUTTON).performClick()
     assertTrue("Unenroll button should trigger callback", unenrollClicked)
@@ -121,7 +105,8 @@ class EventDetailsTest {
       assertEquals(
           "Error message should be the localized error string",
           "Failed to load event",
-          state.message)
+          state.message,
+      )
     }
   }
 
@@ -169,7 +154,8 @@ class EventDetailsTest {
     composeTestRule
         .onNodeWithText(
             "The Drone Workshop is a multi-evening workshop organized by AéroPoly...",
-            substring = true)
+            substring = true,
+        )
         .assertIsDisplayed()
   }
 
@@ -197,7 +183,11 @@ class EventDetailsTest {
     var clicked = false
     composeTestRule.setContent {
       EventDetailsContent(
-          event = sampleEvent, onGoBack = {}, onOpenMap = { clicked = true }, onEnrollClick = {})
+          event = sampleEvent,
+          onGoBack = {},
+          onOpenMap = { clicked = true },
+          onEnrollClick = {},
+      )
     }
     composeTestRule
         .onNodeWithTag(EventDetailsTestTags.VIEW_LOCATION_BUTTON)
@@ -214,7 +204,8 @@ class EventDetailsTest {
           event = sampleEvent,
           onGoBack = { backClicked = true },
           onEnrollClick = {},
-          onOpenMap = {})
+          onOpenMap = {},
+      )
     }
     composeTestRule.onNodeWithTag(EventDetailsTestTags.BACK_BUTTON).performClick()
     assertTrue("Back button should trigger onGoBack callback", backClicked)
@@ -351,7 +342,11 @@ class EventDetailsTest {
 
     composeTestRule.setContent {
       EventDetailsContent(
-          event = sampleEvent, onEnrollClick = {}, onGoBack = { clickCount++ }, onOpenMap = {})
+          event = sampleEvent,
+          onEnrollClick = {},
+          onGoBack = { clickCount++ },
+          onOpenMap = {},
+      )
     }
 
     // Click enroll button multiple times
@@ -372,7 +367,8 @@ class EventDetailsTest {
           event = sampleEvent,
           onGoBack = { goBackCalled = true },
           onEnrollClick = {},
-          onOpenMap = {})
+          onOpenMap = {},
+      )
     }
 
     // Verify content is displayed

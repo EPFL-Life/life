@@ -71,6 +71,13 @@ object ExampleAssociations {
                   "linkedin" to "https://www.linkedin.com/company/esnlausanne",
                   "website" to "https://esnlausanne.ch"))
 
+  val sampleAssociation =
+      Association(
+          name = "AeroPoly",
+          id = "AeroPoly",
+          description = "Description",
+          eventCategory = EventCategory.ACADEMIC)
+
   // Association with empty social links for testing
 
   // A list of all sample associations for convenience
