@@ -59,6 +59,4 @@ interface AssociationRepository {
   suspend fun getEventsForAssociation(associationId: String): Result<List<Event>>
 
   fun listenAll(onChange: (List<Association>) -> Unit)
-
-  fun listen(associationId: String, onChange: (Association) -> Unit)
 }

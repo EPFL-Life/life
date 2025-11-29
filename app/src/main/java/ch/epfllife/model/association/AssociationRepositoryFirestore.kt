@@ -5,12 +5,10 @@ import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.event.EventRepositoryFirestore
 import ch.epfllife.model.firestore.FirestoreCollections
-import ch.epfllife.model.firestore.createListen
 import ch.epfllife.model.firestore.createListenAll
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlin.text.get
 import kotlinx.coroutines.tasks.await
 
 class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : AssociationRepository {
@@ -179,14 +177,6 @@ class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : Associ
       createListenAll(
           db.collection(FirestoreCollections.ASSOCIATIONS),
           ::documentToAssociation,
-          onChange,
-      )
-
-  override fun listen(associationId: String, onChange: (Association) -> Unit) =
-      createListen(
-          db.collection(FirestoreCollections.ASSOCIATIONS),
-          ::documentToAssociation,
-          associationId,
           onChange,
       )
 }

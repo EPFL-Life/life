@@ -271,7 +271,7 @@ class AssociationRepositoryFirestoreTest : FirestoreLifeTest() {
   }
 
   @Test
-  fun listenToCreateEvent() = runTest {
+  fun listenToCreateAssoc() = runTest {
     var assocList = emptyList<Association>()
     db.assocRepo.listenAll { assoc -> assocList = assoc }
     db.assocRepo.createAssociation(ExampleAssociations.association1)
@@ -282,7 +282,7 @@ class AssociationRepositoryFirestoreTest : FirestoreLifeTest() {
   }
 
   @Test
-  fun listenToUpdateEvent() = runTest {
+  fun listenToUpdateAssoc() = runTest {
     var assocList = emptyList<Association>()
     db.assocRepo.listenAll { assoc -> assocList = assoc }
     db.assocRepo.createAssociation(ExampleAssociations.association1)
@@ -296,7 +296,7 @@ class AssociationRepositoryFirestoreTest : FirestoreLifeTest() {
   }
 
   @Test
-  fun listenToDeleteEvent() = runTest {
+  fun listenToDeleteAssoc() = runTest {
     var assocList = emptyList<Association>()
     db.assocRepo.listenAll { assoc -> assocList = assoc }
     db.assocRepo.createAssociation(ExampleAssociations.association1)
