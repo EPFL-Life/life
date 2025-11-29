@@ -31,6 +31,45 @@ class EventRepositoryLocalTest {
   }
 
   @Test
+  fun listenToCreateEvent() = runTest {
+    var eventsList = emptyList<Event>()
+    repositoryEvent.listenAll { events -> eventsList = events }
+    repositoryEvent.createEvent(ExampleEvents.event1)
+
+    kotlinx.coroutines.delay(100)
+
+    assertEquals(listOf(ExampleEvents.event1), eventsList)
+  }
+
+  @Test
+  fun listenToUpdateEvent() = runTest {
+    repositoryEvent.createEvent(ExampleEvents.event1)
+
+    var eventsList = emptyList<Event>()
+    repositoryEvent.listenAll { events -> eventsList = events }
+
+    val updatedEvent = ExampleEvents.event1.copy(title = "Updated Title")
+    repositoryEvent.updateEvent(ExampleEvents.event1.id, updatedEvent)
+
+    kotlinx.coroutines.delay(100)
+
+    assertEquals(listOf(updatedEvent), eventsList)
+  }
+
+  @Test
+  fun listenToDeleteEvent() = runTest {
+    var eventsList = emptyList<Event>()
+    repositoryEvent.listenAll { events -> eventsList = events }
+    repositoryEvent.createEvent(ExampleEvents.event1)
+
+    repositoryEvent.deleteEvent(ExampleEvents.event1.id)
+
+    kotlinx.coroutines.delay(100)
+
+    assertEquals(emptyList<Event>(), eventsList)
+  }
+
+  @Test
   fun getAllEvents_returnsAllEvents() = runTest {
 
     // add 3 example events

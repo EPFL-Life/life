@@ -507,4 +507,12 @@ private class FakeAssociationRepository(
   override suspend fun getEventsForAssociation(associationId: String): Result<List<Event>> {
     return eventsResult ?: throw UnsupportedOperationException("Not used in these tests.")
   }
+
+  override fun listenAll(onChange: (List<Association>) -> Unit) {
+    throw UnsupportedOperationException("Not used in these tests")
+  }
+
+  override fun listen(associationId: String, onChange: (Association) -> Unit) {
+    throw UnsupportedOperationException("Not used in these tests")
+  }
 }

@@ -49,4 +49,8 @@ interface EventRepository {
    * = { error -> println("Failed to delete: ${error.message}") } ) }
    */
   suspend fun deleteEvent(eventId: String): Result<Unit>
+
+  fun listenAll(onChange: (List<Event>) -> Unit)
+
+  fun listen(eventId: String, onChange: (Event) -> Unit)
 }
