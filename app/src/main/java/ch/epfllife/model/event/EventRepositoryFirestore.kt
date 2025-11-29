@@ -4,13 +4,17 @@ import android.util.Log
 import ch.epfllife.model.association.Association
 import ch.epfllife.model.association.AssociationRepositoryFirestore
 import ch.epfllife.model.firestore.FirestoreCollections
+import ch.epfllife.model.firestore.createListen
+import ch.epfllife.model.firestore.createListenAll
 import ch.epfllife.model.map.Location
 import ch.epfllife.model.user.Price
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Source
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 
 class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventRepository {
@@ -89,6 +93,21 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
     }
   }
 
+  override fun listenAll(onChange: (List<Event>) -> Unit) =
+      createListenAll(
+          db.collection(FirestoreCollections.EVENTS),
+          { runBlocking { documentToEvent(it) } },
+          onChange,
+      )
+
+  override fun listen(eventId: String, onChange: (Event) -> Unit) =
+      createListen(
+          db.collection(FirestoreCollections.EVENTS),
+          { runBlocking { documentToEvent(it) } },
+          eventId,
+          onChange,
+      )
+
   companion object {
     /**
      * Converts an [Event] object into a [Map] suitable for Firestore insertion, replacing the full
@@ -106,7 +125,8 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
               mapOf(
                   "name" to event.location.name,
                   "latitude" to event.location.latitude,
-                  "longitude" to event.location.longitude),
+                  "longitude" to event.location.longitude,
+              ),
           "time" to event.time,
           "association" to associationRef,
           "tags" to event.tags,
@@ -117,7 +137,9 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
 
     suspend fun getAssociation(document: DocumentSnapshot): Association? {
       val assocRef = document.get("association") as? DocumentReference ?: return null
-      val assocSnap = assocRef.get().await()
+      val assocSnap =
+          // Prioritize cached data
+          runCatching { assocRef.get(Source.CACHE).await() }.getOrElse { assocRef.get().await() }
 
       return AssociationRepositoryFirestore.documentToAssociation(assocSnap)
     }
@@ -147,6 +169,9 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
         val description = document.getString("description")!!
         val time = document.getString("time")!!
         val association = getAssociation(document)
+        if (association == null) {
+          throw RuntimeException("Failed to fetch association for event ${document.id}")
+        }
 
         // 3. Get optional String field
         // If 'imageUrl' is missing, getString() returns null, which is valid.
@@ -161,7 +186,8 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
             Location(
                 name = locMap?.get("name") as String,
                 latitude = locMap["latitude"] as Double,
-                longitude = locMap["longitude"] as Double)
+                longitude = locMap["longitude"] as Double,
+            )
 
         // 5. Handle optional List of Strings
         val tags: List<String> =
@@ -179,10 +205,11 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
             description = description,
             location = location,
             time = time,
-            association = association!!,
+            association = association,
             tags = tags,
             price = Price(price),
-            pictureUrl = pictureUrl)
+            pictureUrl = pictureUrl,
+        )
       } catch (e: Exception) {
         // Catch any other errors (e.g., bad casts, toUInt() failure)
         Log.e("FirestoreMapper", "Error converting document ${document.id} to Event", e)

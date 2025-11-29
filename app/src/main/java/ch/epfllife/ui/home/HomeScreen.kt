@@ -37,7 +37,6 @@ fun HomeScreen(
     onEventClick: (eventId: String) -> Unit,
 ) {
   LaunchedEffect(Unit) { viewModel.refresh() }
-
   var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
 
   val allEvents by viewModel.allEvents.collectAsState()

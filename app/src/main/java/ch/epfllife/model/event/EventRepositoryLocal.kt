@@ -9,6 +9,16 @@ class EventRepositoryLocal : EventRepository {
   // counter  to allow us to create new ids
   private var counter = 0
 
+  private val eventsListeners = mutableListOf<((List<Event>) -> Unit)>()
+  private val eventListeners = mutableMapOf<String, ((Event) -> Unit)>()
+
+  private fun notifyListeners() {
+    eventsListeners.forEach { it(events.toList()) }
+    events.forEach { event ->
+      eventListeners.forEach { id, listener -> if (event.id == id) listener(event) }
+    }
+  }
+
   override fun getNewUid(): String {
     return counter++.toString()
   }
@@ -30,6 +40,7 @@ class EventRepositoryLocal : EventRepository {
 
     // actually add event
     events.add(event)
+    notifyListeners()
     return Result.success(Unit)
   }
 
@@ -44,6 +55,7 @@ class EventRepositoryLocal : EventRepository {
 
     // update event
     events[eventIndex] = newEvent
+    notifyListeners()
     return Result.success(Unit)
   }
 
@@ -51,10 +63,23 @@ class EventRepositoryLocal : EventRepository {
     val removed = events.removeIf { it.id == eventId }
 
     return if (removed) {
+      notifyListeners()
       Result.success(Unit)
     } else {
       Result.failure(NoSuchElementException("Event with id $eventId not found!"))
     }
+  }
+
+  override fun listenAll(onChange: (List<Event>) -> Unit) {
+    eventsListeners.add(onChange)
+    // send initial data
+    onChange(events.toList())
+  }
+
+  override fun listen(eventId: String, onChange: (Event) -> Unit) {
+    eventListeners.put(eventId, onChange)
+    // send initial data
+    events.find { it.id == eventId }?.let(onChange)
   }
 
   fun seedEvents(newEvents: List<Event>) {
