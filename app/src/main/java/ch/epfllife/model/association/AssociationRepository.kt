@@ -57,4 +57,8 @@ interface AssociationRepository {
    * @return A Result object with a list of [Event] objects associated with the given ID.
    */
   suspend fun getEventsForAssociation(associationId: String): Result<List<Event>>
+
+  fun listenAll(onChange: (List<Association>) -> Unit)
+
+  fun listen(associationId: String, onChange: (Association) -> Unit)
 }

@@ -5,6 +5,8 @@ import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.event.EventRepositoryFirestore
 import ch.epfllife.model.firestore.FirestoreCollections
+import ch.epfllife.model.firestore.createListen
+import ch.epfllife.model.firestore.createListenAll
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -38,7 +40,7 @@ class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : Associ
 
   override suspend fun updateAssociation(
       associationId: String,
-      newAssociation: Association
+      newAssociation: Association,
   ): Result<Unit> {
 
     // 1. Check if the object's ID matches the parameter ID
@@ -159,7 +161,8 @@ class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : Associ
             logoUrl = logoUrl,
             eventCategory = eventCategory,
             about = about,
-            socialLinks = socialLinks)
+            socialLinks = socialLinks,
+        )
       } catch (e: NullPointerException) {
         // this can happen when one of the required fields is not present
         Log.e("AssociationRepository", "Error converting document to Association", e)
@@ -171,4 +174,19 @@ class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : Associ
       }
     }
   }
+
+  override fun listenAll(onChange: (List<Association>) -> Unit) =
+      createListenAll(
+          db.collection(FirestoreCollections.ASSOCIATIONS),
+          ::documentToAssociation,
+          onChange,
+      )
+
+  override fun listen(associationId: String, onChange: (Association) -> Unit) =
+      createListen(
+          db.collection(FirestoreCollections.ASSOCIATIONS),
+          ::documentToAssociation,
+          associationId,
+          onChange,
+      )
 }

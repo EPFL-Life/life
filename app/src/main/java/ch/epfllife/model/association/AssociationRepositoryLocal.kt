@@ -11,6 +11,16 @@ class AssociationRepositoryLocal(private val eventRepository: EventRepository) :
   private val associations = mutableListOf<Association>()
   private var counter = 0
 
+  private val associationsListeners = mutableListOf<((List<Association>) -> Unit)>()
+  private val associationListeners = mutableMapOf<String, ((Association) -> Unit)>()
+
+  private fun notifyListeners() {
+    associationsListeners.forEach { it(associations.toList()) }
+    associations.forEach { assoc ->
+      associationListeners.forEach { id, listener -> if (assoc.id == id) listener(assoc) }
+    }
+  }
+
   override fun getNewUid(): String {
     return counter++.toString()
   }
@@ -33,6 +43,7 @@ class AssociationRepositoryLocal(private val eventRepository: EventRepository) :
 
     // add new association
     associations.add(association)
+    notifyListeners()
     return Result.success(Unit)
   }
 
@@ -42,6 +53,7 @@ class AssociationRepositoryLocal(private val eventRepository: EventRepository) :
 
     // check if association exists and return failure/success
     return if (removedAssociation) {
+      notifyListeners()
       Result.success(Unit)
     } else {
       Result.failure(NoSuchElementException("Association not found with ID: $associationId"))
@@ -50,7 +62,7 @@ class AssociationRepositoryLocal(private val eventRepository: EventRepository) :
 
   override suspend fun updateAssociation(
       associationId: String,
-      newAssociation: Association
+      newAssociation: Association,
   ): Result<Unit> {
 
     // 1. Find the index of the association to update
@@ -71,6 +83,7 @@ class AssociationRepositoryLocal(private val eventRepository: EventRepository) :
 
     // 4. Perform the update by replacing the item at its index
     associations[existingIndex] = newAssociation
+    notifyListeners()
     return Result.success(Unit)
   }
 
@@ -85,5 +98,17 @@ class AssociationRepositoryLocal(private val eventRepository: EventRepository) :
       // inefficient but works for testing
       eventRepository.getAllEvents().filter() { it.association.id == associationId }
     }
+  }
+
+  override fun listenAll(onChange: (List<Association>) -> Unit) {
+    associationsListeners.add(onChange)
+    // send initial data
+    onChange(associations.toList())
+  }
+
+  override fun listen(associationId: String, onChange: (Association) -> Unit) {
+    associationListeners.put(associationId, onChange)
+    // send initial data
+    associations.find { it.id == associationId }?.let(onChange)
   }
 }
