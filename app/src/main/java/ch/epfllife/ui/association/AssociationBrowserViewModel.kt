@@ -21,7 +21,7 @@ class AssociationBrowserViewModel(private val db: Db) : ViewModel() {
   val subscribedAssociations: StateFlow<List<Association>> = _subscribedAssociations.asStateFlow()
 
   init {
-    refresh()
+    db.assocRepo.listenAll { _allAssociations.value = it }
   }
 
   /** Fetches all associations from the repository and updates the [allAssociations] state. */

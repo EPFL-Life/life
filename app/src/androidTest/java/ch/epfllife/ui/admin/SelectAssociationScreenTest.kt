@@ -124,4 +124,8 @@ private class FakeAssociationRepository(
 
   override suspend fun getEventsForAssociation(associationId: String): Result<List<Event>> =
       Result.success(emptyList())
+
+  override fun listenAll(onChange: (List<Association>) -> Unit) {
+    throw UnsupportedOperationException("Not needed")
+  }
 }
