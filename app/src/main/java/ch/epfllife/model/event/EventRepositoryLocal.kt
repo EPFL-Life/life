@@ -10,13 +10,9 @@ class EventRepositoryLocal : EventRepository {
   private var counter = 0
 
   private val eventsListeners = mutableListOf<((List<Event>) -> Unit)>()
-  private val eventListeners = mutableMapOf<String, ((Event) -> Unit)>()
 
   private fun notifyListeners() {
     eventsListeners.forEach { it(events.toList()) }
-    events.forEach { event ->
-      eventListeners.forEach { id, listener -> if (event.id == id) listener(event) }
-    }
   }
 
   override fun getNewUid(): String {
@@ -74,12 +70,6 @@ class EventRepositoryLocal : EventRepository {
     eventsListeners.add(onChange)
     // send initial data
     onChange(events.toList())
-  }
-
-  override fun listen(eventId: String, onChange: (Event) -> Unit) {
-    eventListeners.put(eventId, onChange)
-    // send initial data
-    events.find { it.id == eventId }?.let(onChange)
   }
 
   fun seedEvents(newEvents: List<Event>) {

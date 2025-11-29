@@ -25,18 +25,3 @@ fun <T> createListenAll(
     snapshot?.mapNotNull(parser)?.let(onChange)
   }
 }
-
-fun <T> createListen(
-    collection: CollectionReference,
-    parser: (DocumentSnapshot) -> T?,
-    docId: String,
-    onChange: (T) -> Unit,
-) {
-  collection.document(docId).addSnapshotListener { snapshot, error ->
-    if (error != null) {
-      Log.e("FirebaseListener", "Listening on ${collection.id}/${docId} failed", error)
-      return@addSnapshotListener
-    }
-    snapshot?.let(parser)?.let(onChange)
-  }
-}
