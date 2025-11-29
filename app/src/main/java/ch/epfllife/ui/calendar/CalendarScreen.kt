@@ -42,7 +42,6 @@ fun CalendarScreen(
     viewModel: HomeViewModel = viewModel { HomeViewModel(db) },
     onEventClick: (String) -> Unit,
 ) {
-  LaunchedEffect(Unit) { viewModel.refresh() }
   var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
   var query by remember { mutableStateOf("") }
 

@@ -251,4 +251,42 @@ class EventRepositoryLocalTest {
     // Assert: failure
     assert(response.isFailure)
   }
+
+  @Test
+  fun listenToCreateEvent() = runTest {
+    var assocList = emptyList<Association>()
+    repositoryAssociation.listenAll { assoc -> assocList = assoc }
+    repositoryAssociation.createAssociation(ExampleAssociations.association1)
+
+    kotlinx.coroutines.delay(100)
+
+    assertEquals(listOf(ExampleAssociations.association1), assocList)
+  }
+
+  @Test
+  fun listenToUpdateEvent() = runTest {
+    var assocList = emptyList<Association>()
+    repositoryAssociation.listenAll { assoc -> assocList = assoc }
+    repositoryAssociation.createAssociation(ExampleAssociations.association1)
+
+    val updatedEvent = ExampleAssociations.association1.copy(name = "Updated Name")
+    repositoryAssociation.updateAssociation(ExampleAssociations.association1.id, updatedEvent)
+
+    kotlinx.coroutines.delay(100)
+
+    assertEquals(listOf(updatedEvent), assocList)
+  }
+
+  @Test
+  fun listenToDeleteEvent() = runTest {
+    var assocList = emptyList<Association>()
+    repositoryAssociation.listenAll { assoc -> assocList = assoc }
+    repositoryAssociation.createAssociation(ExampleAssociations.association1)
+
+    repositoryAssociation.deleteAssociation(ExampleAssociations.association1.id)
+
+    kotlinx.coroutines.delay(100)
+
+    assertEquals(emptyList<Association>(), assocList)
+  }
 }

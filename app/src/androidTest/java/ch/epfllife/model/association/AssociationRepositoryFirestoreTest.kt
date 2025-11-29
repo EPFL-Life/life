@@ -269,4 +269,42 @@ class AssociationRepositoryFirestoreTest : FirestoreLifeTest() {
     // assert: the parsed association is null
     assertEquals(resultParsed, null)
   }
+
+  @Test
+  fun listenToCreateEvent() = runTest {
+    var assocList = emptyList<Association>()
+    db.assocRepo.listenAll { assoc -> assocList = assoc }
+    db.assocRepo.createAssociation(ExampleAssociations.association1)
+
+    kotlinx.coroutines.delay(100)
+
+    assertEquals(listOf(ExampleAssociations.association1), assocList)
+  }
+
+  @Test
+  fun listenToUpdateEvent() = runTest {
+    var assocList = emptyList<Association>()
+    db.assocRepo.listenAll { assoc -> assocList = assoc }
+    db.assocRepo.createAssociation(ExampleAssociations.association1)
+
+    val updatedEvent = ExampleAssociations.association1.copy(name = "Updated Name")
+    db.assocRepo.updateAssociation(ExampleAssociations.association1.id, updatedEvent)
+
+    kotlinx.coroutines.delay(100)
+
+    assertEquals(listOf(updatedEvent), assocList)
+  }
+
+  @Test
+  fun listenToDeleteEvent() = runTest {
+    var assocList = emptyList<Association>()
+    db.assocRepo.listenAll { assoc -> assocList = assoc }
+    db.assocRepo.createAssociation(ExampleAssociations.association1)
+
+    db.assocRepo.deleteAssociation(ExampleAssociations.association1.id)
+
+    kotlinx.coroutines.delay(100)
+
+    assertEquals(emptyList<Association>(), assocList)
+  }
 }
