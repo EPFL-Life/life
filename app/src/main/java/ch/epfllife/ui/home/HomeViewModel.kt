@@ -1,5 +1,6 @@
 package ch.epfllife.ui.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ch.epfllife.model.db.Db
@@ -21,24 +22,15 @@ class HomeViewModel(private val db: Db) : ViewModel() {
     viewModelScope.launch {
       try {
         _allEvents.value = db.eventRepo.getAllEvents()
-        val currentUser = db.userRepo.getCurrentUser()
-
-        if (currentUser != null) {
+        db.userRepo.getCurrentUser()?.let { currentUser ->
           val enrolledEventIds = currentUser.enrolledEvents
           _myEvents.value = _allEvents.value.filter { event -> enrolledEventIds.contains(event.id) }
-        } else {
-          _myEvents.value = emptyList()
         }
-      } catch (_: Exception) {
-        _allEvents.value = emptyList()
-        _myEvents.value = emptyList()
+      } catch (e: Exception) {
+        Log.e("HomeViewModel", "Failed to refresh events", e)
+        // Refresh failed, so we keep the previous state
       }
       signalFinished()
     }
-  }
-
-  // For testing purposes - allows setting myEvents directly
-  fun setMyEvents(events: List<Event>) {
-    _myEvents.value = events
   }
 }

@@ -1,5 +1,6 @@
 package ch.epfllife.ui.association
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ch.epfllife.model.association.Association
@@ -26,20 +27,19 @@ class AssociationBrowserViewModel(private val db: Db) : ViewModel() {
   /** Fetches all associations from the repository and updates the [allAssociations] state. */
   fun refresh(signalFinished: () -> Unit = {}) {
     viewModelScope.launch {
-      val allAssociations =
-          try {
-            db.assocRepo.getAllAssociations()
-          } catch (_: Exception) {
-            emptyList()
-          }
-      _allAssociations.value = allAssociations
+      try {
+        val allAssociations = db.assocRepo.getAllAssociations()
+        _allAssociations.value = allAssociations
 
-      val currentUser = db.userRepo.getCurrentUser()
-      if (currentUser != null) {
-        _subscribedAssociations.value =
-            allAssociations.filter { currentUser.subscriptions.contains(it.id) }
-      } else {
-        _subscribedAssociations.value = emptyList()
+        val currentUser = db.userRepo.getCurrentUser()
+        if (currentUser != null) {
+          _subscribedAssociations.value =
+              allAssociations.filter { currentUser.subscriptions.contains(it.id) }
+        } else {
+          _subscribedAssociations.value = emptyList()
+        }
+      } catch (e: Exception) {
+        Log.e("AssociationBrowserViewModel", "Failed to refresh associations", e)
       }
 
       signalFinished()
