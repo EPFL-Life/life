@@ -94,9 +94,6 @@ class EventDetailsTest {
 
           override fun listenAll(onChange: (List<Event>) -> Unit) =
               throw UnsupportedOperationException("Listening not supported in fake repo")
-
-          override fun listen(eventId: String, onChange: (Event) -> Unit) =
-              throw UnsupportedOperationException("Listening not supported in fake repo")
         }
 
     val viewModel = EventDetailsViewModel(Db.freshLocal().copy(eventRepo = fakeRepoThrowsException))

@@ -253,7 +253,7 @@ class EventRepositoryLocalTest {
   }
 
   @Test
-  fun listenToCreateEvent() = runTest {
+  fun listenToCreateAssoc() = runTest {
     var assocList = emptyList<Association>()
     repositoryAssociation.listenAll { assoc -> assocList = assoc }
     repositoryAssociation.createAssociation(ExampleAssociations.association1)
@@ -264,7 +264,7 @@ class EventRepositoryLocalTest {
   }
 
   @Test
-  fun listenToUpdateEvent() = runTest {
+  fun listenToUpdateAssoc() = runTest {
     var assocList = emptyList<Association>()
     repositoryAssociation.listenAll { assoc -> assocList = assoc }
     repositoryAssociation.createAssociation(ExampleAssociations.association1)
@@ -278,7 +278,7 @@ class EventRepositoryLocalTest {
   }
 
   @Test
-  fun listenToDeleteEvent() = runTest {
+  fun listenToDeleteAssoc() = runTest {
     var assocList = emptyList<Association>()
     repositoryAssociation.listenAll { assoc -> assocList = assoc }
     repositoryAssociation.createAssociation(ExampleAssociations.association1)
