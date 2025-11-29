@@ -508,11 +508,6 @@ private class FakeAssociationRepository(
     return eventsResult ?: throw UnsupportedOperationException("Not used in these tests.")
   }
 
-  override fun listenAll(onChange: (List<Association>) -> Unit) {
-    throw UnsupportedOperationException("Not used in these tests")
-  }
-
-  override fun listen(associationId: String, onChange: (Association) -> Unit) {
-    throw UnsupportedOperationException("Not used in these tests")
-  }
+  override fun listenAll(onChange: (List<Association>) -> Unit) =
+      throw UnsupportedOperationException("Not used in these tests")
 }

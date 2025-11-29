@@ -4,7 +4,6 @@ import android.util.Log
 import ch.epfllife.model.association.Association
 import ch.epfllife.model.association.AssociationRepositoryFirestore
 import ch.epfllife.model.firestore.FirestoreCollections
-import ch.epfllife.model.firestore.createListen
 import ch.epfllife.model.firestore.createListenAll
 import ch.epfllife.model.map.Location
 import ch.epfllife.model.user.Price
@@ -97,14 +96,6 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
       createListenAll(
           db.collection(FirestoreCollections.EVENTS),
           { runBlocking { documentToEvent(it) } },
-          onChange,
-      )
-
-  override fun listen(eventId: String, onChange: (Event) -> Unit) =
-      createListen(
-          db.collection(FirestoreCollections.EVENTS),
-          { runBlocking { documentToEvent(it) } },
-          eventId,
           onChange,
       )
 
