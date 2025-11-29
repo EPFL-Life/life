@@ -12,13 +12,9 @@ class AssociationRepositoryLocal(private val eventRepository: EventRepository) :
   private var counter = 0
 
   private val associationsListeners = mutableListOf<((List<Association>) -> Unit)>()
-  private val associationListeners = mutableMapOf<String, ((Association) -> Unit)>()
 
   private fun notifyListeners() {
     associationsListeners.forEach { it(associations.toList()) }
-    associations.forEach { assoc ->
-      associationListeners.forEach { id, listener -> if (assoc.id == id) listener(assoc) }
-    }
   }
 
   override fun getNewUid(): String {
@@ -104,11 +100,5 @@ class AssociationRepositoryLocal(private val eventRepository: EventRepository) :
     associationsListeners.add(onChange)
     // send initial data
     onChange(associations.toList())
-  }
-
-  override fun listen(associationId: String, onChange: (Association) -> Unit) {
-    associationListeners.put(associationId, onChange)
-    // send initial data
-    associations.find { it.id == associationId }?.let(onChange)
   }
 }
