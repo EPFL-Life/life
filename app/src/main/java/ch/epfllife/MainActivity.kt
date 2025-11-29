@@ -37,6 +37,8 @@ import ch.epfllife.ui.navigation.Screen
 import ch.epfllife.ui.navigation.Tab
 import ch.epfllife.ui.settings.SettingsScreen
 import ch.epfllife.ui.theme.Theme
+import com.google.firebase.Firebase
+import com.google.firebase.database.database
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -45,6 +47,8 @@ class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
+    // Keep cached data across app restarts
+    Firebase.database.setPersistenceEnabled(true)
     setContent {
       ThemedApp(auth = Auth(CredentialManager.create(LocalContext.current)), db = Db.firestore)
     }
@@ -127,13 +131,15 @@ fun App(
                 onAssociationClick = { associationId ->
                   navigationActions.navigateToAssociationDetails(associationId)
                 },
-                db = db)
+                db = db,
+            )
           }
 
           composable(Screen.Calendar.route) {
             CalendarScreen(
                 onEventClick = { eventId -> navigationActions.navigateToEventDetails(eventId) },
-                db = db)
+                db = db,
+            )
           }
 
           composable(
