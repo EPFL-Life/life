@@ -175,6 +175,7 @@ dependencies {
   // Networking with OkHttp
   implementation(libs.okhttp)
   implementation(libs.play.services.location)
+  implementation(libs.androidx.monitor)
 
   // Testing Unit
   testImplementation(libs.test.core.ktx)
