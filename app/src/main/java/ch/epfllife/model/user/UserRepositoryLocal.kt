@@ -180,7 +180,7 @@ class UserRepositoryLocal(
     return updateUser(currentUser.id, updatedUser)
   }
 
-  override suspend fun unsubscribeToAssociation(associationId: String): Result<Unit> {
+  override suspend fun unsubscribeFromAssociation(associationId: String): Result<Unit> {
     val currentUser = getCurrentUser()
 
     // case 1: getCurrentUser() returns a null object

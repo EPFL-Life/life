@@ -92,5 +92,5 @@ interface UserRepository {
    * @param associationId The unique identifier of the Association to unsubscribe from.
    * @return A [Result] indicating success or failure.
    */
-  suspend fun unsubscribeToAssociation(associationId: String): Result<Unit>
+  suspend fun unsubscribeFromAssociation(associationId: String): Result<Unit>
 }
