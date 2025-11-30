@@ -77,4 +77,21 @@ interface UserRepository {
    * @return A [Result] indicating success or failure.
    */
   suspend fun unsubscribeFromEvent(eventId: String): Result<Unit>
+
+  /**
+   * Adds a new association to the currently authenticated user's subscriptions.
+   *
+   * @param associationId The unique identifier of the Association to subscribe to.
+   * @return A [Result] indicating success or failure.
+   */
+  suspend fun subscribeToAssociation(associationId: String): Result<Unit>
+
+  /**
+   * Removes an association ID from the currently authenticated user's subscriptions.
+   *
+   * @param associationId The unique identifier of the Association to unsubscribe from.
+   * @return A [Result] indicating success or failure.
+   */
+  suspend fun unsubscribeFromAssociation(associationId: String): Result<Unit>
+
 }
