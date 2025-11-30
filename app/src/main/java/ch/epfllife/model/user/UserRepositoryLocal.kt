@@ -3,8 +3,10 @@ package ch.epfllife.model.user
 import ch.epfllife.model.association.AssociationRepositoryLocal
 import ch.epfllife.model.event.EventRepositoryLocal
 
-class UserRepositoryLocal(private var eventRepositoryLocal: EventRepositoryLocal? = null, private var associationRepository: AssociationRepositoryLocal?=null) :
-    UserRepository {
+class UserRepositoryLocal(
+    private var eventRepositoryLocal: EventRepositoryLocal? = null,
+    private var associationRepository: AssociationRepositoryLocal? = null
+) : UserRepository {
 
   // In-memory storage for users (use this only for testing)
   private val users = mutableMapOf<String, User>()
@@ -143,73 +145,73 @@ class UserRepositoryLocal(private var eventRepositoryLocal: EventRepositoryLocal
     return updateUser(currentUser.id, updatedUser)
   }
 
-    override suspend fun subscribeToAssociation(associationId: String): Result<Unit> {
-        val currentUser = getCurrentUser()
+  override suspend fun subscribeToAssociation(associationId: String): Result<Unit> {
+    val currentUser = getCurrentUser()
 
-        // case 1: getCurrentUser() returns a null object
-        if (currentUser == null) {
-            return Result.failure(NoSuchElementException(ERROR_USER_NOT_LOGGED_IN))
-        }
-
-        // case 2: check that the association repository is initialized
-        val associationRepository =
-            associationRepository
-                ?: return Result.failure(
-                    IllegalStateException(
-                        "AssociationRepository not initialized in UserRepositoryLocal."))
-
-        // case 3: when user tries to subscribe to an invalid association
-        if (associationRepository.getAssociation(associationId) == null) {
-            return Result.failure(
-                NoSuchElementException(
-                    "Association with ID $associationId does not exist in the repository."))
-        }
-
-        // case 4: the user is already subscribed to association
-        if (currentUser.subscriptions.contains(associationId)) {
-            return Result.failure(
-                IllegalArgumentException(
-                    "User is already subscribed to association with ID: $associationId"))
-        }
-
-        // case 5: user can subscribe to association
-        val updatedUser = currentUser.copy(subscriptions = currentUser.subscriptions + associationId)
-        // reused updateUser() method
-        return updateUser(currentUser.id, updatedUser)
+    // case 1: getCurrentUser() returns a null object
+    if (currentUser == null) {
+      return Result.failure(NoSuchElementException(ERROR_USER_NOT_LOGGED_IN))
     }
 
-    override suspend fun unsubscribeFromAssociation(associationId: String): Result<Unit> {
-        val currentUser = getCurrentUser()
+    // case 2: check that the association repository is initialized
+    val associationRepository =
+        associationRepository
+            ?: return Result.failure(
+                IllegalStateException(
+                    "AssociationRepository not initialized in UserRepositoryLocal."))
 
-        // case 1: getCurrentUser() returns a null object
-        if (currentUser == null) {
-            return Result.failure(NoSuchElementException(ERROR_USER_NOT_LOGGED_IN))
-        }
-
-        // case 2: check that the association repository is initialized
-        val associationRepository =
-            associationRepository
-                ?: return Result.failure(
-                    IllegalStateException(
-                        "AssociationRepository not initialized in UserRepositoryLocal."))
-
-        // case 3: when user tries to unsubscribe to an invalid association
-        if (associationRepository.getAssociation(associationId) == null) {
-            return Result.failure(
-                NoSuchElementException(
-                    "Association with ID $associationId does not exist in the repository."))
-        }
-
-        // case 4: the user is trying to unsubscribe from an association they are not subscribed to
-        if (!currentUser.subscriptions.contains(associationId)) {
-            return Result.failure(
-                IllegalArgumentException(
-                    "User is already subscribed to association with ID: $associationId"))
-        }
-
-        // case 5: user can unsubscribe to association
-        val updatedUser = currentUser.copy(subscriptions = currentUser.subscriptions - associationId)
-        // reused updateUser() method
-        return updateUser(currentUser.id, updatedUser)
+    // case 3: when user tries to subscribe to an invalid association
+    if (associationRepository.getAssociation(associationId) == null) {
+      return Result.failure(
+          NoSuchElementException(
+              "Association with ID $associationId does not exist in the repository."))
     }
+
+    // case 4: the user is already subscribed to association
+    if (currentUser.subscriptions.contains(associationId)) {
+      return Result.failure(
+          IllegalArgumentException(
+              "User is already subscribed to association with ID: $associationId"))
+    }
+
+    // case 5: user can subscribe to association
+    val updatedUser = currentUser.copy(subscriptions = currentUser.subscriptions + associationId)
+    // reused updateUser() method
+    return updateUser(currentUser.id, updatedUser)
+  }
+
+  override suspend fun unsubscribeFromAssociation(associationId: String): Result<Unit> {
+    val currentUser = getCurrentUser()
+
+    // case 1: getCurrentUser() returns a null object
+    if (currentUser == null) {
+      return Result.failure(NoSuchElementException(ERROR_USER_NOT_LOGGED_IN))
+    }
+
+    // case 2: check that the association repository is initialized
+    val associationRepository =
+        associationRepository
+            ?: return Result.failure(
+                IllegalStateException(
+                    "AssociationRepository not initialized in UserRepositoryLocal."))
+
+    // case 3: when user tries to unsubscribe to an invalid association
+    if (associationRepository.getAssociation(associationId) == null) {
+      return Result.failure(
+          NoSuchElementException(
+              "Association with ID $associationId does not exist in the repository."))
+    }
+
+    // case 4: the user is trying to unsubscribe from an association they are not subscribed to
+    if (!currentUser.subscriptions.contains(associationId)) {
+      return Result.failure(
+          IllegalArgumentException(
+              "User is already subscribed to association with ID: $associationId"))
+    }
+
+    // case 5: user can unsubscribe to association
+    val updatedUser = currentUser.copy(subscriptions = currentUser.subscriptions - associationId)
+    // reused updateUser() method
+    return updateUser(currentUser.id, updatedUser)
+  }
 }
