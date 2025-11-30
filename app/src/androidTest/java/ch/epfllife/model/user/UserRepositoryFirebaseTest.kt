@@ -380,4 +380,101 @@ class UserRepositoryFirebaseTest : FirestoreLifeTest() {
     // assert
     assertTrue(result.isFailure)
   }
+
+  @Test
+  fun subscribeToAssociation_success() = runTest {
+    val (user, association, _) = setUpSimple()
+
+    // action: subscribe to event
+    val result = db.userRepo.subscribeToAssociation(association.id)
+
+    // assert
+    assertTrue(result.isSuccess)
+
+    // ensure that the subscription is updated
+    val updatedUser = db.userRepo.getUser(user.id)
+    assertTrue(updatedUser?.subscriptions?.contains(association.id) ?: false)
+  }
+
+  @Test
+  fun subscribeToAssociation_returnsFailure_whenLoggedOut() = runTest {
+    val (_, association, _) = setUpSimple()
+
+    // action: subscribe to a association without being logged in
+    Firebase.auth.signOut()
+    val result = db.userRepo.subscribeToAssociation(association.id)
+    assertTrue(result.isFailure)
+  }
+
+  @Test
+  fun subscribeToAssociation_returnsFailure_whenAssociationDoesNotExist() = runTest {
+    val (_, _, _) = setUpSimple()
+
+    // action: subscribe to a non-existent association
+    val result = db.userRepo.subscribeToAssociation("nonExistentEventId")
+    // assert
+    assertTrue(result.isFailure)
+  }
+
+  @Test
+  fun subscribeToAssociation_returnsFailure_whenAlreadySubscribed() = runTest {
+    val (_, association, _) = setUpSimple()
+
+    // action: enroll to association
+    val firstAssociation = db.userRepo.subscribeToAssociation(association.id)
+    assertTrue(firstAssociation.isSuccess)
+
+    // action: enroll to association that user had already subscribed
+    val secondAssociation = db.userRepo.subscribeToAssociation(association.id)
+    assertTrue(secondAssociation.isFailure)
+  }
+
+  @Test
+  fun unsubscribeFromAssociation_success() = runTest {
+    val (user, association, _) = setUpSimple()
+    val sub = db.userRepo.subscribeToAssociation(association.id)
+    assertTrue(sub.isSuccess)
+
+    // action: unsubscribe
+    val result = db.userRepo.unsubscribeFromAssociation(association.id)
+
+    // assert
+    assertTrue(result.isSuccess)
+    val updated = db.userRepo.getUser(user.id)
+    assertTrue(!(updated?.subscriptions?.contains(association.id) ?: false))
+  }
+
+  @Test
+  fun unsubscribeFromAssociation_returnsFailure_whenLoggedOut() = runTest {
+    val (_, association, _) = setUpSimple()
+
+    // action: try to unsubscribe from event while logged out
+    Firebase.auth.signOut()
+    val result = db.userRepo.unsubscribeFromAssociation(association.id)
+    // assert: the action must fail
+    assertTrue(result.isFailure)
+  }
+
+  @Test
+  fun unsubscribeFromAssociation_returnsFailure_whenEventDoesNotExist() = runTest {
+    val (_, _, _) = setUpSimple()
+
+    // action: try to unsubscribe from a non-existent event
+    val result = db.userRepo.unsubscribeFromAssociation("nonExistentEventId")
+
+    // assert: the action must fail
+    assertTrue(result.isFailure)
+  }
+
+  @Test
+  fun unsubscribeFromAssociation_returnsFailure_whenNotSubscribed() = runTest {
+    val (_, _, _) = setUpSimple()
+
+    // (arrange: User is NOT subscribed to this association)
+    // action: try to unsubscribe from an event they are not subscribed to
+    val result = db.userRepo.unsubscribeFromAssociation(ExampleAssociations.association2.id)
+
+    // assert: the action must fail
+    assertTrue(result.isFailure)
+  }
 }
