@@ -70,5 +70,6 @@
     <string name="error_unenroll_failed">Failed to unenroll: Please try again.</string>
     <string name="error_event_not_found">Failed to unenroll: Please try again.</string>
     <string name="error_loading_event">Failed to load event</string>
+    <string name="error_user_is_not_logged_in">No user is currently logged in</string>
 
 </resources>

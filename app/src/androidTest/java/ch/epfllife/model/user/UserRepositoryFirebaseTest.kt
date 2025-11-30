@@ -9,6 +9,7 @@ import ch.epfllife.utils.FakeCredentialManager
 import ch.epfllife.utils.FirestoreLifeTest
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import junit.framework.TestCase
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Assert.assertEquals
@@ -457,6 +458,160 @@ class UserRepositoryFirebaseTest : FirestoreLifeTest() {
     val result = userRepository.unsubscribeFromEvent(event.id)
 
     // assert
+    assertTrue(result.isFailure)
+  }
+
+  @Test
+  fun subscribeToAssociation_success() = runTest {
+
+    // arrange: add an association
+    val association = ExampleAssociations.association3
+    assocRepository.createAssociation(association)
+
+    // Arrange: need to have an authenticated user
+    val authUid = signInTestUserUsingAuth()
+    // to avoid problems, we assign the sample user the UID of the
+    // authenticated user, thus simulating that they are the same.
+    val user3 = ExampleUsers.user3
+    userRepository.createUser(user3.copy(id = authUid))
+    // action: subscribe to event
+    val result = userRepository.subscribeToAssociation(association.id)
+
+    // assert
+    TestCase.assertTrue(result.isSuccess)
+
+    // ensure that the subscription is updated
+    val updatedUser = userRepository.getUser(authUid)
+    TestCase.assertTrue(updatedUser?.subscriptions?.contains(association.id) ?: false)
+  }
+
+  @Test
+  fun subscribeToAssociation_returnsFailure_whenLoggedOut() = runTest {
+    // arrange: add an association
+    val association = ExampleAssociations.association3
+    assocRepository.createAssociation(association)
+    // Arrange: need to have an authenticated user
+    val authUid = signInTestUserUsingAuth()
+    // to avoid problems, we assign the sample user the UID of the
+    // authenticated user, thus simulating that they are the same.
+    val user3 = ExampleUsers.user3
+    userRepository.createUser(user3.copy(id = authUid))
+    // action: subscribe to a association without being logged in
+    Firebase.auth.signOut()
+    val result = userRepository.subscribeToAssociation(association.id)
+    TestCase.assertTrue(result.isFailure)
+  }
+
+  @Test
+  fun subscribeToAssociation_returnsFailure_whenAssociationDoesNotExist() = runTest {
+    // Arrange: need to have an authenticated user
+    val authUid = signInTestUserUsingAuth()
+    // to avoid problems, we assign the sample user the UID of the
+    // authenticated user, thus simulating that they are the same.
+    val user3 = ExampleUsers.user3
+    userRepository.createUser(user3.copy(id = authUid))
+
+    // action: subscribe to a non-existent association
+    val result = userRepository.subscribeToAssociation("nonExistentEventId")
+    // assert
+    TestCase.assertTrue(result.isFailure)
+  }
+
+  @Test
+  fun subscribeToAssociation_returnsFailure_whenAlreadySubscribed() = runTest {
+    // arrange: create an association
+    val association = ExampleAssociations.association3
+    assocRepository.createAssociation(association)
+    // Arrange: need to have an authenticated user
+    val authUid = signInTestUserUsingAuth()
+    // to avoid problems, we assign the sample user the UID of the
+    // authenticated user, thus simulating that they are the same.
+    val user3 = ExampleUsers.user3
+    userRepository.createUser(user3.copy(id = authUid))
+    // action: enroll to association
+    val firstAssociation = userRepository.subscribeToAssociation(association.id)
+    TestCase.assertTrue(firstAssociation.isSuccess)
+
+    // action: enroll to association that user had already subscribed
+    val secondAssociation = userRepository.subscribeToAssociation(association.id)
+    TestCase.assertTrue(secondAssociation.isFailure)
+  }
+
+  @Test
+  fun unsubscribeFromAssociation_success() = runTest {
+    // arrange: create user + association, subscribe first
+    val association = ExampleAssociations.association3
+    assocRepository.createAssociation(association)
+    // Arrange: need to have an authenticated user
+    val authUid = signInTestUserUsingAuth()
+    // to avoid problems, we assign the sample user the UID of the
+    // authenticated user, thus simulating that they are the same.
+    val user3 = ExampleUsers.user3
+    userRepository.createUser(user3.copy(id = authUid))
+    val sub = userRepository.subscribeToAssociation(association.id)
+    TestCase.assertTrue(sub.isSuccess)
+
+    // action: unsubscribe
+    val result = userRepository.unsubscribeFromAssociation(association.id)
+
+    // assert
+    TestCase.assertTrue(result.isSuccess)
+    val updated = userRepository.getUser(ExampleUsers.user3.id)
+    TestCase.assertTrue(!(updated?.subscriptions?.contains(association.id) ?: false))
+  }
+
+  @Test
+  fun unsubscribeFromAssociation_returnsFailure_whenLoggedOut() = runTest {
+    // arrange: add an user
+    // arrange: add an event
+    assocRepository.createAssociation(ExampleAssociations.association3)
+    // Arrange: need to have an authenticated user
+    val authUid = signInTestUserUsingAuth()
+    // to avoid problems, we assign the sample user the UID of the
+    // authenticated user, thus simulating that they are the same.
+    val user3 = ExampleUsers.user3
+    userRepository.createUser(user3.copy(id = authUid))
+    // action: try to unsubscribe from event while logged out
+    Firebase.auth.signOut()
+    val result = userRepository.unsubscribeFromAssociation(ExampleAssociations.association3.id)
+    // assert: the action must fail
+    TestCase.assertTrue(result.isFailure)
+  }
+
+  @Test
+  fun unsubscribeFromAssociation_returnsFailure_whenEventDoesNotExist() = runTest {
+    // arrange: create user + login
+    // Arrange: need to have an authenticated user
+    val authUid = signInTestUserUsingAuth()
+    // to avoid problems, we assign the sample user the UID of the
+    // authenticated user, thus simulating that they are the same.
+    val user3 = ExampleUsers.user3
+    userRepository.createUser(user3.copy(id = authUid))
+
+    // action: try to unsubscribe from a non-existent event
+    val result = userRepository.unsubscribeFromAssociation("nonExistentEventId")
+
+    // assert: the action must fail
+    assertTrue(result.isFailure)
+  }
+
+  @Test
+  fun unsubscribeFromAssociation_returnsFailure_whenNotSubscribed() = runTest {
+    // arrange: create user + association
+    val association = ExampleAssociations.association3
+    assocRepository.createAssociation(association)
+    // arrange: login user
+    // Arrange: need to have an authenticated user
+    val authUid = signInTestUserUsingAuth()
+    // to avoid problems, we assign the sample user the UID of the
+    // authenticated user, thus simulating that they are the same.
+    val user3 = ExampleUsers.user3
+    userRepository.createUser(user3.copy(id = authUid))
+    // (arrange: User is NOT subscribed to this association)
+    // action: try to unsubscribe from an event they are not subscribed to
+    val result = userRepository.unsubscribeFromAssociation(association.id)
+
+    // assert: the action must fail
     assertTrue(result.isFailure)
   }
 }

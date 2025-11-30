@@ -145,7 +145,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
 
     // case 1: getCurrentUser() returns a null object
     if (currentUser == null) {
-      return Result.failure(NoSuchElementException("No user is currently logged in"))
+      return Result.failure(NoSuchElementException(ERROR_USER_NOT_LOGGED_IN))
     }
 
     // case 2: event doesn't exist
@@ -174,7 +174,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
 
     // case 1: getCurrentUser() returns a null object
     if (currentUser == null) {
-      return Result.failure(NoSuchElementException("No user is currently logged in"))
+      return Result.failure(NoSuchElementException(ERROR_USER_NOT_LOGGED_IN))
     }
 
     // case 2: event doesn't exist
@@ -195,6 +195,66 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     // we proceed to update the list of enrolled events
     val updatedUser = currentUser.copy(enrolledEvents = currentUser.enrolledEvents - eventId)
     // finally we update the user with the new list
+    return updateUser(currentUser.id, updatedUser)
+  }
+
+  override suspend fun subscribeToAssociation(associationId: String): Result<Unit> {
+    val currentUser = getCurrentUser()
+
+    // case 1: getCurrentUser() returns a null object
+    if (currentUser == null) {
+      return Result.failure(NoSuchElementException(ERROR_USER_NOT_LOGGED_IN))
+    }
+
+    val association =
+        db.collection(FirestoreCollections.ASSOCIATIONS).document(associationId).get().await()
+    // case 2: when user tries to subscribe to an invalid association
+    if (!association.exists()) {
+      return Result.failure(
+          NoSuchElementException(
+              "Association with ID $associationId does not exist in the repository."))
+    }
+
+    // case 3: the user is already subscribed to association
+    if (currentUser.subscriptions.contains(associationId)) {
+      return Result.failure(
+          IllegalArgumentException(
+              "User is already subscribed to association with ID: $associationId"))
+    }
+
+    // case 4: user can subscribe to association
+    val updatedUser = currentUser.copy(subscriptions = currentUser.subscriptions + associationId)
+    // reused updateUser() method
+    return updateUser(currentUser.id, updatedUser)
+  }
+
+  override suspend fun unsubscribeFromAssociation(associationId: String): Result<Unit> {
+    val currentUser = getCurrentUser()
+
+    // case 1: getCurrentUser() returns a null object
+    if (currentUser == null) {
+      return Result.failure(NoSuchElementException(ERROR_USER_NOT_LOGGED_IN))
+    }
+
+    val association =
+        db.collection(FirestoreCollections.ASSOCIATIONS).document(associationId).get().await()
+    // case 2: when user tries to unsubscribe to an invalid association
+    if (!association.exists()) {
+      return Result.failure(
+          NoSuchElementException(
+              "Association with ID $associationId does not exist in the repository."))
+    }
+
+    // case 3: the user is trying to unsubscribe from an association they are not subscribed to
+    if (!currentUser.subscriptions.contains(associationId)) {
+      return Result.failure(
+          IllegalArgumentException(
+              "User is already subscribed to association with ID: $associationId"))
+    }
+
+    // case 4: user can unsubscribe to association
+    val updatedUser = currentUser.copy(subscriptions = currentUser.subscriptions - associationId)
+    // reused updateUser() method
     return updateUser(currentUser.id, updatedUser)
   }
 }
