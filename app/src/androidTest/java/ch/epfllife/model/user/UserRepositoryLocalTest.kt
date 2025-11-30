@@ -1,7 +1,9 @@
 package ch.epfllife.model.user
 
+import ch.epfllife.example_data.ExampleAssociations
 import ch.epfllife.example_data.ExampleEvents
 import ch.epfllife.example_data.ExampleUsers
+import ch.epfllife.model.association.AssociationRepositoryLocal
 import ch.epfllife.model.event.EventRepositoryLocal
 import java.lang.IllegalStateException
 import junit.framework.TestCase.assertEquals
@@ -15,11 +17,13 @@ class UserRepositoryLocalTest {
   // we need this to declare the property for the whole class
   private lateinit var repositoryUser: UserRepositoryLocal
   private lateinit var repositoryEventLocal: EventRepositoryLocal
+  private lateinit var repositoryAssociationLocal: AssociationRepositoryLocal
 
   @Before
   fun setup() {
     repositoryEventLocal = EventRepositoryLocal()
-    repositoryUser = UserRepositoryLocal(repositoryEventLocal)
+    repositoryAssociationLocal = AssociationRepositoryLocal(repositoryEventLocal)
+    repositoryUser = UserRepositoryLocal(repositoryEventLocal, repositoryAssociationLocal)
   }
 
   @Test
@@ -317,6 +321,160 @@ class UserRepositoryLocalTest {
 
     // action: try to unsubscribe from an event they are not subscribed to
     val result = repositoryUser.unsubscribeFromEvent(event.id)
+
+    // assert: the action must fail
+    assertTrue(result.isFailure)
+  }
+
+  @Test
+  fun subscribeToAssociation_success() = runTest {
+    // arrange: add an user
+    repositoryUser.createUser(ExampleUsers.user3)
+    // arrange: add an association
+    val association = ExampleAssociations.association3
+    repositoryAssociationLocal.createAssociation(association)
+    // action: simulate login
+    repositoryUser.simulateLogin(ExampleUsers.user3.id)
+
+    // action: subscribe to event
+    val result = repositoryUser.subscribeToAssociation(association.id)
+
+    // assert
+    assertTrue(result.isSuccess)
+
+    // ensure that the subscription is updated
+    val updatedUser = repositoryUser.getUser(ExampleUsers.user3.id)
+    assertTrue(updatedUser?.subscriptions?.contains(association.id) ?: false)
+  }
+
+  @Test
+  fun subscribeToAssociation_returnsFailure_whenLoggedOut() = runTest {
+    // arrange: add an user
+    repositoryUser.createUser(ExampleUsers.user3)
+    // arrange: add an association
+    val association = ExampleAssociations.association3
+    repositoryAssociationLocal.createAssociation(association)
+    // action: subscribe to a association without being logged in
+    val result = repositoryUser.subscribeToAssociation(association.id)
+    assertTrue(result.isFailure)
+  }
+
+  @Test
+  fun subscribeToAssociation_returnsFailure_whenAssociationRepoNotInitialized() = runTest {
+    // arrange: initialize a null association repository
+    repositoryUser = UserRepositoryLocal(null, null)
+    // action: create an user + login
+    repositoryUser.createUser(ExampleUsers.user3)
+    repositoryUser.simulateLogin(ExampleUsers.user3.id)
+
+    // action:subscribe to an association with a null event repository
+    val result = repositoryUser.subscribeToAssociation(ExampleAssociations.association3.id)
+    assertTrue(result.isFailure)
+  }
+
+  @Test
+  fun subscribeToAssociation_returnsFailure_whenAssociationDoesNotExist() = runTest {
+    // arrange: create user + login
+    repositoryUser.createUser(ExampleUsers.user3)
+    repositoryUser.simulateLogin(ExampleUsers.user3.id)
+
+    // action: subscribe to a non-existent association
+    val result = repositoryUser.subscribeToAssociation("nonExistentEventId")
+    // assert
+    assertTrue(result.isFailure)
+  }
+
+  @Test
+  fun subscribeToAssociation_returnsFailure_whenAlreadySubscribed() = runTest {
+    // arrange: create an association
+    repositoryUser.createUser(ExampleUsers.user3)
+    val association = ExampleAssociations.association3
+    repositoryAssociationLocal.createAssociation(association)
+    repositoryUser.simulateLogin(ExampleUsers.user3.id)
+
+    // action: enroll to association
+    val firstAssociation = repositoryUser.subscribeToAssociation(association.id)
+    assertTrue(firstAssociation.isSuccess)
+
+    // action: enroll to association that user had already subscribed
+    val secondAssociation = repositoryUser.subscribeToAssociation(association.id)
+    assertTrue(secondAssociation.isFailure)
+  }
+
+  @Test
+  fun unsubscribeFromAssociation_success() = runTest {
+    // arrange: create user + association, subscribe first
+    repositoryUser.createUser(ExampleUsers.user3)
+    val association = ExampleAssociations.association3
+    repositoryAssociationLocal.createAssociation(association)
+    repositoryUser.simulateLogin(ExampleUsers.user3.id)
+    val sub = repositoryUser.subscribeToAssociation(association.id)
+    assertTrue(sub.isSuccess)
+
+    // action: unsubscribe
+    val result = repositoryUser.unsubscribeFromAssociation(association.id)
+
+    // assert
+    assertTrue(result.isSuccess)
+    val updated = repositoryUser.getUser(ExampleUsers.user3.id)
+    assertTrue(!(updated?.subscriptions?.contains(association.id) ?: false))
+  }
+
+  @Test
+  fun unsubscribeFromAssociation_returnsFailure_whenLoggedOut() = runTest {
+    // arrange: add an user
+    repositoryUser.createUser(ExampleUsers.user3)
+    // arrange: add an event
+    repositoryAssociationLocal.createAssociation(ExampleAssociations.association3)
+    // (arrange: No user is logged in by default)
+
+    // action: try to unsubscribe from event while logged out
+    val result = repositoryUser.unsubscribeFromAssociation(ExampleAssociations.association3.id)
+    // assert: the action must fail
+    assertTrue(result.isFailure)
+  }
+
+  @Test
+  fun unsubscribeFromAssociation_returnsFailure_whenAssociationRepoNotInitialized() = runTest {
+    // arrange: initialize the repository with a null event repository
+    repositoryUser = UserRepositoryLocal(null, null)
+    // arrange: create an user + login
+    repositoryUser.createUser(ExampleUsers.user3)
+    repositoryUser.simulateLogin(ExampleUsers.user3.id)
+
+    // action: try to unsubscribe from event with a null event repository
+    val result = repositoryUser.unsubscribeFromAssociation(ExampleAssociations.association3.id)
+    // assert: the action must fail and check the type of failure
+    assertTrue(result.isFailure)
+    assertTrue(result.exceptionOrNull() is IllegalStateException)
+  }
+
+  @Test
+  fun unsubscribeFromAssociation_returnsFailure_whenEventDoesNotExist() = runTest {
+    // arrange: create user + login
+    repositoryUser.createUser(ExampleUsers.user3)
+    repositoryUser.simulateLogin(ExampleUsers.user3.id)
+    // (arrange: Event does not exist in repositoryEventLocal)
+
+    // action: try to unsubscribe from a non-existent event
+    val result = repositoryUser.unsubscribeFromAssociation("nonExistentEventId")
+
+    // assert: the action must fail
+    assertTrue(result.isFailure)
+  }
+
+  @Test
+  fun unsubscribeFromAssociation_returnsFailure_whenNotSubscribed() = runTest {
+    // arrange: create user + association
+    repositoryUser.createUser(ExampleUsers.user3)
+    val association = ExampleAssociations.association3
+    repositoryAssociationLocal.createAssociation(association)
+    // arrange: login user
+    repositoryUser.simulateLogin(ExampleUsers.user3.id)
+    // (arrange: User is NOT subscribed to this association)
+
+    // action: try to unsubscribe from an event they are not subscribed to
+    val result = repositoryUser.unsubscribeFromAssociation(association.id)
 
     // assert: the action must fail
     assertTrue(result.isFailure)
