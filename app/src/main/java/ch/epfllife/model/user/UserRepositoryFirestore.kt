@@ -209,7 +209,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     val association =
         db.collection(FirestoreCollections.ASSOCIATIONS).document(associationId).get().await()
     // case 2: when user tries to subscribe to an invalid association
-    if (association.exists()) {
+    if (!association.exists()) {
       return Result.failure(
           NoSuchElementException(
               "Association with ID $associationId does not exist in the repository."))
@@ -239,7 +239,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     val association =
         db.collection(FirestoreCollections.ASSOCIATIONS).document(associationId).get().await()
     // case 2: when user tries to unsubscribe to an invalid association
-    if (association.exists()) {
+    if (!association.exists()) {
       return Result.failure(
           NoSuchElementException(
               "Association with ID $associationId does not exist in the repository."))

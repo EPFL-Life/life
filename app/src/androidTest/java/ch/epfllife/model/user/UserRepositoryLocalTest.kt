@@ -425,11 +425,11 @@ class UserRepositoryLocalTest {
     // arrange: add an user
     repositoryUser.createUser(ExampleUsers.user3)
     // arrange: add an event
-    repositoryEventLocal.createEvent(ExampleEvents.event1)
+    repositoryAssociationLocal.createAssociation(ExampleAssociations.association3)
     // (arrange: No user is logged in by default)
 
     // action: try to unsubscribe from event while logged out
-    val result = repositoryUser.unsubscribeFromEvent(ExampleEvents.event1.id)
+    val result = repositoryUser.unsubscribeFromAssociation(ExampleAssociations.association3.id)
     // assert: the action must fail
     assertTrue(result.isFailure)
   }
