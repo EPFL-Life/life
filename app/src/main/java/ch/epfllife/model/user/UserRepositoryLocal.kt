@@ -86,7 +86,7 @@ class UserRepositoryLocal(
 
     // case 1: getCurrentUser() returns a null object
     if (currentUser == null) {
-      return Result.failure(NoSuchElementException("No user is currently logged in"))
+      return Result.failure(NoSuchElementException(ERROR_USER_NOT_LOGGED_IN))
     }
 
     // case 2: check that the event repository is initialized
@@ -118,7 +118,7 @@ class UserRepositoryLocal(
 
     // case 1: getCurrentUser() returns a null object
     if (currentUser == null) {
-      return Result.failure(NoSuchElementException("No user is currently logged in"))
+      return Result.failure(NoSuchElementException(ERROR_USER_NOT_LOGGED_IN))
     }
 
     // case 2: check that the event repository is initialized
@@ -150,7 +150,7 @@ class UserRepositoryLocal(
 
     // case 1: getCurrentUser() returns a null object
     if (currentUser == null) {
-      return Result.failure(NoSuchElementException("No user is currently logged in"))
+      return Result.failure(NoSuchElementException(ERROR_USER_NOT_LOGGED_IN))
     }
 
     // case 2: check that the association repository is initialized
@@ -185,7 +185,7 @@ class UserRepositoryLocal(
 
     // case 1: getCurrentUser() returns a null object
     if (currentUser == null) {
-      return Result.failure(NoSuchElementException("No user is currently logged in"))
+      return Result.failure(NoSuchElementException(ERROR_USER_NOT_LOGGED_IN))
     }
 
     // case 2: check that the association repository is initialized
