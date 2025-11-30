@@ -71,7 +71,6 @@ fragmentKtx = "1.8.2"
 kotlinxSerializationJson = "1.6.2"
 androidxCoreKtx = "1.6.1"
 playServicesLocation = "21.3.0"
-monitor = "1.8.0"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
@@ -131,7 +130,6 @@ review-ktx = { module = "com.google.android.play:review-ktx", version.ref = "rev
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 test-core-ktx = { group = "androidx.test", name = "core-ktx", version.ref = "androidxCoreKtx" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
-androidx-monitor = { group = "androidx.test", name = "monitor", version.ref = "monitor" }
 
 
 [plugins]

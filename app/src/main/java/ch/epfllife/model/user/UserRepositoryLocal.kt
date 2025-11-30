@@ -1,8 +1,5 @@
 package ch.epfllife.model.user
 
-import android.content.Context
-import androidx.test.platform.app.InstrumentationRegistry
-import ch.epfllife.R
 import ch.epfllife.model.association.AssociationRepositoryLocal
 import ch.epfllife.model.event.EventRepositoryLocal
 
@@ -11,9 +8,6 @@ class UserRepositoryLocal(
     private var associationRepository: AssociationRepositoryLocal? = null
 ) : UserRepository {
 
-  private val context: Context by lazy {
-    InstrumentationRegistry.getInstrumentation().targetContext
-  }
   // In-memory storage for users (use this only for testing)
   private val users = mutableMapOf<String, User>()
 
@@ -92,8 +86,7 @@ class UserRepositoryLocal(
 
     // case 1: getCurrentUser() returns a null object
     if (currentUser == null) {
-      return Result.failure(
-          NoSuchElementException(context.getString(R.string.error_user_is_not_logged_in)))
+      return Result.failure(NoSuchElementException("No user is currently logged in"))
     }
 
     // case 2: check that the event repository is initialized
@@ -125,8 +118,7 @@ class UserRepositoryLocal(
 
     // case 1: getCurrentUser() returns a null object
     if (currentUser == null) {
-      return Result.failure(
-          NoSuchElementException(context.getString(R.string.error_user_is_not_logged_in)))
+      return Result.failure(NoSuchElementException("No user is currently logged in"))
     }
 
     // case 2: check that the event repository is initialized
@@ -158,8 +150,7 @@ class UserRepositoryLocal(
 
     // case 1: getCurrentUser() returns a null object
     if (currentUser == null) {
-      return Result.failure(
-          NoSuchElementException(context.getString(R.string.error_user_is_not_logged_in)))
+      return Result.failure(NoSuchElementException("No user is currently logged in"))
     }
 
     // case 2: check that the association repository is initialized
@@ -194,8 +185,7 @@ class UserRepositoryLocal(
 
     // case 1: getCurrentUser() returns a null object
     if (currentUser == null) {
-      return Result.failure(
-          NoSuchElementException(context.getString(R.string.error_user_is_not_logged_in)))
+      return Result.failure(NoSuchElementException("No user is currently logged in"))
     }
 
     // case 2: check that the association repository is initialized
