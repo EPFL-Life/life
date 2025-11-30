@@ -93,5 +93,4 @@ interface UserRepository {
    * @return A [Result] indicating success or failure.
    */
   suspend fun unsubscribeFromAssociation(associationId: String): Result<Unit>
-
 }
