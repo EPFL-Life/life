@@ -78,7 +78,6 @@ interface UserRepository {
    */
   suspend fun unsubscribeFromEvent(eventId: String): Result<Unit>
 
-
   /**
    * Adds an association to the currently authenticated user's subscriptions.
    *
@@ -94,5 +93,4 @@ interface UserRepository {
    * @return A [Result] indicating success or failure.
    */
   suspend fun unsubscribeToAssociation(associationId: String): Result<Unit>
-
 }
