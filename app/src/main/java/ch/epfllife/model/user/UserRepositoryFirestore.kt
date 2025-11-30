@@ -1,6 +1,9 @@
 package ch.epfllife.model.user
 
+import android.content.Context
 import android.util.Log
+import androidx.test.platform.app.InstrumentationRegistry
+import ch.epfllife.R
 import ch.epfllife.model.firestore.FirestoreCollections
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
@@ -9,6 +12,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
 class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepository {
+  private val context: Context by lazy {
+    InstrumentationRegistry.getInstrumentation().targetContext
+  }
 
   override suspend fun getCurrentUser(): User? {
 
@@ -145,7 +151,8 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
 
     // case 1: getCurrentUser() returns a null object
     if (currentUser == null) {
-      return Result.failure(NoSuchElementException("No user is currently logged in"))
+      return Result.failure(
+          NoSuchElementException(context.getString(R.string.error_user_is_not_logged_in)))
     }
 
     // case 2: event doesn't exist
@@ -174,7 +181,8 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
 
     // case 1: getCurrentUser() returns a null object
     if (currentUser == null) {
-      return Result.failure(NoSuchElementException("No user is currently logged in"))
+      return Result.failure(
+          NoSuchElementException(context.getString(R.string.error_user_is_not_logged_in)))
     }
 
     // case 2: event doesn't exist
@@ -203,7 +211,8 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
 
     // case 1: getCurrentUser() returns a null object
     if (currentUser == null) {
-      return Result.failure(NoSuchElementException("No user is currently logged in"))
+      return Result.failure(
+          NoSuchElementException(context.getString(R.string.error_user_is_not_logged_in)))
     }
 
     val association =
@@ -233,7 +242,8 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
 
     // case 1: getCurrentUser() returns a null object
     if (currentUser == null) {
-      return Result.failure(NoSuchElementException("No user is currently logged in"))
+      return Result.failure(
+          NoSuchElementException(context.getString(R.string.error_user_is_not_logged_in)))
     }
 
     val association =
