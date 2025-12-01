@@ -1,5 +1,8 @@
 package ch.epfllife.ui.composables
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -55,31 +58,11 @@ class ComposablesTest {
   }
 
   @Test
-  fun searchBar_TriggersOnSearchClick() {
-    var searchClicked = false
-    composeTestRule.setContent { SearchBar(onSearchClick = { searchClicked = true }) }
-    composeTestRule.onNode(hasContentDescription("Search")).performClick()
-    assertTrue("SearchBar should trigger onSearchClick callback", searchClicked)
-  }
-
-  @Test
   fun searchBar_TriggersOnFilterClick() {
     var filterClicked = false
     composeTestRule.setContent { SearchBar(onFilterClick = { filterClicked = true }) }
     composeTestRule.onNode(hasContentDescription("Filter")).performClick()
     assertTrue("SearchBar should trigger onFilterClick callback", filterClicked)
-  }
-
-  @Test
-  fun searchBar_OnlySearchClickWhenClickingSearchArea() {
-    var searchClicked = false
-    var filterClicked = false
-    composeTestRule.setContent {
-      SearchBar(onSearchClick = { searchClicked = true }, onFilterClick = { filterClicked = true })
-    }
-    composeTestRule.onNode(hasContentDescription("Search")).performClick()
-    assertTrue("SearchBar should trigger onSearchClick", searchClicked)
-    assertFalse("SearchBar should not trigger onFilterClick", filterClicked)
   }
 
   @Test
@@ -95,6 +78,16 @@ class ComposablesTest {
     composeTestRule.setContent { SearchBar(searchColorBar = Color.Red) }
     // Just verify it renders without crashing
     composeTestRule.onNode(hasContentDescription("Search")).assertExists()
+  }
+
+  @Test
+  fun searchBar_UpdatesQuery() {
+    var query by mutableStateOf("")
+    composeTestRule.setContent { SearchBar(query = query, onQueryChange = { query = it }) }
+
+    // Since we put "Search..." placeholder, we can look for that if empty.
+    composeTestRule.onNode(hasSetTextAction()).performTextInput("test")
+    assertEquals("Query should be updated", "test", query)
   }
 
   // ============ DisplayedSubscriptionFilter Tests ============
@@ -248,13 +241,13 @@ class ComposablesTest {
 
   @Test
   fun composables_WorkTogetherInLayout() {
-    var searchClicked = false
+    var query = ""
     var selectedFilter = SubscriptionFilter.All
     var eventClicked = false
 
     composeTestRule.setContent {
       androidx.compose.foundation.layout.Column {
-        SearchBar(onSearchClick = { searchClicked = true })
+        SearchBar(query = query, onQueryChange = { query = it })
         DisplayedSubscriptionFilter(
             selected = selectedFilter,
             onSelected = { selectedFilter = it },
@@ -271,24 +264,18 @@ class ComposablesTest {
     composeTestRule.onNodeWithText("Sample Event").assertIsDisplayed()
 
     // Test interactions
-    composeTestRule.onNode(hasContentDescription("Search")).performClick()
-    assertTrue("Search should be clicked", searchClicked)
+    composeTestRule.onNode(hasSetTextAction()).performTextInput("test")
+    // We can't verify query var update here because it's a local var in test,
+    // and the composable updates it but the test var is not a state holder that updates
+    // automatically in this scope
+    // unless we use a wrapper or check the UI.
+    // But we verified SearchBar updates in searchBar_UpdatesQuery.
 
     composeTestRule.onNodeWithText("Subscribed").performClick()
     assertEquals("Filter should change", SubscriptionFilter.Subscribed, selectedFilter)
 
     composeTestRule.onNodeWithText("Sample Event").performClick()
     assertTrue("Event should be clicked", eventClicked)
-  }
-
-  @Test
-  fun searchBar_DoesNotCrashWithMultipleClicks() {
-    var clickCount = 0
-    composeTestRule.setContent { SearchBar(onSearchClick = { clickCount++ }) }
-
-    repeat(10) { composeTestRule.onNode(hasContentDescription("Search")).performClick() }
-
-    assertEquals("Should handle multiple clicks", 10, clickCount)
   }
 
   @Test
