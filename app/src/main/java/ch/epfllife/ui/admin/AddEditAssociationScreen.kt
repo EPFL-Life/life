@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -18,6 +19,14 @@ import ch.epfllife.R
 import ch.epfllife.ui.association.SocialIcons
 import ch.epfllife.ui.composables.BackButton
 import ch.epfllife.ui.theme.LifeRed
+
+object AddEditAssociationTestTags {
+  const val HEADER = "AddEditAssociation_Header"
+  const val NAME_FIELD = "AddEditAssociation_NameField"
+  const val DESCRIPTION_FIELD = "AddEditAssociation_DescriptionField"
+  const val ABOUT_FIELD = "AddEditAssociation_AboutField"
+  const val SUBMIT_BUTTON = "AddEditAssociation_SubmitButton"
+}
 
 @Composable
 fun AddEditAssociationScreen(
@@ -44,7 +53,8 @@ fun AddEditAssociationScreen(
           // --- Header ---
           Text(
               text = stringResource(R.string.add_new_association),
-              style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
+              style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+              modifier = Modifier.testTag(AddEditAssociationTestTags.HEADER))
           HorizontalDivider(color = Color.Black)
 
           // --- General Info ---
@@ -58,19 +68,23 @@ fun AddEditAssociationScreen(
               value = formState.name,
               onValueChange = { viewModel.updateName(it) },
               label = { Text(stringResource(R.string.association_name_required)) },
-              modifier = Modifier.fillMaxWidth())
+              modifier = Modifier.fillMaxWidth().testTag(AddEditAssociationTestTags.NAME_FIELD))
 
           OutlinedTextField(
               value = formState.description,
               onValueChange = { viewModel.updateDescription(it) },
               label = { Text(stringResource(R.string.short_description_required)) },
-              modifier = Modifier.fillMaxWidth())
+              modifier =
+                  Modifier.fillMaxWidth().testTag(AddEditAssociationTestTags.DESCRIPTION_FIELD))
 
           OutlinedTextField(
               value = formState.about,
               onValueChange = { viewModel.updateAbout(it) },
               label = { Text(stringResource(R.string.about_association_required)) },
-              modifier = Modifier.fillMaxWidth().height(120.dp))
+              modifier =
+                  Modifier.fillMaxWidth()
+                      .height(120.dp)
+                      .testTag(AddEditAssociationTestTags.ABOUT_FIELD))
 
           // --- Social Pages ---
           Text(
@@ -132,7 +146,10 @@ fun AddEditAssociationScreen(
 
           // --- Submit Button ---
           Button(
-              modifier = Modifier.fillMaxWidth().height(50.dp),
+              modifier =
+                  Modifier.fillMaxWidth()
+                      .height(50.dp)
+                      .testTag(AddEditAssociationTestTags.SUBMIT_BUTTON),
               onClick = { viewModel.submit(onSubmitSuccess) },
               shape = RoundedCornerShape(6.dp),
               colors =

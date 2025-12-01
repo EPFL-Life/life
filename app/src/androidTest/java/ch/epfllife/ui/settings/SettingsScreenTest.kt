@@ -43,7 +43,15 @@ class SettingsScreenTest {
 
   @Test
   fun contentIsDisplayed() {
-    composeTestRule.setContent { SettingsScreen(auth = auth, onSignedOut = {}) }
+    composeTestRule.setContent {
+      SettingsScreen(
+          auth = auth,
+          onSignedOut = {},
+          onSelectAssociationClick = {},
+          onManageAssociationClick = {},
+          onManageAssociationEventsClick = {},
+          onAddNewAssociationClick = {})
+    }
     listOf(
             NavigationTestTags.SETTINGS_SCREEN,
             SettingsScreenTestTags.SIGN_OUT_BUTTON,
@@ -56,7 +64,14 @@ class SettingsScreenTest {
     Assert.assertNotNull(Firebase.auth.currentUser)
     var clicked = false
     composeTestRule.setContent {
-      SettingsScreen(auth = auth, onSignedOut = { clicked = true }, toastHelper = fakeToastHelper)
+      SettingsScreen(
+          auth = auth,
+          onSignedOut = { clicked = true },
+          toastHelper = fakeToastHelper,
+          onSelectAssociationClick = {},
+          onManageAssociationClick = {},
+          onManageAssociationEventsClick = {},
+          onAddNewAssociationClick = {})
     }
     composeTestRule.onNodeWithTag(SettingsScreenTestTags.SIGN_OUT_BUTTON).performClick()
     composeTestRule.waitUntil(5000) { clicked }
