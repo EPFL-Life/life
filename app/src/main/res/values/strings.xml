@@ -70,5 +70,13 @@
     <string name="error_unenroll_failed">Failed to unenroll: Please try again.</string>
     <string name="error_event_not_found">Failed to unenroll: Please try again.</string>
     <string name="error_loading_event">Failed to load event</string>
+    <string name="error_loading_associations">Failed to load associations: %1$s</string>
+    <string name="retry">Retry</string>
+
+
+    <!-- Admin -->
+    <string name="settings_screen_association">Select Association</string>
+    <string name="add_new_association">Add New Association</string>
+    <string name="edit_existing_association">Edit Existing Association</string>
 
 </resources>

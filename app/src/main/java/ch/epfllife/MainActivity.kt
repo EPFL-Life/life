@@ -23,6 +23,7 @@ import androidx.navigation.navArgument
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.db.Db
 import ch.epfllife.model.map.Location
+import ch.epfllife.ui.admin.SelectAssociationScreen
 import ch.epfllife.ui.association.AssociationBrowser
 import ch.epfllife.ui.association.AssociationDetailsScreen
 import ch.epfllife.ui.authentication.SignInScreen
@@ -183,7 +184,22 @@ fun App(
             SettingsScreen(
                 auth = auth,
                 onSignedOut = { navigationActions.navigateTo(Screen.SignIn) },
-            )
+                onSelectAssociationClick = {
+                  navigationActions.navigateTo(Screen.SelectAssociation)
+                })
+          }
+
+          composable(Screen.SelectAssociation.route) {
+            SelectAssociationScreen(
+                db = db,
+                onGoBack = { navController.popBackStack() },
+                onAssociationSelected = { associationId ->
+                  // TODO: Store selected association
+                  navController.popBackStack()
+                },
+                onAddNewAssociation = {
+                  // TODO: Navigate to future CreateAssociationScreen
+                })
           }
         }
       }
