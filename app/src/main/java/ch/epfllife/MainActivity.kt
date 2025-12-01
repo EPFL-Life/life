@@ -20,9 +20,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import ch.epfllife.model.association.Association
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.db.Db
 import ch.epfllife.model.map.Location
+import ch.epfllife.ui.admin.AddEditAssociationScreen
+import ch.epfllife.ui.admin.AddEditAssociationViewModel
 import ch.epfllife.ui.admin.SelectAssociationScreen
 import ch.epfllife.ui.association.AssociationBrowser
 import ch.epfllife.ui.association.AssociationDetailsScreen
@@ -186,7 +189,14 @@ fun App(
                 onSignedOut = { navigationActions.navigateTo(Screen.SignIn) },
                 onSelectAssociationClick = {
                   navigationActions.navigateTo(Screen.SelectAssociation)
-                })
+                },
+                onManageAssociationClick = { associationId ->
+                  navigationActions.navigateToAddEditAssociation(associationId)
+                },
+                onManageAssociationEventsClick = { associationId ->
+                  // placeholder, can navigate to manage events later
+                },
+                onAddNewAssociationClick = { navigationActions.navigateToAddEditAssociation() })
           }
 
           composable(Screen.SelectAssociation.route) {
@@ -194,13 +204,30 @@ fun App(
                 db = db,
                 onGoBack = { navController.popBackStack() },
                 onAssociationSelected = { associationId ->
-                  // TODO: Store selected association
                   navController.popBackStack()
+                  navigationActions.navigateTo(Screen.Settings)
                 },
-                onAddNewAssociation = {
-                  // TODO: Navigate to future CreateAssociationScreen
-                })
+                onAddNewAssociation = { navigationActions.navigateToAddEditAssociation() })
           }
+
+          composable(
+              route = Screen.AddEditAssociation.route,
+              arguments =
+                  listOf(
+                      navArgument(Screen.AddEditAssociation.ASSOCIATION_ID_ARG) {
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = null
+                      })) { backStackEntry ->
+                val associationId =
+                    backStackEntry.arguments?.getString(
+                        Screen.AddEditAssociation.ASSOCIATION_ID_ARG)
+                // For now, placeholder
+                val association: Association? = null // replace with db call later
+                AddEditAssociationScreen(
+                    viewModel = AddEditAssociationViewModel(association),
+                    onSubmitSuccess = { navController.popBackStack() })
+              }
         }
       }
 }

@@ -27,6 +27,18 @@ sealed class Screen(
   object Map : Screen(route = "map", name = "Map")
 
   object SelectAssociation : Screen("selectassociation", name = "SelectAssociation")
+
+  object AddEditAssociation :
+      Screen(
+          route = "add_edit_association?associationId={associationId}",
+          name = "AddEditAssociation") {
+    private const val BASE_ROUTE = "add_edit_association"
+    const val ASSOCIATION_ID_ARG = "associationId"
+
+    fun createRoute(associationId: String? = null): String =
+        if (associationId.isNullOrBlank()) BASE_ROUTE
+        else "$BASE_ROUTE?$ASSOCIATION_ID_ARG=$associationId"
+  }
 }
 
 open class NavigationActions(
@@ -66,9 +78,21 @@ open class NavigationActions(
     navController.navigate(route)
   }
 
+  fun navigateToAssociationDetails(associationId: String) {
+    navigateToScreenWithId(Screen.AssociationDetails, associationId)
+  }
+
+  fun navigateToAddEditAssociation(associationId: String? = null) {
+    navController.navigate(Screen.AddEditAssociation.createRoute(associationId))
+  }
+
   /** Navigate back to the previous screen. */
   open fun goBack() {
     navController.popBackStack()
+  }
+
+  open fun currentRoute(): String {
+    return navController.currentDestination?.route ?: ""
   }
 
   /**
@@ -76,12 +100,4 @@ open class NavigationActions(
    *
    * @return The current route
    */
-  open fun currentRoute(): String {
-    return navController.currentDestination?.route ?: ""
-  }
-
-  fun navigateToAssociationDetails(associationId: String) {
-    val route = "${Screen.AssociationDetails.route}/$associationId"
-    navController.navigate(route)
-  }
 }

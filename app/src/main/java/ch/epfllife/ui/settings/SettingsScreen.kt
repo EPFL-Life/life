@@ -45,7 +45,11 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = viewModel { SettingsViewModel(auth) },
     onSignedOut: () -> Unit,
     toastHelper: ToastHelper = SystemToastHelper(),
-    onSelectAssociationClick: () -> Unit
+    onSelectAssociationClick: () -> Unit,
+    onManageAssociationClick: (String) -> Unit,
+    onManageAssociationEventsClick: (String) -> Unit,
+    selectedAssociationName: String? = null,
+    onAddNewAssociationClick: () -> Unit // added
 ) {
   val context = LocalContext.current
   val uiState by viewModel.uiState.collectAsState()
@@ -88,9 +92,26 @@ fun SettingsScreen(
             }
         Spacer(Modifier.height(20.dp))
 
+        // Select Association
         SettingsButton(
-            text = stringResource(R.string.settings_screen_association),
+            text =
+                selectedAssociationName?.let { "Selected: $it" }
+                    ?: stringResource(R.string.settings_screen_association),
             onClick = onSelectAssociationClick,
             modifier = Modifier.fillMaxWidth())
+
+        Spacer(Modifier.height(16.dp))
+
+        selectedAssociationName?.let { name ->
+          SettingsButton(
+              text = stringResource(R.string.manage_association, name),
+              onClick = { onManageAssociationClick(name) },
+              modifier = Modifier.fillMaxWidth())
+
+          SettingsButton(
+              text = stringResource(R.string.manage_association_events, name),
+              onClick = { onManageAssociationEventsClick(name) },
+              modifier = Modifier.fillMaxWidth())
+        }
       }
 }
