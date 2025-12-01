@@ -48,8 +48,9 @@ fun SettingsScreen(
     onSelectAssociationClick: () -> Unit,
     onManageAssociationClick: (String) -> Unit,
     onManageAssociationEventsClick: (String) -> Unit,
+    selectedAssociationId: String? = null,
     selectedAssociationName: String? = null,
-    onAddNewAssociationClick: () -> Unit // added
+    onAddNewAssociationClick: () -> Unit
 ) {
   val context = LocalContext.current
   val uiState by viewModel.uiState.collectAsState()
@@ -95,22 +96,25 @@ fun SettingsScreen(
         // Select Association
         SettingsButton(
             text =
-                selectedAssociationName?.let { "Selected: $it" }
-                    ?: stringResource(R.string.settings_screen_association),
+                selectedAssociationName?.let {
+                  stringResource(R.string.settings_selected_association, it)
+                } ?: stringResource(R.string.settings_screen_association),
             onClick = onSelectAssociationClick,
             modifier = Modifier.fillMaxWidth())
 
         Spacer(Modifier.height(16.dp))
 
-        selectedAssociationName?.let { name ->
+        if (!selectedAssociationName.isNullOrBlank() && !selectedAssociationId.isNullOrBlank()) {
+          val associationName = selectedAssociationName
+          val associationId = selectedAssociationId
           SettingsButton(
-              text = stringResource(R.string.manage_association, name),
-              onClick = { onManageAssociationClick(name) },
+              text = stringResource(R.string.manage_association, associationName),
+              onClick = { onManageAssociationClick(associationId) },
               modifier = Modifier.fillMaxWidth())
-
+          Spacer(Modifier.height(16.dp))
           SettingsButton(
-              text = stringResource(R.string.manage_association_events, name),
-              onClick = { onManageAssociationEventsClick(name) },
+              text = stringResource(R.string.manage_association_events, associationName),
+              onClick = { onManageAssociationEventsClick(associationId) },
               modifier = Modifier.fillMaxWidth())
         }
       }
