@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.R
 import ch.epfllife.model.authentication.Auth
+import ch.epfllife.ui.composables.SettingsButton
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.theme.LifeRed
 import ch.epfllife.utils.SystemToastHelper
@@ -43,7 +44,8 @@ fun SettingsScreen(
     auth: Auth,
     viewModel: SettingsViewModel = viewModel { SettingsViewModel(auth) },
     onSignedOut: () -> Unit,
-    toastHelper: ToastHelper = SystemToastHelper()
+    toastHelper: ToastHelper = SystemToastHelper(),
+    onSelectAssociationClick: () -> Unit
 ) {
   val context = LocalContext.current
   val uiState by viewModel.uiState.collectAsState()
@@ -84,5 +86,11 @@ fun SettingsScreen(
                         MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold))
               }
             }
+        Spacer(Modifier.height(20.dp))
+
+        SettingsButton(
+            text = stringResource(R.string.settings_screen_association),
+            onClick = onSelectAssociationClick,
+            modifier = Modifier.fillMaxWidth())
       }
 }
