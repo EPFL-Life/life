@@ -206,7 +206,7 @@ class UserRepositoryLocal(
     if (!currentUser.subscriptions.contains(associationId)) {
       return Result.failure(
           IllegalArgumentException(
-              "User is already subscribed to association with ID: $associationId"))
+              "User is not subscribed to association with ID: $associationId"))
     }
 
     // case 5: user can unsubscribe to association
