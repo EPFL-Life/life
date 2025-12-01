@@ -80,4 +80,48 @@ class SettingsScreenTest {
         composeTestRule.activity.getString(R.string.signout_successful),
         fakeToastHelper.lastMessage)
   }
+
+  @Test
+  fun selectAssociationButtonInvokesCallback() {
+    var clicked = false
+    composeTestRule.setContent {
+      SettingsScreen(
+          auth = auth,
+          onSignedOut = {},
+          onSelectAssociationClick = { clicked = true },
+          onManageAssociationClick = {},
+          onManageAssociationEventsClick = {},
+          onAddNewAssociationClick = {})
+    }
+
+    composeTestRule.onNodeWithTag(SettingsScreenTestTags.SELECT_ASSOCIATION_BUTTON).performClick()
+    composeTestRule.waitUntil(5_000) { clicked }
+  }
+
+  @Test
+  fun manageButtonsVisibleAndClickableWhenAssociationSelected() {
+    val associationId = "asso-sat"
+    val associationName = "Satellite"
+    var manageClickedId: String? = null
+    var manageEventsClickedId: String? = null
+
+    composeTestRule.setContent {
+      SettingsScreen(
+          auth = auth,
+          onSignedOut = {},
+          selectedAssociationId = associationId,
+          selectedAssociationName = associationName,
+          onSelectAssociationClick = {},
+          onManageAssociationClick = { manageClickedId = it },
+          onManageAssociationEventsClick = { manageEventsClickedId = it },
+          onAddNewAssociationClick = {})
+    }
+
+    composeTestRule.onNodeWithTag(SettingsScreenTestTags.MANAGE_ASSOCIATION_BUTTON).performClick()
+    composeTestRule.onNodeWithTag(SettingsScreenTestTags.MANAGE_EVENTS_BUTTON).performClick()
+
+    composeTestRule.waitUntil(5_000) {
+      manageClickedId == associationId && manageEventsClickedId == associationId
+    }
+  }
 }

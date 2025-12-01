@@ -36,6 +36,9 @@ import ch.epfllife.utils.ToastHelper
 
 object SettingsScreenTestTags {
   const val SIGN_OUT_BUTTON = "signOutButton"
+  const val SELECT_ASSOCIATION_BUTTON = "selectAssociationButton"
+  const val MANAGE_ASSOCIATION_BUTTON = "manageAssociationButton"
+  const val MANAGE_EVENTS_BUTTON = "manageAssociationEventsButton"
 }
 
 @Composable
@@ -100,7 +103,8 @@ fun SettingsScreen(
                   stringResource(R.string.settings_selected_association, it)
                 } ?: stringResource(R.string.settings_screen_association),
             onClick = onSelectAssociationClick,
-            modifier = Modifier.fillMaxWidth())
+            modifier =
+                Modifier.fillMaxWidth().testTag(SettingsScreenTestTags.SELECT_ASSOCIATION_BUTTON))
 
         Spacer(Modifier.height(16.dp))
 
@@ -110,12 +114,14 @@ fun SettingsScreen(
           SettingsButton(
               text = stringResource(R.string.manage_association, associationName),
               onClick = { onManageAssociationClick(associationId) },
-              modifier = Modifier.fillMaxWidth())
+              modifier =
+                  Modifier.fillMaxWidth().testTag(SettingsScreenTestTags.MANAGE_ASSOCIATION_BUTTON))
           Spacer(Modifier.height(16.dp))
           SettingsButton(
               text = stringResource(R.string.manage_association_events, associationName),
               onClick = { onManageAssociationEventsClick(associationId) },
-              modifier = Modifier.fillMaxWidth())
+              modifier =
+                  Modifier.fillMaxWidth().testTag(SettingsScreenTestTags.MANAGE_EVENTS_BUTTON))
         }
       }
 }

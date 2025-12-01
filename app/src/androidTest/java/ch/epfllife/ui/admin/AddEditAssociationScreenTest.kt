@@ -8,6 +8,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTextInput
 import ch.epfllife.example_data.ExampleAssociations
+import ch.epfllife.model.association.Association
 import ch.epfllife.ui.theme.Theme
 import org.junit.Rule
 import org.junit.Test
@@ -16,9 +17,15 @@ class AddEditAssociationScreenTest {
 
   @get:Rule val composeTestRule = createComposeRule()
 
-  private fun setContent(viewModel: AddEditAssociationViewModel = AddEditAssociationViewModel()) {
+  private fun setContent(
+      viewModel: AddEditAssociationViewModel = AddEditAssociationViewModel(),
+      onSubmitSuccess: () -> Unit = {},
+  ) {
     composeTestRule.setContent {
-      Theme { AddEditAssociationScreen(viewModel = viewModel, onBack = {}, onSubmitSuccess = {}) }
+      Theme {
+        AddEditAssociationScreen(
+            viewModel = viewModel, onBack = {}, onSubmitSuccess = onSubmitSuccess)
+      }
     }
   }
 
@@ -28,7 +35,7 @@ class AddEditAssociationScreenTest {
 
     composeTestRule.onNodeWithTag(AddEditAssociationTestTags.SUBMIT_BUTTON).assertIsNotEnabled()
 
-    fillMandatoryFields("New Association", "Short description", "Detailed about section")
+    fillMandatoryFields(ExampleAssociations.association4)
 
     composeTestRule.onNodeWithTag(AddEditAssociationTestTags.SUBMIT_BUTTON).assertIsEnabled()
   }
@@ -51,7 +58,11 @@ class AddEditAssociationScreenTest {
     }
   }
 
-  private fun fillMandatoryFields(name: String, description: String, about: String) {
+  private fun fillMandatoryFields(association: Association) {
+    val name = association.name
+    val description = association.description
+    val about = association.about ?: "About ${association.name}"
+
     composeTestRule.onNodeWithTag(AddEditAssociationTestTags.NAME_FIELD).performTextInput(name)
     composeTestRule
         .onNodeWithTag(AddEditAssociationTestTags.DESCRIPTION_FIELD)
