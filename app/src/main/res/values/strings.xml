@@ -88,6 +88,8 @@
     <string name="logo_url">Logo URL</string>
     <string name="banner_url">Banner URL</string>
     <string name="submit">Submit</string>
+    <string name="settings_selected_association">Selected: %1$s</string>
+
 
 
     <!-- Extra -->

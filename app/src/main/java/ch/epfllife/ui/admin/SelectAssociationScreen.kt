@@ -14,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.R
+import ch.epfllife.model.association.Association
 import ch.epfllife.model.db.Db
 import ch.epfllife.ui.composables.AssociationCard
 import ch.epfllife.ui.composables.BackButton
@@ -24,7 +25,7 @@ import ch.epfllife.ui.composables.SettingsButton
 fun SelectAssociationScreen(
     db: Db,
     onGoBack: () -> Unit,
-    onAssociationSelected: (String) -> Unit,
+    onAssociationSelected: (Association) -> Unit,
     onAddNewAssociation: () -> Unit = {},
     viewModel: SelectAssociationViewModel = viewModel { SelectAssociationViewModel(db) }
 ) {
@@ -57,6 +58,7 @@ fun SelectAssociationScreen(
         is SelectAssociationUIState.Success -> {
           val state = uiState as SelectAssociationUIState.Success
           val associations = state.associations
+          val selectedID = state.selectedAssociationId
 
           Column(
               modifier =
@@ -82,7 +84,7 @@ fun SelectAssociationScreen(
                       association = association,
                       onClick = {
                         viewModel.selectAssociation(association.id)
-                        onAssociationSelected(association.id)
+                        onAssociationSelected(association)
                       })
                 }
               }
