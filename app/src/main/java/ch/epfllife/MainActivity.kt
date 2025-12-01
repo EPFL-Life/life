@@ -226,6 +226,7 @@ fun App(
                 val association: Association? = null // replace with db call later
                 AddEditAssociationScreen(
                     viewModel = AddEditAssociationViewModel(association),
+                    onBack = { navController.popBackStack() },
                     onSubmitSuccess = { navController.popBackStack() })
               }
         }

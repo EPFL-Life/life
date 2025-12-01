@@ -8,7 +8,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.R
@@ -47,9 +49,7 @@ fun SelectAssociationScreen(
                     text = stringResource(R.string.error_loading_association, message),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.error)
-
                 Spacer(Modifier.height(16.dp))
-
                 Button(onClick = { viewModel.reload() }) { Text(stringResource(R.string.retry)) }
               }
         }
@@ -57,26 +57,24 @@ fun SelectAssociationScreen(
         is SelectAssociationUIState.Success -> {
           val state = uiState as SelectAssociationUIState.Success
           val associations = state.associations
-          val selectedId = state.selectedAssociationId
 
           Column(
               modifier =
                   Modifier.fillMaxWidth()
                       .verticalScroll(rememberScrollState())
-                      .padding(top = 80.dp, start = 16.dp, end = 16.dp, bottom = 60.dp),
-              verticalArrangement = Arrangement.spacedBy(20.dp)) {
+                      .padding(top = 72.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
+              verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                // --- Header Title ---
+                Text(
+                    text = stringResource(R.string.settings_screen_association),
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
+                HorizontalDivider(color = Color.Black)
+                Spacer(Modifier.height(4.dp))
 
                 // Add New Association button
                 SettingsButton(
                     text = stringResource(R.string.add_new_association),
                     onClick = onAddNewAssociation)
-
-                // Title
-                Text(
-                    text = stringResource(R.string.edit_existing_association),
-                    style = MaterialTheme.typography.titleMedium)
-
-                HorizontalDivider()
 
                 // List of associations
                 associations.forEach { association ->
@@ -92,9 +90,7 @@ fun SelectAssociationScreen(
       }
     }
 
-    // Back button
-    BackButton(
-        modifier = Modifier.align(Alignment.TopStart).padding(top = 16.dp, start = 16.dp),
-        onGoBack = onGoBack)
+    // --- Back Button Overlay ---
+    BackButton(modifier = Modifier.align(Alignment.TopStart), onGoBack = onGoBack)
   }
 }
