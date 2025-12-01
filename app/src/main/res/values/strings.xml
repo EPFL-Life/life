@@ -71,4 +71,7 @@
     <string name="error_event_not_found">Failed to unenroll: Please try again.</string>
     <string name="error_loading_event">Failed to load event</string>
 
+    <!-- Extra -->
+    <string name="search_bar_placeholder">Search...</string>
+
 </resources>
