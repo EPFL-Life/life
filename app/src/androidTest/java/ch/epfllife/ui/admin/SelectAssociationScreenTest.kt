@@ -91,6 +91,33 @@ class SelectAssociationScreenTest {
     val fakeRepo = FakeAssociationRepository(associations.toList())
     return baseDb.copy(assocRepo = fakeRepo)
   }
+
+  @Test
+  fun addNewAssociationButtonInvokesCallback() {
+    val db = fakeDbWithAssociations(ExampleAssociations.association1)
+    var addNewClicked = false
+
+    composeTestRule.setContent {
+      Theme {
+        SelectAssociationScreen(
+            db = db,
+            onGoBack = {},
+            onAssociationSelected = {},
+            onAddNewAssociation = { addNewClicked = true })
+      }
+    }
+
+    composeTestRule.waitUntil(5_000) {
+      composeTestRule
+          .onAllNodes(hasTestTag(SelectAssociationTestTags.ADD_NEW_BUTTON))
+          .fetchSemanticsNodes()
+          .isNotEmpty()
+    }
+
+    composeTestRule.onNodeWithTag(SelectAssociationTestTags.ADD_NEW_BUTTON).performClick()
+
+    composeTestRule.waitUntil(5_000) { addNewClicked }
+  }
 }
 
 private class FakeAssociationRepository(
