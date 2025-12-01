@@ -78,6 +78,9 @@
     <string name="settings_screen_association">Select Association</string>
     <string name="add_new_association">Add New Association</string>
     <string name="edit_existing_association">Edit Existing Association</string>
+    <string name="manage_association">Manage %1$s</string>
+    <string name="manage_association_events">Manage %1$s\'s events</string>
+
 
     <!-- Extra -->
     <string name="search_bar_placeholder">Search...</string>

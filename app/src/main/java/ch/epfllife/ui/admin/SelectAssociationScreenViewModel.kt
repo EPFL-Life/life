@@ -11,9 +11,12 @@ import kotlinx.coroutines.launch
 sealed interface SelectAssociationUIState {
   object Loading : SelectAssociationUIState
 
-  data class Success(val associations: List<Association>) : SelectAssociationUIState
-
   data class Error(val message: String) : SelectAssociationUIState
+
+  data class Success(
+      val associations: List<Association>,
+      val selectedAssociationId: String? = null
+  ) : SelectAssociationUIState
 }
 
 class SelectAssociationViewModel(private val db: Db) : ViewModel() {
@@ -34,6 +37,13 @@ class SelectAssociationViewModel(private val db: Db) : ViewModel() {
       } catch (e: Exception) {
         _uiState.value = SelectAssociationUIState.Error(e.message ?: "Unknown error")
       }
+    }
+  }
+
+  fun selectAssociation(id: String) {
+    val current = _uiState.value
+    if (current is SelectAssociationUIState.Success) {
+      _uiState.value = current.copy(selectedAssociationId = id)
     }
   }
 

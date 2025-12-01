@@ -55,7 +55,9 @@ fun SelectAssociationScreen(
         }
 
         is SelectAssociationUIState.Success -> {
-          val associations = (uiState as SelectAssociationUIState.Success).associations
+          val state = uiState as SelectAssociationUIState.Success
+          val associations = state.associations
+          val selectedId = state.selectedAssociationId
 
           Column(
               modifier =
@@ -80,7 +82,10 @@ fun SelectAssociationScreen(
                 associations.forEach { association ->
                   AssociationCard(
                       association = association,
-                      onClick = { onAssociationSelected(association.id) })
+                      onClick = {
+                        viewModel.selectAssociation(association.id)
+                        onAssociationSelected(association.id)
+                      })
                 }
               }
         }
