@@ -23,13 +23,21 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 
 @Composable
-fun AssociationCard(association: Association, modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun AssociationCard(
+    association: Association,
+    modifier: Modifier = Modifier,
+    testTag: String? = null,
+    onClick: () -> Unit
+) {
+  val baseModifier = modifier.fillMaxWidth().padding(5.dp)
+  val taggedModifier =
+      if (testTag != null) baseModifier.testTag(testTag)
+      else baseModifier.testTag(AssociationCardTestTags.ASSOCIATION_CARD)
   Card(
       onClick = onClick,
       shape = RoundedCornerShape(12.dp),
       elevation = CardDefaults.elevatedCardElevation(5.dp),
-      modifier =
-          modifier.fillMaxWidth().padding(5.dp).testTag(AssociationCardTestTags.ASSOCIATION_CARD)) {
+      modifier = taggedModifier) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
