@@ -80,6 +80,14 @@
     <string name="edit_existing_association">Edit Existing Association</string>
     <string name="manage_association">Manage %1$s</string>
     <string name="manage_association_events">Manage %1$s\'s events</string>
+    <string name="general_info">General Information</string>
+    <string name="association_name_required">Association Name*</string>
+    <string name="short_description_required">Short Description*</string>
+    <string name="about_association_required">About the Association*</string>
+    <string name="upload_images">Upload Images</string>
+    <string name="logo_url">Logo URL</string>
+    <string name="banner_url">Banner URL</string>
+    <string name="submit">Submit</string>
 
 
 </resources>
