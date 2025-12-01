@@ -79,7 +79,7 @@ fun CalendarScreen(
   ) {
     Spacer(Modifier.height(40.dp))
 
-    SearchBar()
+    SearchBar(query = query, onQueryChange = { query = it })
 
     Spacer(Modifier.height(12.dp))
 

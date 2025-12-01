@@ -61,7 +61,8 @@ fun HomeScreen(
         }
 
         Spacer(Modifier.height(12.dp))
-        SearchBar()
+        var query by remember { mutableStateOf("") }
+        SearchBar(query = query, onQueryChange = { query = it })
 
         Spacer(Modifier.height(12.dp))
 
@@ -80,8 +81,15 @@ fun HomeScreen(
             } else {
               Pair(R.string.home_no_events_title, R.string.home_no_events_description)
             }
+
+        val filteredEvents =
+            shownEvents.filter {
+              it.title.contains(query, ignoreCase = true) ||
+                  it.association.name.contains(query, ignoreCase = true)
+            }
+
         ListView(
-            list = shownEvents,
+            list = filteredEvents,
             emptyTitle = stringResource(title),
             emptyDescription = stringResource(description),
             onRefresh = viewModel::refresh,

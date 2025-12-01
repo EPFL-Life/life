@@ -47,7 +47,8 @@ fun AssociationBrowser(
     // Empty space where the logo would normally be
     Spacer(Modifier.height(40.dp))
 
-    SearchBar()
+    var query by remember { mutableStateOf("") }
+    SearchBar(query = query, onQueryChange = { query = it })
 
     Spacer(Modifier.height(12.dp))
 
@@ -66,8 +67,10 @@ fun AssociationBrowser(
         } else {
           Pair(R.string.associations_no_all_title, R.string.associations_no_all_description)
         }
+    val filteredAssociations =
+        shownAssociations.filter { it.name.contains(query, ignoreCase = true) }
     ListView(
-        list = shownAssociations,
+        list = filteredAssociations,
         emptyTitle = stringResource(id = title),
         emptyDescription = stringResource(id = description),
         onRefresh = viewModel::refresh,
