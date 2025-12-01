@@ -248,8 +248,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     // case 3: the user is trying to unsubscribe from an association they are not subscribed to
     if (!currentUser.subscriptions.contains(associationId)) {
       return Result.failure(
-          IllegalArgumentException(
-            "User is not subscribed to association with ID: $associationId"))
+          IllegalArgumentException("User is not subscribed to association with ID: $associationId"))
     }
 
     // case 4: user can unsubscribe to association
