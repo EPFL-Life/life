@@ -6,11 +6,9 @@ import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.Event
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 sealed interface ManageEventsUIState {
   object Loading : ManageEventsUIState
@@ -41,7 +39,7 @@ class ManageEventsViewModel(private val db: Db, private val associationId: Strin
   private suspend fun loadEvents() {
     _uiState.value = ManageEventsUIState.Loading
 
-    val result = withContext(Dispatchers.IO) { db.assocRepo.getEventsForAssociation(associationId) }
+    val result = db.assocRepo.getEventsForAssociation(associationId)
 
     result.fold(
         onSuccess = { events ->

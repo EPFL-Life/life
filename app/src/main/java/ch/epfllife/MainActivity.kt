@@ -352,12 +352,11 @@ fun App(
                           value =
                               runCatching {
                                     val association =
-                                        withContext(Dispatchers.IO) {
-                                          db.assocRepo.getAssociation(associationId)
-                                        }
+                                        db.assocRepo.getAssociation(associationId)
                                             ?: throw IllegalStateException(
                                                 context.getString(
                                                     R.string.error_association_not_found))
+
                                     AddEditEventPayload(association = association, event = null)
                                   }
                                   .fold(
@@ -372,9 +371,11 @@ fun App(
 
                 when (val state = payloadState) {
                   LoadState.Loading -> FullScreenLoader()
+
                   is LoadState.Error ->
                       FullScreenError(
                           message = state.message, onBack = { navigationActions.goBack() })
+
                   is LoadState.Success -> {
                     AddEditEventScreen(
                         db = db,
@@ -403,6 +404,7 @@ fun App(
                 val associationId =
                     backStackEntry.arguments?.getString(Screen.AddEditEvent.ARG_ASSOCIATION_ID)
                         ?: ""
+
                 val eventId =
                     backStackEntry.arguments?.getString(Screen.AddEditEvent.ARG_EVENT_ID) ?: ""
 
@@ -411,18 +413,18 @@ fun App(
                         initialValue = LoadState.Loading, key1 = associationId, key2 = eventId) {
                           value =
                               runCatching {
-                                    withContext(Dispatchers.IO) {
-                                      val association =
-                                          db.assocRepo.getAssociation(associationId)
-                                              ?: throw IllegalStateException(
-                                                  context.getString(
-                                                      R.string.error_association_not_found))
-                                      val event =
-                                          db.eventRepo.getEvent(eventId)
-                                              ?: throw IllegalStateException(
-                                                  context.getString(R.string.error_loading_event))
-                                      AddEditEventPayload(association = association, event = event)
-                                    }
+                                    val association =
+                                        db.assocRepo.getAssociation(associationId)
+                                            ?: throw IllegalStateException(
+                                                context.getString(
+                                                    R.string.error_association_not_found))
+
+                                    val event =
+                                        db.eventRepo.getEvent(eventId)
+                                            ?: throw IllegalStateException(
+                                                context.getString(R.string.error_loading_event))
+
+                                    AddEditEventPayload(association = association, event = event)
                                   }
                                   .fold(
                                       onSuccess = { LoadState.Success(it) },
@@ -435,21 +437,22 @@ fun App(
 
                 when (val state = payloadState) {
                   LoadState.Loading -> FullScreenLoader()
+
                   is LoadState.Error ->
                       FullScreenError(
                           message = state.message, onBack = { navigationActions.goBack() })
-                  is LoadState.Success -> {
-                    AddEditEventScreen(
-                        db = db,
-                        association = state.data.association,
-                        initialEvent = state.data.event,
-                        onBack = { navigationActions.goBack() },
-                        onSubmitSuccess = { navigationActions.goBack() },
-                        onPreviewLocation = { location ->
-                          val encoded = Uri.encode(Json.encodeToString(location))
-                          navigationActions.navigateToScreenWithId(Screen.Map, encoded)
-                        })
-                  }
+
+                  is LoadState.Success ->
+                      AddEditEventScreen(
+                          db = db,
+                          association = state.data.association,
+                          initialEvent = state.data.event,
+                          onBack = { navigationActions.goBack() },
+                          onSubmitSuccess = { navigationActions.goBack() },
+                          onPreviewLocation = { location ->
+                            val encoded = Uri.encode(Json.encodeToString(location))
+                            navigationActions.navigateToScreenWithId(Screen.Map, encoded)
+                          })
                 }
               }
         }
