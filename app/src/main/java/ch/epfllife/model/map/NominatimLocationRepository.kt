@@ -13,9 +13,8 @@ import org.json.JSONArray
 class NominatimLocationRepository(
     private val client: OkHttpClient,
     private val userAgent: String = DEFAULT_USER_AGENT,
-    private val referer: String =
-        DEFAULT_REFERER private
-            val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val referer: String = DEFAULT_REFERER,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : LocationRepository {
 
   private fun parseBody(body: String): List<Location> {
