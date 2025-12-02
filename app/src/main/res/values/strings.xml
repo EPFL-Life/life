@@ -74,7 +74,7 @@
     <string name="retry">Retry</string>
 
 
-    <!-- Admin -->
+    <!-- Admin Association-->
     <string name="settings_screen_association">Select Association</string>
     <string name="add_new_association">Add New Association</string>
     <string name="manage_association">Manage %1$s</string>
@@ -88,6 +88,22 @@
     <string name="banner_url">Banner URL</string>
     <string name="submit">Submit</string>
     <string name="settings_selected_association">Selected: %1$s</string>
+
+    <!-- Manage events -->
+    <string name="manage_events_title">Manage Events</string>
+    <string name="add_new_event">Add New Event</string>
+    <string name="manage_events_empty">No upcoming events for this association.</string>
+    <string name="error_loading_events">Failed to load events: %1$s</string>
+
+    <!-- Add/Edit event form -->
+    <string name="edit_event">Edit Event</string>
+    <string name="event_title_required">Title*</string>
+    <string name="event_description_required">Description*</string>
+    <string name="event_location_required">Location*</string>
+    <string name="event_time_required">Time*</string>
+    <string name="event_price_optional">Price (optional)</string>
+    <string name="event_tags">Tags (comma separated)</string>
+    <string name="event_picture_url">Picture URL</string>
 
 
 
