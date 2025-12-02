@@ -20,7 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -124,14 +124,14 @@ fun AddEditEventScreen(
                   if (initialEvent == null) stringResource(R.string.add_new_event)
                   else stringResource(R.string.edit_event),
               style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
-          Divider(color = MaterialTheme.colorScheme.onSurfaceVariant)
+          HorizontalDivider(color = MaterialTheme.colorScheme.onSurfaceVariant)
 
           // --- General Info ---
           Text(
               text = stringResource(R.string.general_info),
               color = MaterialTheme.colorScheme.outline,
               style = MaterialTheme.typography.titleSmall)
-          Divider()
+          HorizontalDivider()
 
           OutlinedTextField(
               value = formState.title,
@@ -184,7 +184,7 @@ fun AddEditEventScreen(
               text = stringResource(R.string.event_location_section_title),
               color = MaterialTheme.colorScheme.outline,
               style = MaterialTheme.typography.titleSmall)
-          Divider()
+          HorizontalDivider()
 
           OutlinedTextField(
               value = formState.locationName,

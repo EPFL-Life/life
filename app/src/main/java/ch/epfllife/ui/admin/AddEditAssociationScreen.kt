@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -76,7 +75,7 @@ fun AddEditAssociationScreen(
               text = stringResource(R.string.general_info),
               color = MaterialTheme.colorScheme.outline,
               style = MaterialTheme.typography.titleSmall)
-          Divider()
+          HorizontalDivider()
 
           OutlinedTextField(
               value = formState.name,
@@ -105,7 +104,7 @@ fun AddEditAssociationScreen(
               text = stringResource(R.string.social_pages_title),
               color = MaterialTheme.colorScheme.outline,
               style = MaterialTheme.typography.titleSmall)
-          Divider()
+          HorizontalDivider()
 
           formState.socialMedia.forEach { sm ->
             Row(
