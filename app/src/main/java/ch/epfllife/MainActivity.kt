@@ -205,7 +205,7 @@ fun App(
                 onManageAssociationClick = { associationId ->
                   navigationActions.navigateToAddEditAssociation(associationId)
                 },
-                onManageAssociationEventsClick = { associationId ->
+                onManageAssociationEventsClick = { _ -> // use AssociationID
                   // TODO: placeholder, can navigate to manage events later
                 },
                 selectedAssociationId = selectedAssociationId,

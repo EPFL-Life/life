@@ -48,7 +48,6 @@ fun SelectAssociationScreen(
         }
 
         is SelectAssociationUIState.Error -> {
-          val message = (uiState as SelectAssociationUIState.Error).message
           Column(
               modifier = Modifier.fillMaxSize().padding(horizontal = 32.dp),
               verticalArrangement = Arrangement.Center,
@@ -65,7 +64,6 @@ fun SelectAssociationScreen(
         is SelectAssociationUIState.Success -> {
           val state = uiState as SelectAssociationUIState.Success
           val associations = state.associations
-          val selectedID = state.selectedAssociationId
 
           Column(
               modifier =
