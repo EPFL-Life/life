@@ -2,6 +2,7 @@ package ch.epfllife.model.map
 
 import android.util.Log
 import java.io.IOException
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
@@ -9,7 +10,10 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONArray
 
-class NominatimLocationRepository(private val client: OkHttpClient) : LocationRepository {
+class NominatimLocationRepository(
+    private val client: OkHttpClient,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+) : LocationRepository {
 
   private fun parseBody(body: String): List<Location> {
     val jsonArray = JSONArray(body)
@@ -24,7 +28,7 @@ class NominatimLocationRepository(private val client: OkHttpClient) : LocationRe
   }
 
   override suspend fun search(query: String): List<Location> =
-      withContext(Dispatchers.IO) {
+      withContext(dispatcher) {
         // Using HttpUrl.Builder to properly construct the URL with query parameters.
         val url =
             HttpUrl.Builder()
