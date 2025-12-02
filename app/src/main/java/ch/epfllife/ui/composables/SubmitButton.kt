@@ -32,4 +32,3 @@ fun SubmitButton(modifier: Modifier = Modifier, enabled: Boolean, onClick: () ->
         }
       }
 }
-

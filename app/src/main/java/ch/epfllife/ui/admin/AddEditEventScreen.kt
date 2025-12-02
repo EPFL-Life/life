@@ -1,27 +1,58 @@
 package ch.epfllife.ui.admin
 
-import androidx.compose.foundation.layout.*
+import android.Manifest
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
+import android.content.pm.PackageManager
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import ch.epfllife.BuildConfig
 import ch.epfllife.R
 import ch.epfllife.model.association.Association
 import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.Event
+import ch.epfllife.model.map.Location
+import ch.epfllife.model.map.NominatimLocationRepository
 import ch.epfllife.ui.composables.BackButton
+import ch.epfllife.ui.composables.Map
 import ch.epfllife.ui.composables.SubmitButton
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import okhttp3.OkHttpClient
 
 @Composable
 fun AddEditEventScreen(
@@ -30,12 +61,53 @@ fun AddEditEventScreen(
     initialEvent: Event? = null,
     onBack: () -> Unit,
     onSubmitSuccess: () -> Unit,
-    viewModel: AddEditEventViewModel = viewModel {
-      AddEditEventViewModel(db, association, initialEvent)
-    }
+    onPreviewLocation: (Location) -> Unit = {},
 ) {
+  val locationRepository =
+      remember {
+        val ua =
+            "${BuildConfig.APPLICATION_ID}/${BuildConfig.VERSION_NAME} (contact@epfllife.app)"
+        NominatimLocationRepository(OkHttpClient(), userAgent = ua, referer = "https://epfllife.app")
+      }
+  val viewModel: AddEditEventViewModel =
+      viewModel { AddEditEventViewModel(db, association, initialEvent, locationRepository) }
   val formState by viewModel.formState.collectAsState()
   val scroll = rememberScrollState()
+  val context = LocalContext.current
+  val dateTimeFormatter = remember { DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm") }
+  val interactionSource = remember { MutableInteractionSource() }
+
+  fun parseCurrentDateTime(): LocalDateTime {
+    return try {
+      LocalDateTime.parse(formState.time, dateTimeFormatter)
+    } catch (_: Exception) {
+      LocalDateTime.now()
+    }
+  }
+
+  fun showTimePicker(selectedDate: LocalDate) {
+    val initial = parseCurrentDateTime()
+    TimePickerDialog(
+            context,
+            { _, hourOfDay, minute ->
+              val combinedDateTime =
+                  LocalDateTime.of(selectedDate, LocalTime.of(hourOfDay, minute))
+              viewModel.updateTime(combinedDateTime.format(dateTimeFormatter))
+            },
+            initial.hour,
+            initial.minute,
+            true)
+        .show()
+  }
+
+  fun showDatePicker() {
+    val initial = parseCurrentDateTime()
+    DatePickerDialog(context, { _, year, month, dayOfMonth ->
+          val selectedDate = LocalDate.of(year, month + 1, dayOfMonth)
+          showTimePicker(selectedDate)
+        }, initial.year, initial.monthValue - 1, initial.dayOfMonth)
+        .show()
+  }
 
   Box(modifier = Modifier.fillMaxSize()) {
     Column(
@@ -43,13 +115,20 @@ fun AddEditEventScreen(
             Modifier.fillMaxSize()
                 .verticalScroll(scroll)
                 .padding(top = 72.dp, start = 16.dp, end = 16.dp, bottom = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        verticalArrangement = Arrangement.spacedBy(16.dp)) {
+          // --- Header ---
           Text(
               text =
                   if (initialEvent == null) stringResource(R.string.add_new_event)
                   else stringResource(R.string.edit_event),
               style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
+          Divider(color = MaterialTheme.colorScheme.onSurfaceVariant)
 
+          // --- General Info ---
+          Text(
+              text = stringResource(R.string.general_info),
+              color = MaterialTheme.colorScheme.outline,
+              style = MaterialTheme.typography.titleSmall)
           Divider()
 
           OutlinedTextField(
@@ -64,17 +143,21 @@ fun AddEditEventScreen(
               label = { Text(stringResource(R.string.event_description_required)) },
               modifier = Modifier.fillMaxWidth().height(120.dp))
 
-          OutlinedTextField(
-              value = formState.locationName,
-              onValueChange = { viewModel.updateLocationName(it) },
-              label = { Text(stringResource(R.string.event_location_required)) },
-              modifier = Modifier.fillMaxWidth())
-
-          OutlinedTextField(
-              value = formState.time,
-              onValueChange = { viewModel.updateTime(it) },
-              label = { Text(stringResource(R.string.event_time_required)) },
-              modifier = Modifier.fillMaxWidth())
+          Box {
+            OutlinedTextField(
+                value = formState.time,
+                onValueChange = {},
+                label = { Text(stringResource(R.string.event_time_required)) },
+                readOnly = true,
+                modifier = Modifier.fillMaxWidth())
+            Box(
+                modifier =
+                    Modifier.matchParentSize()
+                        .clickable(
+                            interactionSource = interactionSource,
+                            indication = null,
+                            onClick = { showDatePicker() }))
+          }
 
           OutlinedTextField(
               value = formState.priceText,
@@ -93,6 +176,92 @@ fun AddEditEventScreen(
               onValueChange = { viewModel.updatePictureUrl(it) },
               label = { Text(stringResource(R.string.event_picture_url)) },
               modifier = Modifier.fillMaxWidth())
+
+          // --- Location Section ---
+          Text(
+              text = stringResource(R.string.event_location_section_title),
+              color = MaterialTheme.colorScheme.outline,
+              style = MaterialTheme.typography.titleSmall)
+          Divider()
+
+          OutlinedTextField(
+              value = formState.locationName,
+              onValueChange = { viewModel.updateLocationName(it) },
+              label = { Text(stringResource(R.string.event_location_name_label)) },
+              modifier = Modifier.fillMaxWidth())
+
+          Button(
+              onClick = { viewModel.onManualLocationLookup() },
+              enabled = formState.locationName.isNotBlank() && !formState.isLocationSearching) {
+                Text(stringResource(R.string.event_location_search))
+              }
+
+          if (formState.isLocationSearching) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                  CircularProgressIndicator(modifier = Modifier.height(18.dp), strokeWidth = 2.dp)
+                  Text(stringResource(R.string.event_location_searching))
+                }
+          }
+
+          formState.locationErrorRes?.let { res ->
+            Text(
+                text = stringResource(res),
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall)
+          }
+
+          if (formState.locationLatitude != null && formState.locationLongitude != null) {
+            val resolvedName = formState.resolvedLocationName
+            Text(
+                text = stringResource(R.string.event_location_coordinates),
+                style = MaterialTheme.typography.titleMedium)
+            resolvedName?.let { resolved ->
+              Text(
+                  text = stringResource(R.string.event_location_resolved_description, resolved),
+                  style = MaterialTheme.typography.bodySmall,
+                  color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            OutlinedTextField(
+                value = formState.locationLatitude.toString(),
+                onValueChange = {},
+                readOnly = true,
+                label = { Text(stringResource(R.string.event_location_latitude)) },
+                modifier = Modifier.fillMaxWidth())
+            OutlinedTextField(
+                value = formState.locationLongitude.toString(),
+                onValueChange = {},
+                readOnly = true,
+                label = { Text(stringResource(R.string.event_location_longitude)) },
+                modifier = Modifier.fillMaxWidth())
+
+            val previewLocation =
+                remember(formState.locationLatitude, formState.locationLongitude, resolvedName) {
+                  Location(
+                      latitude = formState.locationLatitude!!,
+                      longitude = formState.locationLongitude!!,
+                      name = resolvedName ?: formState.locationName)
+                }
+
+            Box(
+                modifier = Modifier.fillMaxWidth().height(200.dp).clip(RoundedCornerShape(8.dp))) {
+                  Map(
+                      target = previewLocation,
+                      enableControls = false,
+                      locationPermissionRequest = { result ->
+                        val granted =
+                            ContextCompat.checkSelfPermission(
+                                context, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                                PackageManager.PERMISSION_GRANTED
+                        result(granted)
+                      })
+                  Spacer(
+                      modifier =
+                          Modifier.matchParentSize()
+                              .clickable { onPreviewLocation(previewLocation) })
+                }
+          }
 
           Spacer(Modifier.height(12.dp))
 

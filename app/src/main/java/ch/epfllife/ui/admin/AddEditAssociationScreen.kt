@@ -3,19 +3,17 @@ package ch.epfllife.ui.admin
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Divider
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -47,9 +45,10 @@ fun AddEditAssociationScreen(
       formState.name.takeIf { it.isNotBlank() } ?: viewModel.initialAssociationName
   val headerText =
       if (viewModel.isEditing) {
-        associationNameForTitle.takeIf { it.isNotBlank() }?.let {
-          stringResource(R.string.manage_association, it)
-        } ?: stringResource(R.string.manage_association_fallback)
+        associationNameForTitle
+            .takeIf { it.isNotBlank() }
+            ?.let { stringResource(R.string.manage_association, it) }
+            ?: stringResource(R.string.manage_association_fallback)
       } else stringResource(R.string.add_new_association)
 
   Box(modifier = Modifier.fillMaxSize()) {
