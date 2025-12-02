@@ -21,7 +21,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -63,14 +62,13 @@ fun AddEditEventScreen(
     onSubmitSuccess: () -> Unit,
     onPreviewLocation: (Location) -> Unit = {},
 ) {
-  val locationRepository =
-      remember {
-        val ua =
-            "${BuildConfig.APPLICATION_ID}/${BuildConfig.VERSION_NAME} (contact@epfllife.app)"
-        NominatimLocationRepository(OkHttpClient(), userAgent = ua, referer = "https://epfllife.app")
-      }
-  val viewModel: AddEditEventViewModel =
-      viewModel { AddEditEventViewModel(db, association, initialEvent, locationRepository) }
+  val locationRepository = remember {
+    val ua = "${BuildConfig.APPLICATION_ID}/${BuildConfig.VERSION_NAME} (contact@epfllife.app)"
+    NominatimLocationRepository(OkHttpClient(), userAgent = ua, referer = "https://epfllife.app")
+  }
+  val viewModel: AddEditEventViewModel = viewModel {
+    AddEditEventViewModel(db, association, initialEvent, locationRepository)
+  }
   val formState by viewModel.formState.collectAsState()
   val scroll = rememberScrollState()
   val context = LocalContext.current
@@ -90,8 +88,7 @@ fun AddEditEventScreen(
     TimePickerDialog(
             context,
             { _, hourOfDay, minute ->
-              val combinedDateTime =
-                  LocalDateTime.of(selectedDate, LocalTime.of(hourOfDay, minute))
+              val combinedDateTime = LocalDateTime.of(selectedDate, LocalTime.of(hourOfDay, minute))
               viewModel.updateTime(combinedDateTime.format(dateTimeFormatter))
             },
             initial.hour,
@@ -102,10 +99,15 @@ fun AddEditEventScreen(
 
   fun showDatePicker() {
     val initial = parseCurrentDateTime()
-    DatePickerDialog(context, { _, year, month, dayOfMonth ->
-          val selectedDate = LocalDate.of(year, month + 1, dayOfMonth)
-          showTimePicker(selectedDate)
-        }, initial.year, initial.monthValue - 1, initial.dayOfMonth)
+    DatePickerDialog(
+            context,
+            { _, year, month, dayOfMonth ->
+              val selectedDate = LocalDate.of(year, month + 1, dayOfMonth)
+              showTimePicker(selectedDate)
+            },
+            initial.year,
+            initial.monthValue - 1,
+            initial.dayOfMonth)
         .show()
   }
 
@@ -244,23 +246,21 @@ fun AddEditEventScreen(
                       name = resolvedName ?: formState.locationName)
                 }
 
-            Box(
-                modifier = Modifier.fillMaxWidth().height(200.dp).clip(RoundedCornerShape(8.dp))) {
-                  Map(
-                      target = previewLocation,
-                      enableControls = false,
-                      locationPermissionRequest = { result ->
-                        val granted =
-                            ContextCompat.checkSelfPermission(
-                                context, Manifest.permission.ACCESS_FINE_LOCATION) ==
-                                PackageManager.PERMISSION_GRANTED
-                        result(granted)
-                      })
-                  Spacer(
-                      modifier =
-                          Modifier.matchParentSize()
-                              .clickable { onPreviewLocation(previewLocation) })
-                }
+            Box(modifier = Modifier.fillMaxWidth().height(200.dp).clip(RoundedCornerShape(8.dp))) {
+              Map(
+                  target = previewLocation,
+                  enableControls = false,
+                  locationPermissionRequest = { result ->
+                    val granted =
+                        ContextCompat.checkSelfPermission(
+                            context, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                            PackageManager.PERMISSION_GRANTED
+                    result(granted)
+                  })
+              Spacer(
+                  modifier =
+                      Modifier.matchParentSize().clickable { onPreviewLocation(previewLocation) })
+            }
           }
 
           Spacer(Modifier.height(12.dp))
