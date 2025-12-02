@@ -3,20 +3,29 @@ package ch.epfllife
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.credentials.CredentialManager
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -24,6 +33,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import ch.epfllife.R
 import ch.epfllife.model.association.Association
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.db.Db
@@ -48,11 +58,24 @@ import ch.epfllife.ui.navigation.Screen
 import ch.epfllife.ui.navigation.Tab
 import ch.epfllife.ui.settings.SettingsScreen
 import ch.epfllife.ui.theme.Theme
+import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.coroutines.withContext
 
 private const val selectedAssociationIdKey = "selectedAssociationId"
 private const val selectedAssociationNameKey = "selectedAssociationName"
+
+private sealed class LoadState<out T> {
+  object Loading : LoadState<Nothing>()
+  data class Success<T>(val data: T) : LoadState<T>()
+  data class Error(val message: String) : LoadState<Nothing>()
+}
+
+private data class AddEditEventPayload(
+    val association: Association,
+    val event: Event?
+)
 
 class MainActivity : ComponentActivity() {
 
@@ -107,6 +130,8 @@ fun App(
         Screen.Settings.route -> true
         else -> false
       }
+
+  val context = LocalContext.current
 
   Scaffold(
       bottomBar = {
@@ -247,12 +272,48 @@ fun App(
                 val associationId =
                     backStackEntry.arguments?.getString(
                         Screen.AddEditAssociation.ASSOCIATION_ID_ARG)
-                // TODO: For now, placeholder
-                val association: Association? = null // TODO: replace with db call later
-                AddEditAssociationScreen(
-                    viewModel = AddEditAssociationViewModel(association),
-                    onBack = { navController.popBackStack() },
-                    onSubmitSuccess = { navController.popBackStack() })
+
+                if (associationId.isNullOrBlank()) {
+                  AddEditAssociationScreen(
+                      viewModel = AddEditAssociationViewModel(null),
+                      onBack = { navController.popBackStack() },
+                      onSubmitSuccess = { navController.popBackStack() })
+                } else {
+                  val associationState by
+                      produceState<LoadState<Association>>(
+                          initialValue = LoadState.Loading, key1 = associationId) {
+                        value =
+                            runCatching {
+                                  withContext(Dispatchers.IO) {
+                                    db.assocRepo.getAssociation(associationId)
+                                  }
+                                      ?: throw IllegalStateException(
+                                          context.getString(
+                                              R.string.error_association_not_found))
+                                }
+                                .fold(
+                                    onSuccess = { LoadState.Success(it) },
+                                    onFailure = {
+                                      LoadState.Error(
+                                          it.message
+                                              ?: context.getString(
+                                                  R.string.error_loading_association))
+                                    })
+                      }
+
+                  when (val state = associationState) {
+                    LoadState.Loading -> FullScreenLoader()
+                    is LoadState.Error ->
+                        FullScreenError(
+                            message = state.message, onBack = { navigationActions.goBack() })
+                    is LoadState.Success -> {
+                      AddEditAssociationScreen(
+                          viewModel = AddEditAssociationViewModel(state.data),
+                          onBack = { navController.popBackStack() },
+                          onSubmitSuccess = { navController.popBackStack() })
+                    }
+                  }
+                }
               }
 
           composable(
@@ -287,19 +348,42 @@ fun App(
                     backStackEntry.arguments?.getString(Screen.AddEditEvent.ARG_ASSOCIATION_ID)
                         ?: ""
 
-                var association by remember { mutableStateOf<Association?>(null) }
+                val payloadState by
+                    produceState<LoadState<AddEditEventPayload>>(
+                        initialValue = LoadState.Loading, key1 = associationId) {
+                      value =
+                          runCatching {
+                                val association =
+                                    withContext(Dispatchers.IO) {
+                                      db.assocRepo.getAssociation(associationId)
+                                    }
+                                        ?: throw IllegalStateException(
+                                            context.getString(R.string.error_association_not_found))
+                                AddEditEventPayload(association = association, event = null)
+                              }
+                              .fold(
+                                  onSuccess = { LoadState.Success(it) },
+                                  onFailure = {
+                                    LoadState.Error(
+                                        it.message
+                                            ?: context.getString(
+                                                R.string.error_loading_association))
+                                  })
+                    }
 
-                LaunchedEffect(associationId) {
-                  association = db.assocRepo.getAssociation(associationId) // ✔ correct method
-                }
-
-                association?.let {
-                  AddEditEventScreen(
-                      db = db,
-                      association = it,
-                      initialEvent = null,
-                      onBack = { navigationActions.goBack() },
-                      onSubmitSuccess = { navigationActions.goBack() })
+                when (val state = payloadState) {
+                  LoadState.Loading -> FullScreenLoader()
+                  is LoadState.Error ->
+                      FullScreenError(
+                          message = state.message, onBack = { navigationActions.goBack() })
+                  is LoadState.Success -> {
+                    AddEditEventScreen(
+                        db = db,
+                        association = state.data.association,
+                        initialEvent = state.data.event,
+                        onBack = { navigationActions.goBack() },
+                        onSubmitSuccess = { navigationActions.goBack() })
+                  }
                 }
               }
 
@@ -319,26 +403,70 @@ fun App(
                 val eventId =
                     backStackEntry.arguments?.getString(Screen.AddEditEvent.ARG_EVENT_ID) ?: ""
 
-                var association by remember { mutableStateOf<Association?>(null) }
-                var event by remember { mutableStateOf<Event?>(null) }
+                val payloadState by
+                    produceState<LoadState<AddEditEventPayload>>(
+                        initialValue = LoadState.Loading, key1 = associationId, key2 = eventId) {
+                      value =
+                          runCatching {
+                                withContext(Dispatchers.IO) {
+                                  val association =
+                                      db.assocRepo.getAssociation(associationId)
+                                          ?: throw IllegalStateException(
+                                              context.getString(
+                                                  R.string.error_association_not_found))
+                                  val event =
+                                      db.eventRepo.getEvent(eventId)
+                                          ?: throw IllegalStateException(
+                                              context.getString(R.string.error_loading_event))
+                                  AddEditEventPayload(association = association, event = event)
+                                }
+                              }
+                              .fold(
+                                  onSuccess = { LoadState.Success(it) },
+                                  onFailure = {
+                                    LoadState.Error(
+                                        it.message
+                                            ?: context.getString(R.string.error_loading_event))
+                                  })
+                    }
 
-                LaunchedEffect(associationId, eventId) {
-                  association = db.assocRepo.getAssociation(associationId) // ✔ correct method
-                  event = db.eventRepo.getEvent(eventId) // ✔ correct method
-                }
-
-                val assoc = association
-                val evt = event
-
-                if (assoc != null) {
-                  AddEditEventScreen(
-                      db = db,
-                      association = assoc,
-                      initialEvent = evt,
-                      onBack = { navigationActions.goBack() },
-                      onSubmitSuccess = { navigationActions.goBack() })
+                when (val state = payloadState) {
+                  LoadState.Loading -> FullScreenLoader()
+                  is LoadState.Error ->
+                      FullScreenError(
+                          message = state.message, onBack = { navigationActions.goBack() })
+                  is LoadState.Success -> {
+                    AddEditEventScreen(
+                        db = db,
+                        association = state.data.association,
+                        initialEvent = state.data.event,
+                        onBack = { navigationActions.goBack() },
+                        onSubmitSuccess = { navigationActions.goBack() })
+                  }
                 }
               }
         }
       }
+}
+
+@Composable
+private fun FullScreenLoader() {
+  Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    CircularProgressIndicator()
+  }
+}
+
+@Composable
+private fun FullScreenError(message: String, onBack: () -> Unit) {
+  Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(12.dp)) {
+          Text(
+              text = message,
+              style = MaterialTheme.typography.bodyMedium,
+              color = MaterialTheme.colorScheme.error)
+          Button(onClick = onBack) { Text(text = stringResource(R.string.back_button_description)) }
+        }
+  }
 }

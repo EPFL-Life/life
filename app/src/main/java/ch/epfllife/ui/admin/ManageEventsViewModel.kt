@@ -4,9 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.Event
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 sealed interface ManageEventsUIState {
   object Loading : ManageEventsUIState
@@ -21,27 +25,49 @@ class ManageEventsViewModel(private val db: Db, private val associationId: Strin
   private val _uiState = MutableStateFlow<ManageEventsUIState>(ManageEventsUIState.Loading)
   val uiState: StateFlow<ManageEventsUIState> = _uiState
 
+  private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+
   init {
-    loadEvents()
-  }
-
-  private fun loadEvents() {
-    viewModelScope.launch {
-      try {
-        val list = db.eventRepo.getAllEvents().filter { it.association.id == associationId }
-
-        val sorted = list.sortedBy { it.time }
-        _uiState.value = ManageEventsUIState.Success(sorted)
-      } catch (e: Exception) {
-        _uiState.value = ManageEventsUIState.Error(e.message ?: "Unknown error")
-      }
-    }
+    viewModelScope.launch { loadEvents() }
   }
 
   fun reload(onComplete: (() -> Unit)? = null) {
     viewModelScope.launch {
       loadEvents()
       onComplete?.invoke()
+    }
+  }
+
+  private suspend fun loadEvents() {
+    _uiState.value = ManageEventsUIState.Loading
+
+    val result =
+        withContext(Dispatchers.IO) { db.assocRepo.getEventsForAssociation(associationId) }
+
+    result.fold(
+        onSuccess = { events ->
+          val today = LocalDate.now()
+          val filtered =
+              events
+                  .filter { event ->
+                    val eventDate = event.startDateOrNull()
+                    eventDate == null || !eventDate.isBefore(today)
+                  }
+                  .sortedBy { it.startDateOrNull() ?: LocalDate.MAX }
+
+          _uiState.value = ManageEventsUIState.Success(filtered)
+        },
+        onFailure = { e ->
+          _uiState.value = ManageEventsUIState.Error(e.message ?: "Unknown error")
+        })
+  }
+
+  private fun Event.startDateOrNull(): LocalDate? {
+    if (time.length < 10) return null
+    return try {
+      LocalDate.parse(time.substring(0, 10), dateFormatter)
+    } catch (_: Exception) {
+      null
     }
   }
 }

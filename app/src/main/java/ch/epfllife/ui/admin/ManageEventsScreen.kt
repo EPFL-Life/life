@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.R
@@ -64,8 +65,8 @@ fun ManageEventsScreen(
               verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(
                     text = stringResource(R.string.manage_events_title),
-                    style = MaterialTheme.typography.titleLarge)
-                HorizontalDivider()
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
+                Divider()
 
                 SettingsButton(
                     text = stringResource(R.string.add_new_event),
