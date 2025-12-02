@@ -39,6 +39,25 @@ sealed class Screen(
         if (associationId.isNullOrBlank()) BASE_ROUTE
         else "$BASE_ROUTE?$ASSOCIATION_ID_ARG=$associationId"
   }
+
+  object ManageEvents : Screen("manage_events/{associationId}", name = "ManageEvents") {
+    const val ARG_ASSOCIATION_ID = "associationId"
+
+    fun createRoute(associationId: String) = "manage_events/$associationId"
+  }
+
+  object AddEditEvent : Screen("add_edit_event", "AddEditEvent") {
+    const val ARG_ASSOCIATION_ID = "associationId"
+    const val ARG_EVENT_ID = "eventId"
+
+    const val ROUTE_ADD = "add_edit_event/{associationId}"
+    const val ROUTE_EDIT = "add_edit_event/{associationId}/{eventId}"
+
+    fun createRouteAdd(associationId: String) = "add_edit_event/$associationId"
+
+    fun createRouteEdit(associationId: String, eventId: String) =
+        "add_edit_event/$associationId/$eventId"
+  }
 }
 
 open class NavigationActions(
@@ -93,6 +112,18 @@ open class NavigationActions(
 
   open fun currentRoute(): String {
     return navController.currentDestination?.route ?: ""
+  }
+
+  fun navigateToManageEvents(associationId: String) {
+    navController.navigate(Screen.ManageEvents.createRoute(associationId))
+  }
+
+  fun navigateToAddEditEvent(associationId: String, eventId: String? = null) {
+    val route =
+        if (eventId == null) Screen.AddEditEvent.createRouteAdd(associationId)
+        else Screen.AddEditEvent.createRouteEdit(associationId, eventId)
+
+    navController.navigate(route)
   }
 
   /**

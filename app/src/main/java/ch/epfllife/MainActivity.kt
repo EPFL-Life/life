@@ -8,9 +8,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -24,9 +27,12 @@ import androidx.navigation.navArgument
 import ch.epfllife.model.association.Association
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.db.Db
+import ch.epfllife.model.event.Event
 import ch.epfllife.model.map.Location
 import ch.epfllife.ui.admin.AddEditAssociationScreen
 import ch.epfllife.ui.admin.AddEditAssociationViewModel
+import ch.epfllife.ui.admin.AddEditEventScreen
+import ch.epfllife.ui.admin.ManageEventsScreen
 import ch.epfllife.ui.admin.SelectAssociationScreen
 import ch.epfllife.ui.association.AssociationBrowser
 import ch.epfllife.ui.association.AssociationDetailsScreen
@@ -205,8 +211,8 @@ fun App(
                 onManageAssociationClick = { associationId ->
                   navigationActions.navigateToAddEditAssociation(associationId)
                 },
-                onManageAssociationEventsClick = { _ -> // use AssociationID
-                  // TODO: placeholder, can navigate to manage events later
+                onManageAssociationEventsClick = { associationId ->
+                  navigationActions.navigateToManageEvents(associationId)
                 },
                 selectedAssociationId = selectedAssociationId,
                 selectedAssociationName = selectedAssociationName,
@@ -247,6 +253,91 @@ fun App(
                     viewModel = AddEditAssociationViewModel(association),
                     onBack = { navController.popBackStack() },
                     onSubmitSuccess = { navController.popBackStack() })
+              }
+
+          composable(
+              route = Screen.ManageEvents.route,
+              arguments =
+                  listOf(
+                      navArgument(Screen.ManageEvents.ARG_ASSOCIATION_ID) {
+                        type = NavType.StringType
+                      })) { backStackEntry ->
+                val associationId =
+                    backStackEntry.arguments?.getString(Screen.ManageEvents.ARG_ASSOCIATION_ID)
+                        ?: ""
+
+                ManageEventsScreen(
+                    db = db,
+                    associationId = associationId,
+                    onGoBack = { navigationActions.goBack() },
+                    onAddNewEvent = { navigationActions.navigateToAddEditEvent(associationId) },
+                    onEditEvent = { eventId ->
+                      navigationActions.navigateToAddEditEvent(associationId, eventId)
+                    })
+              }
+
+          composable(
+              route = Screen.AddEditEvent.ROUTE_ADD,
+              arguments =
+                  listOf(
+                      navArgument(Screen.AddEditEvent.ARG_ASSOCIATION_ID) {
+                        type = NavType.StringType
+                      })) { backStackEntry ->
+                val associationId =
+                    backStackEntry.arguments?.getString(Screen.AddEditEvent.ARG_ASSOCIATION_ID)
+                        ?: ""
+
+                var association by remember { mutableStateOf<Association?>(null) }
+
+                LaunchedEffect(associationId) {
+                  association = db.assocRepo.getAssociation(associationId) // ✔ correct method
+                }
+
+                association?.let {
+                  AddEditEventScreen(
+                      db = db,
+                      association = it,
+                      initialEvent = null,
+                      onBack = { navigationActions.goBack() },
+                      onSubmitSuccess = { navigationActions.goBack() })
+                }
+              }
+
+          composable(
+              route = Screen.AddEditEvent.ROUTE_EDIT,
+              arguments =
+                  listOf(
+                      navArgument(Screen.AddEditEvent.ARG_ASSOCIATION_ID) {
+                        type = NavType.StringType
+                      },
+                      navArgument(Screen.AddEditEvent.ARG_EVENT_ID) {
+                        type = NavType.StringType
+                      })) { backStackEntry ->
+                val associationId =
+                    backStackEntry.arguments?.getString(Screen.AddEditEvent.ARG_ASSOCIATION_ID)
+                        ?: ""
+                val eventId =
+                    backStackEntry.arguments?.getString(Screen.AddEditEvent.ARG_EVENT_ID) ?: ""
+
+                var association by remember { mutableStateOf<Association?>(null) }
+                var event by remember { mutableStateOf<Event?>(null) }
+
+                LaunchedEffect(associationId, eventId) {
+                  association = db.assocRepo.getAssociation(associationId) // ✔ correct method
+                  event = db.eventRepo.getEvent(eventId) // ✔ correct method
+                }
+
+                val assoc = association
+                val evt = event
+
+                if (assoc != null) {
+                  AddEditEventScreen(
+                      db = db,
+                      association = assoc,
+                      initialEvent = evt,
+                      onBack = { navigationActions.goBack() },
+                      onSubmitSuccess = { navigationActions.goBack() })
+                }
               }
         }
       }
