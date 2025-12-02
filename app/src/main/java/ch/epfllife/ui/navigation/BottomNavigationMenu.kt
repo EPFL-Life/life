@@ -1,13 +1,8 @@
 package ch.epfllife.ui.navigation
 
-//noinspection UsingMaterialAndMaterial3Libraries
-//noinspection UsingMaterialAndMaterial3Libraries
-
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.Groups
@@ -15,6 +10,8 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,13 +40,13 @@ fun BottomNavigationMenu(
     onTabSelected: (Tab) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-  BottomNavigation(
+  NavigationBar(
       modifier =
           modifier.fillMaxWidth().height(60.dp).testTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU),
-      backgroundColor = MaterialTheme.colorScheme.surface,
+      containerColor = MaterialTheme.colorScheme.surface,
       content = {
         Tab.tabs.forEach { tab ->
-          BottomNavigationItem(
+          NavigationBarItem(
               icon = { Icon(tab.icon, contentDescription = null) },
               // label = { Text(tab.name) },
               selected = tab == selectedTab,
