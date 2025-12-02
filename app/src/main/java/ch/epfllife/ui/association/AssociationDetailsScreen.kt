@@ -93,8 +93,13 @@ fun AssociationDetailsScreen(
       AssociationDetailsContent(
           association = state.association,
           events = state.events,
+          isSubscribed = state.isSubscribed,
           onGoBack = onGoBack,
           onEventClick = onEventClick,
+          onSubscribeClick = { viewModel.subscribeToAssociation(state.association.id, context) },
+          onUnsubscribeClick = {
+            viewModel.unsubscribeFromAssociation(state.association.id, context)
+          },
       )
     }
   }
@@ -105,10 +110,12 @@ fun AssociationDetailsContent(
     association: Association,
     modifier: Modifier = Modifier,
     events: List<Event>,
+    isSubscribed: Boolean,
     onGoBack: () -> Unit,
     onEventClick: (String) -> Unit,
+    onSubscribeClick: () -> Unit,
+    onUnsubscribeClick: () -> Unit,
 ) {
-  var isSubscribed by remember { mutableStateOf(false) }
   val scrollState = rememberScrollState()
   val context = LocalContext.current
 
@@ -158,7 +165,7 @@ fun AssociationDetailsContent(
             }
 
         Button(
-            onClick = { isSubscribed = !isSubscribed },
+            onClick = if (isSubscribed) onUnsubscribeClick else onSubscribeClick,
             modifier = Modifier.fillMaxWidth().testTag(subscribeButtonTag),
             shape = RoundedCornerShape(6.dp),
             colors =

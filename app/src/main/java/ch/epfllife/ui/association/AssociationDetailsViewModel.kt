@@ -15,13 +15,23 @@ import kotlinx.coroutines.launch
 sealed class AssociationDetailsUIState {
   object Loading : AssociationDetailsUIState()
 
-  data class Success(val association: Association, val events: List<Event>) :
-      AssociationDetailsUIState()
+  data class Success(
+      val association: Association,
+      val events: List<Event>,
+      val isSubscribed: Boolean
+  ) : AssociationDetailsUIState()
 
   data class Error(val message: String) : AssociationDetailsUIState()
 }
 
-class AssociationDetailsViewModel(private val db: Db) : ViewModel() {
+/**
+ * ViewModel for the AssociationDetails screen.
+ *
+ * Uses `AssociationRepository` to fetch an Association by id.
+ */
+class AssociationDetailsViewModel(
+    private val db: Db,
+) : ViewModel() {
 
   private val _uiState =
       MutableStateFlow<AssociationDetailsUIState>(AssociationDetailsUIState.Loading)
@@ -32,10 +42,15 @@ class AssociationDetailsViewModel(private val db: Db) : ViewModel() {
     viewModelScope.launch {
       try {
         val association = db.assocRepo.getAssociation(associationId)
+        val eventsResult = db.assocRepo.getEventsForAssociation(associationId)
+        val currentUser = db.userRepo.getCurrentUser()
+
         if (association != null) {
-          val events = db.assocRepo.getEventsForAssociation(associationId)
+          val events = eventsResult.getOrElse { emptyList() }
+          val isSubscribed = currentUser?.subscriptions?.contains(associationId) ?: false
           _uiState.value =
-              AssociationDetailsUIState.Success(association, events.getOrNull() ?: emptyList())
+              AssociationDetailsUIState.Success(
+                  association = association, events = events, isSubscribed = isSubscribed)
         } else {
           _uiState.value =
               AssociationDetailsUIState.Error(
@@ -44,6 +59,49 @@ class AssociationDetailsViewModel(private val db: Db) : ViewModel() {
       } catch (_: Exception) {
         _uiState.value =
             AssociationDetailsUIState.Error(context.getString(R.string.error_loading_association))
+      }
+    }
+  }
+
+  fun subscribeToAssociation(associationId: String, context: Context) {
+    viewModelScope.launch {
+      val currentState = _uiState.value
+      if (currentState is AssociationDetailsUIState.Success) {
+        // Optimistic update
+        _uiState.value = currentState.copy(isSubscribed = true)
+
+        db.userRepo
+            .subscribeToAssociation(associationId)
+            .onFailure {
+              // Revert on failure
+              _uiState.value = currentState.copy(isSubscribed = false)
+              // Optionally show an error message (could use a separate error channel/state)
+            }
+            .onSuccess {
+              // Refresh data to ensure consistency
+              loadAssociation(associationId, context)
+            }
+      }
+    }
+  }
+
+  fun unsubscribeFromAssociation(associationId: String, context: Context) {
+    viewModelScope.launch {
+      val currentState = _uiState.value
+      if (currentState is AssociationDetailsUIState.Success) {
+        // Optimistic update
+        _uiState.value = currentState.copy(isSubscribed = false)
+
+        db.userRepo
+            .unsubscribeFromAssociation(associationId)
+            .onFailure {
+              // Revert on failure
+              _uiState.value = currentState.copy(isSubscribed = true)
+            }
+            .onSuccess {
+              // Refresh data to ensure consistency
+              loadAssociation(associationId, context)
+            }
       }
     }
   }
