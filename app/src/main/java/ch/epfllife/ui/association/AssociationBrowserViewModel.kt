@@ -21,26 +21,28 @@ class AssociationBrowserViewModel(private val db: Db) : ViewModel() {
 
   init {
     refresh()
-    // TODO: Also load subscribed associations when user data is available
   }
 
   /** Fetches all associations from the repository and updates the [allAssociations] state. */
   fun refresh(signalFinished: () -> Unit = {}) {
     viewModelScope.launch {
-      _allAssociations.value =
+      val allAssociations =
           try {
             db.assocRepo.getAllAssociations()
-          } catch (e: Exception) {
-            // Log the error or handle it as needed
-            // e.g., Log.e("AssociationBrowserVM", "Failed to load associations", e)
-            emptyList() // Return an empty list on failure
+          } catch (_: Exception) {
+            emptyList()
           }
+      _allAssociations.value = allAssociations
+
+      val currentUser = db.userRepo.getCurrentUser()
+      if (currentUser != null) {
+        _subscribedAssociations.value =
+            allAssociations.filter { currentUser.subscriptions.contains(it.id) }
+      } else {
+        _subscribedAssociations.value = emptyList()
+      }
+
       signalFinished()
     }
   }
-
-  // TODO: Add a function to load subscribed associations
-  // This will likely require a UserRepository to know which associations
-  // the current user is subscribed to. For now, it remains an empty list,
-  // matching the original hardcoded behavior for "Subscribed".
 }
