@@ -100,7 +100,6 @@
     <string name="edit_event">Edit Event</string>
     <string name="event_title_required">Title*</string>
     <string name="event_description_required">Description*</string>
-    <string name="event_location_required">Location*</string>
     <string name="event_location_section_title">Location</string>
     <string name="event_location_name_label">Location name*</string>
     <string name="event_location_search">Find location</string>
@@ -110,7 +109,6 @@
     <string name="event_location_longitude">Longitude</string>
     <string name="event_location_no_match">No matching location found.</string>
     <string name="event_location_lookup_failed">Failed to fetch location. Try again.</string>
-    <string name="event_location_missing_query">Enter a location name first.</string>
     <string name="event_location_resolved_description">Result: %1$s</string>
     <string name="event_location_query_too_short">Type at least 3 characters.</string>
     <string name="event_time_required">Date and Time*</string>
