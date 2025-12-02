@@ -1,7 +1,6 @@
 package ch.epfllife.ui.admin
 
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -11,6 +10,7 @@ import ch.epfllife.model.association.AssociationRepository
 import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.Event
 import ch.epfllife.ui.theme.Theme
+import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Rule
@@ -32,14 +32,7 @@ class SelectAssociationScreenTest {
       }
     }
 
-    composeTestRule.waitUntil(5_000) {
-      composeTestRule
-          .onAllNodes(
-              hasTestTag(
-                  SelectAssociationTestTags.associationCard(ExampleAssociations.association1.id)))
-          .fetchSemanticsNodes()
-          .isNotEmpty()
-    }
+    composeTestRule.waitForIdle()
 
     composeTestRule
         .onNodeWithTag(
@@ -67,21 +60,13 @@ class SelectAssociationScreenTest {
       }
     }
 
-    composeTestRule.waitUntil(5_000) {
-      composeTestRule
-          .onAllNodes(
-              hasTestTag(
-                  SelectAssociationTestTags.associationCard(ExampleAssociations.association2.id)))
-          .fetchSemanticsNodes()
-          .isNotEmpty()
-    }
+    composeTestRule.waitForIdle()
 
     composeTestRule
         .onNodeWithTag(
             SelectAssociationTestTags.associationCard(ExampleAssociations.association2.id))
         .performClick()
 
-    composeTestRule.waitUntil(5_000) { selectedAssociation != null }
     assertNotNull(selectedAssociation)
     assertEquals(ExampleAssociations.association2.id, selectedAssociation?.id)
   }
@@ -107,16 +92,11 @@ class SelectAssociationScreenTest {
       }
     }
 
-    composeTestRule.waitUntil(5_000) {
-      composeTestRule
-          .onAllNodes(hasTestTag(SelectAssociationTestTags.ADD_NEW_BUTTON))
-          .fetchSemanticsNodes()
-          .isNotEmpty()
-    }
+    composeTestRule.waitForIdle()
 
     composeTestRule.onNodeWithTag(SelectAssociationTestTags.ADD_NEW_BUTTON).performClick()
 
-    composeTestRule.waitUntil(5_000) { addNewClicked }
+    Assert.assertTrue(addNewClicked)
   }
 }
 

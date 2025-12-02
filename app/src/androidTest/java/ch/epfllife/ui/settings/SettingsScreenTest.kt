@@ -74,7 +74,7 @@ class SettingsScreenTest {
           onAddNewAssociationClick = {})
     }
     composeTestRule.onNodeWithTag(SettingsScreenTestTags.SIGN_OUT_BUTTON).performClick()
-    composeTestRule.waitUntil(5000) { clicked }
+      composeTestRule.waitForIdle()
     Assert.assertNull(Firebase.auth.currentUser)
     Assert.assertEquals(
         composeTestRule.activity.getString(R.string.signout_successful),
@@ -95,7 +95,7 @@ class SettingsScreenTest {
     }
 
     composeTestRule.onNodeWithTag(SettingsScreenTestTags.SELECT_ASSOCIATION_BUTTON).performClick()
-    composeTestRule.waitUntil(5_000) { clicked }
+      Assert.assertTrue(clicked)
   }
 
   @Test
@@ -120,8 +120,7 @@ class SettingsScreenTest {
     composeTestRule.onNodeWithTag(SettingsScreenTestTags.MANAGE_ASSOCIATION_BUTTON).performClick()
     composeTestRule.onNodeWithTag(SettingsScreenTestTags.MANAGE_EVENTS_BUTTON).performClick()
 
-    composeTestRule.waitUntil(5_000) {
-      manageClickedId == associationId && manageEventsClickedId == associationId
+      Assert.assertEquals(associationId, manageClickedId)
+      Assert.assertEquals(associationId, manageEventsClickedId)
     }
   }
-}

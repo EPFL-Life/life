@@ -206,7 +206,7 @@ fun App(
                   navigationActions.navigateToAddEditAssociation(associationId)
                 },
                 onManageAssociationEventsClick = { associationId ->
-                  // placeholder, can navigate to manage events later
+                  // TODO: placeholder, can navigate to manage events later
                 },
                 selectedAssociationId = selectedAssociationId,
                 selectedAssociationName = selectedAssociationName,
@@ -241,8 +241,8 @@ fun App(
                 val associationId =
                     backStackEntry.arguments?.getString(
                         Screen.AddEditAssociation.ASSOCIATION_ID_ARG)
-                // For now, placeholder
-                val association: Association? = null // replace with db call later
+                // TODO: For now, placeholder
+                val association: Association? = null // TODO: replace with db call later
                 AddEditAssociationScreen(
                     viewModel = AddEditAssociationViewModel(association),
                     onBack = { navController.popBackStack() },
