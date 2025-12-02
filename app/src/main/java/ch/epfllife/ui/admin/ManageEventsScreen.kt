@@ -66,7 +66,7 @@ fun ManageEventsScreen(
                 Text(
                     text = stringResource(R.string.manage_events_title),
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
-                Divider()
+                HorizontalDivider()
 
                 SettingsButton(
                     text = stringResource(R.string.add_new_event),

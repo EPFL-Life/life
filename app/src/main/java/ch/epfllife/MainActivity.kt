@@ -57,8 +57,6 @@ import ch.epfllife.ui.navigation.Screen
 import ch.epfllife.ui.navigation.Tab
 import ch.epfllife.ui.settings.SettingsScreen
 import ch.epfllife.ui.theme.Theme
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -271,23 +269,27 @@ fun App(
                     backStackEntry.arguments?.getString(
                         Screen.AddEditAssociation.ASSOCIATION_ID_ARG)
 
+                // Case 1: Creating a new association
                 if (associationId.isNullOrBlank()) {
+
                   AddEditAssociationScreen(
                       viewModel = AddEditAssociationViewModel(null),
                       onBack = { navController.popBackStack() },
                       onSubmitSuccess = { navController.popBackStack() })
                 } else {
+
+                  // Case 2: Editing an existing association
                   val associationState by
                       produceState<LoadState<Association>>(
                           initialValue = LoadState.Loading, key1 = associationId) {
                             value =
                                 runCatching {
-                                      withContext(Dispatchers.IO) {
-                                        db.assocRepo.getAssociation(associationId)
-                                      }
-                                          ?: throw IllegalStateException(
-                                              context.getString(
-                                                  R.string.error_association_not_found))
+                                      val association =
+                                          db.assocRepo.getAssociation(associationId)
+                                              ?: throw IllegalStateException(
+                                                  context.getString(
+                                                      R.string.error_association_not_found))
+                                      association
                                     }
                                     .fold(
                                         onSuccess = { LoadState.Success(it) },
@@ -301,15 +303,16 @@ fun App(
 
                   when (val state = associationState) {
                     LoadState.Loading -> FullScreenLoader()
+
                     is LoadState.Error ->
                         FullScreenError(
-                            message = state.message, onBack = { navigationActions.goBack() })
-                    is LoadState.Success -> {
-                      AddEditAssociationScreen(
-                          viewModel = AddEditAssociationViewModel(state.data),
-                          onBack = { navController.popBackStack() },
-                          onSubmitSuccess = { navController.popBackStack() })
-                    }
+                            message = state.message, onBack = { navController.popBackStack() })
+
+                    is LoadState.Success ->
+                        AddEditAssociationScreen(
+                            viewModel = AddEditAssociationViewModel(state.data),
+                            onBack = { navController.popBackStack() },
+                            onSubmitSuccess = { navController.popBackStack() })
                   }
                 }
               }
