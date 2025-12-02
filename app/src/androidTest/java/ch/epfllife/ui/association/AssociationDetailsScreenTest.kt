@@ -1,5 +1,7 @@
 package ch.epfllife.ui.association
 
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.platform.app.InstrumentationRegistry
@@ -38,6 +40,9 @@ class AssociationDetailsScreenTest {
             onGoBack = onGoBack,
             onEventClick = {},
             events = emptyList(),
+            isSubscribed = false,
+            onSubscribeClick = {},
+            onUnsubscribeClick = {},
         )
       }
     }
@@ -124,6 +129,9 @@ class AssociationDetailsScreenTest {
                 onGoBack = onClick,
                 onEventClick = {},
                 events = emptyList(),
+                isSubscribed = false,
+                onSubscribeClick = {},
+                onUnsubscribeClick = {},
             )
           }
         },
@@ -140,10 +148,31 @@ class AssociationDetailsScreenTest {
         .assertHasClickAction()
   }
 
+  // Helper to set up AssociationDetailsContent with state management for interaction tests
+  private fun setAssociationDetailsContentWithState(
+      association: Association,
+      initialSubscribed: Boolean = false
+  ) {
+    composeTestRule.setContent {
+      val isSubscribed = remember { mutableStateOf(initialSubscribed) }
+      Theme {
+        AssociationDetailsContent(
+            association = association,
+            onGoBack = {},
+            onEventClick = {},
+            events = emptyList(),
+            isSubscribed = isSubscribed.value,
+            onSubscribeClick = { isSubscribed.value = true },
+            onUnsubscribeClick = { isSubscribed.value = false },
+        )
+      }
+    }
+  }
+
   @Test
   fun contentSubscribeButtonTogglesState() {
     val association = ExampleAssociations.association2
-    setAssociationDetailsContent(association)
+    setAssociationDetailsContentWithState(association)
 
     // Initially should show subscribe button
     composeTestRule.onNodeWithTag(AssociationDetailsTestTags.SUBSCRIBE_BUTTON).assertIsDisplayed()
@@ -157,7 +186,7 @@ class AssociationDetailsScreenTest {
   @Test
   fun contentSubscribeButtonTogglesBackAndForth() {
     val association = ExampleAssociations.association1
-    setAssociationDetailsContent(association)
+    setAssociationDetailsContentWithState(association)
 
     // Initially unsubscribed
     composeTestRule.onNodeWithTag(AssociationDetailsTestTags.SUBSCRIBE_BUTTON).assertIsDisplayed()
@@ -196,7 +225,7 @@ class AssociationDetailsScreenTest {
   @Test
   fun integrationMultipleClicksOnSubscribeButton() {
     val association = ExampleAssociations.association2
-    setAssociationDetailsContent(association)
+    setAssociationDetailsContentWithState(association)
 
     // Click subscribe button multiple times and assert the state toggles each time
     repeat(5) { i ->
@@ -377,6 +406,7 @@ class AssociationDetailsScreenTest {
     val successState = state as AssociationDetailsUIState.Success
     assertEquals(association, successState.association)
     assertEquals(eventsList, successState.events)
+    assertFalse(successState.isSubscribed)
   }
 
   @OptIn(ExperimentalCoroutinesApi::class)
@@ -405,6 +435,7 @@ class AssociationDetailsScreenTest {
     val successState = state as AssociationDetailsUIState.Success
     assertEquals(association, successState.association)
     assertEquals(emptyList<Event>(), successState.events)
+    assertFalse(successState.isSubscribed)
   }
 
   @OptIn(ExperimentalCoroutinesApi::class)
@@ -433,6 +464,7 @@ class AssociationDetailsScreenTest {
     val successState = state as AssociationDetailsUIState.Success
     assertEquals(association, successState.association)
     assertEquals(emptyEvents, successState.events)
+    assertFalse(successState.isSubscribed)
   }
 }
 
