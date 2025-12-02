@@ -2,7 +2,6 @@ package ch.epfllife.model.map
 
 import android.util.Log
 import java.io.IOException
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
@@ -12,7 +11,8 @@ import org.json.JSONArray
 
 class NominatimLocationRepository(
     private val client: OkHttpClient,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val userAgent: String = DEFAULT_USER_AGENT,
+    private val referer: String = DEFAULT_REFERER
 ) : LocationRepository {
 
   private fun parseBody(body: String): List<Location> {
@@ -28,7 +28,7 @@ class NominatimLocationRepository(
   }
 
   override suspend fun search(query: String): List<Location> =
-      withContext(dispatcher) {
+      withContext(Dispatchers.IO) {
         // Using HttpUrl.Builder to properly construct the URL with query parameters.
         val url =
             HttpUrl.Builder()
@@ -43,10 +43,8 @@ class NominatimLocationRepository(
         val request =
             Request.Builder()
                 .url(url)
-                .header(
-                    "User-Agent",
-                    "YourAppName/1.0 (your-email@example.com)") // Set a proper User-Agent
-                .header("Referer", "https://yourapp.com") // Optionally add a Referer
+                .header("User-Agent", userAgent)
+                .header("Referer", referer)
                 .build()
 
         try {
@@ -72,3 +70,6 @@ class NominatimLocationRepository(
         }
       }
 }
+
+private const val DEFAULT_USER_AGENT = "EPFLLife/1.0 (contact@epfllife.app)"
+private const val DEFAULT_REFERER = "https://epfllife.app"

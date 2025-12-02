@@ -41,8 +41,7 @@ class ManageEventsViewModel(private val db: Db, private val associationId: Strin
   private suspend fun loadEvents() {
     _uiState.value = ManageEventsUIState.Loading
 
-    val result =
-        withContext(Dispatchers.IO) { db.assocRepo.getEventsForAssociation(associationId) }
+    val result = withContext(Dispatchers.IO) { db.assocRepo.getEventsForAssociation(associationId) }
 
     result.fold(
         onSuccess = { events ->
