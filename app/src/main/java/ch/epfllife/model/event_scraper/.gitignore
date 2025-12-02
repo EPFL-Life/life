@@ -1,10 +1,19 @@
 # Created by pytest automatically.
 
+#Firebase credentials
+serviceAccountKey.json
+*.json 
+
 # Virtual and Cache
 
 venv/
+env/
+ENV/
 .pytest_cache/
-.vscode/          
+.vscode/
+.idea/
+*.swp
+*.swo          
 .mypy_cache/       
 
 # Python compiled files and temporary files
@@ -14,6 +23,7 @@ venv/
 **/*.pyd
 **/*.egg
 **/*.spec
+*.log
 **/__pycache__/   
 
 # Coverage reports
@@ -22,3 +32,7 @@ venv/
 coverage.xml
 *.cover
 htmlcov/
+
+# Operating System files
+.DS_Store
+Thumbs.db
