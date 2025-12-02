@@ -25,10 +25,15 @@ data class AssociationFormState(
     var bannerUrl: String = ""
 )
 
-class AddEditAssociationViewModel(existingAssociation: Association? = null) : ViewModel() {
+class AddEditAssociationViewModel(private val existingAssociation: Association? = null) :
+    ViewModel() {
 
   var formState by mutableStateOf(AssociationFormState())
     private set
+
+  val isEditing: Boolean = existingAssociation != null
+
+  val initialAssociationName: String = existingAssociation?.name ?: ""
 
   init {
     existingAssociation?.let { assoc ->

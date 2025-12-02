@@ -2,13 +2,20 @@ package ch.epfllife.ui.admin
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -18,7 +25,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.R
 import ch.epfllife.ui.association.SocialIcons
 import ch.epfllife.ui.composables.BackButton
-import ch.epfllife.ui.theme.LifeRed
+import ch.epfllife.ui.composables.SubmitButton
 
 object AddEditAssociationTestTags {
   const val HEADER = "AddEditAssociation_Header"
@@ -36,6 +43,14 @@ fun AddEditAssociationScreen(
 ) {
   val scrollState = rememberScrollState()
   val formState = viewModel.formState
+  val associationNameForTitle =
+      formState.name.takeIf { it.isNotBlank() } ?: viewModel.initialAssociationName
+  val headerText =
+      if (viewModel.isEditing) {
+        associationNameForTitle.takeIf { it.isNotBlank() }?.let {
+          stringResource(R.string.manage_association, it)
+        } ?: stringResource(R.string.manage_association_fallback)
+      } else stringResource(R.string.add_new_association)
 
   Box(modifier = Modifier.fillMaxSize()) {
 
@@ -52,7 +67,7 @@ fun AddEditAssociationScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp)) {
           // --- Header ---
           Text(
-              text = stringResource(R.string.add_new_association),
+              text = headerText,
               style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
               modifier = Modifier.testTag(AddEditAssociationTestTags.HEADER))
           HorizontalDivider(color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -62,7 +77,7 @@ fun AddEditAssociationScreen(
               text = stringResource(R.string.general_info),
               color = MaterialTheme.colorScheme.outline,
               style = MaterialTheme.typography.titleSmall)
-          HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+          Divider()
 
           OutlinedTextField(
               value = formState.name,
@@ -91,7 +106,7 @@ fun AddEditAssociationScreen(
               text = stringResource(R.string.social_pages_title),
               color = MaterialTheme.colorScheme.outline,
               style = MaterialTheme.typography.titleSmall)
-          HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+          Divider()
 
           formState.socialMedia.forEach { sm ->
             Row(
@@ -145,23 +160,13 @@ fun AddEditAssociationScreen(
           Spacer(Modifier.height(24.dp))
 
           // --- Submit Button ---
-          Button(
+          SubmitButton(
               modifier =
                   Modifier.fillMaxWidth()
                       .height(50.dp)
                       .testTag(AddEditAssociationTestTags.SUBMIT_BUTTON),
-              onClick = { viewModel.submit(onSubmitSuccess) },
-              shape = RoundedCornerShape(6.dp),
-              colors =
-                  ButtonDefaults.buttonColors(containerColor = LifeRed, contentColor = Color.White),
-              enabled = viewModel.isFormValid()) {
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                  Text(
-                      text = stringResource(R.string.submit),
-                      style =
-                          MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold))
-                }
-              }
+              enabled = viewModel.isFormValid(),
+              onClick = { viewModel.submit(onSubmitSuccess) })
 
           Spacer(Modifier.height(24.dp))
         }

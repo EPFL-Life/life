@@ -3,8 +3,13 @@ package ch.epfllife.ui.admin
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -16,7 +21,7 @@ import ch.epfllife.model.association.Association
 import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.Event
 import ch.epfllife.ui.composables.BackButton
-import ch.epfllife.ui.theme.LifeRed
+import ch.epfllife.ui.composables.SubmitButton
 
 @Composable
 fun AddEditEventScreen(
@@ -91,17 +96,10 @@ fun AddEditEventScreen(
 
           Spacer(Modifier.height(12.dp))
 
-          Button(
-              onClick = { viewModel.submit(onSubmitSuccess) },
+          SubmitButton(
+              modifier = Modifier.fillMaxWidth().height(50.dp),
               enabled = viewModel.isFormValid(),
-              colors =
-                  ButtonDefaults.buttonColors(
-                      containerColor = LifeRed, contentColor = MaterialTheme.colorScheme.onPrimary),
-              modifier = Modifier.fillMaxWidth().height(50.dp)) {
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                  Text(stringResource(R.string.submit))
-                }
-              }
+              onClick = { viewModel.submit(onSubmitSuccess) })
         }
 
     BackButton(modifier = Modifier.align(Alignment.TopStart), onGoBack = onBack)
