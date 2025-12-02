@@ -8,7 +8,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -55,7 +54,7 @@ fun SelectAssociationScreen(
               verticalArrangement = Arrangement.Center,
               horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = stringResource(R.string.error_loading_association, message),
+                    text = stringResource(R.string.error_loading_association),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.error)
                 Spacer(Modifier.height(16.dp))
@@ -79,7 +78,7 @@ fun SelectAssociationScreen(
                 Text(
                     text = stringResource(R.string.settings_screen_association),
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
-                HorizontalDivider(color = Color.Black)
+                HorizontalDivider(color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(Modifier.height(4.dp))
 
                 // Add New Association button

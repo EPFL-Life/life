@@ -55,14 +55,14 @@ fun AddEditAssociationScreen(
               text = stringResource(R.string.add_new_association),
               style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
               modifier = Modifier.testTag(AddEditAssociationTestTags.HEADER))
-          HorizontalDivider(color = Color.Black)
+          HorizontalDivider(color = MaterialTheme.colorScheme.onSurfaceVariant)
 
           // --- General Info ---
           Text(
               text = stringResource(R.string.general_info),
-              color = Color.Gray,
+              color = MaterialTheme.colorScheme.outline,
               style = MaterialTheme.typography.titleSmall)
-          HorizontalDivider(color = Color.Gray)
+          HorizontalDivider(color = MaterialTheme.colorScheme.outline)
 
           OutlinedTextField(
               value = formState.name,
@@ -89,9 +89,9 @@ fun AddEditAssociationScreen(
           // --- Social Pages ---
           Text(
               text = stringResource(R.string.social_pages_title),
-              color = Color.Gray,
+              color = MaterialTheme.colorScheme.outline,
               style = MaterialTheme.typography.titleSmall)
-          HorizontalDivider(color = Color.Gray)
+          HorizontalDivider(color = MaterialTheme.colorScheme.outline)
 
           formState.socialMedia.forEach { sm ->
             Row(
@@ -126,9 +126,9 @@ fun AddEditAssociationScreen(
           // --- Upload Images (URLs) ---
           Text(
               text = stringResource(R.string.upload_images),
-              color = Color.Gray,
+              color = MaterialTheme.colorScheme.outline,
               style = MaterialTheme.typography.titleSmall)
-          HorizontalDivider(color = Color.Gray)
+          HorizontalDivider(color = MaterialTheme.colorScheme.outline)
 
           OutlinedTextField(
               value = formState.logoUrl,
