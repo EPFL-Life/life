@@ -39,9 +39,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.BuildConfig
 import ch.epfllife.R
-import ch.epfllife.model.association.Association
 import ch.epfllife.model.db.Db
-import ch.epfllife.model.event.Event
 import ch.epfllife.model.map.Location
 import ch.epfllife.model.map.NominatimLocationRepository
 import ch.epfllife.ui.composables.BackButton
@@ -56,8 +54,9 @@ import okhttp3.OkHttpClient
 @Composable
 fun AddEditEventScreen(
     db: Db,
-    association: Association,
-    initialEvent: Event? = null,
+    associationId: String,
+    eventId: String? = null,
+    viewModel: AddEditEventViewModel? = null,
     onBack: () -> Unit,
     onSubmitSuccess: () -> Unit,
     onPreviewLocation: (Location) -> Unit = {},
@@ -66,9 +65,66 @@ fun AddEditEventScreen(
     val ua = "${BuildConfig.APPLICATION_ID}/${BuildConfig.VERSION_NAME} (contact@epfllife.app)"
     NominatimLocationRepository(OkHttpClient(), userAgent = ua, referer = "https://epfllife.app")
   }
-  val viewModel: AddEditEventViewModel = viewModel {
-    AddEditEventViewModel(db, association, initialEvent, locationRepository)
+  val finalViewModel: AddEditEventViewModel =
+      viewModel
+          ?: viewModel { AddEditEventViewModel(db, associationId, eventId, locationRepository) }
+
+  val uiState by finalViewModel.uiState.collectAsState()
+
+  Box(modifier = Modifier.fillMaxSize()) {
+    when (val state = uiState) {
+      is AddEditEventUIState.Loading -> {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+          CircularProgressIndicator()
+        }
+      }
+      is AddEditEventUIState.Error -> {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally) {
+              Text(
+                  text = state.message,
+                  color = MaterialTheme.colorScheme.error,
+                  style = MaterialTheme.typography.bodyLarge)
+              Spacer(modifier = Modifier.height(16.dp))
+              Button(onClick = onBack) { Text(stringResource(R.string.back_button_description)) }
+            }
+      }
+      is AddEditEventUIState.Success -> {
+        AddEditEventContent(
+            viewModel = finalViewModel,
+            isEditing = eventId != null,
+            onSubmitSuccess = onSubmitSuccess,
+            onPreviewLocation = onPreviewLocation)
+      }
+    }
+
+    // Back button is handled inside content for success state, but we might want it always visible?
+    // The original design had it overlaying everything.
+    // However, if loading/error, we might want different behavior.
+    // Let's keep it simple and consistent with ManageEventsScreen pattern if possible,
+    // but here we have a full screen form.
+    // Actually, let's put the BackButton in the Success content, and handle it separately for
+    // Error.
+    // Loading doesn't need a back button usually, or maybe it does?
+    // Let's stick to the structure where BackButton is at the top level if possible,
+    // but the content scrolling might interfere.
+    // Re-reading original code: BackButton was at the end of the Box.
+
+    if (uiState !is AddEditEventUIState.Error) {
+      BackButton(modifier = Modifier.align(Alignment.TopStart), onGoBack = onBack)
+    }
   }
+}
+
+@Composable
+private fun AddEditEventContent(
+    viewModel: AddEditEventViewModel,
+    isEditing: Boolean,
+    onSubmitSuccess: () -> Unit,
+    onPreviewLocation: (Location) -> Unit
+) {
   val formState by viewModel.formState.collectAsState()
   val scroll = rememberScrollState()
   val context = LocalContext.current
@@ -111,166 +167,162 @@ fun AddEditEventScreen(
         .show()
   }
 
-  Box(modifier = Modifier.fillMaxSize()) {
-    Column(
-        modifier =
-            Modifier.fillMaxSize()
-                .verticalScroll(scroll)
-                .padding(top = 72.dp, start = 16.dp, end = 16.dp, bottom = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)) {
-          // --- Header ---
-          Text(
-              text =
-                  if (initialEvent == null) stringResource(R.string.add_new_event)
-                  else stringResource(R.string.edit_event),
-              style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
-          HorizontalDivider(color = MaterialTheme.colorScheme.onSurfaceVariant)
+  Column(
+      modifier =
+          Modifier.fillMaxSize()
+              .verticalScroll(scroll)
+              .padding(top = 72.dp, start = 16.dp, end = 16.dp, bottom = 24.dp),
+      verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        // --- Header ---
+        Text(
+            text =
+                if (!isEditing) stringResource(R.string.add_new_event)
+                else stringResource(R.string.edit_event),
+            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
+        HorizontalDivider(color = MaterialTheme.colorScheme.onSurfaceVariant)
 
-          // --- General Info ---
-          Text(
-              text = stringResource(R.string.general_info),
-              color = MaterialTheme.colorScheme.outline,
-              style = MaterialTheme.typography.titleSmall)
-          HorizontalDivider()
+        // --- General Info ---
+        Text(
+            text = stringResource(R.string.general_info),
+            color = MaterialTheme.colorScheme.outline,
+            style = MaterialTheme.typography.titleSmall)
+        HorizontalDivider()
 
+        OutlinedTextField(
+            value = formState.title,
+            onValueChange = { viewModel.updateTitle(it) },
+            label = { Text(stringResource(R.string.event_title_required)) },
+            modifier = Modifier.fillMaxWidth())
+
+        OutlinedTextField(
+            value = formState.description,
+            onValueChange = { viewModel.updateDescription(it) },
+            label = { Text(stringResource(R.string.event_description_required)) },
+            modifier = Modifier.fillMaxWidth().height(120.dp))
+
+        Box {
           OutlinedTextField(
-              value = formState.title,
-              onValueChange = { viewModel.updateTitle(it) },
-              label = { Text(stringResource(R.string.event_title_required)) },
+              value = formState.time,
+              onValueChange = {},
+              label = { Text(stringResource(R.string.event_time_required)) },
+              readOnly = true,
               modifier = Modifier.fillMaxWidth())
-
-          OutlinedTextField(
-              value = formState.description,
-              onValueChange = { viewModel.updateDescription(it) },
-              label = { Text(stringResource(R.string.event_description_required)) },
-              modifier = Modifier.fillMaxWidth().height(120.dp))
-
-          Box {
-            OutlinedTextField(
-                value = formState.time,
-                onValueChange = {},
-                label = { Text(stringResource(R.string.event_time_required)) },
-                readOnly = true,
-                modifier = Modifier.fillMaxWidth())
-            Box(
-                modifier =
-                    Modifier.matchParentSize()
-                        .clickable(
-                            interactionSource = interactionSource,
-                            indication = null,
-                            onClick = { showDatePicker() }))
-          }
-
-          OutlinedTextField(
-              value = formState.priceText,
-              onValueChange = { viewModel.updatePriceText(it) },
-              label = { Text(stringResource(R.string.event_price_optional)) },
-              modifier = Modifier.fillMaxWidth())
-
-          OutlinedTextField(
-              value = formState.tagsText,
-              onValueChange = { viewModel.updateTagsText(it) },
-              label = { Text(stringResource(R.string.event_tags)) },
-              modifier = Modifier.fillMaxWidth())
-
-          OutlinedTextField(
-              value = formState.pictureUrl,
-              onValueChange = { viewModel.updatePictureUrl(it) },
-              label = { Text(stringResource(R.string.event_picture_url)) },
-              modifier = Modifier.fillMaxWidth())
-
-          // --- Location Section ---
-          Text(
-              text = stringResource(R.string.event_location_section_title),
-              color = MaterialTheme.colorScheme.outline,
-              style = MaterialTheme.typography.titleSmall)
-          HorizontalDivider()
-
-          OutlinedTextField(
-              value = formState.locationName,
-              onValueChange = { viewModel.updateLocationName(it) },
-              label = { Text(stringResource(R.string.event_location_name_label)) },
-              modifier = Modifier.fillMaxWidth())
-
-          Button(
-              onClick = { viewModel.onManualLocationLookup() },
-              enabled = formState.locationName.isNotBlank() && !formState.isLocationSearching) {
-                Text(stringResource(R.string.event_location_search))
-              }
-
-          if (formState.isLocationSearching) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                  CircularProgressIndicator(modifier = Modifier.height(18.dp), strokeWidth = 2.dp)
-                  Text(stringResource(R.string.event_location_searching))
-                }
-          }
-
-          formState.locationErrorRes?.let { res ->
-            Text(
-                text = stringResource(res),
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall)
-          }
-
-          if (formState.locationLatitude != null && formState.locationLongitude != null) {
-            val resolvedName = formState.resolvedLocationName
-            Text(
-                text = stringResource(R.string.event_location_coordinates),
-                style = MaterialTheme.typography.titleMedium)
-            resolvedName?.let { resolved ->
-              Text(
-                  text = stringResource(R.string.event_location_resolved_description, resolved),
-                  style = MaterialTheme.typography.bodySmall,
-                  color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-            OutlinedTextField(
-                value = formState.locationLatitude.toString(),
-                onValueChange = {},
-                readOnly = true,
-                label = { Text(stringResource(R.string.event_location_latitude)) },
-                modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(
-                value = formState.locationLongitude.toString(),
-                onValueChange = {},
-                readOnly = true,
-                label = { Text(stringResource(R.string.event_location_longitude)) },
-                modifier = Modifier.fillMaxWidth())
-
-            val previewLocation =
-                remember(formState.locationLatitude, formState.locationLongitude, resolvedName) {
-                  Location(
-                      latitude = formState.locationLatitude!!,
-                      longitude = formState.locationLongitude!!,
-                      name = resolvedName ?: formState.locationName)
-                }
-
-            Box(modifier = Modifier.fillMaxWidth().height(200.dp).clip(RoundedCornerShape(8.dp))) {
-              Map(
-                  target = previewLocation,
-                  enableControls = false,
-                  locationPermissionRequest = { result ->
-                    val granted =
-                        ContextCompat.checkSelfPermission(
-                            context, Manifest.permission.ACCESS_FINE_LOCATION) ==
-                            PackageManager.PERMISSION_GRANTED
-                    result(granted)
-                  })
-              Spacer(
-                  modifier =
-                      Modifier.matchParentSize().clickable { onPreviewLocation(previewLocation) })
-            }
-          }
-
-          Spacer(Modifier.height(12.dp))
-
-          SubmitButton(
-              modifier = Modifier.fillMaxWidth().height(50.dp),
-              enabled = viewModel.isFormValid(),
-              onClick = { viewModel.submit(onSubmitSuccess) })
+          Box(
+              modifier =
+                  Modifier.matchParentSize()
+                      .clickable(
+                          interactionSource = interactionSource,
+                          indication = null,
+                          onClick = { showDatePicker() }))
         }
 
-    BackButton(modifier = Modifier.align(Alignment.TopStart), onGoBack = onBack)
-  }
+        OutlinedTextField(
+            value = formState.priceText,
+            onValueChange = { viewModel.updatePriceText(it) },
+            label = { Text(stringResource(R.string.event_price_optional)) },
+            modifier = Modifier.fillMaxWidth())
+
+        OutlinedTextField(
+            value = formState.tagsText,
+            onValueChange = { viewModel.updateTagsText(it) },
+            label = { Text(stringResource(R.string.event_tags)) },
+            modifier = Modifier.fillMaxWidth())
+
+        OutlinedTextField(
+            value = formState.pictureUrl,
+            onValueChange = { viewModel.updatePictureUrl(it) },
+            label = { Text(stringResource(R.string.event_picture_url)) },
+            modifier = Modifier.fillMaxWidth())
+
+        // --- Location Section ---
+        Text(
+            text = stringResource(R.string.event_location_section_title),
+            color = MaterialTheme.colorScheme.outline,
+            style = MaterialTheme.typography.titleSmall)
+        HorizontalDivider()
+
+        OutlinedTextField(
+            value = formState.locationName,
+            onValueChange = { viewModel.updateLocationName(it) },
+            label = { Text(stringResource(R.string.event_location_name_label)) },
+            modifier = Modifier.fillMaxWidth())
+
+        Button(
+            onClick = { viewModel.onManualLocationLookup() },
+            enabled = formState.locationName.isNotBlank() && !formState.isLocationSearching) {
+              Text(stringResource(R.string.event_location_search))
+            }
+
+        if (formState.isLocationSearching) {
+          Row(
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                CircularProgressIndicator(modifier = Modifier.height(18.dp), strokeWidth = 2.dp)
+                Text(stringResource(R.string.event_location_searching))
+              }
+        }
+
+        formState.locationErrorRes?.let { res ->
+          Text(
+              text = stringResource(res),
+              color = MaterialTheme.colorScheme.error,
+              style = MaterialTheme.typography.bodySmall)
+        }
+
+        if (formState.locationLatitude != null && formState.locationLongitude != null) {
+          val resolvedName = formState.resolvedLocationName
+          Text(
+              text = stringResource(R.string.event_location_coordinates),
+              style = MaterialTheme.typography.titleMedium)
+          resolvedName?.let { resolved ->
+            Text(
+                text = stringResource(R.string.event_location_resolved_description, resolved),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+          }
+          OutlinedTextField(
+              value = formState.locationLatitude.toString(),
+              onValueChange = {},
+              readOnly = true,
+              label = { Text(stringResource(R.string.event_location_latitude)) },
+              modifier = Modifier.fillMaxWidth())
+          OutlinedTextField(
+              value = formState.locationLongitude.toString(),
+              onValueChange = {},
+              readOnly = true,
+              label = { Text(stringResource(R.string.event_location_longitude)) },
+              modifier = Modifier.fillMaxWidth())
+
+          val previewLocation =
+              remember(formState.locationLatitude, formState.locationLongitude, resolvedName) {
+                Location(
+                    latitude = formState.locationLatitude!!,
+                    longitude = formState.locationLongitude!!,
+                    name = resolvedName ?: formState.locationName)
+              }
+
+          Box(modifier = Modifier.fillMaxWidth().height(200.dp).clip(RoundedCornerShape(8.dp))) {
+            Map(
+                target = previewLocation,
+                enableControls = false,
+                locationPermissionRequest = { result ->
+                  val granted =
+                      ContextCompat.checkSelfPermission(
+                          context, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                          PackageManager.PERMISSION_GRANTED
+                  result(granted)
+                })
+            Spacer(
+                modifier =
+                    Modifier.matchParentSize().clickable { onPreviewLocation(previewLocation) })
+          }
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        SubmitButton(
+            modifier = Modifier.fillMaxWidth().height(50.dp),
+            enabled = viewModel.isFormValid(),
+            onClick = { viewModel.submit(onSubmitSuccess) })
+      }
 }

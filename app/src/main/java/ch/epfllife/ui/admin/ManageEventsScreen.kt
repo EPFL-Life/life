@@ -24,10 +24,10 @@ import ch.epfllife.ui.composables.SettingsButton
 fun ManageEventsScreen(
     db: Db,
     associationId: String,
+    viewModel: ManageEventsViewModel = viewModel { ManageEventsViewModel(db, associationId) },
     onGoBack: () -> Unit,
     onAddNewEvent: (String) -> Unit,
     onEditEvent: (String) -> Unit,
-    viewModel: ManageEventsViewModel = viewModel { ManageEventsViewModel(db, associationId) }
 ) {
   val uiState by viewModel.uiState.collectAsState()
 
@@ -70,7 +70,7 @@ fun ManageEventsScreen(
 
                 SettingsButton(
                     text = stringResource(R.string.add_new_event),
-                    onClick = { onAddNewEvent(associationId) })
+                    onClick = { onAddNewEvent(viewModel.associationId) })
 
                 if (events.isEmpty()) {
                   Spacer(Modifier.height(12.dp))

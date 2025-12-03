@@ -4,28 +4,17 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.credentials.CredentialManager
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -33,13 +22,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import ch.epfllife.model.association.Association
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.db.Db
-import ch.epfllife.model.event.Event
 import ch.epfllife.model.map.Location
 import ch.epfllife.ui.admin.AddEditAssociationScreen
-import ch.epfllife.ui.admin.AddEditAssociationViewModel
 import ch.epfllife.ui.admin.AddEditEventScreen
 import ch.epfllife.ui.admin.ManageEventsScreen
 import ch.epfllife.ui.admin.SelectAssociationScreen
@@ -62,16 +48,6 @@ import kotlinx.serialization.json.Json
 
 private const val selectedAssociationIdKey = "selectedAssociationId"
 private const val selectedAssociationNameKey = "selectedAssociationName"
-
-private sealed class LoadState<out T> {
-  object Loading : LoadState<Nothing>()
-
-  data class Success<T>(val data: T) : LoadState<T>()
-
-  data class Error(val message: String) : LoadState<Nothing>()
-}
-
-private data class AddEditEventPayload(val association: Association, val event: Event?)
 
 class MainActivity : ComponentActivity() {
 
@@ -126,8 +102,6 @@ fun App(
         Screen.Settings.route -> true
         else -> false
       }
-
-  val context = LocalContext.current
 
   Scaffold(
       bottomBar = {
@@ -269,52 +243,11 @@ fun App(
                     backStackEntry.arguments?.getString(
                         Screen.AddEditAssociation.ASSOCIATION_ID_ARG)
 
-                // Case 1: Creating a new association
-                if (associationId.isNullOrBlank()) {
-
-                  AddEditAssociationScreen(
-                      viewModel = AddEditAssociationViewModel(null),
-                      onBack = { navController.popBackStack() },
-                      onSubmitSuccess = { navController.popBackStack() })
-                } else {
-
-                  // Case 2: Editing an existing association
-                  val associationState by
-                      produceState<LoadState<Association>>(
-                          initialValue = LoadState.Loading, key1 = associationId) {
-                            value =
-                                runCatching {
-                                      val association =
-                                          db.assocRepo.getAssociation(associationId)
-                                              ?: throw IllegalStateException(
-                                                  context.getString(
-                                                      R.string.error_association_not_found))
-                                      association
-                                    }
-                                    .fold(
-                                        onSuccess = { LoadState.Success(it) },
-                                        onFailure = {
-                                          LoadState.Error(
-                                              it.message
-                                                  ?: context.getString(
-                                                      R.string.error_loading_association))
-                                        })
-                          }
-
-                  when (val state = associationState) {
-                    LoadState.Loading -> FullScreenLoader()
-
-                    is LoadState.Error ->
-                        FullScreenError(
-                            message = state.message, onBack = { navController.popBackStack() })
-
-                    is LoadState.Success ->
-                        AddEditAssociationScreen(
-                            viewModel = AddEditAssociationViewModel(state.data),
-                            onBack = { navController.popBackStack() },
-                            onSubmitSuccess = { navController.popBackStack() })
-                  }
-                }
+                AddEditAssociationScreen(
+                    db = db,
+                    associationId = associationId,
+                    onBack = { navController.popBackStack() },
+                    onSubmitSuccess = { navController.popBackStack() })
               }
 
           composable(
@@ -349,49 +282,16 @@ fun App(
                     backStackEntry.arguments?.getString(Screen.AddEditEvent.ARG_ASSOCIATION_ID)
                         ?: ""
 
-                val payloadState by
-                    produceState<LoadState<AddEditEventPayload>>(
-                        initialValue = LoadState.Loading, key1 = associationId) {
-                          value =
-                              runCatching {
-                                    val association =
-                                        db.assocRepo.getAssociation(associationId)
-                                            ?: throw IllegalStateException(
-                                                context.getString(
-                                                    R.string.error_association_not_found))
-
-                                    AddEditEventPayload(association = association, event = null)
-                                  }
-                                  .fold(
-                                      onSuccess = { LoadState.Success(it) },
-                                      onFailure = {
-                                        LoadState.Error(
-                                            it.message
-                                                ?: context.getString(
-                                                    R.string.error_loading_association))
-                                      })
-                        }
-
-                when (val state = payloadState) {
-                  LoadState.Loading -> FullScreenLoader()
-
-                  is LoadState.Error ->
-                      FullScreenError(
-                          message = state.message, onBack = { navigationActions.goBack() })
-
-                  is LoadState.Success -> {
-                    AddEditEventScreen(
-                        db = db,
-                        association = state.data.association,
-                        initialEvent = state.data.event,
-                        onBack = { navigationActions.goBack() },
-                        onSubmitSuccess = { navigationActions.goBack() },
-                        onPreviewLocation = { location ->
-                          val encoded = Uri.encode(Json.encodeToString(location))
-                          navigationActions.navigateToScreenWithId(Screen.Map, encoded)
-                        })
-                  }
-                }
+                AddEditEventScreen(
+                    db = db,
+                    associationId = associationId,
+                    eventId = null,
+                    onBack = { navigationActions.goBack() },
+                    onSubmitSuccess = { navigationActions.goBack() },
+                    onPreviewLocation = { location ->
+                      val encoded = Uri.encode(Json.encodeToString(location))
+                      navigationActions.navigateToScreenWithId(Screen.Map, encoded)
+                    })
               }
 
           composable(
@@ -411,75 +311,17 @@ fun App(
                 val eventId =
                     backStackEntry.arguments?.getString(Screen.AddEditEvent.ARG_EVENT_ID) ?: ""
 
-                val payloadState by
-                    produceState<LoadState<AddEditEventPayload>>(
-                        initialValue = LoadState.Loading, key1 = associationId, key2 = eventId) {
-                          value =
-                              runCatching {
-                                    val association =
-                                        db.assocRepo.getAssociation(associationId)
-                                            ?: throw IllegalStateException(
-                                                context.getString(
-                                                    R.string.error_association_not_found))
-
-                                    val event =
-                                        db.eventRepo.getEvent(eventId)
-                                            ?: throw IllegalStateException(
-                                                context.getString(R.string.error_loading_event))
-
-                                    AddEditEventPayload(association = association, event = event)
-                                  }
-                                  .fold(
-                                      onSuccess = { LoadState.Success(it) },
-                                      onFailure = {
-                                        LoadState.Error(
-                                            it.message
-                                                ?: context.getString(R.string.error_loading_event))
-                                      })
-                        }
-
-                when (val state = payloadState) {
-                  LoadState.Loading -> FullScreenLoader()
-
-                  is LoadState.Error ->
-                      FullScreenError(
-                          message = state.message, onBack = { navigationActions.goBack() })
-
-                  is LoadState.Success ->
-                      AddEditEventScreen(
-                          db = db,
-                          association = state.data.association,
-                          initialEvent = state.data.event,
-                          onBack = { navigationActions.goBack() },
-                          onSubmitSuccess = { navigationActions.goBack() },
-                          onPreviewLocation = { location ->
-                            val encoded = Uri.encode(Json.encodeToString(location))
-                            navigationActions.navigateToScreenWithId(Screen.Map, encoded)
-                          })
-                }
+                AddEditEventScreen(
+                    db = db,
+                    associationId = associationId,
+                    eventId = eventId,
+                    onBack = { navigationActions.goBack() },
+                    onSubmitSuccess = { navigationActions.goBack() },
+                    onPreviewLocation = { location ->
+                      val encoded = Uri.encode(Json.encodeToString(location))
+                      navigationActions.navigateToScreenWithId(Screen.Map, encoded)
+                    })
               }
         }
       }
-}
-
-@Composable
-private fun FullScreenLoader() {
-  Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-    CircularProgressIndicator()
-  }
-}
-
-@Composable
-private fun FullScreenError(message: String, onBack: () -> Unit) {
-  Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(12.dp)) {
-          Text(
-              text = message,
-              style = MaterialTheme.typography.bodyMedium,
-              color = MaterialTheme.colorScheme.error)
-          Button(onClick = onBack) { Text(text = stringResource(R.string.back_button_description)) }
-        }
-  }
 }

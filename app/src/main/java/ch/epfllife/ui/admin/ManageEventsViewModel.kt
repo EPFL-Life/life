@@ -18,7 +18,7 @@ sealed interface ManageEventsUIState {
   data class Success(val events: List<Event>) : ManageEventsUIState
 }
 
-class ManageEventsViewModel(private val db: Db, private val associationId: String) : ViewModel() {
+class ManageEventsViewModel(private val db: Db, val associationId: String) : ViewModel() {
 
   private val _uiState = MutableStateFlow<ManageEventsUIState>(ManageEventsUIState.Loading)
   val uiState: StateFlow<ManageEventsUIState> = _uiState
