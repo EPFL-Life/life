@@ -31,10 +31,18 @@ data class AddEditEventFormState(
     val tagsText: String = ""
 )
 
+sealed interface AddEditEventUIState {
+  object Loading : AddEditEventUIState
+
+  data class Error(val message: String) : AddEditEventUIState
+
+  data class Success(val association: Association, val event: Event?) : AddEditEventUIState
+}
+
 class AddEditEventViewModel(
     private val db: Db,
-    private val association: Association,
-    private val initialEvent: Event? = null,
+    private val associationId: String,
+    private val eventId: String? = null,
     private val locationRepository: LocationRepository
 ) : ViewModel() {
 
@@ -43,13 +51,43 @@ class AddEditEventViewModel(
     private const val LOCATION_SEARCH_DEBOUNCE_MS = 700L
   }
 
+  private val _uiState = MutableStateFlow<AddEditEventUIState>(AddEditEventUIState.Loading)
+  val uiState: StateFlow<AddEditEventUIState> = _uiState
+
   private val _formState = MutableStateFlow(AddEditEventFormState())
   val formState: StateFlow<AddEditEventFormState> = _formState
 
   private var locationSearchJob: Job? = null
+  private var loadedAssociation: Association? = null
+  private var loadedEvent: Event? = null
 
   init {
-    initialEvent?.let { populateFromEvent(it) }
+    loadData()
+  }
+
+  private fun loadData() {
+    viewModelScope.launch {
+      _uiState.value = AddEditEventUIState.Loading
+      try {
+        val association =
+            db.assocRepo.getAssociation(associationId)
+                ?: throw IllegalStateException("Association not found")
+        loadedAssociation = association
+
+        val event =
+            if (eventId != null) {
+              db.eventRepo.getEvent(eventId) ?: throw IllegalStateException("Event not found")
+            } else {
+              null
+            }
+        loadedEvent = event
+
+        event?.let { populateFromEvent(it) }
+        _uiState.value = AddEditEventUIState.Success(association, event)
+      } catch (e: Exception) {
+        _uiState.value = AddEditEventUIState.Error(e.message ?: "Unknown error")
+      }
+    }
   }
 
   private fun populateFromEvent(e: Event) {
@@ -186,6 +224,7 @@ class AddEditEventViewModel(
   fun submit(onComplete: () -> Unit) {
     viewModelScope.launch {
       val s = _formState.value
+      val association = loadedAssociation ?: return@launch
 
       val price = Price(s.priceText.toUIntOrNull() ?: 0u)
 
@@ -197,7 +236,7 @@ class AddEditEventViewModel(
       val tags = s.tagsText.split(",").map { it.trim() }.filter { it.isNotEmpty() }
 
       val event =
-          (initialEvent?.copy(
+          (loadedEvent?.copy(
               title = s.title,
               description = s.description,
               location = location,
@@ -217,7 +256,7 @@ class AddEditEventViewModel(
                   tags = tags))
 
       // TODO: implement repo calls once backend ready:
-      // if (initialEvent == null) db.eventRepo.createEvent(event)
+      // if (loadedEvent == null) db.eventRepo.createEvent(event)
       // else db.eventRepo.updateEvent(event)
 
       onComplete()

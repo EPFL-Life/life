@@ -5,9 +5,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import ch.epfllife.model.association.Association
+import androidx.lifecycle.viewModelScope
+import ch.epfllife.model.db.Db
 import ch.epfllife.ui.association.SocialIcons
 import java.net.URI
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 data class SocialMediaEntry(
     val platform: String,
@@ -25,34 +29,73 @@ data class AssociationFormState(
     var bannerUrl: String = ""
 )
 
-class AddEditAssociationViewModel(private val existingAssociation: Association? = null) :
+sealed interface AddEditAssociationUIState {
+  object Loading : AddEditAssociationUIState
+
+  data class Error(val message: String) : AddEditAssociationUIState
+
+  object Success : AddEditAssociationUIState
+}
+
+class AddEditAssociationViewModel(private val db: Db, private val associationId: String? = null) :
     ViewModel() {
 
   var formState by mutableStateOf(AssociationFormState())
     private set
 
-  val isEditing: Boolean = existingAssociation != null
+  private val _uiState =
+      MutableStateFlow<AddEditAssociationUIState>(AddEditAssociationUIState.Loading)
+  val uiState: StateFlow<AddEditAssociationUIState> = _uiState
 
-  val initialAssociationName: String = existingAssociation?.name ?: ""
+  val isEditing: Boolean = associationId != null
+
+  // We can't know the initial name until we load the association, so we'll expose it from formState
+  // or a separate field after loading
+  // But for the UI title, we can use formState.name if it's populated.
+  // The original code had `initialAssociationName`.
+  var initialAssociationName: String = ""
+    private set
 
   init {
-    existingAssociation?.let { assoc ->
-      val socialList =
-          SocialIcons.platformOrder.map { platform ->
-            SocialMediaEntry(
-                platform = platform,
-                enabled = assoc.socialLinks?.containsKey(platform) == true,
-                link = assoc.socialLinks?.get(platform) ?: "")
-          }
+    loadData()
+  }
 
-      formState =
-          AssociationFormState(
-              name = assoc.name,
-              description = assoc.description,
-              about = assoc.about ?: "",
-              socialMedia = socialList,
-              logoUrl = assoc.logoUrl ?: "",
-              bannerUrl = assoc.pictureUrl ?: "")
+  private fun loadData() {
+    if (associationId == null) {
+      _uiState.value = AddEditAssociationUIState.Success
+      return
+    }
+
+    viewModelScope.launch {
+      _uiState.value = AddEditAssociationUIState.Loading
+      try {
+        val assoc =
+            db.assocRepo.getAssociation(associationId)
+                ?: throw IllegalStateException("Association not found")
+
+        initialAssociationName = assoc.name
+
+        val socialList =
+            SocialIcons.platformOrder.map { platform ->
+              SocialMediaEntry(
+                  platform = platform,
+                  enabled = assoc.socialLinks?.containsKey(platform) == true,
+                  link = assoc.socialLinks?.get(platform) ?: "")
+            }
+
+        formState =
+            AssociationFormState(
+                name = assoc.name,
+                description = assoc.description,
+                about = assoc.about ?: "",
+                socialMedia = socialList,
+                logoUrl = assoc.logoUrl ?: "",
+                bannerUrl = assoc.pictureUrl ?: "")
+
+        _uiState.value = AddEditAssociationUIState.Success
+      } catch (e: Exception) {
+        _uiState.value = AddEditAssociationUIState.Error(e.message ?: "Unknown error")
+      }
     }
   }
 

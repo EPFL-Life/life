@@ -105,15 +105,6 @@ open class NavigationActions(
     navController.navigate(Screen.AddEditAssociation.createRoute(associationId))
   }
 
-  /** Navigate back to the previous screen. */
-  open fun goBack() {
-    navController.popBackStack()
-  }
-
-  open fun currentRoute(): String {
-    return navController.currentDestination?.route ?: ""
-  }
-
   fun navigateToManageEvents(associationId: String) {
     navController.navigate(Screen.ManageEvents.createRoute(associationId))
   }
@@ -126,9 +117,17 @@ open class NavigationActions(
     navController.navigate(route)
   }
 
+  /** Navigate back to the previous screen. */
+  open fun goBack() {
+    navController.popBackStack()
+  }
+
   /**
    * Get the current route of the navigation controller.
    *
    * @return The current route
    */
+  open fun currentRoute(): String {
+    return navController.currentDestination?.route ?: ""
+  }
 }
