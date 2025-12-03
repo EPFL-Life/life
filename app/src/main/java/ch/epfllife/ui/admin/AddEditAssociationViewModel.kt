@@ -1,18 +1,19 @@
 package ch.epfllife.ui.admin
 
-import android.util.Log
 import android.util.Patterns
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import ch.epfllife.R
+import ch.epfllife.model.association.Association
+import ch.epfllife.model.association.AssociationRepository
 import ch.epfllife.model.db.Db
+import ch.epfllife.model.event.EventCategory
 import ch.epfllife.ui.association.SocialIcons
 import java.net.URI
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 data class SocialMediaEntry(
@@ -31,70 +32,35 @@ data class AssociationFormState(
     var bannerUrl: String = ""
 )
 
-sealed interface AddEditAssociationUIState {
-  object Loading : AddEditAssociationUIState
-
-  data class Error(val messageRes: Int) : AddEditAssociationUIState
-
-  object Success : AddEditAssociationUIState
-}
-
-class AddEditAssociationViewModel(private val db: Db, private val associationId: String? = null) :
-    ViewModel() {
+class AddEditAssociationViewModel(
+    private val existingAssociation: Association? = null,
+    private val associationRepository: AssociationRepository = Db.firestore.assocRepo,
+    private val submitDispatcher: CoroutineDispatcher = Dispatchers.Main,
+) : ViewModel() {
 
   var formState by mutableStateOf(AssociationFormState())
     private set
 
-  private val _uiState =
-      MutableStateFlow<AddEditAssociationUIState>(AddEditAssociationUIState.Loading)
-  val uiState: StateFlow<AddEditAssociationUIState> = _uiState
-
-  val isEditing: Boolean = associationId != null
-
-  var initialAssociationName: String = ""
-    private set
+  private val associationId: String = existingAssociation?.id ?: associationRepository.getNewUid()
 
   init {
-    loadData()
-  }
+    existingAssociation?.let { assoc ->
+      val socialList =
+          SocialIcons.platformOrder.map { platform ->
+            SocialMediaEntry(
+                platform = platform,
+                enabled = assoc.socialLinks?.containsKey(platform) == true,
+                link = assoc.socialLinks?.get(platform) ?: "")
+          }
 
-  private fun loadData() {
-    if (associationId == null) {
-      _uiState.value = AddEditAssociationUIState.Success
-      return
-    }
-
-    viewModelScope.launch {
-      _uiState.value = AddEditAssociationUIState.Loading
-      try {
-        val assoc =
-            db.assocRepo.getAssociation(associationId)
-                ?: throw IllegalStateException("Association not found")
-
-        initialAssociationName = assoc.name
-
-        val socialList =
-            SocialIcons.platformOrder.map { platform ->
-              SocialMediaEntry(
-                  platform = platform,
-                  enabled = assoc.socialLinks?.containsKey(platform) == true,
-                  link = assoc.socialLinks?.get(platform) ?: "")
-            }
-
-        formState =
-            AssociationFormState(
-                name = assoc.name,
-                description = assoc.description,
-                about = assoc.about ?: "",
-                socialMedia = socialList,
-                logoUrl = assoc.logoUrl ?: "",
-                bannerUrl = assoc.pictureUrl ?: "")
-
-        _uiState.value = AddEditAssociationUIState.Success
-      } catch (e: Exception) {
-        Log.e("AddEditAssociationVM", "Failed to load association", e)
-        _uiState.value = AddEditAssociationUIState.Error(R.string.error_loading_association)
-      }
+      formState =
+          AssociationFormState(
+              name = assoc.name,
+              description = assoc.description,
+              about = assoc.about ?: "",
+              socialMedia = socialList,
+              logoUrl = assoc.logoUrl ?: "",
+              bannerUrl = assoc.pictureUrl ?: "")
     }
   }
 
@@ -168,7 +134,34 @@ class AddEditAssociationViewModel(private val db: Db, private val associationId:
 
   fun submit(onSuccess: () -> Unit) {
     if (!isFormValid()) return
-    // TODO: send data to Firebase
-    onSuccess()
+
+    viewModelScope.launch(submitDispatcher) {
+      val association = buildAssociation()
+      val result =
+          if (existingAssociation == null) {
+            associationRepository.createAssociation(association)
+          } else {
+            associationRepository.updateAssociation(associationId, association)
+          }
+
+      result.onSuccess { onSuccess() }
+    }
+  }
+
+  private fun buildAssociation(): Association {
+    val socialLinks =
+        formState.socialMedia
+            .filter { it.enabled && it.link.isNotBlank() }
+            .associate { it.platform to it.link.trim() }
+
+    return Association(
+        id = associationId,
+        name = formState.name.trim(),
+        description = formState.description.trim(),
+        pictureUrl = formState.bannerUrl.ifBlank { null },
+        logoUrl = formState.logoUrl.ifBlank { null },
+        eventCategory = existingAssociation?.eventCategory ?: EventCategory.OTHER,
+        about = formState.about.trim().ifBlank { null },
+        socialLinks = if (socialLinks.isEmpty()) null else socialLinks)
   }
 }

@@ -1,6 +1,5 @@
 package ch.epfllife
 
-import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,6 +10,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -22,12 +22,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import ch.epfllife.model.association.Association
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.db.Db
 import ch.epfllife.model.map.Location
 import ch.epfllife.ui.admin.AddEditAssociationScreen
-import ch.epfllife.ui.admin.AddEditEventScreen
-import ch.epfllife.ui.admin.ManageEventsScreen
+import ch.epfllife.ui.admin.AddEditAssociationViewModel
 import ch.epfllife.ui.admin.SelectAssociationScreen
 import ch.epfllife.ui.association.AssociationBrowser
 import ch.epfllife.ui.association.AssociationDetailsScreen
@@ -43,8 +43,6 @@ import ch.epfllife.ui.navigation.Screen
 import ch.epfllife.ui.navigation.Tab
 import ch.epfllife.ui.settings.SettingsScreen
 import ch.epfllife.ui.theme.Theme
-import com.google.firebase.Firebase
-import com.google.firebase.database.database
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -56,8 +54,6 @@ class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    // Keep cached data across app restarts
-    Firebase.database.setPersistenceEnabled(true)
     setContent {
       ThemedApp(auth = Auth(CredentialManager.create(LocalContext.current)), db = Db.firestore)
     }
@@ -104,6 +100,7 @@ fun App(
         Screen.AssociationBrowser.route,
         Screen.Calendar.route,
         Screen.Settings.route -> true
+
         else -> false
       }
 
@@ -140,15 +137,13 @@ fun App(
                 onAssociationClick = { associationId ->
                   navigationActions.navigateToAssociationDetails(associationId)
                 },
-                db = db,
-            )
+                db = db)
           }
 
           composable(Screen.Calendar.route) {
             CalendarScreen(
                 onEventClick = { eventId -> navigationActions.navigateToEventDetails(eventId) },
-                db = db,
-            )
+                db = db)
           }
 
           composable(
@@ -176,7 +171,7 @@ fun App(
                 eventId = eventId,
                 onGoBack = { navigationActions.goBack() },
                 onOpenMap = { location ->
-                  val encodedLocation = Uri.encode(Json.encodeToString(location))
+                  val encodedLocation = Json.encodeToString(location)
                   navigationActions.navigateToScreenWithId(Screen.Map, encodedLocation)
                 },
                 db = db,
@@ -212,8 +207,8 @@ fun App(
                 onManageAssociationClick = { associationId ->
                   navigationActions.navigateToAddEditAssociation(associationId)
                 },
-                onManageAssociationEventsClick = { associationId ->
-                  navigationActions.navigateToManageEvents(associationId)
+                onManageAssociationEventsClick = { _ -> // use AssociationID
+                  // TODO: placeholder, can navigate to manage events later
                 },
                 selectedAssociationId = selectedAssociationId,
                 selectedAssociationName = selectedAssociationName,
@@ -249,84 +244,15 @@ fun App(
                     backStackEntry.arguments?.getString(
                         Screen.AddEditAssociation.ASSOCIATION_ID_ARG)
 
+                val association by
+                    produceState<Association?>(initialValue = null, associationId) {
+                      value = associationId?.let { db.assocRepo.getAssociation(it) }
+                    }
+
                 AddEditAssociationScreen(
-                    db = db,
-                    associationId = associationId,
+                    viewModel = AddEditAssociationViewModel(association),
                     onBack = { navController.popBackStack() },
                     onSubmitSuccess = { navController.popBackStack() })
-              }
-
-          composable(
-              route = Screen.ManageEvents.route,
-              arguments =
-                  listOf(
-                      navArgument(Screen.ManageEvents.ARG_ASSOCIATION_ID) {
-                        type = NavType.StringType
-                      })) { backStackEntry ->
-                val associationId =
-                    backStackEntry.arguments?.getString(Screen.ManageEvents.ARG_ASSOCIATION_ID)
-                        ?: ""
-
-                ManageEventsScreen(
-                    db = db,
-                    associationId = associationId,
-                    onGoBack = { navigationActions.goBack() },
-                    onAddNewEvent = { navigationActions.navigateToAddEditEvent(associationId) },
-                    onEditEvent = { eventId ->
-                      navigationActions.navigateToAddEditEvent(associationId, eventId)
-                    })
-              }
-
-          composable(
-              route = Screen.AddEditEvent.ROUTE_ADD,
-              arguments =
-                  listOf(
-                      navArgument(Screen.AddEditEvent.ARG_ASSOCIATION_ID) {
-                        type = NavType.StringType
-                      })) { backStackEntry ->
-                val associationId =
-                    backStackEntry.arguments?.getString(Screen.AddEditEvent.ARG_ASSOCIATION_ID)
-                        ?: ""
-
-                AddEditEventScreen(
-                    db = db,
-                    associationId = associationId,
-                    eventId = null,
-                    onBack = { navigationActions.goBack() },
-                    onSubmitSuccess = { navigationActions.goBack() },
-                    onPreviewLocation = { location ->
-                      val encoded = Uri.encode(Json.encodeToString(location))
-                      navigationActions.navigateToScreenWithId(Screen.Map, encoded)
-                    })
-              }
-
-          composable(
-              route = Screen.AddEditEvent.ROUTE_EDIT,
-              arguments =
-                  listOf(
-                      navArgument(Screen.AddEditEvent.ARG_ASSOCIATION_ID) {
-                        type = NavType.StringType
-                      },
-                      navArgument(Screen.AddEditEvent.ARG_EVENT_ID) {
-                        type = NavType.StringType
-                      })) { backStackEntry ->
-                val associationId =
-                    backStackEntry.arguments?.getString(Screen.AddEditEvent.ARG_ASSOCIATION_ID)
-                        ?: ""
-
-                val eventId =
-                    backStackEntry.arguments?.getString(Screen.AddEditEvent.ARG_EVENT_ID) ?: ""
-
-                AddEditEventScreen(
-                    db = db,
-                    associationId = associationId,
-                    eventId = eventId,
-                    onBack = { navigationActions.goBack() },
-                    onSubmitSuccess = { navigationActions.goBack() },
-                    onPreviewLocation = { location ->
-                      val encoded = Uri.encode(Json.encodeToString(location))
-                      navigationActions.navigateToScreenWithId(Screen.Map, encoded)
-                    })
               }
         }
       }
