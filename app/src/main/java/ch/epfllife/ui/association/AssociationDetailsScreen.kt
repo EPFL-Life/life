@@ -18,7 +18,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -29,7 +28,6 @@ import ch.epfllife.model.event.Event
 import ch.epfllife.ui.composables.BackButton
 import ch.epfllife.ui.composables.EventCard
 import ch.epfllife.ui.theme.LifeRed
-import ch.epfllife.ui.theme.Theme
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 
@@ -256,14 +254,5 @@ fun AssociationDetailsContent(
             Modifier.align(Alignment.TopStart).testTag(AssociationDetailsTestTags.BACK_BUTTON),
         onGoBack = onGoBack,
     )
-  }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AssociationDetailsPreview() {
-  Theme {
-    AssociationDetailsScreen(
-        associationId = "1", onGoBack = {}, onEventClick = {}, db = Db.freshLocal())
   }
 }
