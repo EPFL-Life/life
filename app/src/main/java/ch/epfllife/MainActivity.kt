@@ -11,7 +11,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -23,7 +22,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import ch.epfllife.model.association.Association
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.db.Db
 import ch.epfllife.model.map.Location
@@ -245,11 +243,6 @@ fun App(
                 val associationId =
                     backStackEntry.arguments?.getString(
                         Screen.AddEditAssociation.ASSOCIATION_ID_ARG)
-
-                val association by
-                    produceState<Association?>(initialValue = null, associationId) {
-                      value = associationId?.let { db.assocRepo.getAssociation(it) }
-                    }
 
                 AddEditAssociationScreen(
                     db = db,
