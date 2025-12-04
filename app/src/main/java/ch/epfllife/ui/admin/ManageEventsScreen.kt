@@ -12,6 +12,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.R
 import ch.epfllife.model.db.Db
@@ -37,6 +40,18 @@ fun ManageEventsScreen(
     onEditEvent: (String) -> Unit,
 ) {
   val uiState by viewModel.uiState.collectAsState()
+
+  // we need this to automatically refresh the events when the screen is resumed
+  val lifecycleOwner = LocalLifecycleOwner.current
+  DisposableEffect(lifecycleOwner) {
+    val observer = LifecycleEventObserver { _, event ->
+      if (event == Lifecycle.Event.ON_RESUME) {
+        viewModel.reload()
+      }
+    }
+    lifecycleOwner.lifecycle.addObserver(observer)
+    onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+  }
 
   Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface)) {
     Refreshable(onRefresh = { finishRefreshing -> viewModel.reload { finishRefreshing() } }) {
