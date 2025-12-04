@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -50,6 +51,15 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import okhttp3.OkHttpClient
+
+object AddEditEventTestTags {
+  const val TITLE_FIELD = "AddEditEvent_TitleField"
+  const val DESCRIPTION_FIELD = "AddEditEvent_DescriptionField"
+  const val TIME_FIELD = "AddEditEvent_TimeField"
+  const val TIME_PICKER_BOX = "AddEditEvent_TimePickerBox"
+  const val LOCATION_FIELD = "AddEditEvent_LocationField"
+  const val SUBMIT_BUTTON = "AddEditEvent_SubmitButton"
+}
 
 @Composable
 fun AddEditEventScreen(
@@ -180,13 +190,16 @@ private fun AddEditEventContent(
             value = formState.title,
             onValueChange = { viewModel.updateTitle(it) },
             label = { Text(stringResource(R.string.event_title_required)) },
-            modifier = Modifier.fillMaxWidth())
+            modifier = Modifier.fillMaxWidth().testTag(AddEditEventTestTags.TITLE_FIELD))
 
         OutlinedTextField(
             value = formState.description,
             onValueChange = { viewModel.updateDescription(it) },
             label = { Text(stringResource(R.string.event_description_required)) },
-            modifier = Modifier.fillMaxWidth().height(120.dp))
+            modifier =
+                Modifier.fillMaxWidth()
+                    .height(120.dp)
+                    .testTag(AddEditEventTestTags.DESCRIPTION_FIELD))
 
         Box {
           OutlinedTextField(
@@ -194,14 +207,15 @@ private fun AddEditEventContent(
               onValueChange = {},
               label = { Text(stringResource(R.string.event_time_required)) },
               readOnly = true,
-              modifier = Modifier.fillMaxWidth())
+              modifier = Modifier.fillMaxWidth().testTag(AddEditEventTestTags.TIME_FIELD))
           Box(
               modifier =
                   Modifier.matchParentSize()
                       .clickable(
                           interactionSource = interactionSource,
                           indication = null,
-                          onClick = { showDatePicker() }))
+                          onClick = { showDatePicker() })
+                      .testTag(AddEditEventTestTags.TIME_PICKER_BOX))
         }
 
         OutlinedTextField(
@@ -233,7 +247,7 @@ private fun AddEditEventContent(
             value = formState.locationName,
             onValueChange = { viewModel.updateLocationName(it) },
             label = { Text(stringResource(R.string.event_location_name_label)) },
-            modifier = Modifier.fillMaxWidth())
+            modifier = Modifier.fillMaxWidth().testTag(AddEditEventTestTags.LOCATION_FIELD))
 
         Button(
             onClick = { viewModel.onManualLocationLookup() },
@@ -309,7 +323,8 @@ private fun AddEditEventContent(
         Spacer(Modifier.height(12.dp))
 
         SubmitButton(
-            modifier = Modifier.fillMaxWidth().height(50.dp),
+            modifier =
+                Modifier.fillMaxWidth().height(50.dp).testTag(AddEditEventTestTags.SUBMIT_BUTTON),
             enabled = viewModel.isFormValid(),
             onClick = { viewModel.submit(onSubmitSuccess) })
       }

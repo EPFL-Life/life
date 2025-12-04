@@ -8,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -19,6 +20,12 @@ import ch.epfllife.ui.composables.BackButton
 import ch.epfllife.ui.composables.EventCard
 import ch.epfllife.ui.composables.Refreshable
 import ch.epfllife.ui.composables.SettingsButton
+
+object ManageEventsTestTags {
+  const val TITLE = "ManageEvents_Title"
+  const val ADD_EVENT_BUTTON = "ManageEvents_AddEventButton"
+  const val EMPTY_TEXT = "ManageEvents_EmptyText"
+}
 
 @Composable
 fun ManageEventsScreen(
@@ -65,18 +72,21 @@ fun ManageEventsScreen(
               verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(
                     text = stringResource(R.string.manage_events_title),
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                    modifier = Modifier.testTag(ManageEventsTestTags.TITLE))
                 HorizontalDivider()
 
                 SettingsButton(
                     text = stringResource(R.string.add_new_event),
-                    onClick = { onAddNewEvent(viewModel.associationId) })
+                    onClick = { onAddNewEvent(viewModel.associationId) },
+                    modifier = Modifier.testTag(ManageEventsTestTags.ADD_EVENT_BUTTON))
 
                 if (events.isEmpty()) {
                   Spacer(Modifier.height(12.dp))
                   Text(
                       text = stringResource(R.string.manage_events_empty),
-                      style = MaterialTheme.typography.bodyMedium)
+                      style = MaterialTheme.typography.bodyMedium,
+                      modifier = Modifier.testTag(ManageEventsTestTags.EMPTY_TEXT))
                 } else {
                   events.forEach { event: Event ->
                     EventCard(event = event, onClick = { onEditEvent(event.id) })
