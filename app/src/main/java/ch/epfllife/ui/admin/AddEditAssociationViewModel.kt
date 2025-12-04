@@ -1,11 +1,13 @@
 package ch.epfllife.ui.admin
 
+import android.util.Log
 import android.util.Patterns
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import ch.epfllife.R
 import ch.epfllife.model.db.Db
 import ch.epfllife.ui.association.SocialIcons
 import java.net.URI
@@ -32,7 +34,7 @@ data class AssociationFormState(
 sealed interface AddEditAssociationUIState {
   object Loading : AddEditAssociationUIState
 
-  data class Error(val message: String) : AddEditAssociationUIState
+  data class Error(val messageRes: Int) : AddEditAssociationUIState
 
   object Success : AddEditAssociationUIState
 }
@@ -90,7 +92,8 @@ class AddEditAssociationViewModel(private val db: Db, private val associationId:
 
         _uiState.value = AddEditAssociationUIState.Success
       } catch (e: Exception) {
-        _uiState.value = AddEditAssociationUIState.Error(e.message ?: "Unknown error")
+        Log.e("AddEditAssociationVM", "Failed to load association", e)
+        _uiState.value = AddEditAssociationUIState.Error(R.string.error_loading_association)
       }
     }
   }

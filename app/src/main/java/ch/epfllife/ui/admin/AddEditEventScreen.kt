@@ -94,7 +94,7 @@ fun AddEditEventScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally) {
               Text(
-                  text = state.message,
+                  text = stringResource(state.messageRes),
                   color = MaterialTheme.colorScheme.error,
                   style = MaterialTheme.typography.bodyLarge)
               Spacer(modifier = Modifier.height(16.dp))
