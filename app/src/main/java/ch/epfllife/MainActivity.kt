@@ -1,5 +1,6 @@
 package ch.epfllife
 
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -27,7 +28,8 @@ import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.db.Db
 import ch.epfllife.model.map.Location
 import ch.epfllife.ui.admin.AddEditAssociationScreen
-import ch.epfllife.ui.admin.AddEditAssociationViewModel
+import ch.epfllife.ui.admin.AddEditEventScreen
+import ch.epfllife.ui.admin.ManageEventsScreen
 import ch.epfllife.ui.admin.SelectAssociationScreen
 import ch.epfllife.ui.association.AssociationBrowser
 import ch.epfllife.ui.association.AssociationDetailsScreen
@@ -171,7 +173,7 @@ fun App(
                 eventId = eventId,
                 onGoBack = { navigationActions.goBack() },
                 onOpenMap = { location ->
-                  val encodedLocation = Json.encodeToString(location)
+                  val encodedLocation = Uri.encode(Json.encodeToString(location))
                   navigationActions.navigateToScreenWithId(Screen.Map, encodedLocation)
                 },
                 db = db,
@@ -207,8 +209,8 @@ fun App(
                 onManageAssociationClick = { associationId ->
                   navigationActions.navigateToAddEditAssociation(associationId)
                 },
-                onManageAssociationEventsClick = { _ -> // use AssociationID
-                  // TODO: placeholder, can navigate to manage events later
+                onManageAssociationEventsClick = { associationId ->
+                  navigationActions.navigateToManageEvents(associationId)
                 },
                 selectedAssociationId = selectedAssociationId,
                 selectedAssociationName = selectedAssociationName,
@@ -250,9 +252,83 @@ fun App(
                     }
 
                 AddEditAssociationScreen(
-                    viewModel = AddEditAssociationViewModel(association),
+                    db = db,
+                    associationId = associationId,
                     onBack = { navController.popBackStack() },
                     onSubmitSuccess = { navController.popBackStack() })
+              }
+
+          composable(
+              route = Screen.ManageEvents.route,
+              arguments =
+                  listOf(
+                      navArgument(Screen.ManageEvents.ARG_ASSOCIATION_ID) {
+                        type = NavType.StringType
+                      })) { backStackEntry ->
+                val associationId =
+                    backStackEntry.arguments?.getString(Screen.ManageEvents.ARG_ASSOCIATION_ID)
+                        ?: ""
+
+                ManageEventsScreen(
+                    db = db,
+                    associationId = associationId,
+                    onGoBack = { navigationActions.goBack() },
+                    onAddNewEvent = { navigationActions.navigateToAddEditEvent(associationId) },
+                    onEditEvent = { eventId ->
+                      navigationActions.navigateToAddEditEvent(associationId, eventId)
+                    })
+              }
+
+          composable(
+              route = Screen.AddEditEvent.ROUTE_ADD,
+              arguments =
+                  listOf(
+                      navArgument(Screen.AddEditEvent.ARG_ASSOCIATION_ID) {
+                        type = NavType.StringType
+                      })) { backStackEntry ->
+                val associationId =
+                    backStackEntry.arguments?.getString(Screen.AddEditEvent.ARG_ASSOCIATION_ID)
+                        ?: ""
+
+                AddEditEventScreen(
+                    db = db,
+                    associationId = associationId,
+                    eventId = null,
+                    onBack = { navigationActions.goBack() },
+                    onSubmitSuccess = { navigationActions.goBack() },
+                    onPreviewLocation = { location ->
+                      val encoded = Uri.encode(Json.encodeToString(location))
+                      navigationActions.navigateToScreenWithId(Screen.Map, encoded)
+                    })
+              }
+
+          composable(
+              route = Screen.AddEditEvent.ROUTE_EDIT,
+              arguments =
+                  listOf(
+                      navArgument(Screen.AddEditEvent.ARG_ASSOCIATION_ID) {
+                        type = NavType.StringType
+                      },
+                      navArgument(Screen.AddEditEvent.ARG_EVENT_ID) {
+                        type = NavType.StringType
+                      })) { backStackEntry ->
+                val associationId =
+                    backStackEntry.arguments?.getString(Screen.AddEditEvent.ARG_ASSOCIATION_ID)
+                        ?: ""
+
+                val eventId =
+                    backStackEntry.arguments?.getString(Screen.AddEditEvent.ARG_EVENT_ID) ?: ""
+
+                AddEditEventScreen(
+                    db = db,
+                    associationId = associationId,
+                    eventId = eventId,
+                    onBack = { navigationActions.goBack() },
+                    onSubmitSuccess = { navigationActions.goBack() },
+                    onPreviewLocation = { location ->
+                      val encoded = Uri.encode(Json.encodeToString(location))
+                      navigationActions.navigateToScreenWithId(Screen.Map, encoded)
+                    })
               }
         }
       }
