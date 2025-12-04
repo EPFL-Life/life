@@ -49,10 +49,6 @@ class AddEditAssociationViewModel(private val db: Db, private val associationId:
 
   val isEditing: Boolean = associationId != null
 
-  // We can't know the initial name until we load the association, so we'll expose it from formState
-  // or a separate field after loading
-  // But for the UI title, we can use formState.name if it's populated.
-  // The original code had `initialAssociationName`.
   var initialAssociationName: String = ""
     private set
 

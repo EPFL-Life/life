@@ -100,18 +100,6 @@ fun AddEditEventScreen(
       }
     }
 
-    // Back button is handled inside content for success state, but we might want it always visible?
-    // The original design had it overlaying everything.
-    // However, if loading/error, we might want different behavior.
-    // Let's keep it simple and consistent with ManageEventsScreen pattern if possible,
-    // but here we have a full screen form.
-    // Actually, let's put the BackButton in the Success content, and handle it separately for
-    // Error.
-    // Loading doesn't need a back button usually, or maybe it does?
-    // Let's stick to the structure where BackButton is at the top level if possible,
-    // but the content scrolling might interfere.
-    // Re-reading original code: BackButton was at the end of the Box.
-
     if (uiState !is AddEditEventUIState.Error) {
       BackButton(modifier = Modifier.align(Alignment.TopStart), onGoBack = onBack)
     }
