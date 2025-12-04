@@ -121,5 +121,6 @@
 
     <!-- Extra -->
     <string name="search_bar_placeholder">Search...</string>
+    <string name="refresh_failed">Failed to refresh</string>
 
 </resources>

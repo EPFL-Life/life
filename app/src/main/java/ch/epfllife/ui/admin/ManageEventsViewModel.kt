@@ -31,10 +31,14 @@ class ManageEventsViewModel(private val db: Db, val associationId: String) : Vie
     viewModelScope.launch { loadEvents() }
   }
 
-  fun reload(onComplete: (() -> Unit)? = null) {
+  fun refresh(signalFinished: (() -> Unit) = {}, signalFailure: (() -> Unit) = {}) {
     viewModelScope.launch {
       loadEvents()
-      onComplete?.invoke()
+      if (uiState.value is ManageEventsUIState.Error) {
+        signalFailure()
+      } else {
+        signalFinished()
+      }
     }
   }
 

@@ -39,7 +39,7 @@ fun SelectAssociationScreen(
   val uiState by viewModel.uiState.collectAsState()
 
   Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface)) {
-    Refreshable(onRefresh = { finishRefreshing -> viewModel.reload { finishRefreshing() } }) {
+    Refreshable(onRefresh = viewModel::refresh) {
       when (uiState) {
         is SelectAssociationUIState.Loading -> {
           Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -57,7 +57,7 @@ fun SelectAssociationScreen(
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.error)
                 Spacer(Modifier.height(16.dp))
-                Button(onClick = { viewModel.reload() }) { Text(stringResource(R.string.retry)) }
+                Button(onClick = { viewModel.refresh() }) { Text(stringResource(R.string.retry)) }
               }
         }
 

@@ -3,15 +3,21 @@ package ch.epfllife.ui.composables
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.test.platform.app.InstrumentationRegistry
+import ch.epfllife.R
 import ch.epfllife.model.association.Association
 import ch.epfllife.model.enums.SubscriptionFilter
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.map.Location
 import ch.epfllife.model.user.Price
+import ch.epfllife.utils.FakeToastHelper
+import ch.epfllife.utils.triggerRefresh
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
@@ -32,7 +38,8 @@ class ComposablesTest {
                   id = "hjebgfehib2",
                   name = "TestAssociation",
                   description = "This is a test",
-                  eventCategory = EventCategory.ACADEMIC),
+                  eventCategory = EventCategory.ACADEMIC,
+              ),
           tags = emptyList(),
           price = Price(0u),
       )
@@ -99,7 +106,8 @@ class ComposablesTest {
           selected = SubscriptionFilter.All,
           onSelected = {},
           subscribedLabel = "Subscribed",
-          allLabel = "All Events")
+          allLabel = "All Events",
+      )
     }
     composeTestRule.onNodeWithText("Subscribed").assertIsDisplayed()
   }
@@ -111,7 +119,8 @@ class ComposablesTest {
           selected = SubscriptionFilter.All,
           onSelected = {},
           subscribedLabel = "Subscribed",
-          allLabel = "All Events")
+          allLabel = "All Events",
+      )
     }
     composeTestRule.onNodeWithText("All Events").assertIsDisplayed()
   }
@@ -124,13 +133,15 @@ class ComposablesTest {
           selected = SubscriptionFilter.All,
           onSelected = { selectedFilter = it },
           subscribedLabel = "Subscribed",
-          allLabel = "All Events")
+          allLabel = "All Events",
+      )
     }
     composeTestRule.onNodeWithText("Subscribed").performClick()
     assertEquals(
         "Clicking Subscribed should call onSelected with Subscribed",
         SubscriptionFilter.Subscribed,
-        selectedFilter)
+        selectedFilter,
+    )
   }
 
   @Test
@@ -141,13 +152,15 @@ class ComposablesTest {
           selected = SubscriptionFilter.Subscribed,
           onSelected = { selectedFilter = it },
           subscribedLabel = "Subscribed",
-          allLabel = "All Events")
+          allLabel = "All Events",
+      )
     }
     composeTestRule.onNodeWithText("All Events").performClick()
     assertEquals(
         "Clicking All Events should call onSelected with All",
         SubscriptionFilter.All,
-        selectedFilter)
+        selectedFilter,
+    )
   }
 
   @Test
@@ -157,7 +170,8 @@ class ComposablesTest {
           selected = SubscriptionFilter.Subscribed,
           onSelected = {},
           subscribedLabel = "Subscribed",
-          allLabel = "All Events")
+          allLabel = "All Events",
+      )
     }
     // The selected button should be displayed (bold text styling)
     composeTestRule.onNodeWithText("Subscribed").assertIsDisplayed()
@@ -171,7 +185,8 @@ class ComposablesTest {
           selected = SubscriptionFilter.All,
           onSelected = {},
           subscribedLabel = "Subscribed",
-          allLabel = "All Events")
+          allLabel = "All Events",
+      )
     }
     composeTestRule.onNodeWithText("Subscribed").assertIsDisplayed()
     composeTestRule.onNodeWithText("All Events").assertIsDisplayed()
@@ -185,12 +200,16 @@ class ComposablesTest {
           selected = selectedFilter,
           onSelected = { selectedFilter = it },
           subscribedLabel = "Subscribed",
-          allLabel = "All Events")
+          allLabel = "All Events",
+      )
     }
     composeTestRule.onNodeWithText("Subscribed").performClick()
     composeTestRule.waitForIdle()
     assertEquals(
-        "Selection should change to Subscribed", SubscriptionFilter.Subscribed, selectedFilter)
+        "Selection should change to Subscribed",
+        SubscriptionFilter.Subscribed,
+        selectedFilter,
+    )
   }
 
   @Test
@@ -201,7 +220,8 @@ class ComposablesTest {
           selected = selectedFilter,
           onSelected = { selectedFilter = it },
           subscribedLabel = "Subscribed",
-          allLabel = "All Events")
+          allLabel = "All Events",
+      )
     }
 
     // Switch to Subscribed
@@ -223,7 +243,8 @@ class ComposablesTest {
           selected = SubscriptionFilter.All,
           onSelected = { callbackResults.add(it) },
           subscribedLabel = "Subscribed",
-          allLabel = "All Events")
+          allLabel = "All Events",
+      )
     }
 
     composeTestRule.onNodeWithText("Subscribed").performClick()
@@ -233,7 +254,10 @@ class ComposablesTest {
 
     assertEquals("Should have two callback calls", 2, callbackResults.size)
     assertEquals(
-        "First callback should be Subscribed", SubscriptionFilter.Subscribed, callbackResults[0])
+        "First callback should be Subscribed",
+        SubscriptionFilter.Subscribed,
+        callbackResults[0],
+    )
     assertEquals("Second callback should be All", SubscriptionFilter.All, callbackResults[1])
   }
 
@@ -252,7 +276,8 @@ class ComposablesTest {
             selected = selectedFilter,
             onSelected = { selectedFilter = it },
             subscribedLabel = "Subscribed",
-            allLabel = "All Events")
+            allLabel = "All Events",
+        )
         EventCard(sampleEvent, onClick = { eventClicked = true })
       }
     }
@@ -286,7 +311,8 @@ class ComposablesTest {
           selected = SubscriptionFilter.All,
           onSelected = { clickCount++ },
           subscribedLabel = "Subscribed",
-          allLabel = "All Events")
+          allLabel = "All Events",
+      )
     }
 
     repeat(5) {
@@ -297,5 +323,26 @@ class ComposablesTest {
     }
 
     assertEquals("Should handle rapid clicks", 10, clickCount)
+  }
+
+  @Test
+  fun refreshShowsToastOnFailure() {
+    val tag = "RefreshableTest"
+    val testToastHelper = FakeToastHelper()
+    val context = InstrumentationRegistry.getInstrumentation().targetContext
+
+    composeTestRule.setContent {
+      Refreshable(
+          onRefresh = { _, signalFailed -> signalFailed() },
+          toastHelper = testToastHelper,
+          modifier = Modifier.testTag(tag),
+      ) {
+        // Empty content
+      }
+    }
+
+    composeTestRule.triggerRefresh(tag)
+
+    assertEquals(context.getString(R.string.refresh_failed), testToastHelper.lastMessage)
   }
 }

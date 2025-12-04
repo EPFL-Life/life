@@ -46,7 +46,7 @@ fun ManageEventsScreen(
   DisposableEffect(lifecycleOwner) {
     val observer = LifecycleEventObserver { _, event ->
       if (event == Lifecycle.Event.ON_RESUME) {
-        viewModel.reload()
+        viewModel.refresh()
       }
     }
     lifecycleOwner.lifecycle.addObserver(observer)
@@ -54,7 +54,7 @@ fun ManageEventsScreen(
   }
 
   Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface)) {
-    Refreshable(onRefresh = { finishRefreshing -> viewModel.reload { finishRefreshing() } }) {
+    Refreshable(onRefresh = viewModel::refresh) {
       when (uiState) {
         is ManageEventsUIState.Loading -> {
           Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -70,7 +70,7 @@ fun ManageEventsScreen(
               horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(text = stringResource(msgRes), color = MaterialTheme.colorScheme.error)
                 Spacer(Modifier.height(12.dp))
-                Button(onClick = { viewModel.reload() }) { Text(stringResource(R.string.retry)) }
+                Button(onClick = { viewModel.refresh() }) { Text(stringResource(R.string.retry)) }
               }
         }
 

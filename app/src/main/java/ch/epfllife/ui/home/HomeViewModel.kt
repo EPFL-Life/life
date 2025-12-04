@@ -18,7 +18,10 @@ class HomeViewModel(private val db: Db) : ViewModel() {
   private val _myEvents = MutableStateFlow<List<Event>>(emptyList())
   val myEvents: StateFlow<List<Event>> = _myEvents.asStateFlow()
 
-  fun refresh(signalFinished: () -> Unit = {}) {
+  fun refresh(
+      signalFinished: () -> Unit = {},
+      signalFailed: () -> Unit = {},
+  ) {
     viewModelScope.launch {
       try {
         _allEvents.value = db.eventRepo.getAllEvents()
@@ -32,6 +35,7 @@ class HomeViewModel(private val db: Db) : ViewModel() {
       } catch (e: Exception) {
         Log.e("HomeViewModel", "Failed to refresh events", e)
         // Refresh failed, so we keep the previous state
+        signalFailed()
       }
       signalFinished()
     }

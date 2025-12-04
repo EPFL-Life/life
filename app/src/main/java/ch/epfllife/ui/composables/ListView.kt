@@ -23,7 +23,7 @@ fun <T> ListView(
     list: List<T>,
     emptyTitle: String,
     emptyDescription: String? = null,
-    onRefresh: (() -> Unit) -> Unit,
+    onRefresh: (signalFinished: () -> Unit, signalFailed: () -> Unit) -> Unit,
     content: LazyListScope.(List<T>) -> Unit,
 ) {
   Refreshable(onRefresh = onRefresh) {

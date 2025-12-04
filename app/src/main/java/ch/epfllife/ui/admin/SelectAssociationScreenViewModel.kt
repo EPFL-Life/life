@@ -47,10 +47,14 @@ class SelectAssociationViewModel(private val db: Db) : ViewModel() {
     }
   }
 
-  fun reload(onComplete: (() -> Unit)? = null) {
+  fun refresh(signalFinished: (() -> Unit) = {}, signalFailed: (() -> Unit) = {}) {
     viewModelScope.launch {
       loadAssociations()
-      onComplete?.invoke()
+      if (uiState.value is SelectAssociationUIState.Error) {
+        signalFailed()
+      } else {
+        signalFinished()
+      }
     }
   }
 }

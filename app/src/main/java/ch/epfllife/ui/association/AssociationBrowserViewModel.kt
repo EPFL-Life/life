@@ -25,7 +25,7 @@ class AssociationBrowserViewModel(private val db: Db) : ViewModel() {
   }
 
   /** Fetches all associations from the repository and updates the [allAssociations] state. */
-  fun refresh(signalFinished: () -> Unit = {}) {
+  fun refresh(signalFinished: () -> Unit = {}, signalFailed: () -> Unit = {}) {
     viewModelScope.launch {
       try {
         val allAssociations = db.assocRepo.getAllAssociations()
@@ -36,10 +36,12 @@ class AssociationBrowserViewModel(private val db: Db) : ViewModel() {
           _subscribedAssociations.value =
               allAssociations.filter { currentUser.subscriptions.contains(it.id) }
         } else {
+          signalFailed()
           _subscribedAssociations.value = emptyList()
         }
       } catch (e: Exception) {
         Log.e("AssociationBrowserViewModel", "Failed to refresh associations", e)
+        signalFailed()
       }
 
       signalFinished()
