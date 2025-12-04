@@ -11,6 +11,7 @@ import ch.epfllife.example_data.ExampleAssociations
 import ch.epfllife.model.association.Association
 import ch.epfllife.model.association.AssociationRepository
 import ch.epfllife.model.db.Db
+import ch.epfllife.ui.association.SocialIcons
 import ch.epfllife.ui.theme.Theme
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -237,6 +238,38 @@ class AddEditAssociationScreenTest {
     assert(updatedAssoc.pictureUrl == existing.pictureUrl)
     assert(updatedAssoc.logoUrl == existing.logoUrl)
     assert(updatedAssoc.socialLinks == existing.socialLinks)
+  }
+
+  @OptIn(ExperimentalCoroutinesApi::class)
+  @Test
+  fun submitNewAssociation_savesSocialAndMediaFields() = runTest {
+    val dispatcher = StandardTestDispatcher(testScheduler)
+    val fakeRepo = FakeAssociationRepository()
+    val viewModel =
+        AddEditAssociationViewModel(
+            associationRepository = fakeRepo,
+            submitDispatcher = dispatcher,
+        )
+
+    viewModel.populateMandatoryFields(ExampleAssociations.association2)
+    val targetPlatform = SocialIcons.platformOrder.first()
+    val logoUrl = "https://example.com/logo.png"
+    val bannerUrl = "https://example.com/banner.png"
+    val socialUrl = "https://social.example.com/assoc"
+
+    viewModel.updateLogoUrl(logoUrl)
+    viewModel.updateBannerUrl(bannerUrl)
+    viewModel.updateSocialMedia(targetPlatform, true)
+    viewModel.updateSocialMediaLink(targetPlatform, socialUrl)
+
+    viewModel.submit {}
+    advanceUntilIdle()
+
+    fakeRepo.assertCreateCalls(1)
+    val created = fakeRepo.createdAssociations.first()
+    assert(created.logoUrl == logoUrl)
+    assert(created.pictureUrl == bannerUrl)
+    assert(created.socialLinks?.get(targetPlatform) == socialUrl)
   }
 
   private fun AddEditAssociationViewModel.populateMandatoryFields(source: Association) {
