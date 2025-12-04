@@ -22,9 +22,12 @@ class HomeViewModel(private val db: Db) : ViewModel() {
     viewModelScope.launch {
       try {
         _allEvents.value = db.eventRepo.getAllEvents()
-        db.userRepo.getCurrentUser()?.let { currentUser ->
-          val enrolledEventIds = currentUser.enrolledEvents
+        val user = db.userRepo.getCurrentUser()
+        if (user != null) {
+          val enrolledEventIds = user.enrolledEvents
           _myEvents.value = _allEvents.value.filter { event -> enrolledEventIds.contains(event.id) }
+        } else {
+          _myEvents.value = emptyList()
         }
       } catch (e: Exception) {
         Log.e("HomeViewModel", "Failed to refresh events", e)
