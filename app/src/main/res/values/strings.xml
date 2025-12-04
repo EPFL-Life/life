@@ -95,6 +95,7 @@
     <string name="add_new_event">Add New Event</string>
     <string name="manage_events_empty">No upcoming events for this association.</string>
     <string name="error_loading_events">Failed to load events: %1$s</string>
+    <string name="error_loading_events_generic">Failed to load events</string>
 
     <!-- Add/Edit event form -->
     <string name="edit_event">Edit Event</string>

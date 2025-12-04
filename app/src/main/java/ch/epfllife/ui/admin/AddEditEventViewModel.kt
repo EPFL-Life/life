@@ -1,5 +1,6 @@
 package ch.epfllife.ui.admin
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ch.epfllife.R
@@ -34,7 +35,7 @@ data class AddEditEventFormState(
 sealed interface AddEditEventUIState {
   object Loading : AddEditEventUIState
 
-  data class Error(val message: String) : AddEditEventUIState
+  data class Error(val messageRes: Int) : AddEditEventUIState
 
   data class Success(val association: Association, val event: Event?) : AddEditEventUIState
 }
@@ -85,7 +86,8 @@ class AddEditEventViewModel(
         event?.let { populateFromEvent(it) }
         _uiState.value = AddEditEventUIState.Success(association, event)
       } catch (e: Exception) {
-        _uiState.value = AddEditEventUIState.Error(e.message ?: "Unknown error")
+        Log.e("AddEditEventVM", "Failed to load event", e)
+        _uiState.value = AddEditEventUIState.Error(R.string.error_loading_event)
       }
     }
   }

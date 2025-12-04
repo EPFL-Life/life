@@ -63,14 +63,12 @@ fun ManageEventsScreen(
         }
 
         is ManageEventsUIState.Error -> {
-          val msg = (uiState as ManageEventsUIState.Error).message
+          val msgRes = (uiState as ManageEventsUIState.Error).messageRes
           Column(
               modifier = Modifier.fillMaxSize().padding(32.dp),
               verticalArrangement = Arrangement.Center,
               horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = stringResource(R.string.error_loading_events, msg),
-                    color = MaterialTheme.colorScheme.error)
+                Text(text = stringResource(msgRes), color = MaterialTheme.colorScheme.error)
                 Spacer(Modifier.height(12.dp))
                 Button(onClick = { viewModel.reload() }) { Text(stringResource(R.string.retry)) }
               }

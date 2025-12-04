@@ -1,7 +1,9 @@
 package ch.epfllife.ui.admin
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import ch.epfllife.R
 import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.Event
 import java.time.LocalDate
@@ -13,7 +15,7 @@ import kotlinx.coroutines.launch
 sealed interface ManageEventsUIState {
   object Loading : ManageEventsUIState
 
-  data class Error(val message: String) : ManageEventsUIState
+  data class Error(val messageRes: Int) : ManageEventsUIState
 
   data class Success(val events: List<Event>) : ManageEventsUIState
 }
@@ -55,7 +57,8 @@ class ManageEventsViewModel(private val db: Db, val associationId: String) : Vie
           _uiState.value = ManageEventsUIState.Success(filtered)
         },
         onFailure = { e ->
-          _uiState.value = ManageEventsUIState.Error(e.message ?: "Unknown error")
+          Log.e("ManageEventsVM", "Failed to load events for association $associationId", e)
+          _uiState.value = ManageEventsUIState.Error(R.string.error_loading_events_generic)
         })
   }
 
