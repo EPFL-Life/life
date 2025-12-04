@@ -18,12 +18,14 @@ data class Db(
     val assocRepo: AssociationRepository,
 ) {
   companion object {
-    val firestore: Db =
-        Db(
-            userRepo = UserRepositoryFirestore(Firebase.firestore),
-            eventRepo = EventRepositoryFirestore(Firebase.firestore),
-            assocRepo = AssociationRepositoryFirestore(Firebase.firestore),
-        )
+    // https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/lazy.html
+    val firestore: Db by lazy {
+      Db(
+          userRepo = UserRepositoryFirestore(Firebase.firestore),
+          eventRepo = EventRepositoryFirestore(Firebase.firestore),
+          assocRepo = AssociationRepositoryFirestore(Firebase.firestore),
+      )
+    }
 
     fun freshLocal(): Db {
       val eventRepo = EventRepositoryLocal()
