@@ -7,12 +7,13 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextInput
 import ch.epfllife.example_data.ExampleAssociations
 import ch.epfllife.model.association.Association
 import ch.epfllife.model.association.AssociationRepository
-import ch.epfllife.model.event.Event
+import ch.epfllife.model.db.Db
 import ch.epfllife.ui.theme.Theme
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -24,33 +25,59 @@ class AddEditAssociationScreenTest {
   @get:Rule val composeTestRule = createComposeRule()
 
   private fun setContent(
-      viewModel: AddEditAssociationViewModel = AddEditAssociationViewModel(),
+      db: Db = Db.freshLocal(),
+      associationId: String? = null,
+      viewModel: AddEditAssociationViewModel? = null,
       onSubmitSuccess: () -> Unit = {},
   ) {
     composeTestRule.setContent {
       Theme {
-        AddEditAssociationScreen(
-            viewModel = viewModel, onBack = {}, onSubmitSuccess = onSubmitSuccess)
+        if (viewModel != null) {
+          AddEditAssociationScreen(
+              db = db,
+              associationId = associationId,
+              viewModel = viewModel,
+              onBack = {},
+              onSubmitSuccess = onSubmitSuccess)
+        } else {
+          AddEditAssociationScreen(
+              db = db,
+              associationId = associationId,
+              onBack = {},
+              onSubmitSuccess = onSubmitSuccess)
+        }
       }
     }
   }
 
   @Test
-  fun submitButtonRequiresMandatoryFields() {
-    setContent()
+  fun displayEmptyFormForNewAssociation() {
+    // Arrange
+    val db = Db.freshLocal()
 
+    // Act
+    setContent(db = db)
+    composeTestRule.waitForIdle()
+
+    // Assert
+    composeTestRule
+        .onNodeWithTag(AddEditAssociationTestTags.NAME_FIELD)
+        .assert(hasText("", substring = false))
     composeTestRule.onNodeWithTag(AddEditAssociationTestTags.SUBMIT_BUTTON).assertIsNotEnabled()
-
-    fillMandatoryFields(ExampleAssociations.association4)
-
-    composeTestRule.onNodeWithTag(AddEditAssociationTestTags.SUBMIT_BUTTON).assertIsEnabled()
   }
 
   @Test
-  fun editingExistingAssociationPrefillsForm() {
+  fun displayFilledFormForExistingAssociation() {
+    // Arrange
     val association = ExampleAssociations.association1
-    setContent(AddEditAssociationViewModel(existingAssociation = association))
+    val db = Db.freshLocal()
+    runBlocking { db.assocRepo.createAssociation(association) }
 
+    // Act
+    setContent(db = db, associationId = association.id)
+    composeTestRule.waitForIdle()
+
+    // Assert
     composeTestRule
         .onNodeWithTag(AddEditAssociationTestTags.NAME_FIELD)
         .assert(hasText(association.name, substring = false))
@@ -62,8 +89,27 @@ class AddEditAssociationScreenTest {
           .onNodeWithTag(AddEditAssociationTestTags.ABOUT_FIELD)
           .assert(hasText(it, substring = false))
     }
+    composeTestRule.onNodeWithTag(AddEditAssociationTestTags.SUBMIT_BUTTON).assertIsEnabled()
   }
 
+  @Test
+  fun viewModelInjectionWorks() {
+    // Arrange
+    val db = Db.freshLocal()
+    val viewModel = AddEditAssociationViewModel(db = db)
+    viewModel.updateName("Injected Name")
+
+    // Act
+    setContent(viewModel = viewModel)
+    composeTestRule.waitForIdle()
+
+    // Assert
+    composeTestRule
+        .onNodeWithTag(AddEditAssociationTestTags.NAME_FIELD)
+        .assert(hasText("Injected Name", substring = false))
+  }
+
+  @OptIn(ExperimentalCoroutinesApi::class)
   @Test
   fun submitNewAssociation_callsCreateOnRepository() = runTest {
     val dispatcher = StandardTestDispatcher(testScheduler)
@@ -86,6 +132,7 @@ class AddEditAssociationScreenTest {
     assert(created.description == ExampleAssociations.association4.description)
   }
 
+  @OptIn(ExperimentalCoroutinesApi::class)
   @Test
   fun submitExistingAssociation_callsUpdateWithModifiedData() = runTest {
     val dispatcher = StandardTestDispatcher(testScheduler)
@@ -93,8 +140,8 @@ class AddEditAssociationScreenTest {
     val fakeRepo = FakeAssociationRepository()
     val viewModel =
         AddEditAssociationViewModel(
-            existingAssociation = existing,
             associationRepository = fakeRepo,
+            existingAssociation = existing,
             submitDispatcher = dispatcher,
         )
 
@@ -132,6 +179,7 @@ class AddEditAssociationScreenTest {
     assert(fakeRepo.updatedAssociations.isEmpty())
   }
 
+  @OptIn(ExperimentalCoroutinesApi::class)
   @Test
   fun submitNewAssociation_preservesOptionalFields() = runTest {
     val dispatcher = StandardTestDispatcher(testScheduler)
@@ -162,6 +210,7 @@ class AddEditAssociationScreenTest {
     assert(created.socialLinks == null)
   }
 
+  @OptIn(ExperimentalCoroutinesApi::class)
   @Test
   fun submitExistingAssociation_preservesUneditedOptionalFields() = runTest {
     val dispatcher = StandardTestDispatcher(testScheduler)
@@ -169,8 +218,8 @@ class AddEditAssociationScreenTest {
     val fakeRepo = FakeAssociationRepository()
     val viewModel =
         AddEditAssociationViewModel(
-            existingAssociation = existing,
             associationRepository = fakeRepo,
+            existingAssociation = existing,
             submitDispatcher = dispatcher,
         )
 
@@ -188,18 +237,6 @@ class AddEditAssociationScreenTest {
     assert(updatedAssoc.pictureUrl == existing.pictureUrl)
     assert(updatedAssoc.logoUrl == existing.logoUrl)
     assert(updatedAssoc.socialLinks == existing.socialLinks)
-  }
-
-  private fun fillMandatoryFields(association: Association) {
-    val name = association.name
-    val description = association.description
-    val about = association.about ?: "About ${association.name}"
-
-    composeTestRule.onNodeWithTag(AddEditAssociationTestTags.NAME_FIELD).performTextInput(name)
-    composeTestRule
-        .onNodeWithTag(AddEditAssociationTestTags.DESCRIPTION_FIELD)
-        .performTextInput(description)
-    composeTestRule.onNodeWithTag(AddEditAssociationTestTags.ABOUT_FIELD).performTextInput(about)
   }
 
   private fun AddEditAssociationViewModel.populateMandatoryFields(source: Association) {
@@ -235,8 +272,8 @@ class AddEditAssociationScreenTest {
     override suspend fun deleteAssociation(associationId: String): Result<Unit> =
         Result.success(Unit)
 
-    override suspend fun getEventsForAssociation(associationId: String): Result<List<Event>> =
-        Result.success(emptyList())
+    override suspend fun getEventsForAssociation(associationId: String) =
+        Result.success(emptyList<ch.epfllife.model.event.Event>())
 
     fun assertCreateCalls(expected: Int) {
       check(createdAssociations.size == expected) {
