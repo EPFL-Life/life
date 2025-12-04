@@ -86,7 +86,8 @@ class AddEditEventScreenTest {
     composeTestRule.onNodeWithTag(AddEditEventTestTags.SUBMIT_BUTTON).assertIsEnabled()
   }
 
-  @Ignore("This test passes locally but fails on CI. The reason is that the time picker popup can not be clicked in the CI pipeline")
+  @Ignore(
+      "This test passes locally but fails on CI. The reason is that the time picker popup can not be clicked in the CI pipeline")
   @Test
   fun timeSelectionUpdatesViewModel() {
     // Arrange
