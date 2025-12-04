@@ -255,9 +255,8 @@ class AddEditEventViewModel(
                   pictureUrl = s.pictureUrl.ifBlank { null },
                   tags = tags))
 
-      // TODO: implement repo calls once backend ready:
-      // if (loadedEvent == null) db.eventRepo.createEvent(event)
-      // else db.eventRepo.updateEvent(event)
+      if (loadedEvent == null) db.eventRepo.createEvent(event)
+      else db.eventRepo.updateEvent(event.id, event)
 
       onComplete()
     }
