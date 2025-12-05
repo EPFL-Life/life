@@ -9,7 +9,6 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import ch.epfllife.example_data.ExampleAssociations
 import ch.epfllife.model.association.Association
-import ch.epfllife.model.association.AssociationRepository
 import ch.epfllife.model.db.Db
 import ch.epfllife.ui.association.SocialIcons
 import ch.epfllife.ui.theme.Theme
@@ -114,21 +113,18 @@ class AddEditAssociationScreenTest {
   @Test
   fun submitNewAssociation_callsCreateOnRepository() = runTest {
     val dispatcher = StandardTestDispatcher(testScheduler)
-    val fakeRepo = FakeAssociationRepository().apply { newUidToReturn = "new-assoc-id" }
-    val viewModel =
-        AddEditAssociationViewModel(
-            associationRepository = fakeRepo,
-            submitDispatcher = dispatcher,
-        )
+    val db = Db.freshLocal()
+    val viewModel = AddEditAssociationViewModel(db = db, submitDispatcher = dispatcher)
 
     viewModel.populateMandatoryFields(ExampleAssociations.association4)
 
     viewModel.submit {}
     advanceUntilIdle()
 
-    fakeRepo.assertCreateCalls(1)
-    val created = fakeRepo.createdAssociations.first()
-    assert(created.id == "new-assoc-id")
+    val associations = db.assocRepo.getAllAssociations()
+    assert(associations.size == 1)
+    val created = associations.first()
+    assert(created.id.isNotBlank())
     assert(created.name == ExampleAssociations.association4.name)
     assert(created.description == ExampleAssociations.association4.description)
   }
@@ -138,11 +134,12 @@ class AddEditAssociationScreenTest {
   fun submitExistingAssociation_callsUpdateWithModifiedData() = runTest {
     val dispatcher = StandardTestDispatcher(testScheduler)
     val existing = ExampleAssociations.association1
-    val fakeRepo = FakeAssociationRepository()
+    val db = Db.freshLocal()
+    db.assocRepo.createAssociation(existing)
     val viewModel =
         AddEditAssociationViewModel(
-            associationRepository = fakeRepo,
-            existingAssociation = existing,
+            db = db,
+            associationId = existing.id,
             submitDispatcher = dispatcher,
         )
 
@@ -152,32 +149,26 @@ class AddEditAssociationScreenTest {
     viewModel.submit {}
     advanceUntilIdle()
 
-    fakeRepo.assertUpdateCalls(1)
-    val (updatedId, updatedAssoc) = fakeRepo.updatedAssociations.first()
-
-    assert(updatedId == existing.id)
-    assert(updatedAssoc.name == updatedName)
-    assert(updatedAssoc.description == existing.description)
-    assert(updatedAssoc.eventCategory == existing.eventCategory)
+    val updated = db.assocRepo.getAssociation(existing.id)
+    checkNotNull(updated)
+    assert(updated.name == updatedName)
+    assert(updated.description == existing.description)
+    assert(updated.eventCategory == existing.eventCategory)
   }
 
   @Test
   fun invalidForm_doesNotCallRepository() {
-    val fakeRepo = FakeAssociationRepository()
-    val viewModel = AddEditAssociationViewModel(associationRepository = fakeRepo)
+    val db = Db.freshLocal()
+    val viewModel = AddEditAssociationViewModel(db)
 
-    setContent(viewModel = viewModel)
+    setContent(db = db, viewModel = viewModel)
 
-    // Do not fill mandatory fields so the form stays invalid
     composeTestRule.onNodeWithTag(AddEditAssociationTestTags.SUBMIT_BUTTON).assertIsNotEnabled()
-
-    // Try to click the button anyway (should be a no-op in terms of ViewModel.submit())
     composeTestRule.onNodeWithTag(AddEditAssociationTestTags.SUBMIT_BUTTON).performClick()
-
     composeTestRule.waitForIdle()
 
-    assert(fakeRepo.createdAssociations.isEmpty())
-    assert(fakeRepo.updatedAssociations.isEmpty())
+    val associations = runBlocking { db.assocRepo.getAllAssociations() }
+    assert(associations.isEmpty())
   }
 
   @OptIn(ExperimentalCoroutinesApi::class)
@@ -185,27 +176,17 @@ class AddEditAssociationScreenTest {
   fun submitNewAssociation_preservesOptionalFields() = runTest {
     val dispatcher = StandardTestDispatcher(testScheduler)
     val base = ExampleAssociations.association4
-    val fakeRepo = FakeAssociationRepository().apply { newUidToReturn = "new-assoc-id" }
-    val viewModel =
-        AddEditAssociationViewModel(
-            associationRepository = fakeRepo,
-            submitDispatcher = dispatcher,
-        )
+    val db = Db.freshLocal()
+    val viewModel = AddEditAssociationViewModel(db = db, submitDispatcher = dispatcher)
 
     viewModel.populateMandatoryFields(base)
 
     viewModel.submit {}
     advanceUntilIdle()
 
-    fakeRepo.assertCreateCalls(1)
-    val created = fakeRepo.createdAssociations.first()
-
-    // Name/description come from the form (which we populated from base)
+    val created = db.assocRepo.getAllAssociations().first()
     assert(created.name == base.name)
     assert(created.description == base.description)
-
-    // Optional fields are not populated in the form in this test, so they should be null/empty
-    // in the resulting Association built by the ViewModel.
     assert(created.pictureUrl == null)
     assert(created.logoUrl == null)
     assert(created.socialLinks == null)
@@ -216,40 +197,34 @@ class AddEditAssociationScreenTest {
   fun submitExistingAssociation_preservesUneditedOptionalFields() = runTest {
     val dispatcher = StandardTestDispatcher(testScheduler)
     val existing = ExampleAssociations.association1
-    val fakeRepo = FakeAssociationRepository()
+    val db = Db.freshLocal()
+    db.assocRepo.createAssociation(existing)
     val viewModel =
         AddEditAssociationViewModel(
-            associationRepository = fakeRepo,
-            existingAssociation = existing,
+            db = db,
+            associationId = existing.id,
             submitDispatcher = dispatcher,
         )
 
-    // Change only the name, leaving other optional fields untouched
     val updatedName = "Updated ${existing.name}"
     viewModel.updateName(updatedName)
 
     viewModel.submit {}
     advanceUntilIdle()
 
-    fakeRepo.assertUpdateCalls(1)
-    val (_, updatedAssoc) = fakeRepo.updatedAssociations.first()
-
-    // Name changed, but optional fields should remain the same as the original
-    assert(updatedAssoc.pictureUrl == existing.pictureUrl)
-    assert(updatedAssoc.logoUrl == existing.logoUrl)
-    assert(updatedAssoc.socialLinks == existing.socialLinks)
+    val updated = db.assocRepo.getAssociation(existing.id)
+    checkNotNull(updated)
+    assert(updated.pictureUrl == existing.pictureUrl)
+    assert(updated.logoUrl == existing.logoUrl)
+    assert(updated.socialLinks == existing.socialLinks)
   }
 
   @OptIn(ExperimentalCoroutinesApi::class)
   @Test
   fun submitNewAssociation_savesSocialAndMediaFields() = runTest {
     val dispatcher = StandardTestDispatcher(testScheduler)
-    val fakeRepo = FakeAssociationRepository()
-    val viewModel =
-        AddEditAssociationViewModel(
-            associationRepository = fakeRepo,
-            submitDispatcher = dispatcher,
-        )
+    val db = Db.freshLocal()
+    val viewModel = AddEditAssociationViewModel(db = db, submitDispatcher = dispatcher)
 
     viewModel.populateMandatoryFields(ExampleAssociations.association2)
     val targetPlatform = SocialIcons.platformOrder.first()
@@ -265,8 +240,7 @@ class AddEditAssociationScreenTest {
     viewModel.submit {}
     advanceUntilIdle()
 
-    fakeRepo.assertCreateCalls(1)
-    val created = fakeRepo.createdAssociations.first()
+    val created = db.assocRepo.getAllAssociations().first()
     assert(created.logoUrl == logoUrl)
     assert(created.pictureUrl == bannerUrl)
     assert(created.socialLinks?.get(targetPlatform) == socialUrl)
@@ -276,48 +250,5 @@ class AddEditAssociationScreenTest {
     updateName(source.name)
     updateDescription(source.description)
     updateAbout(source.about ?: "About ${source.name}")
-  }
-
-  private class FakeAssociationRepository : AssociationRepository {
-    var newUidToReturn: String = "fake-new-id"
-    val createdAssociations = mutableListOf<Association>()
-    val updatedAssociations = mutableListOf<Pair<String, Association>>()
-
-    override fun getNewUid(): String = newUidToReturn
-
-    override suspend fun getAssociation(associationId: String): Association? = null
-
-    override suspend fun getAllAssociations(): List<Association> = emptyList()
-
-    override suspend fun createAssociation(association: Association): Result<Unit> {
-      createdAssociations.add(association)
-      return Result.success(Unit)
-    }
-
-    override suspend fun updateAssociation(
-        associationId: String,
-        newAssociation: Association
-    ): Result<Unit> {
-      updatedAssociations.add(associationId to newAssociation)
-      return Result.success(Unit)
-    }
-
-    override suspend fun deleteAssociation(associationId: String): Result<Unit> =
-        Result.success(Unit)
-
-    override suspend fun getEventsForAssociation(associationId: String) =
-        Result.success(emptyList<ch.epfllife.model.event.Event>())
-
-    fun assertCreateCalls(expected: Int) {
-      check(createdAssociations.size == expected) {
-        "Expected $expected create calls but had ${createdAssociations.size}"
-      }
-    }
-
-    fun assertUpdateCalls(expected: Int) {
-      check(updatedAssociations.size == expected) {
-        "Expected $expected update calls but had ${updatedAssociations.size}"
-      }
-    }
   }
 }

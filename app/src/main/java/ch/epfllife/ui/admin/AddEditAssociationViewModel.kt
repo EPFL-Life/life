@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ch.epfllife.R
 import ch.epfllife.model.association.Association
-import ch.epfllife.model.association.AssociationRepository
 import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.EventCategory
 import ch.epfllife.ui.association.SocialIcons
@@ -45,19 +44,12 @@ sealed interface AddEditAssociationUIState {
 }
 
 class AddEditAssociationViewModel(
-    private val db: Db? = null,
+    private val db: Db,
     private val associationId: String? = null,
-    private val associationRepository: AssociationRepository? = null,
-    private val existingAssociation: Association? = null,
     private val submitDispatcher: CoroutineDispatcher = Dispatchers.Main,
 ) : ViewModel() {
 
-  private val repo =
-      associationRepository
-          ?: db?.assocRepo
-          ?: throw IllegalArgumentException("Provide either Db or AssociationRepository")
-
-  private val resolvedAssociationId: String? = associationId ?: existingAssociation?.id
+  private val repo = db.assocRepo
 
   var formState by mutableStateOf(AssociationFormState())
     private set
@@ -66,22 +58,18 @@ class AddEditAssociationViewModel(
       MutableStateFlow<AddEditAssociationUIState>(AddEditAssociationUIState.Loading)
   val uiState: StateFlow<AddEditAssociationUIState> = _uiState
 
-  val isEditing: Boolean = resolvedAssociationId != null
+  val isEditing: Boolean = associationId != null
 
   var initialAssociationName: String = ""
     private set
 
-  private var associationSnapshot: Association? = existingAssociation
+  private var associationSnapshot: Association? = null
 
   init {
-    when {
-      existingAssociation != null -> {
-        populateForm(existingAssociation)
-        _uiState.value = AddEditAssociationUIState.Success
-      }
-
-      resolvedAssociationId != null -> loadData(resolvedAssociationId)
-      else -> _uiState.value = AddEditAssociationUIState.Success
+    if (isEditing) {
+      loadData(associationId!!)
+    } else {
+      _uiState.value = AddEditAssociationUIState.Success
     }
   }
 
@@ -196,7 +184,7 @@ class AddEditAssociationViewModel(
       val association = buildAssociation()
       val result =
           if (isEditing) {
-            repo.updateAssociation(resolvedAssociationId!!, association)
+            repo.updateAssociation(associationId!!, association)
           } else {
             repo.createAssociation(association)
           }
@@ -219,7 +207,7 @@ class AddEditAssociationViewModel(
             .filter { it.enabled && it.link.isNotBlank() }
             .associate { it.platform to it.link.trim() }
 
-    val associationUid = resolvedAssociationId ?: repo.getNewUid()
+    val associationUid = associationId ?: repo.getNewUid()
 
     return Association(
         id = associationUid,
