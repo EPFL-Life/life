@@ -1,10 +1,10 @@
-# event_scraper/test_selectors.py
 #!/usr/bin/env python3
 """Test ESN EPFL website selectors"""
 
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from config import REQUEST_HEADERS
 
 import requests
 from bs4 import BeautifulSoup
@@ -15,9 +15,7 @@ def test_esn_selectors():
     url = "https://epfl.esn.ch/events"
     
     try:
-        response = requests.get(url, headers={
-            'User-Agent': 'Mozilla/5.0'
-        })
+        response = requests.get(url, headers=REQUEST_HEADERS)
         response.raise_for_status()
         
         soup = BeautifulSoup(response.content, 'html.parser')
