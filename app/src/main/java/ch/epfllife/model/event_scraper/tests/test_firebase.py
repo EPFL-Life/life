@@ -5,11 +5,9 @@ import sys
 import os
 import logging
 
-# Add current directory to Python path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-
-# Add parent directory to path so we can import our modules
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(current_dir)
+sys.path.insert(0, project_root)
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from firestore.database import FirebaseDatabase
