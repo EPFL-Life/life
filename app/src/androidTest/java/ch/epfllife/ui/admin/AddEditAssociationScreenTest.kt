@@ -13,6 +13,7 @@ import ch.epfllife.model.db.Db
 import ch.epfllife.ui.association.SocialIcons
 import ch.epfllife.ui.theme.Theme
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 
@@ -119,8 +120,8 @@ class AddEditAssociationScreenTest {
     val associations = runBlocking { db.assocRepo.getAllAssociations() }
     val created = associations.first()
     assert(created.id.isNotBlank())
-    assert(created.name == ExampleAssociations.association4.name)
-    assert(created.description == ExampleAssociations.association4.description)
+    assertEquals(created.name, ExampleAssociations.association4.name)
+    assertEquals(created.description, ExampleAssociations.association4.description)
   }
 
   @Test
@@ -141,9 +142,9 @@ class AddEditAssociationScreenTest {
 
     val updated = runBlocking { db.assocRepo.getAssociation(existing.id) }
     checkNotNull(updated)
-    assert(updated.name == updatedName)
-    assert(updated.description == existing.description)
-    assert(updated.eventCategory == existing.eventCategory)
+    assertEquals(updated.name, updatedName)
+    assertEquals(updated.description, existing.description)
+    assertEquals(updated.eventCategory, existing.eventCategory)
   }
 
   @Test
@@ -174,11 +175,11 @@ class AddEditAssociationScreenTest {
     waitUntilTrue { runBlocking { db.assocRepo.getAllAssociations().isNotEmpty() } }
 
     val created = runBlocking { db.assocRepo.getAllAssociations().first() }
-    assert(created.name == base.name)
-    assert(created.description == base.description)
-    assert(created.pictureUrl == null)
-    assert(created.logoUrl == null)
-    assert(created.socialLinks == null)
+    assertEquals(created.name, base.name)
+    assertEquals(created.description, base.description)
+    assertEquals(created.pictureUrl, null)
+    assertEquals(created.logoUrl, null)
+    assertEquals(created.socialLinks, null)
   }
 
   @Test
@@ -199,9 +200,9 @@ class AddEditAssociationScreenTest {
 
     val updated = runBlocking { db.assocRepo.getAssociation(existing.id) }
     checkNotNull(updated)
-    assert(updated.pictureUrl == existing.pictureUrl)
-    assert(updated.logoUrl == existing.logoUrl)
-    assert(updated.socialLinks == existing.socialLinks)
+    assertEquals(updated.pictureUrl, existing.pictureUrl)
+    assertEquals(updated.logoUrl, existing.logoUrl)
+    assertEquals(updated.socialLinks, existing.socialLinks)
   }
 
   @Test
@@ -225,9 +226,9 @@ class AddEditAssociationScreenTest {
     waitUntilTrue { runBlocking { db.assocRepo.getAllAssociations().isNotEmpty() } }
 
     val created = runBlocking { db.assocRepo.getAllAssociations().first() }
-    assert(created.logoUrl == logoUrl)
-    assert(created.pictureUrl == bannerUrl)
-    assert(created.socialLinks?.get(targetPlatform) == socialUrl)
+    assertEquals(created.logoUrl, logoUrl)
+    assertEquals(created.pictureUrl, bannerUrl)
+    assertEquals(created.socialLinks?.get(targetPlatform), socialUrl)
   }
 
   private fun waitUntilTrue(timeoutMillis: Long = 20_000, condition: () -> Boolean) {
