@@ -131,7 +131,17 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
             name = name,
             subscriptions = subscriptions,
             enrolledEvents = enrolledEvents,
-            userSettings = userSettings)
+            userSettings = userSettings,
+            role =
+                try {
+                  val roleString = document.getString("role")
+                  if (roleString != null) UserRole.valueOf(roleString) else UserRole.USER
+                } catch (_: IllegalArgumentException) {
+                  UserRole.USER
+                },
+            managedAssociationIds =
+                (document["managedAssociationIds"] as? List<*>)?.mapNotNull { it as? String }
+                    ?: emptyList())
       } catch (e: NullPointerException) {
         // this can happen when one of the required fields is not present
         Log.e("UserRepository", "Error converting document to User", e)
