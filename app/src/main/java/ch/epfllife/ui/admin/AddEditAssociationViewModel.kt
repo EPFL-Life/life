@@ -8,7 +8,9 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ch.epfllife.R
+import ch.epfllife.model.association.Association
 import ch.epfllife.model.db.Db
+import ch.epfllife.model.event.EventCategory
 import ch.epfllife.ui.association.SocialIcons
 import java.net.URI
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,7 +30,8 @@ data class AssociationFormState(
     var socialMedia: List<SocialMediaEntry> =
         SocialIcons.platformOrder.map { SocialMediaEntry(it) },
     var logoUrl: String = "",
-    var bannerUrl: String = ""
+    var bannerUrl: String = "",
+    var eventCategory: EventCategory = EventCategory.OTHER
 )
 
 sealed interface AddEditAssociationUIState {
@@ -88,7 +91,8 @@ class AddEditAssociationViewModel(private val db: Db, private val associationId:
                 about = assoc.about ?: "",
                 socialMedia = socialList,
                 logoUrl = assoc.logoUrl ?: "",
-                bannerUrl = assoc.pictureUrl ?: "")
+                bannerUrl = assoc.pictureUrl ?: "",
+                eventCategory = assoc.eventCategory)
 
         _uiState.value = AddEditAssociationUIState.Success
       } catch (e: Exception) {
@@ -168,7 +172,44 @@ class AddEditAssociationViewModel(private val db: Db, private val associationId:
 
   fun submit(onSuccess: () -> Unit) {
     if (!isFormValid()) return
-    // TODO: send data to Firebase
-    onSuccess()
+
+    viewModelScope.launch {
+      _uiState.value = AddEditAssociationUIState.Loading
+      try {
+        val socialLinks =
+            formState.socialMedia
+                .filter { it.enabled && it.link.isNotBlank() }
+                .associate { it.platform to it.link }
+
+        val id = associationId ?: db.assocRepo.getNewUid()
+
+        val association =
+            Association(
+                id = id,
+                name = formState.name,
+                description = formState.description,
+                pictureUrl = formState.bannerUrl.takeIf { it.isNotBlank() },
+                logoUrl = formState.logoUrl.takeIf { it.isNotBlank() },
+                eventCategory = formState.eventCategory,
+                about = formState.about,
+                socialLinks = socialLinks)
+
+        val result =
+            if (associationId == null) {
+              db.assocRepo.createAssociation(association)
+            } else {
+              db.assocRepo.updateAssociation(id, association)
+            }
+
+        if (result.isSuccess) {
+          onSuccess()
+        } else {
+          _uiState.value = AddEditAssociationUIState.Error(R.string.error_saving_association)
+        }
+      } catch (e: Exception) {
+        Log.e("AddEditAssociationVM", "Failed to save association", e)
+        _uiState.value = AddEditAssociationUIState.Error(R.string.error_saving_association)
+      }
+    }
   }
 }

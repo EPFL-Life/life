@@ -121,5 +121,6 @@
 
     <!-- Extra -->
     <string name="search_bar_placeholder">Search...</string>
+    <string name="error_saving_association">Failed to save association</string>
 
 </resources>
