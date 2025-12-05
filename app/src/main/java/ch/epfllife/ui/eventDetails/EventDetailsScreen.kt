@@ -5,8 +5,6 @@ import android.content.pm.PackageManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -198,41 +196,39 @@ fun EventDetailsContent(
 
             // Row containing: Date, Time, Location
             // TODO-question: make this clickable to be displayed in Calender?
-            FlowRow(
+            Row(
                 modifier =
                     Modifier.fillMaxWidth()
                         .wrapContentHeight()
                         .clip(RoundedCornerShape(8.dp))
                         .background(MaterialTheme.colorScheme.surfaceVariant)
                         .padding(12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                maxItemsInEachRow = 2,
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-              Row(
-                  modifier = Modifier.weight(1f, fill = false),
-                  verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.CalendarToday,
-                        contentDescription = "Date",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Column {
-                      Text(
-                          text = formattedDate,
-                          style = MaterialTheme.typography.bodyMedium,
-                          modifier = Modifier.testTag(EventDetailsTestTags.EVENT_TIME),
-                      )
-                      Text(
-                          text = formattedLocation,
-                          style = MaterialTheme.typography.bodySmall,
-                          maxLines = 3,
-                          overflow = TextOverflow.Ellipsis,
-                          modifier = Modifier.testTag(EventDetailsTestTags.EVENT_LOCATION),
-                      )
-                    }
-                  }
+              Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.CalendarToday,
+                    contentDescription = "Date",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Column {
+                  Text(
+                      text = formattedDate,
+                      style = MaterialTheme.typography.bodyMedium,
+                      modifier = Modifier.testTag(EventDetailsTestTags.EVENT_TIME),
+                  )
+                  Text(
+                      text = formattedLocation,
+                      style = MaterialTheme.typography.bodySmall,
+                      maxLines = 3,
+                      overflow = TextOverflow.Ellipsis,
+                      modifier = Modifier.testTag(EventDetailsTestTags.EVENT_LOCATION),
+                  )
+                }
+              }
+              Spacer(modifier = Modifier.width(16.dp))
               Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Default.AccessTime,

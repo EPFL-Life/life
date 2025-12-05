@@ -3,7 +3,6 @@ package ch.epfllife.ui.eventDetails
 // import androidx.compose.ui.test.assertExists
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -82,8 +81,8 @@ class EventDetailsScreenTest {
   fun dateAndTime_areDisplayed() {
     composeTestRule.onNodeWithContentDescription("Date").assertExists()
     composeTestRule.onNodeWithContentDescription("Time").assertExists()
-    // FIX: Instead of assuming a single node, we assert that *at least one* node displays the text
-    composeTestRule.onAllNodesWithText("2025-10-12 18:00")[0].assertIsDisplayed()
+    composeTestRule.onNodeWithText("2025-10-12").assertIsDisplayed()
+    composeTestRule.onNodeWithText("18:00").assertIsDisplayed()
   }
 
   /** Checks that the “View Location on Map” section is present and clickable. */
