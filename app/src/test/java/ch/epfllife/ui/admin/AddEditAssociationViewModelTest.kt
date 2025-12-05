@@ -88,4 +88,52 @@ class AddEditAssociationViewModelTest {
     assertEquals("Updated Name", updatedAssociation?.name)
     assertEquals(EventCategory.CULTURE, updatedAssociation?.eventCategory)
   }
+
+  @Test
+  fun updateSocialMedia_updatesEnabledState() {
+    val viewModel = AddEditAssociationViewModel(db, null)
+    // Use the first available platform to ensure it exists
+    val platform = viewModel.formState.socialMedia.first().platform
+
+    viewModel.updateSocialMedia(platform, true)
+
+    val entry = viewModel.formState.socialMedia.find { it.platform == platform }
+    assertTrue(entry?.enabled == true)
+
+    viewModel.updateSocialMedia(platform, false)
+    val entryDisabled = viewModel.formState.socialMedia.find { it.platform == platform }
+    assertTrue(entryDisabled?.enabled == false)
+  }
+
+  @Test
+  fun updateSocialMediaLink_updatesLink() {
+    val viewModel = AddEditAssociationViewModel(db, null)
+    val platform = viewModel.formState.socialMedia.first().platform
+    val link = "https://example.com/test"
+
+    viewModel.updateSocialMediaLink(platform, link)
+
+    val entry = viewModel.formState.socialMedia.find { it.platform == platform }
+    assertEquals(link, entry?.link)
+  }
+
+  @Test
+  fun updateLogoUrl_updatesLogoUrl() {
+    val viewModel = AddEditAssociationViewModel(db, null)
+    val url = "https://example.com/logo.png"
+
+    viewModel.updateLogoUrl(url)
+
+    assertEquals(url, viewModel.formState.logoUrl)
+  }
+
+  @Test
+  fun updateBannerUrl_updatesBannerUrl() {
+    val viewModel = AddEditAssociationViewModel(db, null)
+    val url = "https://example.com/banner.png"
+
+    viewModel.updateBannerUrl(url)
+
+    assertEquals(url, viewModel.formState.bannerUrl)
+  }
 }
