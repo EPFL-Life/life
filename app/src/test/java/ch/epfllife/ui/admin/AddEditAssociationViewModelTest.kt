@@ -143,31 +143,35 @@ class AddEditAssociationViewModelTest {
     val mockRepo = io.mockk.mockk<ch.epfllife.model.association.AssociationRepository>()
     io.mockk.coEvery { mockRepo.getAssociation(any()) } returns null
     val mockDb = db.copy(assocRepo = mockRepo)
-    
+
     val viewModel = AddEditAssociationViewModel(mockDb, "nonExistentId")
     advanceUntilIdle()
 
     // Assert
     val state = viewModel.uiState.value
     assertTrue(state is AddEditAssociationUIState.Error)
-    assertEquals(ch.epfllife.R.string.error_loading_association, (state as AddEditAssociationUIState.Error).messageRes)
+    assertEquals(
+        ch.epfllife.R.string.error_loading_association,
+        (state as AddEditAssociationUIState.Error).messageRes)
   }
 
   @Test
   fun submit_handlesError_whenRepositoryFails() = runTest {
     // Arrange
-    val mockRepo = io.mockk.mockk<ch.epfllife.model.association.AssociationRepository>(relaxed = true)
-    io.mockk.coEvery { mockRepo.createAssociation(any()) } returns Result.failure(Exception("Failed"))
+    val mockRepo =
+        io.mockk.mockk<ch.epfllife.model.association.AssociationRepository>(relaxed = true)
+    io.mockk.coEvery { mockRepo.createAssociation(any()) } returns
+        Result.failure(Exception("Failed"))
     io.mockk.coEvery { mockRepo.getNewUid() } returns "newId"
     val mockDb = db.copy(assocRepo = mockRepo)
-    
+
     val viewModel = AddEditAssociationViewModel(mockDb, null)
     viewModel.updateName("New Association")
     viewModel.updateDescription("Description")
     viewModel.updateAbout("About")
-    
+
     var successCalled = false
-    
+
     // Act
     viewModel.submit { successCalled = true }
     advanceUntilIdle()
@@ -176,6 +180,8 @@ class AddEditAssociationViewModelTest {
     org.junit.Assert.assertFalse(successCalled)
     val state = viewModel.uiState.value
     assertTrue(state is AddEditAssociationUIState.Error)
-    assertEquals(ch.epfllife.R.string.error_saving_association, (state as AddEditAssociationUIState.Error).messageRes)
+    assertEquals(
+        ch.epfllife.R.string.error_saving_association,
+        (state as AddEditAssociationUIState.Error).messageRes)
   }
 }
