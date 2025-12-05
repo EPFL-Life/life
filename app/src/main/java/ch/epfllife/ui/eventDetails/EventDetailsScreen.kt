@@ -5,6 +5,8 @@ import android.content.pm.PackageManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -21,20 +23,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
-import ch.epfllife.model.association.Association
 import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.Event
-import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.map.Location
-import ch.epfllife.model.user.Price
 import ch.epfllife.ui.composables.BackButton
 import ch.epfllife.ui.composables.Map
 import ch.epfllife.ui.theme.LifeRed
-import ch.epfllife.ui.theme.Theme
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 
@@ -104,6 +102,7 @@ fun EventDetailsScreen(
 }
 
 @Composable
+@OptIn(ExperimentalLayoutApi::class)
 fun EventDetailsContent(
     modifier: Modifier = Modifier,
     event: Event,
@@ -114,6 +113,25 @@ fun EventDetailsContent(
     onUnenrollClick: () -> Unit = {},
 ) {
   val context = LocalContext.current
+  val (formattedDate, formattedTime) =
+      remember(event.time) {
+        val trimmed = event.time.trim()
+        val parts = trimmed.split(" ", limit = 2)
+        val datePart = parts.getOrNull(0).orEmpty().ifBlank { trimmed }
+        val rawTimePart = parts.getOrNull(1).orEmpty()
+        val timePart =
+            when {
+              rawTimePart.isBlank() -> ""
+              ':' in rawTimePart -> rawTimePart
+              rawTimePart.count { it == '-' } == 1 -> rawTimePart.replace('-', ':')
+              else -> rawTimePart
+            }.ifBlank { trimmed }
+        datePart to timePart
+      }
+  val formattedLocation =
+      remember(event.location.name) {
+        event.location.name.lines().map { it.trim() }.filter { it.isNotEmpty() }.joinToString(", ")
+      }
   Box(
       modifier =
           modifier
@@ -180,37 +198,41 @@ fun EventDetailsContent(
 
             // Row containing: Date, Time, Location
             // TODO-question: make this clickable to be displayed in Calender?
-            Row(
+            FlowRow(
                 modifier =
                     Modifier.fillMaxWidth()
+                        .wrapContentHeight()
                         .clip(RoundedCornerShape(8.dp))
                         .background(MaterialTheme.colorScheme.surfaceVariant)
                         .padding(12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                maxItemsInEachRow = 2,
             ) {
-              Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Default.CalendarToday,
-                    contentDescription = "Date",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Column {
-                  Text(
-                      text = event.time,
-                      style = MaterialTheme.typography.bodyMedium,
-                      modifier = Modifier.testTag(EventDetailsTestTags.EVENT_TIME),
-                  ) // TODO we need some proper time to time-text
-                  // formating
-                  // (implement in repository)
-                  Text(
-                      text = event.location.name,
-                      style = MaterialTheme.typography.bodySmall,
-                      modifier = Modifier.testTag(EventDetailsTestTags.EVENT_LOCATION),
-                  )
-                }
-              }
+              Row(
+                  modifier = Modifier.weight(1f, fill = false),
+                  verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.CalendarToday,
+                        contentDescription = "Date",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Column {
+                      Text(
+                          text = formattedDate,
+                          style = MaterialTheme.typography.bodyMedium,
+                          modifier = Modifier.testTag(EventDetailsTestTags.EVENT_TIME),
+                      )
+                      Text(
+                          text = formattedLocation,
+                          style = MaterialTheme.typography.bodySmall,
+                          maxLines = 3,
+                          overflow = TextOverflow.Ellipsis,
+                          modifier = Modifier.testTag(EventDetailsTestTags.EVENT_LOCATION),
+                      )
+                    }
+                  }
               Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Default.AccessTime,
@@ -218,7 +240,7 @@ fun EventDetailsContent(
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = event.time, style = MaterialTheme.typography.bodyMedium)
+                Text(text = formattedTime, style = MaterialTheme.typography.bodyMedium)
               }
             }
 
@@ -284,35 +306,4 @@ fun EventDetailsContent(
             onGoBack = onGoBack,
         )
       }
-}
-
-// ------------- Use this for Preview ------------------
-
-@Preview(showBackground = true)
-@Composable
-fun EventDetailsPreview() {
-  val sampleEvent =
-      Event(
-          id = "1",
-          title = "Drone Workshop",
-          description =
-              "The Drone Workshop is a multi-evening workshop organized by AéroPoly, where you can build your own 3-inch FPV drone...",
-          location = Location(46.5191, 6.5668, "Centre Sport et Santé"),
-          time = "2025-10-12 18:00",
-          association =
-              Association(
-                  id = "dkjaend38rh",
-                  name = "AeroPoly",
-                  description = "AéroPoly is the EPFL drone club.",
-                  eventCategory = EventCategory.ACADEMIC,
-              ),
-          tags = listOf("workshop"),
-          price = Price(10u),
-          pictureUrl =
-              "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg",
-      )
-
-  Theme() {
-    EventDetailsContent(event = sampleEvent, onOpenMap = {}, onGoBack = {}, onEnrollClick = {})
-  }
 }
