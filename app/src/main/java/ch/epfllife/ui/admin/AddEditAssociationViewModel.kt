@@ -13,7 +13,6 @@ import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.EventCategory
 import ch.epfllife.ui.association.SocialIcons
 import java.net.URI
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -46,7 +45,6 @@ sealed interface AddEditAssociationUIState {
 class AddEditAssociationViewModel(
     private val db: Db,
     private val associationId: String? = null,
-    private val submitDispatcher: CoroutineDispatcher = Dispatchers.Main,
 ) : ViewModel() {
 
   private val repo = db.assocRepo
@@ -180,7 +178,7 @@ class AddEditAssociationViewModel(
   fun submit(onSuccess: () -> Unit) {
     if (!isFormValid()) return
 
-    viewModelScope.launch(submitDispatcher) {
+    viewModelScope.launch(Dispatchers.Main) {
       val association = buildAssociation()
       val result =
           if (isEditing) {
