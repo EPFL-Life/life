@@ -1,6 +1,7 @@
 package ch.epfllife.example_data
 
 import ch.epfllife.model.user.User
+import ch.epfllife.model.user.UserRole
 import ch.epfllife.model.user.UserSettings
 
 /** A singleton object holding sample user data for testing and previews. */
@@ -29,6 +30,15 @@ object ExampleUsers {
           enrolledEvents = listOf("2"),
           userSettings = UserSettings())
 
+  val adminUser = User(id = "admin1", name = "Admin User", role = UserRole.ADMIN)
+
+  val associationAdminUser =
+      User(
+          id = "assocAdmin1",
+          name = "Association Admin",
+          role = UserRole.ASSOCIATION_ADMIN,
+          managedAssociationIds = listOf("assoc1"))
+
   // A list of all sample users for convenience
-  val allUsers = listOf(user1, user2, user3)
+  val allUsers = listOf(user1, user2, user3, adminUser, associationAdminUser)
 }
