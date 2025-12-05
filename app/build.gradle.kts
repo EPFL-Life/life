@@ -22,7 +22,8 @@ android {
     localProperties.load(FileInputStream(localPropertiesFile))
   }
 
-  val mapsApiKey: String = localProperties.getProperty("MAPS_API_KEY") ?: ""
+  val mapsApiKey: String =
+      localProperties.getProperty("MAPS_API_KEY") ?: System.getenv("MAPS_API_KEY") ?: ""
 
   defaultConfig {
     applicationId = "ch.epfllife"
