@@ -131,6 +131,7 @@ class AddEditAssociationScreenTest {
     val viewModel = AddEditAssociationViewModel(db = db, associationId = existing.id)
 
     viewModel.awaitAssociationLoaded()
+    viewModel.populateMandatoryFields(existing)
     val updatedName = "Updated ${existing.name}"
     viewModel.updateName(updatedName)
 
@@ -188,6 +189,7 @@ class AddEditAssociationScreenTest {
     val viewModel = AddEditAssociationViewModel(db = db, associationId = existing.id)
 
     viewModel.awaitAssociationLoaded()
+    viewModel.populateMandatoryFields(existing)
     val updatedName = "Updated ${existing.name}"
     viewModel.updateName(updatedName)
 
