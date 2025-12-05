@@ -8,12 +8,9 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import ch.epfllife.model.association.Association
+import ch.epfllife.example_data.ExampleEvents
 import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.Event
-import ch.epfllife.model.event.EventCategory
-import ch.epfllife.model.map.Location
-import ch.epfllife.model.user.Price
 import ch.epfllife.ui.theme.Theme
 import org.junit.Before
 import org.junit.Rule
@@ -32,25 +29,7 @@ class EventDetailsScreenTest {
 
   @Before
   fun setUp() {
-    // Create a mock event similar to the one used in the Preview
-    sampleEvent =
-        Event(
-            id = "1",
-            title = "Drone Workshop",
-            description =
-                "The Drone Workshop is a multi-evening workshop organized by AéroPoly, where you can build your own 3-inch FPV drone...",
-            location = Location(46.5191, 6.5668, "Centre Sport et Santé"),
-            time = "2025-10-12 18:00",
-            association =
-                Association(
-                    id = "AeroPoly",
-                    name = "AeroPoly",
-                    description = "Description",
-                    eventCategory = EventCategory.ACADEMIC),
-            tags = listOf("workshop"),
-            price = Price(10u),
-            pictureUrl =
-                "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")
+    sampleEvent = ExampleEvents.sampleEvent
   }
 
   private fun setSuccessContent(event: Event = sampleEvent) {
@@ -72,9 +51,9 @@ class EventDetailsScreenTest {
   @Test
   fun eventInformation_isDisplayedCorrectly() {
     setSuccessContent()
-    composeTestRule.onNodeWithText("Drone Workshop").assertIsDisplayed()
-    composeTestRule.onNodeWithText("AeroPoly").assertIsDisplayed()
-    composeTestRule.onNodeWithText("CHF 0.10").assertIsDisplayed()
+    composeTestRule.onNodeWithText(sampleEvent.title).assertIsDisplayed()
+    composeTestRule.onNodeWithText(sampleEvent.association.name).assertIsDisplayed()
+    composeTestRule.onNodeWithText(sampleEvent.price.toString()).assertIsDisplayed()
     composeTestRule.onNodeWithText("Description").assertIsDisplayed()
     composeTestRule.onNodeWithText(sampleEvent.description).assertIsDisplayed()
   }
@@ -88,15 +67,18 @@ class EventDetailsScreenTest {
     setSuccessContent()
     composeTestRule.onNodeWithContentDescription("Date").assertExists()
     composeTestRule.onNodeWithContentDescription("Time").assertExists()
-    composeTestRule.onNodeWithText("2025-10-12").assertIsDisplayed()
-    composeTestRule.onNodeWithText("18:00").assertIsDisplayed()
+    val (expectedDate, expectedTime) = sampleEvent.time.split(" ")
+    composeTestRule.onNodeWithText(expectedDate).assertIsDisplayed()
+    composeTestRule.onNodeWithText(expectedTime).assertIsDisplayed()
   }
 
   @Test
   fun timeWithDash_isFormattedWithColon() {
-    val dashedEvent = sampleEvent.copy(time = "2025-10-12 07-30")
+    val dashedTime = ExampleEvents.event1.time.replace(":", "-")
+    val dashedEvent = ExampleEvents.event1.copy(time = dashedTime)
     setSuccessContent(dashedEvent)
-    composeTestRule.onNodeWithText("07:30").assertIsDisplayed()
+    val expectedTime = ExampleEvents.event1.time.split(" ")[1]
+    composeTestRule.onNodeWithText(expectedTime).assertIsDisplayed()
   }
 
   @Test
