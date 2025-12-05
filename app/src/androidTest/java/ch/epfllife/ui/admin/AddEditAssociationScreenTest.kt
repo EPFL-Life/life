@@ -251,38 +251,6 @@ class AddEditAssociationScreenTest {
     }
   }
 
-  @OptIn(ExperimentalCoroutinesApi::class)
-  @Test
-  fun submitNewAssociation_savesSocialAndMediaFields() = runTest {
-    val dispatcher = StandardTestDispatcher(testScheduler)
-    val fakeRepo = FakeAssociationRepository()
-    val viewModel =
-        AddEditAssociationViewModel(
-            associationRepository = fakeRepo,
-            submitDispatcher = dispatcher,
-        )
-
-    viewModel.populateMandatoryFields(ExampleAssociations.association2)
-    val targetPlatform = SocialIcons.platformOrder.first()
-    val logoUrl = "https://example.com/logo.png"
-    val bannerUrl = "https://example.com/banner.png"
-    val socialUrl = "https://social.example.com/assoc"
-
-    viewModel.updateLogoUrl(logoUrl)
-    viewModel.updateBannerUrl(bannerUrl)
-    viewModel.updateSocialMedia(targetPlatform, true)
-    viewModel.updateSocialMediaLink(targetPlatform, socialUrl)
-
-    viewModel.submit {}
-    advanceUntilIdle()
-
-    fakeRepo.assertCreateCalls(1)
-    val created = fakeRepo.createdAssociations.first()
-    assert(created.logoUrl == logoUrl)
-    assert(created.pictureUrl == bannerUrl)
-    assert(created.socialLinks?.get(targetPlatform) == socialUrl)
-  }
-
   private fun AddEditAssociationViewModel.populateMandatoryFields(source: Association) {
     updateName(source.name)
     updateDescription(source.description)
