@@ -53,10 +53,10 @@ class EventDetailsScreenTest {
                 "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")
   }
 
-  private fun setSuccessContent() {
+  private fun setSuccessContent(event: Event = sampleEvent) {
     composeTestRule.setContent {
       Theme {
-        EventDetailsContent(event = sampleEvent, onGoBack = {}, onOpenMap = {}, onEnrollClick = {})
+        EventDetailsContent(event = event, onGoBack = {}, onOpenMap = {}, onEnrollClick = {})
       }
     }
   }
@@ -90,6 +90,13 @@ class EventDetailsScreenTest {
     composeTestRule.onNodeWithContentDescription("Time").assertExists()
     composeTestRule.onNodeWithText("2025-10-12").assertIsDisplayed()
     composeTestRule.onNodeWithText("18:00").assertIsDisplayed()
+  }
+
+  @Test
+  fun timeWithDash_isFormattedWithColon() {
+    val dashedEvent = sampleEvent.copy(time = "2025-10-12 07-30")
+    setSuccessContent(dashedEvent)
+    composeTestRule.onNodeWithText("07:30").assertIsDisplayed()
   }
 
   @Test
