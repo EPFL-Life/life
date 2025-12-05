@@ -13,7 +13,6 @@ import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.EventCategory
 import ch.epfllife.ui.association.SocialIcons
 import java.net.URI
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -178,7 +177,7 @@ class AddEditAssociationViewModel(
   fun submit(onSuccess: () -> Unit) {
     if (!isFormValid()) return
 
-    viewModelScope.launch(Dispatchers.Main) {
+    viewModelScope.launch() {
       val association = buildAssociation()
       val result =
           if (isEditing) {
