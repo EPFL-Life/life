@@ -2,12 +2,14 @@ package ch.epfllife.ui.eventDetails
 
 // import androidx.compose.ui.test.assertExists
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import ch.epfllife.model.association.Association
+import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventCategory
 import ch.epfllife.model.map.Location
@@ -49,7 +51,9 @@ class EventDetailsScreenTest {
             price = Price(10u),
             pictureUrl =
                 "https://www.shutterstock.com/image-photo/engineer-working-on-racing-fpv-600nw-2278353271.jpg")
+  }
 
+  private fun setSuccessContent() {
     composeTestRule.setContent {
       Theme {
         EventDetailsContent(event = sampleEvent, onGoBack = {}, onOpenMap = {}, onEnrollClick = {})
@@ -60,12 +64,14 @@ class EventDetailsScreenTest {
   /** Ensures that the event image is visible. */
   @Test
   fun eventImage_isDisplayed() {
+    setSuccessContent()
     composeTestRule.onNodeWithContentDescription("Event Image").assertIsDisplayed()
   }
 
   /** Verifies that the title, club name, price, and description appear correctly. */
   @Test
   fun eventInformation_isDisplayedCorrectly() {
+    setSuccessContent()
     composeTestRule.onNodeWithText("Drone Workshop").assertIsDisplayed()
     composeTestRule.onNodeWithText("AeroPoly").assertIsDisplayed()
     composeTestRule.onNodeWithText("CHF 0.10").assertIsDisplayed()
@@ -79,15 +85,41 @@ class EventDetailsScreenTest {
    */
   @Test
   fun dateAndTime_areDisplayed() {
+    setSuccessContent()
     composeTestRule.onNodeWithContentDescription("Date").assertExists()
     composeTestRule.onNodeWithContentDescription("Time").assertExists()
     composeTestRule.onNodeWithText("2025-10-12").assertIsDisplayed()
     composeTestRule.onNodeWithText("18:00").assertIsDisplayed()
   }
 
+  @Test
+  fun errorState_displaysErrorMessage() {
+    val localDb = Db.freshLocal()
+    composeTestRule.setContent {
+      Theme {
+        EventDetailsScreen(
+            eventId = "missing",
+            db = localDb,
+            onOpenMap = {},
+            onGoBack = {},
+        )
+      }
+    }
+
+    composeTestRule.waitUntil(timeoutMillis = 5_000) {
+      composeTestRule
+          .onAllNodes(hasTestTag(EventDetailsTestTags.ERROR_MESSAGE))
+          .fetchSemanticsNodes()
+          .isNotEmpty()
+    }
+
+    composeTestRule.onNodeWithTag(EventDetailsTestTags.ERROR_MESSAGE).assertIsDisplayed()
+  }
+
   /** Checks that the “View Location on Map” section is present and clickable. */
   @Test
   fun viewLocationOnMap_isDisplayedAndClickable() {
+    setSuccessContent()
     composeTestRule
         .onNodeWithTag(EventDetailsTestTags.VIEW_LOCATION_BUTTON)
         .assertIsDisplayed()
@@ -97,6 +129,7 @@ class EventDetailsScreenTest {
   /** Ensures that the enrolment button is visible and can be clicked. */
   @Test
   fun enrollButton_isDisplayedAndClickable() {
+    setSuccessContent()
     composeTestRule.onNodeWithText("Enrol in event").assertIsDisplayed()
     composeTestRule.onNodeWithText("Enrol in event").performClick()
   }
@@ -104,6 +137,7 @@ class EventDetailsScreenTest {
   /** Checks that the back arrow button exists and can be clicked. */
   @Test
   fun backButton_isDisplayedAndClickable() {
+    setSuccessContent()
     composeTestRule.onNodeWithContentDescription("Back").assertIsDisplayed()
     composeTestRule.onNodeWithContentDescription("Back").performClick()
   }
