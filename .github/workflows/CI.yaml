@@ -148,6 +148,7 @@ jobs:
           ./gradlew assembleDebug lint --parallel --build-cache
         env:
           DEBUG_KEYSTORE_PATH: ./debug.keystore
+          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
 
       - name: Run tests
         run: |
@@ -155,6 +156,7 @@ jobs:
           ./gradlew check --parallel --build-cache
         env:
           DEBUG_KEYSTORE_PATH: ./debug.keystore
+          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
 
       # Start Firebase emulators for instrumentation tests
       - name: Start Firebase emulators
@@ -181,6 +183,7 @@ jobs:
           script: ./gradlew connectedCheck --parallel --build-cache
         env:
           DEBUG_KEYSTORE_PATH: ./debug.keystore
+          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
 
       # This step generates the coverage report which will be used later in the semster for monitoring purposes
       - name: Generate coverage
