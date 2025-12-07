@@ -1,42 +1,70 @@
 package ch.epfllife.ui.composables
 
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
-import ch.epfllife.model.association.Association
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithText
+import ch.epfllife.example_data.ExampleEvents
 import ch.epfllife.model.event.Event
-import ch.epfllife.model.event.EventCategory
-import ch.epfllife.model.map.Location
-import ch.epfllife.model.user.Price
+import ch.epfllife.ui.theme.Theme
 import ch.epfllife.utils.assertClickable
-import com.google.firebase.Timestamp
 import org.junit.Rule
 import org.junit.Test
 
 class EventCardTest {
 
   @get:Rule val composeTestRule = createComposeRule()
-  private val event =
-      Event(
-          id = "0",
-          title = "Test Event",
-          description = "This is a test event",
-          location = Location(46.520278, 6.565556, "EPFL"),
-          time = Timestamp.Companion.now().toString(),
-          association =
-              Association(
-                  name = "assoc1",
-                  id = "assoc1",
-                  description = "This is a test",
-                  eventCategory = EventCategory.ACADEMIC,
-              ),
-          tags = emptyList(),
-          price = Price(0u),
-      )
+
+  private val eventWithBanner = ExampleEvents.event1
+  private val eventWithoutBanner = ExampleEvents.event3
+
+  private fun setEventCardContent(event: Event) {
+    composeTestRule.setContent {
+      Theme {
+        EventCard(
+            event = event,
+            onClick = {},
+        )
+      }
+    }
+  }
 
   @Test
-  fun isClickable() {
+  fun card_isClickable() {
     composeTestRule.assertClickable(
-        { clickHandler -> EventCard(event, onClick = clickHandler) },
-        EventCardTestTags.getEventCardTestTag(event.id),
+        { clickHandler ->
+          Theme {
+            EventCard(
+                event = eventWithBanner,
+                onClick = clickHandler,
+            )
+          }
+        },
+        EventCardTestTags.getEventCardTestTag(eventWithBanner.id),
     )
+  }
+
+  @Test
+  fun bannerImage_isDisplayed_whenPictureUrlAvailable() {
+    setEventCardContent(eventWithBanner)
+
+    composeTestRule.onNodeWithContentDescription("Event Image").assertIsDisplayed()
+  }
+
+  @Test
+  fun bannerImage_isDisplayed_whenPictureMissing() {
+    setEventCardContent(eventWithoutBanner)
+
+    composeTestRule.onNodeWithContentDescription("Event Image").assertIsDisplayed()
+  }
+
+  @Test
+  fun coreEventDetails_areVisible() {
+    setEventCardContent(eventWithBanner)
+
+    composeTestRule.onNodeWithText(eventWithBanner.title).assertIsDisplayed()
+    composeTestRule.onNodeWithText(eventWithBanner.association.name).assertIsDisplayed()
+    composeTestRule.onNodeWithText(eventWithBanner.location.name).assertIsDisplayed()
+    composeTestRule.onNodeWithText(eventWithBanner.time).assertIsDisplayed()
   }
 }
