@@ -3,8 +3,10 @@ package ch.epfllife.ui.home
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
+import ch.epfllife.example_data.ExampleAssociations
 import ch.epfllife.example_data.ExampleEvents
 import ch.epfllife.example_data.ExampleUsers
+import ch.epfllife.model.association.Association
 import ch.epfllife.model.association.AssociationRepositoryLocal
 import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.Event
@@ -16,6 +18,7 @@ import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.theme.Theme
 import ch.epfllife.utils.triggerRefresh
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.*
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -29,11 +32,16 @@ class HomeScreenTest {
   private fun setUpDb(
       myEvents: List<Event> = emptyList(),
       allEvents: List<Event> = emptyList(),
+      subscribedAssociations: List<Association> = emptyList()
   ) = runTest {
     val combinedEvents = (allEvents + myEvents).distinctBy { it.id }
     val eventRepo = EventRepositoryLocal().apply { seedEvents(combinedEvents) }
+    val assocRepo =
+        AssociationRepositoryLocal(eventRepo).apply {
+          subscribedAssociations.forEach { assoc -> createAssociation(assoc) }
+        }
     val userRepo =
-        UserRepositoryLocal(eventRepo).apply {
+        UserRepositoryLocal(eventRepo, assocRepo).apply {
           this.createUser(ExampleUsers.user1)
           this.simulateLogin(ExampleUsers.user1.id)
           myEvents.forEach { event ->
@@ -42,16 +50,17 @@ class HomeScreenTest {
             }
             this.subscribeToEvent(event.id)
           }
+          subscribedAssociations.forEach { assoc -> this.subscribeToAssociation(assoc.id) }
         }
-    val assocRepo = AssociationRepositoryLocal(eventRepo)
     db = Db(userRepo, eventRepo, assocRepo)
   }
 
   private fun setUpHomeScreen(
       myEvents: List<Event> = emptyList(),
       allEvents: List<Event> = emptyList(),
+      subscribedAssociations: List<Association> = emptyList()
   ) {
-    setUpDb(myEvents, allEvents)
+    setUpDb(myEvents, allEvents, subscribedAssociations)
     composeTestRule.setContent { Theme { HomeScreen(db = db, onEventClick = {}) } }
   }
 
@@ -314,5 +323,44 @@ class HomeScreenTest {
 
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithText(specialCharEvent.title).assertIsDisplayed()
+  }
+
+  @Test
+  fun homeScreen_subscribedFilterShowsEnrolledAndSubscribedAssocEvents() {
+    setUpHomeScreen(
+        myEvents = listOf(ExampleEvents.event1),
+        allEvents = listOf(ExampleEvents.event1, ExampleEvents.event2),
+        subscribedAssociations = listOf(ExampleAssociations.association2))
+    composeTestRule.waitForIdle()
+
+    val enrolledTag = EventCardTestTags.getEventCardTestTag(ExampleEvents.event1.id)
+    // event 2 is Association's 2 created event
+    val notEnrolledAssociationEvent = EventCardTestTags.getEventCardTestTag(ExampleEvents.event2.id)
+
+    composeTestRule.onNodeWithTag(enrolledTag).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(notEnrolledAssociationEvent).assertIsDisplayed()
+
+    // the enrolled events should appear before the association event you are NOT enrolled
+    val enrolledBounds = composeTestRule.onNodeWithTag(enrolledTag).getUnclippedBoundsInRoot()
+    val assocBounds =
+        composeTestRule.onNodeWithTag(notEnrolledAssociationEvent).getUnclippedBoundsInRoot()
+    assertTrue(enrolledBounds.top <= assocBounds.top)
+  }
+
+  @Test
+  fun homeScreen_subscribedFilterExcludesNonSubscribedAssocEvents() {
+    val eventEnrolled = ExampleEvents.event1
+    val eventNotRelevant = ExampleEvents.event3
+
+    setUpHomeScreen(
+        myEvents = listOf(eventEnrolled),
+        allEvents = ExampleEvents.allEvents,
+        subscribedAssociations = listOf(ExampleAssociations.association2))
+
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithText(eventEnrolled.title).assertIsDisplayed()
+    composeTestRule.onNodeWithText(eventNotRelevant.title).assertDoesNotExist()
+    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_ALL).performClick()
+    composeTestRule.onNodeWithText(eventNotRelevant.title).assertIsDisplayed()
   }
 }
