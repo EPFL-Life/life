@@ -180,6 +180,9 @@ fun App(
                   val encodedLocation = Uri.encode(Json.encodeToString(location))
                   navigationActions.navigateToScreenWithId(Screen.Map, encodedLocation)
                 },
+                onAssociationClick = { associationId ->
+                  navigationActions.navigateToAssociationDetails(associationId)
+                },
                 db = db,
             )
           }
