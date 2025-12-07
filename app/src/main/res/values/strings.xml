@@ -28,7 +28,7 @@
     <string name="associations_no_all_description">There are currently no associations to show. Please check again later.</string>
 
     <!-- Association and Home screen filter -->
-    <string name="subscribed_filter">Subscribed</string>
+    <string name="subscribed_filter">For You</string>
     <string name="all_events_filter">All Events</string>
     <string name="all_associations_filter">All Associations</string>
 
