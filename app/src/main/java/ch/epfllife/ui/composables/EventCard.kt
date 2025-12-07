@@ -15,61 +15,83 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ch.epfllife.model.event.Event
+import coil.compose.AsyncImage
 
 object EventCardTestTags {
   fun getEventCardTestTag(eventId: String) = "eventCard_$eventId"
 }
 
 @Composable
-fun EventCard(event: Event, modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun EventCard(
+    event: Event,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
 
   Card(
       onClick = onClick,
       shape = RoundedCornerShape(12.dp),
       elevation = CardDefaults.elevatedCardElevation(5.dp),
       modifier = modifier.fillMaxWidth().testTag(EventCardTestTags.getEventCardTestTag(event.id))) {
-        Column(Modifier.padding(horizontal = 16.dp, vertical = 14.dp)) {
-          Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Column {
+          // Banner Image
+          AsyncImage(
+              model =
+                  event.pictureUrl
+                      ?: "https://www.epfl.ch/campus/services/events/wp-content/uploads/2024/09/WEB_Image-Home-Events_ORGANISER.png",
+              contentDescription = "Event Image",
+              contentScale = ContentScale.Crop,
+              modifier =
+                  Modifier.fillMaxWidth()
+                      .height(200.dp)
+                      .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)))
+
+          Column(Modifier.padding(horizontal = 16.dp, vertical = 14.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically) {
+                  Text(
+                      text = event.title,
+                      style = MaterialTheme.typography.titleMedium,
+                      fontWeight = FontWeight.SemiBold,
+                      modifier = Modifier.weight(1f))
+                  // TO DO: Display enrollment status on card
+
+                  Spacer(Modifier.width(6.dp))
+
+                  Icon(
+                      imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                      contentDescription = null,
+                      tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+
+            Spacer(Modifier.height(2.dp))
+
             Text(
-                text = event.title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.weight(1f))
-            Text(
-                text = event.price.formatPrice(),
-                style = MaterialTheme.typography.bodyMedium,
+                text = event.association.name,
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Spacer(Modifier.width(6.dp))
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant)
+
+            Spacer(Modifier.height(10.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically) {
+                  InfoItem(
+                      icon = Icons.Outlined.CalendarMonth,
+                      text = event.location.name,
+                      modifier = Modifier.weight(1f, fill = false))
+                  Spacer(Modifier.width(16.dp))
+                  InfoItem(icon = Icons.Outlined.AccessTime, text = event.time)
+                }
           }
-
-          Spacer(Modifier.height(2.dp))
-
-          Text(
-              text = event.association.name,
-              style = MaterialTheme.typography.bodySmall,
-              color = MaterialTheme.colorScheme.onSurfaceVariant)
-
-          Spacer(Modifier.height(10.dp))
-
-          Row(
-              modifier = Modifier.fillMaxWidth(),
-              horizontalArrangement = Arrangement.SpaceBetween,
-              verticalAlignment = Alignment.CenterVertically) {
-                InfoItem(
-                    icon = Icons.Outlined.CalendarMonth,
-                    text = event.location.name,
-                    modifier = Modifier.weight(1f, fill = false))
-                Spacer(Modifier.width(16.dp))
-                InfoItem(icon = Icons.Outlined.AccessTime, text = event.time)
-              }
         }
       }
 }
