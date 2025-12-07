@@ -24,7 +24,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 
-
 class HomeScreenTest {
 
   @get:Rule val composeTestRule = createComposeRule()
@@ -366,14 +365,12 @@ class HomeScreenTest {
     composeTestRule.onNodeWithText(eventNotRelevant.title).assertIsDisplayed()
   }
 
-
   @Test
   fun homeScreen_subscribedFilterUpdatesAfterSubscribingToAssociation() {
     setUpHomeScreen(
-      myEvents = listOf(ExampleEvents.event1),
-      allEvents = listOf(ExampleEvents.event1, ExampleEvents.event2),
-      subscribedAssociations = emptyList()
-    )
+        myEvents = listOf(ExampleEvents.event1),
+        allEvents = listOf(ExampleEvents.event1, ExampleEvents.event2),
+        subscribedAssociations = emptyList())
 
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_SUBSCRIBED).performClick()
@@ -394,10 +391,9 @@ class HomeScreenTest {
   @Test
   fun homeScreen_subscribedFilterOrderWithMultipleEnrolled() {
     setUpHomeScreen(
-      myEvents = listOf(ExampleEvents.event1, ExampleEvents.event3),
-      allEvents = ExampleEvents.allEvents,
-      subscribedAssociations = listOf(ExampleAssociations.association2)
-    )
+        myEvents = listOf(ExampleEvents.event1, ExampleEvents.event3),
+        allEvents = ExampleEvents.allEvents,
+        subscribedAssociations = listOf(ExampleAssociations.association2))
 
     composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_SUBSCRIBED).performClick()
     composeTestRule.waitForIdle()
@@ -405,7 +401,6 @@ class HomeScreenTest {
     val tag1 = EventCardTestTags.getEventCardTestTag(ExampleEvents.event1.id)
     val tag3 = EventCardTestTags.getEventCardTestTag(ExampleEvents.event3.id)
     val tagAssoc = EventCardTestTags.getEventCardTestTag(ExampleEvents.event2.id)
-
 
     val b1 = composeTestRule.onNodeWithTag(tag1).getUnclippedBoundsInRoot()
     val b3 = composeTestRule.onNodeWithTag(tag3).getUnclippedBoundsInRoot()
@@ -418,33 +413,30 @@ class HomeScreenTest {
   @Test
   fun homeScreen_associationEventsNotAboveEnrolled() {
     setUpHomeScreen(
-      myEvents = listOf(ExampleEvents.event1, ExampleEvents.event3),
-      allEvents = listOf(ExampleEvents.event1, ExampleEvents.event2, ExampleEvents.event3),
-      subscribedAssociations = listOf(ExampleAssociations.association2)
-    )
+        myEvents = listOf(ExampleEvents.event1, ExampleEvents.event3),
+        allEvents = listOf(ExampleEvents.event1, ExampleEvents.event2, ExampleEvents.event3),
+        subscribedAssociations = listOf(ExampleAssociations.association2))
 
     composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_SUBSCRIBED).performClick()
     composeTestRule.waitForIdle()
 
-    val enrolledTags = listOf(
-      EventCardTestTags.getEventCardTestTag(ExampleEvents.event1.id),
-      EventCardTestTags.getEventCardTestTag(ExampleEvents.event3.id)
-    )
+    val enrolledTags =
+        listOf(
+            EventCardTestTags.getEventCardTestTag(ExampleEvents.event1.id),
+            EventCardTestTags.getEventCardTestTag(ExampleEvents.event3.id))
     val assocTag = EventCardTestTags.getEventCardTestTag(ExampleEvents.event2.id)
 
-
-    val enrolledTops = enrolledTags.map { tag ->
-      composeTestRule.onNodeWithTag(tag).assertIsDisplayed()
-      composeTestRule.onNodeWithTag(tag).getUnclippedBoundsInRoot().top
-    }
+    val enrolledTops =
+        enrolledTags.map { tag ->
+          composeTestRule.onNodeWithTag(tag).assertIsDisplayed()
+          composeTestRule.onNodeWithTag(tag).getUnclippedBoundsInRoot().top
+        }
 
     val maxEnrolledTop = enrolledTops.maxOrNull() ?: 0.dp
 
     composeTestRule.onNodeWithTag(assocTag).assertIsDisplayed()
     val assocTop = composeTestRule.onNodeWithTag(assocTag).getUnclippedBoundsInRoot().top
 
-    assertTrue(
-      assocTop >= maxEnrolledTop
-    )
+    assertTrue(assocTop >= maxEnrolledTop)
   }
 }
