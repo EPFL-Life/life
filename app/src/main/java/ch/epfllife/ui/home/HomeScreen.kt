@@ -40,10 +40,11 @@ fun HomeScreen(
 
   var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
 
-  val myEvents by viewModel.myEvents.collectAsState()
   val allEvents by viewModel.allEvents.collectAsState()
+  val subscribedEventsCombined by viewModel.allEventsSubscribedAssociations.collectAsState()
 
-  val shownEvents = if (selected == SubscriptionFilter.Subscribed) myEvents else allEvents
+  val shownEvents =
+      if (selected == SubscriptionFilter.Subscribed) subscribedEventsCombined else allEvents
 
   Column(
       modifier =
