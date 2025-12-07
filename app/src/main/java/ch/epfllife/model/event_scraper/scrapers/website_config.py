@@ -58,9 +58,38 @@ ESN_EPFL_CONFIG = {
         "image": [
             ".field-name-field-image img",   
             ".group-image img",              
-            "img[src*='events']",           
+            "img[src*='events']",
             "img"                           
-        ]
+        ],
+        "event_link": [".views-row h2 a"],
+
+        "detailed_title": ["h1", ".field-name-title h2"],
+        "detailed_date": [".date-display-single"],
+        "detailed_description": [".field-name-body", ".content"],
+        "detailed_location": [
+            ".field-name-field-location",    
+            ".field-location",               
+            ".location",                     
+            ".venue",
+            ".field-name-field-venue",       # Posible selector alternativo
+            ".field-venue",
+            ".address"
+        ],
+
+        "detailed_price": [
+            ".field-name-field-price",       
+            ".field-price",                  
+            ".price",                        
+            ".cost",
+            ".field-name-field-cost",        # Posible selector alternativo
+            ".field-cost",
+            "[class*='price']",              # Cualquier clase que contenga "price"
+            "[class*='cost']"                # Cualquier clase que contenga "cost"
+        ],
+        "detailed_image": [".field-name-field-image img", ".main-image img"],
+
+        
+
     },
     
     "association": Association(
