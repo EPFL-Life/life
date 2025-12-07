@@ -35,7 +35,7 @@ class EventDetailsScreenTest {
   private fun setSuccessContent(event: Event = sampleEvent) {
     composeTestRule.setContent {
       Theme {
-        EventDetailsContent(event = event, onGoBack = {}, onOpenMap = {}, onEnrollClick = {})
+        EventDetailsContent(event = event, onGoBack = {}, onOpenMap = {}, onEnrollClick = {},  onAssociationClick = {})
       }
     }
   }
@@ -91,6 +91,7 @@ class EventDetailsScreenTest {
             db = localDb,
             onOpenMap = {},
             onGoBack = {},
+          onAssociationClick = {},
         )
       }
     }
