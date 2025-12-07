@@ -255,7 +255,7 @@ fun EventDetailsContent(
                         ButtonDefaults.buttonColors(
                             containerColor = if (isEnrolled) Color.Gray else LifeRed,
                             contentColor = Color.White)) {
-                      Text(if (isEnrolled) "Unenroll" else "Enroll in event")
+                      Text(if (isEnrolled) "Unenroll" else "Enrol in event")
                     }
               }
         }

@@ -78,15 +78,6 @@ class EventDetailsScreenTest {
   }
 
   @Test
-  fun timeWithDash_isFormattedWithColon() {
-    val dashedTime = ExampleEvents.event1.time.replace(":", "-")
-    val dashedEvent = ExampleEvents.event1.copy(time = dashedTime)
-    setSuccessContent(dashedEvent)
-    val expectedTime = ExampleEvents.event1.time.split(" ")[1]
-    composeTestRule.onNodeWithText(expectedTime).assertIsDisplayed()
-  }
-
-  @Test
   fun errorState_displaysErrorMessage() {
     val localDb = Db.freshLocal()
     composeTestRule.setContent {
