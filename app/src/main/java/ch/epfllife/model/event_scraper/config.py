@@ -3,7 +3,8 @@ import os
 from datetime import timedelta
 
 # configuration of Firebase
-FIREBASE_CREDENTIALS = "serviceAccountKey.json"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FIREBASE_CREDENTIALS = os.path.join(BASE_DIR, "serviceAccountKey.json")
 
 # Firestore collection names (MUST match Android app)
 FIRESTORE_COLLECTIONS = {
