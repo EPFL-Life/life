@@ -35,10 +35,11 @@ class FirebaseDatabase:
         
         # Check if credentials file exists
         if not Path(credential_path).exists():
-            logger.error(f"Firebase credentials file not found: {credential_path}")
-            logger.error("Please download serviceAccountKey.json from Firebase Console")
-            raise FileNotFoundError(f"Credentials file not found: {credential_path}")
-        
+            error_msg = (
+                f"Firebase credentials file not found: {credential_path}. "
+                "Please download serviceAccountKey.json from Firebase Console")
+            logger.error(error_msg)
+            raise FileNotFoundError(error_msg)
         try:
             # Initialize Firebase app
             if not firebase_admin._apps:
@@ -209,6 +210,7 @@ class FirebaseDatabase:
             assoc_dict["socialLinks"] = {}
         
         # Add timestamp
+        assoc_dict["_source"] = "python_scraper"
         assoc_dict["_lastUpdated"] = firestore.SERVER_TIMESTAMP
         
         return assoc_dict
