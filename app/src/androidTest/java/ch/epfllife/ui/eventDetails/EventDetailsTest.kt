@@ -25,7 +25,8 @@ class EventDetailsTest {
 
   private fun setEventContent(event: Event) {
     composeTestRule.setContent {
-      EventDetailsContent(event = event, onOpenMap = {}, onGoBack = {}, onEnrollClick = {})
+      EventDetailsContent(
+          event = event, onOpenMap = {}, onGoBack = {}, onEnrollClick = {}, onAssociationClick = {})
     }
   }
 
@@ -39,7 +40,7 @@ class EventDetailsTest {
           onOpenMap = {},
           onEnrollClick = {},
           onUnenrollClick = {},
-      )
+          onAssociationClick = {})
     }
     composeTestRule.onNodeWithTag(EventDetailsTestTags.ENROLL_BUTTON).assertIsDisplayed()
     composeTestRule.onNodeWithText("Unenroll").assertIsDisplayed()
@@ -56,7 +57,7 @@ class EventDetailsTest {
           onOpenMap = {},
           onEnrollClick = {},
           onUnenrollClick = { unenrollClicked = true },
-      )
+          onAssociationClick = {})
     }
     composeTestRule.onNodeWithTag(EventDetailsTestTags.ENROLL_BUTTON).performClick()
     assertTrue("Unenroll button should trigger callback", unenrollClicked)
@@ -187,7 +188,7 @@ class EventDetailsTest {
           onGoBack = {},
           onOpenMap = { clicked = true },
           onEnrollClick = {},
-      )
+          onAssociationClick = {})
     }
     composeTestRule
         .onNodeWithTag(EventDetailsTestTags.VIEW_LOCATION_BUTTON)
@@ -205,7 +206,7 @@ class EventDetailsTest {
           onGoBack = { backClicked = true },
           onEnrollClick = {},
           onOpenMap = {},
-      )
+          onAssociationClick = {})
     }
     composeTestRule.onNodeWithTag(EventDetailsTestTags.BACK_BUTTON).performClick()
     assertTrue("Back button should trigger onGoBack callback", backClicked)
@@ -346,7 +347,7 @@ class EventDetailsTest {
           onEnrollClick = {},
           onGoBack = { clickCount++ },
           onOpenMap = {},
-      )
+          onAssociationClick = {})
     }
 
     // Click enroll button multiple times
@@ -368,7 +369,7 @@ class EventDetailsTest {
           onGoBack = { goBackCalled = true },
           onEnrollClick = {},
           onOpenMap = {},
-      )
+          onAssociationClick = {})
     }
 
     // Verify content is displayed
