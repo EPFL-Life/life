@@ -66,39 +66,28 @@ fun EventCard(
                       style = MaterialTheme.typography.titleMedium,
                       fontWeight = FontWeight.SemiBold,
                       modifier = Modifier.weight(1f))
-                    if (isEnrolled) {
-                          Box(
-                              modifier = Modifier
-                                  .background(
-                                      color = Enrolled,
-                                      shape = RoundedCornerShape(6.dp)
-                                  )
-                                  .padding(horizontal = 8.dp, vertical = 3.dp)
-                          ) {
-                              Text(
-                                  text = "Enrolled",
-                                  style = MaterialTheme.typography.labelSmall,
-                                  color = Color.White
-                              )
-                          }
-                      }
-                    else {
-                        Box(
-                            modifier = Modifier
-                                .background(
-                                    color = LifeRed,
-                                    shape = RoundedCornerShape(12.dp)
-                                )
-                                .padding(horizontal = 10.dp, vertical = 4.dp)
-                        ) {
-                            Text(
-                                text = "Enroll",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = Color.White
-                            )
+                  if (isEnrolled) {
+                    Box(
+                        modifier =
+                            Modifier.background(color = Enrolled, shape = RoundedCornerShape(6.dp))
+                                .padding(horizontal = 8.dp, vertical = 3.dp)) {
+                          Text(
+                              text = "Enrolled",
+                              style = MaterialTheme.typography.labelSmall,
+                              color = Color.White)
                         }
-                    }
-                 Spacer(Modifier.width(6.dp))
+                  } else {
+                    Box(
+                        modifier =
+                            Modifier.background(color = LifeRed, shape = RoundedCornerShape(12.dp))
+                                .padding(horizontal = 10.dp, vertical = 4.dp)) {
+                          Text(
+                              text = "Enroll",
+                              style = MaterialTheme.typography.labelSmall,
+                              color = Color.White)
+                        }
+                  }
+                  Spacer(Modifier.width(6.dp))
 
                   Icon(
                       imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
