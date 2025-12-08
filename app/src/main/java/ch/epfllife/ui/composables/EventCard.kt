@@ -1,5 +1,6 @@
 package ch.epfllife.ui.composables
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,11 +17,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ch.epfllife.model.event.Event
+import ch.epfllife.ui.theme.Enrolled
+import ch.epfllife.ui.theme.LifeRed
 import coil.compose.AsyncImage
 
 object EventCardTestTags {
@@ -30,6 +34,7 @@ object EventCardTestTags {
 @Composable
 fun EventCard(
     event: Event,
+    isEnrolled: Boolean,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
@@ -61,9 +66,39 @@ fun EventCard(
                       style = MaterialTheme.typography.titleMedium,
                       fontWeight = FontWeight.SemiBold,
                       modifier = Modifier.weight(1f))
-                  // TO DO: Display enrollment status on card
-
-                  Spacer(Modifier.width(6.dp))
+                    if (isEnrolled) {
+                          Box(
+                              modifier = Modifier
+                                  .background(
+                                      color = Enrolled,
+                                      shape = RoundedCornerShape(6.dp)
+                                  )
+                                  .padding(horizontal = 8.dp, vertical = 3.dp)
+                          ) {
+                              Text(
+                                  text = "Enrolled",
+                                  style = MaterialTheme.typography.labelSmall,
+                                  color = Color.White
+                              )
+                          }
+                      }
+                    else {
+                        Box(
+                            modifier = Modifier
+                                .background(
+                                    color = LifeRed,
+                                    shape = RoundedCornerShape(12.dp)
+                                )
+                                .padding(horizontal = 10.dp, vertical = 4.dp)
+                        ) {
+                            Text(
+                                text = "Enroll",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color.White
+                            )
+                        }
+                    }
+                 Spacer(Modifier.width(6.dp))
 
                   Icon(
                       imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
