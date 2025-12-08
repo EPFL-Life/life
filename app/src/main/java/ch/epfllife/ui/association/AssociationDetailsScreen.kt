@@ -92,6 +92,7 @@ fun AssociationDetailsScreen(
           association = state.association,
           events = state.events,
           isSubscribed = state.isSubscribed,
+          enrolledEventIds = state.enrolledEvents,
           onGoBack = onGoBack,
           onEventClick = onEventClick,
           onSubscribeClick = { viewModel.subscribeToAssociation(state.association.id, context) },
@@ -109,6 +110,7 @@ fun AssociationDetailsContent(
     modifier: Modifier = Modifier,
     events: List<Event>,
     isSubscribed: Boolean,
+    enrolledEventIds: List<String>,
     onGoBack: () -> Unit,
     onEventClick: (String) -> Unit,
     onSubscribeClick: () -> Unit,
@@ -245,7 +247,12 @@ fun AssociationDetailsContent(
               style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
           )
 
-          events.forEach { event -> EventCard(event = event, onClick = { onEventClick(event.id) }) }
+          events.forEach { event ->
+            EventCard(
+                event = event,
+                isEnrolled = enrolledEventIds.contains(event.id),
+                onClick = { onEventClick(event.id) })
+          }
         }
       }
     }
