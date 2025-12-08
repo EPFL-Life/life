@@ -42,6 +42,7 @@ fun HomeScreen(
 
   val allEvents by viewModel.allEvents.collectAsState()
   val subscribedEventsCombined by viewModel.allEventsSubscribedAssociations.collectAsState()
+  val enrolledEvents by viewModel.myEvents.collectAsState()
 
   val shownEvents =
       if (selected == SubscriptionFilter.Subscribed) subscribedEventsCombined else allEvents
@@ -96,7 +97,10 @@ fun HomeScreen(
             onRefresh = viewModel::refresh,
         ) { list ->
           items(list, key = { ev -> ev.id }) { ev ->
-            EventCard(event = ev, onClick = { onEventClick(ev.id) })
+            EventCard(
+                event = ev,
+                isEnrolled = enrolledEvents.contains(ev),
+                onClick = { onEventClick(ev.id) })
           }
         }
       }
