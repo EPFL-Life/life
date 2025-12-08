@@ -17,7 +17,7 @@ sealed interface ManageEventsUIState {
 
   data class Error(val messageRes: Int) : ManageEventsUIState
 
-  data class Success(val events: List<Event>) : ManageEventsUIState
+  data class Success(val events: List<Event>, val enrolledEvents: List<String>) : ManageEventsUIState
 }
 
 class ManageEventsViewModel(private val db: Db, val associationId: String) : ViewModel() {
@@ -42,6 +42,8 @@ class ManageEventsViewModel(private val db: Db, val associationId: String) : Vie
     _uiState.value = ManageEventsUIState.Loading
 
     val result = db.assocRepo.getEventsForAssociation(associationId)
+    val currentUser = db.userRepo.getCurrentUser()
+    val enrolledEventIds = currentUser?.enrolledEvents ?: emptyList()
 
     result.fold(
         onSuccess = { events ->
@@ -54,7 +56,7 @@ class ManageEventsViewModel(private val db: Db, val associationId: String) : Vie
                   }
                   .sortedBy { it.startDateOrNull() ?: LocalDate.MAX }
 
-          _uiState.value = ManageEventsUIState.Success(filtered)
+          _uiState.value = ManageEventsUIState.Success(filtered, enrolledEvents = enrolledEventIds)
         },
         onFailure = { e ->
           Log.e("ManageEventsVM", "Failed to load events for association $associationId", e)

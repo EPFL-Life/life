@@ -76,7 +76,7 @@ fun ManageEventsScreen(
 
         is ManageEventsUIState.Success -> {
           val events = (uiState as ManageEventsUIState.Success).events
-
+            val enrolledEventsIds = (uiState as ManageEventsUIState.Success).enrolledEvents
           Column(
               modifier =
                   Modifier.fillMaxWidth()
@@ -102,7 +102,8 @@ fun ManageEventsScreen(
                       modifier = Modifier.testTag(ManageEventsTestTags.EMPTY_TEXT))
                 } else {
                   events.forEach { event: Event ->
-                    EventCard(event = event, onClick = { onEditEvent(event.id) })
+                    EventCard(
+                        event = event, isEnrolled = enrolledEventsIds.contains(event.id), onClick = { onEditEvent(event.id) })
                   }
                 }
               }
