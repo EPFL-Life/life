@@ -253,7 +253,7 @@ class ComposablesTest {
             onSelected = { selectedFilter = it },
             subscribedLabel = "Subscribed",
             allLabel = "All Events")
-        EventCard(sampleEvent, onClick = { eventClicked = true })
+        EventCard(sampleEvent, isEnrolled = true, onClick = { eventClicked = true })
       }
     }
 
