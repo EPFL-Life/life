@@ -27,6 +27,7 @@ fun AssociationBrowser(
     viewModel: AssociationBrowserViewModel = viewModel { AssociationBrowserViewModel(db) },
     onAssociationClick: (associationId: String) -> Unit,
 ) {
+  LaunchedEffect(Unit) { viewModel.refresh() }
   var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
 
   // Replaced hardcoded lists with data from ViewModel

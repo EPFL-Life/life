@@ -10,7 +10,6 @@ import ch.epfllife.model.user.Price
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Source
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
@@ -128,9 +127,7 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
 
     suspend fun getAssociation(document: DocumentSnapshot): Association? {
       val assocRef = document.get("association") as? DocumentReference ?: return null
-      val assocSnap =
-          // Prioritize cached data
-          runCatching { assocRef.get(Source.CACHE).await() }.getOrElse { assocRef.get().await() }
+      val assocSnap = assocRef.get().await()
 
       return AssociationRepositoryFirestore.documentToAssociation(assocSnap)
     }
