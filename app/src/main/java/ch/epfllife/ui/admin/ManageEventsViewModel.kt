@@ -17,7 +17,8 @@ sealed interface ManageEventsUIState {
 
   data class Error(val messageRes: Int) : ManageEventsUIState
 
-  data class Success(val events: List<Event>, val enrolledEvents: List<String>) : ManageEventsUIState
+  data class Success(val events: List<Event>, val enrolledEvents: List<String>) :
+      ManageEventsUIState
 }
 
 class ManageEventsViewModel(private val db: Db, val associationId: String) : ViewModel() {
