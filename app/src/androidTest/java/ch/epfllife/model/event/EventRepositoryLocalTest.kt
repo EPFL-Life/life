@@ -2,10 +2,14 @@ package ch.epfllife.model.event
 
 import ch.epfllife.example_data.ExampleEvents
 import junit.framework.TestCase.assertEquals
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class EventRepositoryLocalTest {
 
   // we need this to declare the property for the whole class
@@ -14,6 +18,25 @@ class EventRepositoryLocalTest {
   @Before
   fun setup() {
     repositoryEvent = EventRepositoryLocal()
+  }
+
+  private fun getEventList(scope: TestScope): List<Event> {
+    val eventsList = mutableListOf<Event>()
+    repositoryEvent.listenAll(scope) { events ->
+      eventsList.clear()
+      eventsList.addAll(events)
+    }
+    return eventsList
+  }
+
+  private suspend fun TestScope.createEvent(): Pair<Event, List<Event>> {
+    val event = ExampleEvents.event1
+    val eventList = getEventList(this)
+    repositoryEvent.createEvent(event)
+
+    advanceUntilIdle()
+    assertEquals(listOf(event), eventList)
+    return Pair(event, eventList)
   }
 
   @Test
@@ -30,43 +53,25 @@ class EventRepositoryLocalTest {
     assertEquals(1, repositoryEvent.getAllEvents().size)
   }
 
-  @Test
-  fun listenToCreateEvent() = runTest {
-    var eventsList = emptyList<Event>()
-    repositoryEvent.listenAll { events -> eventsList = events }
-    repositoryEvent.createEvent(ExampleEvents.event1)
-
-    kotlinx.coroutines.delay(100)
-
-    assertEquals(listOf(ExampleEvents.event1), eventsList)
-  }
+  @Test fun listenToCreateEvent() = runTest { createEvent() }
 
   @Test
   fun listenToUpdateEvent() = runTest {
-    repositoryEvent.createEvent(ExampleEvents.event1)
+    val (event, eventList) = createEvent()
 
-    var eventsList = emptyList<Event>()
-    repositoryEvent.listenAll { events -> eventsList = events }
-
-    val updatedEvent = ExampleEvents.event1.copy(title = "Updated Title")
-    repositoryEvent.updateEvent(ExampleEvents.event1.id, updatedEvent)
-
-    kotlinx.coroutines.delay(100)
-
-    assertEquals(listOf(updatedEvent), eventsList)
+    val updatedEvent = event.copy(title = "Updated Title")
+    repositoryEvent.updateEvent(event.id, updatedEvent)
+    advanceUntilIdle()
+    assertEquals(listOf(updatedEvent), eventList)
   }
 
   @Test
   fun listenToDeleteEvent() = runTest {
-    var eventsList = emptyList<Event>()
-    repositoryEvent.listenAll { events -> eventsList = events }
-    repositoryEvent.createEvent(ExampleEvents.event1)
+    val (event, eventList) = createEvent()
 
-    repositoryEvent.deleteEvent(ExampleEvents.event1.id)
-
-    kotlinx.coroutines.delay(100)
-
-    assertEquals(emptyList<Event>(), eventsList)
+    repositoryEvent.deleteEvent(event.id)
+    advanceUntilIdle()
+    assertEquals(emptyList<Event>(), eventList)
   }
 
   @Test

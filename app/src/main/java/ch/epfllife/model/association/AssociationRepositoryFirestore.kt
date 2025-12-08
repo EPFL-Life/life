@@ -9,6 +9,7 @@ import ch.epfllife.model.firestore.createListenAll
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.tasks.await
 
 class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : AssociationRepository {
@@ -173,8 +174,9 @@ class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : Associ
     }
   }
 
-  override fun listenAll(onChange: (List<Association>) -> Unit) =
+  override fun listenAll(scope: CoroutineScope, onChange: suspend (List<Association>) -> Unit) =
       createListenAll(
+          scope,
           db.collection(FirestoreCollections.ASSOCIATIONS),
           ::documentToAssociation,
           onChange,

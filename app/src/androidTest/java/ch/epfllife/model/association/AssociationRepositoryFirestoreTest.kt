@@ -3,6 +3,9 @@ package ch.epfllife.model.association
 import ch.epfllife.example_data.ExampleAssociations
 import ch.epfllife.utils.FirestoreLifeTest
 import com.google.firebase.firestore.DocumentSnapshot
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -11,6 +14,7 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class AssociationRepositoryFirestoreTest : FirestoreLifeTest() {
 
   /**
@@ -19,6 +23,24 @@ class AssociationRepositoryFirestoreTest : FirestoreLifeTest() {
    */
 
   //
+
+  private fun getAssocList(scope: TestScope): List<Association> {
+    val assocList = mutableListOf<Association>()
+    db.assocRepo.listenAll(scope) { assocs ->
+      assocList.clear()
+      assocList.addAll(assocs)
+    }
+    return assocList
+  }
+
+  private suspend fun TestScope.createAssoc(): Pair<Association, List<Association>> {
+    val assoc = ExampleAssociations.association1
+    val assocList = getAssocList(this)
+    db.assocRepo.createAssociation(assoc)
+    advanceUntilIdle()
+    assertEquals(listOf(assoc), assocList)
+    return Pair(assoc, assocList)
+  }
 
   @Test
   fun createAssociation_validAssociation_returnsSuccess() = runTest {
@@ -270,41 +292,24 @@ class AssociationRepositoryFirestoreTest : FirestoreLifeTest() {
     assertEquals(resultParsed, null)
   }
 
-  @Test
-  fun listenToCreateAssoc() = runTest {
-    var assocList = emptyList<Association>()
-    db.assocRepo.listenAll { assoc -> assocList = assoc }
-    db.assocRepo.createAssociation(ExampleAssociations.association1)
-
-    kotlinx.coroutines.delay(100)
-
-    assertEquals(listOf(ExampleAssociations.association1), assocList)
-  }
+  @Test fun listenToCreateAssoc() = runTest { createAssoc() }
 
   @Test
   fun listenToUpdateAssoc() = runTest {
-    var assocList = emptyList<Association>()
-    db.assocRepo.listenAll { assoc -> assocList = assoc }
-    db.assocRepo.createAssociation(ExampleAssociations.association1)
+    val (assoc, assocList) = createAssoc()
 
-    val updatedEvent = ExampleAssociations.association1.copy(name = "Updated Name")
-    db.assocRepo.updateAssociation(ExampleAssociations.association1.id, updatedEvent)
-
-    kotlinx.coroutines.delay(100)
-
+    val updatedEvent = assoc.copy(name = "Updated Name")
+    db.assocRepo.updateAssociation(assoc.id, updatedEvent)
+    advanceUntilIdle()
     assertEquals(listOf(updatedEvent), assocList)
   }
 
   @Test
   fun listenToDeleteAssoc() = runTest {
-    var assocList = emptyList<Association>()
-    db.assocRepo.listenAll { assoc -> assocList = assoc }
-    db.assocRepo.createAssociation(ExampleAssociations.association1)
+    val (assoc, assocList) = createAssoc()
+    db.assocRepo.deleteAssociation(assoc.id)
 
-    db.assocRepo.deleteAssociation(ExampleAssociations.association1.id)
-
-    kotlinx.coroutines.delay(100)
-
+    advanceUntilIdle()
     assertEquals(emptyList<Association>(), assocList)
   }
 }

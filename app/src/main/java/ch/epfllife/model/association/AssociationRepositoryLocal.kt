@@ -2,6 +2,8 @@ package ch.epfllife.model.association
 
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 // We pass the eventRepository because the getEventsForAssociation function retrieves events from it
 class AssociationRepositoryLocal(private val eventRepository: EventRepository) :
@@ -96,9 +98,9 @@ class AssociationRepositoryLocal(private val eventRepository: EventRepository) :
     }
   }
 
-  override fun listenAll(onChange: (List<Association>) -> Unit) {
-    associationsListeners.add(onChange)
+  override fun listenAll(scope: CoroutineScope, onChange: suspend (List<Association>) -> Unit) {
+    associationsListeners.add { scope.launch { onChange(it) } }
     // send initial data
-    onChange(associations.toList())
+    scope.launch { onChange(associations.toList()) }
   }
 }

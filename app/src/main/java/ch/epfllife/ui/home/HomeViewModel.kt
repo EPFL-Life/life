@@ -23,7 +23,7 @@ class HomeViewModel(private val db: Db) : ViewModel() {
       _allEventsSubscribedAssociations.asStateFlow()
 
   init {
-    db.eventRepo.listenAll { events -> viewModelScope.launch { updateState(events) } }
+    db.eventRepo.listenAll(viewModelScope, ::updateState)
   }
 
   fun refresh(signalFinished: () -> Unit = {}) {

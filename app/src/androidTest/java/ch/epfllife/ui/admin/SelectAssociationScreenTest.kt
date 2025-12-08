@@ -10,6 +10,7 @@ import ch.epfllife.model.association.AssociationRepository
 import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.Event
 import ch.epfllife.ui.theme.Theme
+import kotlinx.coroutines.CoroutineScope
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -125,7 +126,7 @@ private class FakeAssociationRepository(
   override suspend fun getEventsForAssociation(associationId: String): Result<List<Event>> =
       Result.success(emptyList())
 
-  override fun listenAll(onChange: (List<Association>) -> Unit) {
+  override fun listenAll(scope: CoroutineScope, onChange: suspend (List<Association>) -> Unit) {
     throw UnsupportedOperationException("Not needed")
   }
 }
