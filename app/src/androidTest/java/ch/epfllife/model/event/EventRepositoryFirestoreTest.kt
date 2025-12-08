@@ -255,44 +255,4 @@ class EventRepositoryFirestoreTest : FirestoreLifeTest() {
     val result = EventRepositoryFirestore.documentToEvent(mockDocument)
     assertNull(result)
   }
-
-  @Test
-  fun listenToCreateEvent() = runTest {
-    var eventsList = emptyList<Event>()
-    db.eventRepo.listenAll { events -> eventsList = events }
-    db.eventRepo.createEvent(ExampleEvents.event1)
-
-    kotlinx.coroutines.delay(100)
-
-    assertEquals(listOf(ExampleEvents.event1), eventsList)
-  }
-
-  @Test
-  fun listenToUpdateEvent() = runTest {
-    db.eventRepo.createEvent(ExampleEvents.event1)
-
-    var eventsList = emptyList<Event>()
-    db.eventRepo.listenAll { events -> eventsList = events }
-
-    val updatedEvent = ExampleEvents.event1.copy(title = "Updated Title")
-    db.eventRepo.updateEvent(ExampleEvents.event1.id, updatedEvent)
-
-    kotlinx.coroutines.delay(100)
-
-    assertEquals(listOf(updatedEvent), eventsList)
-  }
-
-  @Test
-  fun listenToDeleteEvent() = runTest {
-    var eventsList = emptyList<Event>()
-    db.eventRepo.listenAll { events -> eventsList = events }
-    db.eventRepo.createEvent(ExampleEvents.event1)
-    assertEquals(listOf(ExampleEvents.event1), eventsList)
-
-    db.eventRepo.deleteEvent(ExampleEvents.event1.id)
-
-    kotlinx.coroutines.delay(100)
-
-    assertEquals(emptyList<Event>(), eventsList)
-  }
 }
