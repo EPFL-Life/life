@@ -18,11 +18,12 @@ class EventCardTest {
   private val eventWithBanner = ExampleEvents.event1
   private val eventWithoutBanner = ExampleEvents.event3
 
-  private fun setEventCardContent(event: Event) {
+  private fun setEventCardContent(event: Event, isEnrolled: Boolean) {
     composeTestRule.setContent {
       Theme {
         EventCard(
             event = event,
+            isEnrolled = isEnrolled,
             onClick = {},
         )
       }
@@ -36,6 +37,7 @@ class EventCardTest {
           Theme {
             EventCard(
                 event = eventWithBanner,
+                isEnrolled = true,
                 onClick = clickHandler,
             )
           }
@@ -46,25 +48,41 @@ class EventCardTest {
 
   @Test
   fun bannerImage_isDisplayed_whenPictureUrlAvailable() {
-    setEventCardContent(eventWithBanner)
+    setEventCardContent(eventWithBanner, isEnrolled = true)
 
     composeTestRule.onNodeWithContentDescription("Event Image").assertIsDisplayed()
   }
 
   @Test
   fun bannerImage_isDisplayed_whenPictureMissing() {
-    setEventCardContent(eventWithoutBanner)
+    setEventCardContent(eventWithoutBanner, isEnrolled = true)
 
     composeTestRule.onNodeWithContentDescription("Event Image").assertIsDisplayed()
   }
 
   @Test
   fun coreEventDetails_areVisible() {
-    setEventCardContent(eventWithBanner)
+    setEventCardContent(eventWithBanner, isEnrolled = true)
 
     composeTestRule.onNodeWithText(eventWithBanner.title).assertIsDisplayed()
     composeTestRule.onNodeWithText(eventWithBanner.association.name).assertIsDisplayed()
     composeTestRule.onNodeWithText(eventWithBanner.location.name).assertIsDisplayed()
     composeTestRule.onNodeWithText(eventWithBanner.time).assertIsDisplayed()
+  }
+
+  @Test
+  fun enrollmentIndicator_isDisplayed_whenEnrolled() {
+    setEventCardContent(eventWithBanner, isEnrolled = true)
+
+    composeTestRule.onNodeWithText("Enrolled", ignoreCase = false).assertIsDisplayed()
+    composeTestRule.onNodeWithText("Enroll", ignoreCase = false).assertDoesNotExist()
+  }
+
+  @Test
+  fun enrollmentButton_isDisplayed_whenNotEnrolled() {
+    setEventCardContent(eventWithBanner, isEnrolled = false)
+
+    composeTestRule.onNodeWithText("Enroll", ignoreCase = false).assertIsDisplayed()
+    composeTestRule.onNodeWithText("Enrolled", ignoreCase = false).assertDoesNotExist()
   }
 }
