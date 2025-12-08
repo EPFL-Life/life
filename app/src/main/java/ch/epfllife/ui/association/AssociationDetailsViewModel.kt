@@ -18,7 +18,8 @@ sealed class AssociationDetailsUIState {
   data class Success(
       val association: Association,
       val events: List<Event>,
-      val isSubscribed: Boolean
+      val enrolledEvents: List<String>,
+      val isSubscribed: Boolean,
   ) : AssociationDetailsUIState()
 
   data class Error(val message: String) : AssociationDetailsUIState()
@@ -44,13 +45,17 @@ class AssociationDetailsViewModel(
         val association = db.assocRepo.getAssociation(associationId)
         val eventsResult = db.assocRepo.getEventsForAssociation(associationId)
         val currentUser = db.userRepo.getCurrentUser()
+        val enrolledEventIds = currentUser?.enrolledEvents ?: emptyList()
 
         if (association != null) {
           val events = eventsResult.getOrElse { emptyList() }
           val isSubscribed = currentUser?.subscriptions?.contains(associationId) ?: false
           _uiState.value =
               AssociationDetailsUIState.Success(
-                  association = association, events = events, isSubscribed = isSubscribed)
+                  association = association,
+                  events = events,
+                  enrolledEvents = enrolledEventIds,
+                  isSubscribed = isSubscribed)
         } else {
           _uiState.value =
               AssociationDetailsUIState.Error(
