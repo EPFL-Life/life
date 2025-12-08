@@ -3,11 +3,15 @@ package ch.epfllife.model.association
 import ch.epfllife.example_data.ExampleAssociations
 import ch.epfllife.example_data.ExampleEvents
 import ch.epfllife.model.event.EventRepositoryLocal
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class EventRepositoryLocalTest {
 
   // testing class
@@ -15,6 +19,24 @@ class EventRepositoryLocalTest {
 
   // dependency needed for testing
   private lateinit var repositoryEvent: EventRepositoryLocal
+
+  private fun getAssocList(scope: TestScope): List<Association> {
+    val associationsList = mutableListOf<Association>()
+    repositoryAssociation.listenAll(scope) { associations ->
+      associationsList.clear()
+      associationsList.addAll(associations)
+    }
+    return associationsList
+  }
+
+  private suspend fun TestScope.createAssoc(): Pair<Association, List<Association>> {
+    val assoc = ExampleAssociations.association1
+    val assocList = getAssocList(this)
+    repositoryAssociation.createAssociation(assoc)
+    advanceUntilIdle()
+    assertEquals(listOf(assoc), assocList)
+    return Pair(assoc, assocList)
+  }
 
   @Before
   fun setup() {
@@ -37,7 +59,8 @@ class EventRepositoryLocalTest {
     assertEquals(1, repositoryAssociation.getAllAssociations().size)
     assertEquals(
         ExampleAssociations.association1,
-        repositoryAssociation.getAssociation(ExampleAssociations.association1.id))
+        repositoryAssociation.getAssociation(ExampleAssociations.association1.id),
+    )
   }
 
   @Test
@@ -55,13 +78,16 @@ class EventRepositoryLocalTest {
     assertEquals(3, repositoryAssociation.getAllAssociations().size)
     assertEquals(
         ExampleAssociations.association1,
-        repositoryAssociation.getAssociation(ExampleAssociations.association1.id))
+        repositoryAssociation.getAssociation(ExampleAssociations.association1.id),
+    )
     assertEquals(
         ExampleAssociations.association2,
-        repositoryAssociation.getAssociation(ExampleAssociations.association2.id))
+        repositoryAssociation.getAssociation(ExampleAssociations.association2.id),
+    )
     assertEquals(
         ExampleAssociations.association3,
-        repositoryAssociation.getAssociation(ExampleAssociations.association3.id))
+        repositoryAssociation.getAssociation(ExampleAssociations.association3.id),
+    )
   }
 
   @Test
@@ -88,7 +114,8 @@ class EventRepositoryLocalTest {
     assertEquals(1, repositoryAssociation.getAllAssociations().size)
     assertEquals(
         ExampleAssociations.association1,
-        repositoryAssociation.getAssociation(ExampleAssociations.association1.id))
+        repositoryAssociation.getAssociation(ExampleAssociations.association1.id),
+    )
 
     // Arrange: change id of association 2 to same as association 1
     val newAssociation =
@@ -104,7 +131,8 @@ class EventRepositoryLocalTest {
     // Assert: check association was updated (we compare only the name bcs id is not the same)
     assertEquals(
         ExampleAssociations.association2.name,
-        repositoryAssociation.getAssociation(ExampleAssociations.association1.id)?.name)
+        repositoryAssociation.getAssociation(ExampleAssociations.association1.id)?.name,
+    )
   }
 
   @Test
@@ -127,7 +155,8 @@ class EventRepositoryLocalTest {
     assertEquals(1, repositoryAssociation.getAllAssociations().size)
     assertEquals(
         ExampleAssociations.association2,
-        repositoryAssociation.getAssociation(ExampleAssociations.association2.id))
+        repositoryAssociation.getAssociation(ExampleAssociations.association2.id),
+    )
   }
 
   @Test
@@ -225,7 +254,9 @@ class EventRepositoryLocalTest {
     // Action: try to update association
     val response =
         repositoryAssociation.updateAssociation(
-            "nonExistentAssociationId", ExampleAssociations.association1)
+            "nonExistentAssociationId",
+            ExampleAssociations.association1,
+        )
 
     // Assert: action was a failure
     assert(response.isFailure)
@@ -246,47 +277,34 @@ class EventRepositoryLocalTest {
     // Action: try to update association with mismatched/different id
     val response =
         repositoryAssociation.updateAssociation(
-            ExampleAssociations.association1.id, ExampleAssociations.association2)
+            ExampleAssociations.association1.id,
+            ExampleAssociations.association2,
+        )
 
     // Assert: failure
     assert(response.isFailure)
   }
 
-  @Test
-  fun listenToCreateAssoc() = runTest {
-    var assocList = emptyList<Association>()
-    repositoryAssociation.listenAll { assoc -> assocList = assoc }
-    repositoryAssociation.createAssociation(ExampleAssociations.association1)
-
-    kotlinx.coroutines.delay(100)
-
-    assertEquals(listOf(ExampleAssociations.association1), assocList)
-  }
+  @Test fun listenToCreateAssoc() = runTest { createAssoc() }
 
   @Test
   fun listenToUpdateAssoc() = runTest {
-    var assocList = emptyList<Association>()
-    repositoryAssociation.listenAll { assoc -> assocList = assoc }
-    repositoryAssociation.createAssociation(ExampleAssociations.association1)
+    val (assoc, assocList) = createAssoc()
 
-    val updatedEvent = ExampleAssociations.association1.copy(name = "Updated Name")
-    repositoryAssociation.updateAssociation(ExampleAssociations.association1.id, updatedEvent)
+    val updatedEvent = assoc.copy(name = "Updated Name")
+    repositoryAssociation.updateAssociation(assoc.id, updatedEvent)
 
-    kotlinx.coroutines.delay(100)
-
+    advanceUntilIdle()
     assertEquals(listOf(updatedEvent), assocList)
   }
 
   @Test
   fun listenToDeleteAssoc() = runTest {
-    var assocList = emptyList<Association>()
-    repositoryAssociation.listenAll { assoc -> assocList = assoc }
-    repositoryAssociation.createAssociation(ExampleAssociations.association1)
+    val (assoc, assocList) = createAssoc()
 
-    repositoryAssociation.deleteAssociation(ExampleAssociations.association1.id)
+    repositoryAssociation.deleteAssociation(assoc.id)
 
-    kotlinx.coroutines.delay(100)
-
+    advanceUntilIdle()
     assertEquals(emptyList<Association>(), assocList)
   }
 }

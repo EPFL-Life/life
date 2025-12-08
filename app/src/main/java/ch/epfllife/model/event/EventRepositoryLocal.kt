@@ -1,5 +1,8 @@
 package ch.epfllife.model.event
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+
 // Please note the explanation and examples in the EventRepository interface
 class EventRepositoryLocal : EventRepository {
 
@@ -66,10 +69,10 @@ class EventRepositoryLocal : EventRepository {
     }
   }
 
-  override fun listenAll(onChange: (List<Event>) -> Unit) {
-    eventsListeners.add(onChange)
+  override fun listenAll(scope: CoroutineScope, onChange: suspend (List<Event>) -> Unit) {
+    eventsListeners.add { scope.launch { onChange(it) } }
     // send initial data
-    onChange(events.toList())
+    scope.launch { onChange(events.toList()) }
   }
 
   fun seedEvents(newEvents: List<Event>) {

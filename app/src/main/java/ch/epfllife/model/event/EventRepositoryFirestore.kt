@@ -10,9 +10,9 @@ import ch.epfllife.model.user.Price
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 
 class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventRepository {
@@ -91,10 +91,11 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
     }
   }
 
-  override fun listenAll(onChange: (List<Event>) -> Unit) =
+  override fun listenAll(scope: CoroutineScope, onChange: suspend (List<Event>) -> Unit) =
       createListenAll(
+          scope,
           db.collection(FirestoreCollections.EVENTS),
-          { runBlocking { documentToEvent(it) } },
+          ::documentToEvent,
           onChange,
       )
 

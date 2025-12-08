@@ -1,5 +1,7 @@
 package ch.epfllife.model.event
 
+import kotlinx.coroutines.CoroutineScope
+
 /** Represents a repository that manages Event items. */
 interface EventRepository {
 
@@ -50,5 +52,5 @@ interface EventRepository {
    */
   suspend fun deleteEvent(eventId: String): Result<Unit>
 
-  fun listenAll(onChange: (List<Event>) -> Unit)
+  fun listenAll(scope: CoroutineScope, onChange: suspend (List<Event>) -> Unit)
 }

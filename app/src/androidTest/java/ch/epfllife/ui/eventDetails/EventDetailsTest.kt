@@ -8,6 +8,7 @@ import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventRepository
 import ch.epfllife.model.user.Price
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Rule
@@ -92,7 +93,7 @@ class EventDetailsTest {
 
           override suspend fun deleteEvent(eventId: String): Result<Unit> = Result.success(Unit)
 
-          override fun listenAll(onChange: (List<Event>) -> Unit) =
+          override fun listenAll(scope: CoroutineScope, onChange: suspend (List<Event>) -> Unit) =
               throw UnsupportedOperationException("Listening not supported in fake repo")
         }
 

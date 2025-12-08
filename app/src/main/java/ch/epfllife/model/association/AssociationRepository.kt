@@ -1,6 +1,7 @@
 package ch.epfllife.model.association
 
 import ch.epfllife.model.event.Event
+import kotlinx.coroutines.CoroutineScope
 
 /** Represents a repository that manages Association data. */
 interface AssociationRepository {
@@ -58,5 +59,5 @@ interface AssociationRepository {
    */
   suspend fun getEventsForAssociation(associationId: String): Result<List<Event>>
 
-  fun listenAll(onChange: (List<Association>) -> Unit)
+  fun listenAll(scope: CoroutineScope, onChange: suspend (List<Association>) -> Unit)
 }
