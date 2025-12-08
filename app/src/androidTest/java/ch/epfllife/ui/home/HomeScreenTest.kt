@@ -439,4 +439,22 @@ class HomeScreenTest {
 
     assertTrue(assocTop >= maxEnrolledTop)
   }
+
+  @Test
+  fun homeScreen_eventIsEnrolled_showsEnrolledIndicator() {
+    setUpHomeScreen(
+        myEvents = listOf(ExampleEvents.event1), allEvents = listOf(ExampleEvents.event1))
+
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithText("Enrolled", ignoreCase = false).assertExists()
+  }
+
+  @Test
+  fun homeScreen_eventNotEnrolled_showsEnrollButton() {
+    setUpHomeScreen(allEvents = listOf(ExampleEvents.event1))
+
+    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_ALL).performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithText("Enroll", ignoreCase = false).assertExists()
+  }
 }
