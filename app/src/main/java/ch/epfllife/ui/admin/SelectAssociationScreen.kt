@@ -80,10 +80,12 @@ fun SelectAssociationScreen(
                 Spacer(Modifier.height(4.dp))
 
                 // Add New Association button
-                SettingsButton(
-                    text = stringResource(R.string.add_new_association),
-                    onClick = onAddNewAssociation,
-                    modifier = Modifier.testTag(SelectAssociationTestTags.ADD_NEW_BUTTON))
+                if (state.canAddAssociation) {
+                  SettingsButton(
+                      text = stringResource(R.string.add_new_association),
+                      onClick = onAddNewAssociation,
+                      modifier = Modifier.testTag(SelectAssociationTestTags.ADD_NEW_BUTTON))
+                }
 
                 // List of associations
                 associations.forEach { association ->

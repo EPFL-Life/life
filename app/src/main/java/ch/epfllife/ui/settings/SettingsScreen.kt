@@ -28,6 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.R
 import ch.epfllife.model.authentication.Auth
+import ch.epfllife.model.db.Db
+import ch.epfllife.model.user.UserRole
 import ch.epfllife.ui.composables.SettingsButton
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.theme.LifeRed
@@ -45,7 +47,7 @@ object SettingsScreenTestTags {
 fun SettingsScreen(
     modifier: Modifier = Modifier,
     auth: Auth,
-    viewModel: SettingsViewModel = viewModel { SettingsViewModel(auth) },
+    viewModel: SettingsViewModel = viewModel { SettingsViewModel(auth, Db.firestore) },
     onSignedOut: () -> Unit,
     toastHelper: ToastHelper = SystemToastHelper(),
     onSelectAssociationClick: () -> Unit,
@@ -97,31 +99,35 @@ fun SettingsScreen(
         Spacer(Modifier.height(20.dp))
 
         // Select Association
-        SettingsButton(
-            text =
-                selectedAssociationName?.let {
-                  stringResource(R.string.settings_selected_association, it)
-                } ?: stringResource(R.string.settings_screen_association),
-            onClick = onSelectAssociationClick,
-            modifier =
-                Modifier.fillMaxWidth().testTag(SettingsScreenTestTags.SELECT_ASSOCIATION_BUTTON))
-
-        Spacer(Modifier.height(16.dp))
-
-        if (!selectedAssociationName.isNullOrBlank() && !selectedAssociationId.isNullOrBlank()) {
-          val associationName = selectedAssociationName
-          val associationId = selectedAssociationId
+        // Select Association
+        if (uiState.userRole == UserRole.ADMIN || uiState.userRole == UserRole.ASSOCIATION_ADMIN) {
           SettingsButton(
-              text = stringResource(R.string.manage_association, associationName),
-              onClick = { onManageAssociationClick(associationId) },
+              text =
+                  selectedAssociationName?.let {
+                    stringResource(R.string.settings_selected_association, it)
+                  } ?: stringResource(R.string.settings_screen_association),
+              onClick = onSelectAssociationClick,
               modifier =
-                  Modifier.fillMaxWidth().testTag(SettingsScreenTestTags.MANAGE_ASSOCIATION_BUTTON))
+                  Modifier.fillMaxWidth().testTag(SettingsScreenTestTags.SELECT_ASSOCIATION_BUTTON))
+
           Spacer(Modifier.height(16.dp))
-          SettingsButton(
-              text = stringResource(R.string.manage_association_events, associationName),
-              onClick = { onManageAssociationEventsClick(associationId) },
-              modifier =
-                  Modifier.fillMaxWidth().testTag(SettingsScreenTestTags.MANAGE_EVENTS_BUTTON))
+
+          if (!selectedAssociationName.isNullOrBlank() && !selectedAssociationId.isNullOrBlank()) {
+            val associationName = selectedAssociationName
+            val associationId = selectedAssociationId
+            SettingsButton(
+                text = stringResource(R.string.manage_association, associationName),
+                onClick = { onManageAssociationClick(associationId) },
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .testTag(SettingsScreenTestTags.MANAGE_ASSOCIATION_BUTTON))
+            Spacer(Modifier.height(16.dp))
+            SettingsButton(
+                text = stringResource(R.string.manage_association_events, associationName),
+                onClick = { onManageAssociationEventsClick(associationId) },
+                modifier =
+                    Modifier.fillMaxWidth().testTag(SettingsScreenTestTags.MANAGE_EVENTS_BUTTON))
+          }
         }
       }
 }
