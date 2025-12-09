@@ -64,8 +64,8 @@ fun EventCard(
                   Text(
                       text = event.title,
                       style = MaterialTheme.typography.titleMedium,
-                      fontWeight = FontWeight.SemiBold,
-                      modifier = Modifier.weight(1f))
+                      fontWeight = FontWeight.SemiBold)
+                  Spacer(Modifier.width(8.dp))
                   if (isEnrolled) {
                     Box(
                         modifier =
@@ -87,8 +87,13 @@ fun EventCard(
                               color = Color.White)
                         }
                   }
-                  Spacer(Modifier.width(6.dp))
+                  Spacer(Modifier.weight(1f))
+                  Text(
+                      text = event.price.formatPrice(),
+                      style = MaterialTheme.typography.bodyMedium,
+                      color = MaterialTheme.colorScheme.onSurfaceVariant)
 
+                  Spacer(Modifier.width(8.dp))
                   Icon(
                       imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                       contentDescription = null,
