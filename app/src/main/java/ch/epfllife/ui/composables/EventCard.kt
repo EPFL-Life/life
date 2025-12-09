@@ -20,12 +20,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ch.epfllife.model.event.Event
 import ch.epfllife.ui.theme.Enrolled
 import ch.epfllife.ui.theme.LifeRed
 import coil.compose.AsyncImage
+import ch.epfllife.R
 
 object EventCardTestTags {
   fun getEventCardTestTag(eventId: String) = "eventCard_$eventId"
@@ -72,7 +74,7 @@ fun EventCard(
                             Modifier.background(color = Enrolled, shape = RoundedCornerShape(6.dp))
                                 .padding(horizontal = 8.dp, vertical = 3.dp)) {
                           Text(
-                              text = "Enrolled",
+                              text = stringResource(R.string.home_enrolled_events),
                               style = MaterialTheme.typography.labelSmall,
                               color = Color.White)
                         }
@@ -82,7 +84,7 @@ fun EventCard(
                             Modifier.background(color = LifeRed, shape = RoundedCornerShape(12.dp))
                                 .padding(horizontal = 10.dp, vertical = 4.dp)) {
                           Text(
-                              text = "Enroll",
+                              text = stringResource(R.string.home_enroll_events),
                               style = MaterialTheme.typography.labelSmall,
                               color = Color.White)
                         }
