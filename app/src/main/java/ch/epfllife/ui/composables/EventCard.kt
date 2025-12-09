@@ -23,11 +23,11 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import ch.epfllife.R
 import ch.epfllife.model.event.Event
 import ch.epfllife.ui.theme.Enrolled
 import ch.epfllife.ui.theme.LifeRed
 import coil.compose.AsyncImage
-import ch.epfllife.R
 
 object EventCardTestTags {
   fun getEventCardTestTag(eventId: String) = "eventCard_$eventId"
