@@ -127,4 +127,26 @@ class EventDetailsScreenTest {
     composeTestRule.onNodeWithContentDescription("Back").assertIsDisplayed()
     composeTestRule.onNodeWithContentDescription("Back").performClick()
   }
+
+  @Test
+  fun description_expandsAndCollapses() {
+    val longDescription = "Start of description. " + "Content ".repeat(50) + "End of description."
+    val eventWithLongDescription = sampleEvent.copy(description = longDescription)
+    setSuccessContent(eventWithLongDescription)
+
+    // Initially, "Show more..." should be visible because of truncation
+    composeTestRule.onNodeWithText("Show more…").assertIsDisplayed()
+
+    // Expand
+    composeTestRule.onNodeWithText("Show more…").performClick()
+
+    // "Show less" should now be visible
+    composeTestRule.onNodeWithText("Show less").assertIsDisplayed()
+
+    // Collapse
+    composeTestRule.onNodeWithText("Show less").performClick()
+
+    // "Show more..." should be visible again
+    composeTestRule.onNodeWithText("Show more…").assertIsDisplayed()
+  }
 }
