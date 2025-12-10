@@ -37,6 +37,7 @@ DEFAULT_EPFL_LOCATION = {
 MAX_FIELD_LENGTHS = {
     "title": 200,
     "description": 2000,
+    "location": 100,
 }
 
 

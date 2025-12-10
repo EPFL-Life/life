@@ -6,6 +6,9 @@ import logging
 from typing import List, Optional, Dict, Any
 from datetime import datetime
 import re
+from scrapers.website_config import WebsiteConfig
+
+from config import MAX_FIELD_LENGTHS
 
 import requests
 from bs4 import BeautifulSoup
@@ -34,7 +37,7 @@ class WebScraper(BaseScraper):
                 - selectors: CSS selectors for parsing
         """
         super().__init__(website_config.get("name", "Unknown Website"))
-        self.config = website_config
+        self.config = WebsiteConfig(**website_config)
         self.base_url = website_config.get("url", "")
         
         # Setup HTTP session
@@ -113,7 +116,7 @@ class WebScraper(BaseScraper):
     def _extract_event_link(self, element) -> Optional[str]:
         """Extract link to detailed event page from an event element."""
         
-        selectors = self.config.get("selectors", {}).get("event_link", ["a"])
+        selectors = self.config.selectors.event_link or ["a"]
         
         for selector in selectors:
             link_elem = element.select_one(selector)
@@ -121,7 +124,7 @@ class WebScraper(BaseScraper):
                 url = link_elem['href']
                 
                 if not url.startswith('http'):
-                    base_domain = self.config.get("base_domain", "")
+                    base_domain = self.config.base_domain
                     if base_domain:
                         # Check that there is not double //
                         base_domain = base_domain.rstrip('/')
@@ -163,125 +166,83 @@ class WebScraper(BaseScraper):
             
             selectors_config = self.config.get("selectors", {})
             
-            # Get selectors based on page type
-            if is_detailed_page:
-                # Use detailed page selectors
-                title_selectors = selectors_config.get("detailed_title") or selectors_config.get("title") or ["h1", "h2"]
-                date_selectors = selectors_config.get("detailed_date") or selectors_config.get("date") or [".date", "time"]
-                desc_selectors = selectors_config.get("detailed_description") or selectors_config.get("description") or [".content", "article"]
-                loc_selectors = selectors_config.get("detailed_location") or selectors_config.get("location") or [".location", ".venue"]
-                price_selectors = selectors_config.get("detailed_price") or selectors_config.get("price") or [".price", ".cost"]
-                img_selectors = selectors_config.get("detailed_image") or selectors_config.get("image") or ["img"]
-                
-                logger.debug(f"    Detailed selectors: title={title_selectors}, loc={loc_selectors}, price={price_selectors}")
-            else:
-                # Use list page selectors
-                title_selectors = selectors_config.get("title") or ["h2", ".title"]
-                date_selectors = selectors_config.get("date") or [".date", "time"]
-                desc_selectors = selectors_config.get("description") or []
-                loc_selectors = selectors_config.get("location") or []
-                price_selectors = selectors_config.get("price") or []
-                img_selectors = selectors_config.get("image") or ["img"]
+ 
             
             # 1. Extract title
-            title = None
-            for selector in title_selectors:
-                if not selector or selector.strip() in ["", ".", "*"]:
-                    continue
-                title_elem = element.select_one(selector)
-                if title_elem:
-                    title = title_elem.text.strip()
-                    logger.debug(f"    Found title with selector '{selector}': {title[:50]}...")
-                    break
-            
+            title = self._extract_text_with_selectors(
+                element, 
+                self.config.selectors.get("title", detailed=is_detailed_page),
+                field_name="title",
+                default_selectors=["h1", "h2"] if is_detailed_page else ["h2", ".title"]
+            )
             if not title:
-                logger.warning("  No title found")
                 return None
             
             # 2. Generate ID
             event_id = Event.generate_id(title, self.source_name)
             
             # 3. Extract date
-            date_str = "Date TBA"
-            for selector in date_selectors:
-                date_elem = element.select_one(selector)
-                if date_elem:
-                    date_str = date_elem.text.strip()
-                    break
-            
+            date_str = self._extract_text_with_selectors(
+                element,
+                self.config.selectors.get("date", is_detailed_page),
+                field_name="date",
+                default_selectors=[".date", "time"],
+                default_value="Date TBA"
+            )
             # 4. Extract description
-            description = ""
-            if is_detailed_page and desc_selectors:
-                for selector in desc_selectors:
-                    desc_elem = element.select_one(selector)
-                    if desc_elem and desc_elem.text.strip():
-                        description = desc_elem.text.strip()[:2000]
-                        break
-            
-            if not description:  # Fallback for list view or no description found
-                description = f"Event organized by {self.source_name}. {title}. Visit the event page for full details."
-            
+            description = self._extract_text_with_selectors(
+                element,
+                self.config.selectors.get("description", is_detailed_page),
+                field_name="description",
+                default_selectors=[".content", "article"] if is_detailed_page else [],
+                default_value=f"Event organized by {self.source_name}. {title}. Visit event page for details."
+            )
             # 5. Extract location
-            location_name = "EPFL Campus (check event for exact location)"
-            for selector in loc_selectors:
-                loc_elem = element.select_one(selector)
-                if loc_elem and loc_elem.text.strip():
-                    location_name = loc_elem.text.strip()[:100]
-                    break
-            
+            location_name = self._extract_text_with_selectors(
+                element,
+                self.config.selectors.get("location", is_detailed_page),
+                field_name="location",
+                default_selectors=[".location", ".venue"],
+                default_value="EPFL Campus (check event for exact location)"
+            )
             location = Location(
-                latitude=46.5191,
-                longitude=6.5668,
-                name=location_name
+                latitude=self.config.coordinates["latitude"],
+                longitude=self.config.coordinates["longitude"],
+                name=location_name[:100]
+            )
+                
+            # 6. Extract image URL
+            image_url = self._extract_image_url(
+                element,
+                self.config.selectors.get("image", is_detailed_page),
+                default_selectors=["img"]
             )
             
-            # 6. Extract image URL
-            image_url = None
-            for selector in img_selectors:
-                img_elem = element.select_one(selector)
-                if img_elem and img_elem.get('src'):
-                    image_url = img_elem['src']
-                    # Convert to absolute URL if relative
-                    if image_url and not image_url.startswith('http'):
-                        base_domain = self.config.get("base_domain", "")
-                        if base_domain:
-                            base_domain = base_domain.rstrip('/')
-                            image_url = image_url.lstrip('/')
-                            image_url = f"{base_domain}/{image_url}"
-                    break
-            
+                
             # 7. Get association from config
-            association = self.config.get("association")
+            association = self.config.association
             if not association:
+                self.logger.error("No association found in config")
                 return None
-            
+        
             # 8. Extract price
-            price_text = None
-            for selector in price_selectors:
-                price_elem = element.select_one(selector)
-                if price_elem:
-                    price_text = price_elem.text.strip()
-                    break
-            
-            price = self._parse_price(price_text) if price_text else Price(cents=0)
-            
+            price_text = self._extract_text_with_selectors(
+                element,
+                self.config.selectors.get("price", is_detailed_page),
+                field_name="price",
+                default_selectors=[".price", ".cost"],
+                default_value=""
+            )
+            price = self._parse_price(price_text)
+
             # 9. Generate tags
-            tags = []
-            title_lower = title.lower()
-            if any(word in title_lower for word in ["ski", "sport", "hike", "bouldering"]):
-                tags.append("Sports")
-            if any(word in title_lower for word in ["party", "social", "dinner", "apero"]):
-                tags.append("Social")
-            if any(word in title_lower for word in ["weekend", "trip", "travel"]):
-                tags.append("Trip")
-            if any(word in title_lower for word in ["workshop", "course", "tutorial"]):
-                tags.append("Workshop")
-            
+            tags = self._generate_tags(title, description)
+
             # 10. Create Event object
             event = Event(
                 id=event_id,
-                title=title[:150],
-                description=description[:2000] if is_detailed_page else description[:500],
+                title=self._safe_truncate(title, "title"),
+                description=self._safe_truncate(description, "description"),
                 location=location,
                 time=date_str,
                 association=association,
@@ -291,11 +252,35 @@ class WebScraper(BaseScraper):
             )
             
             return event
-            
+                
         except Exception as e:
             self.logger.error(f"Error parsing event: {e}")
             return None
         
+
+    def _extract_text_with_selectors(self, element, selectors: List[str], 
+                                field_name: str, 
+                                default_selectors: List[str] = None,
+                                default_value: str = "") -> str:
+        """
+        Extract text using selectors with proper fallback logic
+        """
+        if not selectors and default_selectors:
+            selectors = default_selectors
+        
+        for selector in selectors:
+            if not selector or selector.strip() in ["", ".", "*"]:
+                continue
+                
+            elem = element.select_one(selector)
+            if elem and elem.text.strip():
+                
+                from config import MAX_FIELD_LENGTHS
+                max_len = MAX_FIELD_LENGTHS.get(field_name, 500)
+                return elem.text.strip()[:max_len]
+        
+        return default_value
+            
     def _validate_event(self, event: Event) -> bool:
         """Validate that an event has required fields"""
         if not event or not event.title:
@@ -306,46 +291,64 @@ class WebScraper(BaseScraper):
             return False
         return True
 
+    def _generate_tags(self, title: str, description: str) -> List[str]:
+        """Generate tags based on content"""
+        tags = []
+        text = (title + " " + description).lower()
+        
+        
+        if any(word in text for word in ["ski", "snowboard", "bouldering", "sport", "hike"]):
+            tags.append("Sports")
+        if any(word in text for word in ["party", "social", "dinner", "apero", "drinks"]):
+            tags.append("Social")
+        if any(word in text for word in ["weekend", "trip", "travel", "excursion"]):
+            tags.append("Trip")
+        if any(word in text for word in ["workshop", "course", "tutorial", "lecture"]):
+            tags.append("Workshop")
+        if any(word in text for word in ["market", "christmas", "festive"]):
+            tags.append("Cultural")
+        if any(word in text for word in ["chocolate", "food", "dinner", "sushi"]):
+            tags.append("Food")
+        
+        return tags
+
 
     
-    def _extract_with_selectors(self, element, selectors: List[str]) -> Optional[str]:
-        """Extract text using multiple selector options"""
-        for selector in selectors:
-            found = element.select_one(selector)
-            if found and found.text.strip():
-                return found.text.strip()
-        
-        # Try element's own text as fallback
-        if element.text.strip():
-            return element.text.strip()[:500]
-        
-        return None
+
     
-    def _extract_image(self, element, selectors: List[str]) -> Optional[str]:
-        """Extract image URL"""
+    def _safe_truncate(self, text: str, field: str) -> str:
+        """Safely truncate text to max length for field"""
+        
+        if not text:
+            return text
+        
+        max_len = MAX_FIELD_LENGTHS.get(field, 500)
+        return text.strip()[:max_len]
+    
+    def _extract_image_url(self, element, selectors: List[str], 
+                       default_selectors: List[str] = None) -> Optional[str]:
+        """Extract image URL from selectors"""
+        if not selectors and default_selectors:
+            selectors = default_selectors
+        
         for selector in selectors:
+            if not selector or selector.strip() in ["", ".", "*"]:
+                continue
+                
             img_elem = element.select_one(selector)
             if img_elem and img_elem.get('src'):
                 url = img_elem['src']
+                
                 if url and not url.startswith('http'):
-                    base_domain = self.config.get("base_domain", "")
+                    base_domain = self.config.base_domain
                     if base_domain:
-                        url = f"{base_domain}{url}"
+                        base_domain = base_domain.rstrip('/')
+                        url = url.lstrip('/')
+                        url = f"{base_domain}/{url}"
                 return url
         
         return None
-    
-    def _create_location(self, location_name: str) -> Location:
-        """Create Location object from name"""
-        # Use coordinates from config or defaults
-        coords = self.config.get("coordinates", config.DEFAULT_EPFL_LOCATION)
-        
-        return Location(
-            latitude=coords["latitude"],
-            longitude=coords["longitude"],
-            name=location_name[:100]
-        )
-    
+
     
     def _parse_price(self, price_text: Optional[str]) -> Price:
         """Parse price text robustly"""
@@ -378,31 +381,3 @@ class WebScraper(BaseScraper):
         
         return Price(cents=0) 
     
-    def _generate_tags(self, title: str, description: str) -> List[str]:
-        """Generate tags based on content"""
-        tags = {self.source_name}
-        text = (title + " " + description).lower()
-        
-        # Add content-based tags
-        content_tags = {
-            "party": "Social",
-            "social": "Social", 
-            "workshop": "Workshop",
-            "food": "Food",
-            "dinner": "Food",
-            "sport": "Sports",
-            "hike": "Sports",
-            "culture": "Cultural",
-            "visit": "Cultural",
-            "trip": "Cultural"
-        }
-        
-        for keyword, tag in content_tags.items():
-            if keyword in text:
-                tags.add(tag)
-        
-        return list(tags)
-    
-    def _validate_event(self, event: Event) -> bool:
-        """Basic validation"""
-        return bool(event.title and event.description and len(event.title) > 2)
