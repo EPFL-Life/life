@@ -68,4 +68,6 @@ val Gray = Color(0xFFE0E0E0)
 
 val LifeRed = Color(0xFFDC2626)
 
+val DangerRed = Color(0xFFF44336)
+
 val Enrolled = Color(0xFF4CAF50)

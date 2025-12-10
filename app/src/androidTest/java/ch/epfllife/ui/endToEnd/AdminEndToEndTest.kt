@@ -22,6 +22,7 @@ import ch.epfllife.model.authentication.SignInResult
 import ch.epfllife.model.db.Db
 import ch.epfllife.model.user.UserRepositoryLocal
 import ch.epfllife.ui.admin.AddEditEventTestTags
+import ch.epfllife.ui.admin.AssociationAdminScreenTestTags
 import ch.epfllife.ui.admin.ManageEventsTestTags
 import ch.epfllife.ui.admin.SelectAssociationTestTags
 import ch.epfllife.ui.navigation.NavigationTestTags
@@ -73,8 +74,14 @@ class AdminEndToEndTest {
     composeTestRule.onNodeWithTag(NavigationTestTags.getTabTestTag(Tab.Settings)).performClick()
     composeTestRule.onNodeWithTag(NavigationTestTags.SETTINGS_SCREEN).assertIsDisplayed()
 
-    // 3. Select Association
-    composeTestRule.onNodeWithTag(SettingsScreenTestTags.SELECT_ASSOCIATION_BUTTON).performClick()
+    // 3. Go to Admin Console
+    composeTestRule.onNodeWithTag(SettingsScreenTestTags.ADMIN_CONSOLE_BUTTON).performClick()
+    composeTestRule.onNodeWithTag(AssociationAdminScreenTestTags.SCREEN).assertIsDisplayed()
+
+    // 4. Select Association
+    composeTestRule
+        .onNodeWithTag(AssociationAdminScreenTestTags.SELECT_ASSOCIATION_BUTTON)
+        .performClick()
     composeTestRule.onNodeWithTag(SelectAssociationTestTags.ASSOCIATION_LIST).assertIsDisplayed()
 
     // Click on the association card
@@ -83,11 +90,15 @@ class AdminEndToEndTest {
             SelectAssociationTestTags.associationCard(ExampleAssociations.association2.id))
         .performClick()
 
-    // 4. Verify back in Settings and "Manage Events" is visible
-    composeTestRule.onNodeWithTag(SettingsScreenTestTags.MANAGE_EVENTS_BUTTON).assertIsDisplayed()
+    // 5. Verify back in Admin Console and "Manage Events" is visible
+    composeTestRule
+        .onNodeWithTag(AssociationAdminScreenTestTags.MANAGE_EVENTS_BUTTON)
+        .assertIsDisplayed()
 
-    // 5. Go to Manage Events
-    composeTestRule.onNodeWithTag(SettingsScreenTestTags.MANAGE_EVENTS_BUTTON).performClick()
+    // 6. Go to Manage Events
+    composeTestRule
+        .onNodeWithTag(AssociationAdminScreenTestTags.MANAGE_EVENTS_BUTTON)
+        .performClick()
     composeTestRule.waitUntil(5000) {
       try {
         composeTestRule.onNodeWithTag(ManageEventsTestTags.TITLE).isDisplayed()
@@ -146,8 +157,20 @@ class AdminEndToEndTest {
     composeTestRule.onNodeWithTag(ManageEventsTestTags.TITLE).assertIsDisplayed()
 
     // We are in ManageEventsScreen, which doesn't have bottom bar.
-    // We need to go back to SettingsScreen first.
-    composeTestRule.onNodeWithContentDescription("Back").performClick()
+    // We need to go back to AssociationAdminScreen, then SettingsScreen.
+    composeTestRule.onNodeWithContentDescription("Back").performClick() // Back to Admin Console
+    composeTestRule.waitUntil(10000) {
+      try {
+        composeTestRule.onNodeWithTag(AssociationAdminScreenTestTags.SCREEN).isDisplayed()
+      } catch (e: Exception) {
+        false
+      }
+    }
+    composeTestRule.onNodeWithTag(AssociationAdminScreenTestTags.SCREEN).assertIsDisplayed()
+
+    composeTestRule
+        .onNodeWithTag(AssociationAdminScreenTestTags.BACK_BUTTON)
+        .performClick() // Back to Settings
     composeTestRule.waitUntil(10000) {
       try {
         composeTestRule.onNodeWithTag(NavigationTestTags.SETTINGS_SCREEN).isDisplayed()

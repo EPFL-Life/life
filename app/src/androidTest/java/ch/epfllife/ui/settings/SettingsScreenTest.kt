@@ -2,7 +2,6 @@ package ch.epfllife.ui.settings
 
 import android.view.View
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -10,17 +9,15 @@ import ch.epfllife.R
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.authentication.SignInResult
 import ch.epfllife.model.db.Db
-import ch.epfllife.model.user.User
-import ch.epfllife.model.user.UserRepositoryLocal
-import ch.epfllife.model.user.UserRole
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.utils.FakeCredentialManager
 import ch.epfllife.utils.FakeToastHelper
+import ch.epfllife.utils.SystemToastHelper
+import ch.epfllife.utils.ToastHelper
 import ch.epfllife.utils.assertTagIsDisplayed
 import ch.epfllife.utils.setUpEmulator
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
@@ -47,21 +44,32 @@ class SettingsScreenTest {
     }
   }
 
-  @Test
-  fun contentIsDisplayed() {
+  // we do this extra helper function because it makes the tests more readable and allows to show
+  // the focus on what is beeing tested
+  // we do this extra helper function because it makes the tests more readable and allows to show
+  // the focus on what is beeing tested
+  private fun setSettingsScreenContent(
+      onSignedOut: () -> Unit = {},
+      onAdminConsoleClick: () -> Unit = {},
+      toastHelper: ToastHelper = SystemToastHelper()
+  ) {
     composeTestRule.setContent {
       SettingsScreen(
           auth = auth,
-          onSignedOut = {},
-          onSelectAssociationClick = {},
-          onManageAssociationClick = {},
-          onManageAssociationEventsClick = {},
-          onAddNewAssociationClick = {})
+          associationRepository = Db.freshLocal().assocRepo,
+          onSignedOut = onSignedOut,
+          toastHelper = toastHelper,
+          onAdminConsoleClick = onAdminConsoleClick)
     }
+  }
+
+  @Test
+  fun contentIsDisplayed() {
+    setSettingsScreenContent()
     listOf(
             NavigationTestTags.SETTINGS_SCREEN,
             SettingsScreenTestTags.SIGN_OUT_BUTTON,
-        )
+            SettingsScreenTestTags.ADMIN_CONSOLE_BUTTON)
         .map(composeTestRule::assertTagIsDisplayed)
   }
 
@@ -69,16 +77,7 @@ class SettingsScreenTest {
   fun canSignOut() {
     Assert.assertNotNull(Firebase.auth.currentUser)
     var clicked = false
-    composeTestRule.setContent {
-      SettingsScreen(
-          auth = auth,
-          onSignedOut = { clicked = true },
-          toastHelper = fakeToastHelper,
-          onSelectAssociationClick = {},
-          onManageAssociationClick = {},
-          onManageAssociationEventsClick = {},
-          onAddNewAssociationClick = {})
-    }
+    setSettingsScreenContent(onSignedOut = { clicked = true }, toastHelper = fakeToastHelper)
     composeTestRule.onNodeWithTag(SettingsScreenTestTags.SIGN_OUT_BUTTON).performClick()
     composeTestRule.waitForIdle()
     Assert.assertNull(Firebase.auth.currentUser)
@@ -88,114 +87,11 @@ class SettingsScreenTest {
   }
 
   @Test
-  fun selectAssociationButtonInvokesCallback() {
-    val db = fakeDbWithUserRole(UserRole.ADMIN)
+  fun adminConsoleButtonInvokesCallback() {
     var clicked = false
-    composeTestRule.setContent {
-      SettingsScreen(
-          auth = auth,
-          viewModel = SettingsViewModel(auth, db),
-          onSignedOut = {},
-          onSelectAssociationClick = { clicked = true },
-          onManageAssociationClick = {},
-          onManageAssociationEventsClick = {},
-          onAddNewAssociationClick = {})
-    }
+    setSettingsScreenContent(onAdminConsoleClick = { clicked = true })
 
-    composeTestRule.onNodeWithTag(SettingsScreenTestTags.SELECT_ASSOCIATION_BUTTON).performClick()
+    composeTestRule.onNodeWithTag(SettingsScreenTestTags.ADMIN_CONSOLE_BUTTON).performClick()
     Assert.assertTrue(clicked)
-  }
-
-  @Test
-  fun manageButtonsVisibleAndClickableWhenAssociationSelected() {
-    val db = fakeDbWithUserRole(UserRole.ADMIN)
-    val associationId = "asso-sat"
-    val associationName = "Satellite"
-    var manageClickedId: String? = null
-    var manageEventsClickedId: String? = null
-
-    composeTestRule.setContent {
-      SettingsScreen(
-          auth = auth,
-          viewModel = SettingsViewModel(auth, db),
-          onSignedOut = {},
-          selectedAssociationId = associationId,
-          selectedAssociationName = associationName,
-          onSelectAssociationClick = {},
-          onManageAssociationClick = { manageClickedId = it },
-          onManageAssociationEventsClick = { manageEventsClickedId = it },
-          onAddNewAssociationClick = {})
-    }
-
-    composeTestRule.onNodeWithTag(SettingsScreenTestTags.MANAGE_ASSOCIATION_BUTTON).performClick()
-    composeTestRule.onNodeWithTag(SettingsScreenTestTags.MANAGE_EVENTS_BUTTON).performClick()
-
-    Assert.assertEquals(associationId, manageClickedId)
-    Assert.assertEquals(associationId, manageEventsClickedId)
-  }
-
-  @Test
-  fun selectAssociationButtonVisibleForAdmin() {
-    val db = fakeDbWithUserRole(UserRole.ADMIN)
-    composeTestRule.setContent {
-      SettingsScreen(
-          auth = auth,
-          viewModel = SettingsViewModel(auth, db),
-          onSignedOut = {},
-          onSelectAssociationClick = {},
-          onManageAssociationClick = {},
-          onManageAssociationEventsClick = {},
-          onAddNewAssociationClick = {})
-    }
-    composeTestRule
-        .onNodeWithTag(SettingsScreenTestTags.SELECT_ASSOCIATION_BUTTON)
-        .assertIsDisplayed()
-  }
-
-  @Test
-  fun selectAssociationButtonVisibleForAssociationAdmin() {
-    val db = fakeDbWithUserRole(UserRole.ASSOCIATION_ADMIN)
-    composeTestRule.setContent {
-      SettingsScreen(
-          auth = auth,
-          viewModel = SettingsViewModel(auth, db),
-          onSignedOut = {},
-          onSelectAssociationClick = {},
-          onManageAssociationClick = {},
-          onManageAssociationEventsClick = {},
-          onAddNewAssociationClick = {})
-    }
-    composeTestRule
-        .onNodeWithTag(SettingsScreenTestTags.SELECT_ASSOCIATION_BUTTON)
-        .assertIsDisplayed()
-  }
-
-  @Test
-  fun selectAssociationButtonHiddenForUser() {
-    val db = fakeDbWithUserRole(UserRole.USER)
-    composeTestRule.setContent {
-      SettingsScreen(
-          auth = auth,
-          viewModel = SettingsViewModel(auth, db),
-          onSignedOut = {},
-          onSelectAssociationClick = {},
-          onManageAssociationClick = {},
-          onManageAssociationEventsClick = {},
-          onAddNewAssociationClick = {})
-    }
-    composeTestRule
-        .onNodeWithTag(SettingsScreenTestTags.SELECT_ASSOCIATION_BUTTON)
-        .assertDoesNotExist()
-  }
-
-  private fun fakeDbWithUserRole(role: UserRole): Db {
-    val db = Db.freshLocal()
-    val userRepo = db.userRepo as UserRepositoryLocal
-    val user = User(id = "0", name = "Test User", role = role)
-    runBlocking {
-      userRepo.createUser(user)
-      userRepo.simulateLogin(user.id)
-    }
-    return db
   }
 }
