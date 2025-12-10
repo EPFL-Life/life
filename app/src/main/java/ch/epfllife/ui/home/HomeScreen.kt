@@ -24,6 +24,7 @@ import ch.epfllife.ui.composables.EPFLLogo
 import ch.epfllife.ui.composables.EventCard
 import ch.epfllife.ui.composables.ListView
 import ch.epfllife.ui.composables.SearchBar
+import ch.epfllife.ui.composables.subscriptionSwipe
 import ch.epfllife.ui.navigation.NavigationTestTags
 
 @Composable
@@ -48,6 +49,7 @@ fun HomeScreen(
           modifier
               .fillMaxSize()
               .padding(horizontal = 16.dp, vertical = 12.dp)
+              .subscriptionSwipe(selected) { selected = it }
               .testTag(NavigationTestTags.HOMESCREEN_SCREEN)) {
         EPFLLogo(modifier = modifier)
 
