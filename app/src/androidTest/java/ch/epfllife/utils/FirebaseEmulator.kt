@@ -48,13 +48,25 @@ object FirebaseEmulator {
 
   private val emulatorsEndpoint = "http://$HOST:$EMULATORS_PORT/emulators"
 
-  private fun areEmulatorsRunning(): Boolean =
-      runCatching {
-            val client = httpClient
-            val request = Request.Builder().url(emulatorsEndpoint).build()
-            client.newCall(request).execute().isSuccessful
-          }
-          .getOrNull() == true
+  private fun areEmulatorsRunning(): Boolean {
+    for (i in 0 until 20) {
+      val running =
+          runCatching {
+                val client = httpClient
+                val request = Request.Builder().url(emulatorsEndpoint).build()
+                client.newCall(request).execute().isSuccessful
+              }
+              .getOrNull() == true
+
+      if (running) return true
+      try {
+        Thread.sleep(250)
+      } catch (e: InterruptedException) {
+        return false
+      }
+    }
+    return false
+  }
 
   val isRunning = areEmulatorsRunning()
 
