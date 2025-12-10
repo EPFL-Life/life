@@ -11,27 +11,34 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
+import androidx.test.espresso.Espresso
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import ch.epfllife.ThemedApp
 import ch.epfllife.example_data.ExampleAssociations
 import ch.epfllife.example_data.ExampleEvents
 import ch.epfllife.example_data.ExampleUsers
+import ch.epfllife.model.association.Association
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.authentication.SignInResult
 import ch.epfllife.model.db.Db
+import ch.epfllife.model.user.User
 import ch.epfllife.model.user.UserRepositoryLocal
 import ch.epfllife.ui.admin.AddEditEventTestTags
 import ch.epfllife.ui.admin.AssociationAdminScreenTestTags
 import ch.epfllife.ui.admin.ManageEventsTestTags
 import ch.epfllife.ui.admin.SelectAssociationTestTags
 import ch.epfllife.ui.composables.AssociationCardTestTags
+import ch.epfllife.ui.composables.DisplayedEventsTestTags
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.navigation.Tab
 import ch.epfllife.ui.settings.SettingsScreenTestTags
 import ch.epfllife.utils.FakeCredentialManager
+import ch.epfllife.utils.navigateToTab
 import ch.epfllife.utils.setUpEmulator
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
@@ -42,34 +49,52 @@ class AdminEndToEndTest {
 
   @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
   private val auth = Auth(FakeCredentialManager.withDefaultTestUser)
-  private val db = Db.freshLocal()
+  private lateinit var db: Db
 
   @Before
   fun setup() {
     UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         .executeShellCommand("am broadcast -a android.intent.action.CLOSE_SYSTEM_DIALOGS")
     setUpEmulator(auth, "AdminEndToEndTest")
+    db = Db.freshLocal()
 
     // Seed the association and event
-    runBlocking {
+    runTest {
       db.assocRepo.createAssociation(ExampleAssociations.association2)
       db.eventRepo.createEvent(ExampleEvents.event2)
 
-      // Setup Admin User
-      val userRepo = db.userRepo as UserRepositoryLocal
-      userRepo.createUser(ExampleUsers.adminUser)
-      userRepo.simulateLogin(ExampleUsers.adminUser.id)
+      // Login
+      val signInResult = auth.signInWithCredential(FakeCredentialManager.defaultUserCredentials)
+      Assert.assertTrue("Sign in must succeed", signInResult is SignInResult.Success)
     }
+    composeTestRule.setContent { ThemedApp(auth, db) }
+  }
+
+  private fun loginAsAdmin(): User {
+    val adminUser = ExampleUsers.adminUser
+    runTest {
+      val userRepo = db.userRepo as UserRepositoryLocal
+      userRepo.createUser(adminUser)
+      userRepo.simulateLogin(adminUser.id)
+    }
+    return adminUser
+  }
+
+  private fun loginAsAssocAdmin(assoc: Association): User {
+    val assocAdminUser =
+        ExampleUsers.associationAdminUser.copy(managedAssociationIds = listOf(assoc.id))
+    runTest {
+      val userRepo = db.userRepo as UserRepositoryLocal
+      userRepo.createUser(assocAdminUser)
+      userRepo.simulateLogin(assocAdminUser.id)
+    }
+    return assocAdminUser
   }
 
   @Test
   fun adminCanCreateAndEditEvent() {
     // 1. Login
-    runTest {
-      val signInResult = auth.signInWithCredential(FakeCredentialManager.defaultUserCredentials)
-      Assert.assertTrue("Sign in must succeed", signInResult is SignInResult.Success)
-    }
-    composeTestRule.setContent { ThemedApp(auth, db) }
+    loginAsAdmin()
 
     // 2. Go to Settings
     composeTestRule.onNodeWithTag(NavigationTestTags.getTabTestTag(Tab.Settings)).performClick()
@@ -212,5 +237,56 @@ class AdminEndToEndTest {
       }
     }
     composeTestRule.onNodeWithText(newTitle).assertIsDisplayed()
+  }
+
+  @Test
+  fun createEventAsAssocAdmin() {
+    val assoc = ExampleAssociations.association2
+    val eventTitle = "New Event"
+    loginAsAssocAdmin(assoc)
+
+    // Select association to manage
+    composeTestRule.navigateToTab(Tab.Settings)
+    composeTestRule.onNodeWithTag(SettingsScreenTestTags.ADMIN_CONSOLE_BUTTON).performClick()
+    composeTestRule
+        .onNodeWithTag(AssociationAdminScreenTestTags.SELECT_ASSOCIATION_BUTTON)
+        .performClick()
+    composeTestRule
+        .onNodeWithTag(AssociationCardTestTags.getAssociationCardTestTag(assoc.id))
+        .performClick()
+    composeTestRule.waitForIdle() // automatic navigation back to settings
+
+    // Create new event
+    composeTestRule
+        .onNodeWithTag(AssociationAdminScreenTestTags.MANAGE_EVENTS_BUTTON)
+        .performClick()
+    composeTestRule.onNodeWithTag(ManageEventsTestTags.ADD_EVENT_BUTTON).performClick()
+    // add location first, otherwise we have a few problems with injecting tough input
+    composeTestRule.onNodeWithTag(AddEditEventTestTags.LOCATION_FIELD).performTextInput("EPFL")
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag(AddEditEventTestTags.TITLE_FIELD).performTextInput(eventTitle)
+    composeTestRule
+        .onNodeWithTag(AddEditEventTestTags.DESCRIPTION_FIELD)
+        .performTextInput("Event Description")
+    Espresso.closeSoftKeyboard()
+    composeTestRule.onNodeWithTag(AddEditEventTestTags.TIME_PICKER_BOX).performClick()
+    // Interact with DatePicker (Click OK to accept default/current date)
+    onView(withText("OK")).perform(click())
+    // Interact with TimePicker (Click OK to accept default/current time)
+    onView(withText("OK")).perform(click())
+    composeTestRule.onNodeWithTag(AddEditEventTestTags.SUBMIT_BUTTON).performScrollTo()
+    composeTestRule.onNodeWithTag(AddEditEventTestTags.SUBMIT_BUTTON).performClick()
+    composeTestRule.waitForIdle()
+
+    // Verify event created on manage events screen
+    composeTestRule.waitUntil { composeTestRule.onNodeWithText(eventTitle).isDisplayed() }
+
+    // Verify event created on home screen
+    composeTestRule.onNodeWithTag(ManageEventsTestTags.BACK_BUTTON).performClick()
+    composeTestRule.onNodeWithTag(AssociationAdminScreenTestTags.BACK_BUTTON).performClick()
+    composeTestRule.navigateToTab(Tab.HomeScreen)
+    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_ALL).performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.waitUntil { composeTestRule.onNodeWithText(eventTitle).isDisplayed() }
   }
 }
