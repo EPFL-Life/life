@@ -25,6 +25,7 @@ import ch.epfllife.ui.admin.AddEditEventTestTags
 import ch.epfllife.ui.admin.AssociationAdminScreenTestTags
 import ch.epfllife.ui.admin.ManageEventsTestTags
 import ch.epfllife.ui.admin.SelectAssociationTestTags
+import ch.epfllife.ui.composables.AssociationCardTestTags
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.navigation.Tab
 import ch.epfllife.ui.settings.SettingsScreenTestTags
@@ -95,7 +96,7 @@ class AdminEndToEndTest {
     // Click on the association card
     composeTestRule
         .onNodeWithTag(
-            SelectAssociationTestTags.associationCard(ExampleAssociations.association2.id))
+            AssociationCardTestTags.getAssociationCardTestTag(ExampleAssociations.association2.id))
         .performClick()
 
     // 4. Verify back in Admin Console and "Manage Events" is visible
