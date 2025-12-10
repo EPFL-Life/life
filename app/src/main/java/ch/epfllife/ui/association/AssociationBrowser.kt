@@ -19,6 +19,7 @@ import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
 import ch.epfllife.ui.composables.EPFLLogo
 import ch.epfllife.ui.composables.ListView
 import ch.epfllife.ui.composables.SearchBar
+import ch.epfllife.ui.composables.subscriptionSwipe
 import ch.epfllife.ui.navigation.NavigationTestTags
 
 @Composable
@@ -43,6 +44,7 @@ fun AssociationBrowser(
           modifier
               .fillMaxSize()
               .padding(horizontal = 16.dp, vertical = 12.dp)
+              .subscriptionSwipe(selected) { selected = it }
               .testTag(NavigationTestTags.ASSOCIATIONBROWSER_SCREEN),
       horizontalAlignment = Alignment.CenterHorizontally,
   ) {

@@ -25,6 +25,7 @@ import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
 import ch.epfllife.ui.composables.EPFLLogo
 import ch.epfllife.ui.composables.ListView
 import ch.epfllife.ui.composables.SearchBar
+import ch.epfllife.ui.composables.subscriptionSwipe
 import ch.epfllife.ui.home.HomeViewModel
 import ch.epfllife.ui.navigation.NavigationTestTags
 import java.time.LocalDate
@@ -81,6 +82,7 @@ fun CalendarScreen(
       modifier =
           modifier
               .fillMaxSize()
+              .subscriptionSwipe(selected) { selected = it }
               .padding(horizontal = 16.dp, vertical = 12.dp)
               .testTag(NavigationTestTags.CALENDAR_SCREEN),
       horizontalAlignment = Alignment.CenterHorizontally,
