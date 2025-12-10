@@ -86,4 +86,27 @@ class CalendarGridViewModel(private val db: Db) : ViewModel() {
     val eventsOnDate = getEventsForDate(date)
     return eventsOnDate.any { _enrolledEventIds.value.contains(it.id) }
   }
+
+  fun calculateCalendarDays(currentMonth: YearMonth): List<LocalDate> {
+    val daysInMonth = currentMonth.lengthOfMonth()
+    val firstDayOfMonth = currentMonth.atDay(1)
+    val dayOfWeek = firstDayOfMonth.dayOfWeek.value // 1 (Mon) to 7 (Sun)
+    val daysInPreviousMonth = currentMonth.minusMonths(1).lengthOfMonth()
+
+    // Previous month days
+    val prevMonthDays =
+        (1 until dayOfWeek).map {
+          currentMonth.minusMonths(1).atDay(daysInPreviousMonth - (dayOfWeek - 1 - it))
+        }
+
+    // Current month days
+    val currentMonthDays = (1..daysInMonth).map { currentMonth.atDay(it) }
+
+    // Next month days
+    val totalDaysSoFar = prevMonthDays.size + currentMonthDays.size
+    val daysToFillLastRow = (7 - (totalDaysSoFar % 7)) % 7
+    val nextMonthDays = (1..daysToFillLastRow).map { currentMonth.plusMonths(1).atDay(it) }
+
+    return prevMonthDays + currentMonthDays + nextMonthDays
+  }
 }
