@@ -267,10 +267,10 @@ fun App(
                         handle[selectedAssociationNameKey] = updatedAssociation.name
                       }
                       navController.previousBackStackEntry?.savedStateHandle?.let(applySelection)
-                      val settingsEntry =
-                          runCatching { navController.getBackStackEntry(Screen.Settings.route) }
-                              .getOrNull()
-                      settingsEntry?.savedStateHandle?.let(applySelection)
+                      val settingsEntry = run {
+                        navController.getBackStackEntry(Screen.Settings.route)
+                      }
+                      settingsEntry.savedStateHandle.let(applySelection)
 
                       navController.popBackStack(Screen.Settings.route, false)
                     })
