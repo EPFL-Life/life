@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.R
+import ch.epfllife.model.association.Association
 import ch.epfllife.model.db.Db
 import ch.epfllife.ui.association.SocialIcons
 import ch.epfllife.ui.composables.BackButton
@@ -45,7 +46,7 @@ fun AddEditAssociationScreen(
       AddEditAssociationViewModel(db, associationId)
     },
     onBack: () -> Unit,
-    onSubmitSuccess: () -> Unit
+    onSubmitSuccess: (Association) -> Unit
 ) {
   val uiState by viewModel.uiState.collectAsState()
 
@@ -56,6 +57,7 @@ fun AddEditAssociationScreen(
           CircularProgressIndicator()
         }
       }
+
       is AddEditAssociationUIState.Error -> {
         Column(
             modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -69,6 +71,7 @@ fun AddEditAssociationScreen(
               Button(onClick = onBack) { Text(stringResource(R.string.back_button_description)) }
             }
       }
+
       is AddEditAssociationUIState.Success -> {
         AddEditAssociationContent(viewModel = viewModel, onSubmitSuccess = onSubmitSuccess)
       }
@@ -83,7 +86,7 @@ fun AddEditAssociationScreen(
 @Composable
 private fun AddEditAssociationContent(
     viewModel: AddEditAssociationViewModel,
-    onSubmitSuccess: () -> Unit
+    onSubmitSuccess: (Association) -> Unit
 ) {
   val scrollState = rememberScrollState()
   val formState = viewModel.formState
