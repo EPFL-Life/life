@@ -1,12 +1,15 @@
 package ch.epfllife.ui.association
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -18,6 +21,7 @@ import ch.epfllife.ui.composables.AssociationCard
 import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
 import ch.epfllife.ui.composables.ListView
 import ch.epfllife.ui.composables.SearchBar
+import ch.epfllife.ui.home.HomeScreenTestTags
 import ch.epfllife.ui.navigation.NavigationTestTags
 
 @Composable
@@ -46,7 +50,16 @@ fun AssociationBrowser(
       horizontalAlignment = Alignment.CenterHorizontally,
   ) {
     // Empty space where the logo would normally be
-    Spacer(Modifier.height(40.dp))
+    Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+      Image(
+          painter = painterResource(id = R.drawable.epfl_life_logo),
+          contentDescription = "EPFL Life Logo",
+          modifier = modifier.height(40.dp).testTag(HomeScreenTestTags.EPFLLOGO),
+          contentScale = ContentScale.Fit,
+      )
+    }
+
+    Spacer(Modifier.height(12.dp))
 
     var query by remember { mutableStateOf("") }
     SearchBar(query = query, onQueryChange = { query = it })
