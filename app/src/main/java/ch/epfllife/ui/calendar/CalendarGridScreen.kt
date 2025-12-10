@@ -40,164 +40,208 @@ fun CalendarGridScreen(
   LaunchedEffect(Unit) { viewModel.loadEvents() }
 
   Column(modifier = Modifier.fillMaxSize()) {
-    // Month Header
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically) {
-          IconButton(onClick = { viewModel.previousMonth() }) {
-            Icon(
-                Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = stringResource(id = R.string.calendar_previous_month))
-          }
-          Text(
-              text =
-                  "${currentMonth.month.getDisplayName(TextStyle.FULL, Locale.getDefault())} ${currentMonth.year}",
-              style = MaterialTheme.typography.titleLarge,
-              fontWeight = FontWeight.Bold)
-          IconButton(onClick = { viewModel.nextMonth() }) {
-            Icon(
-                Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = stringResource(id = R.string.calendar_next_month))
-          }
-        }
+    CalendarMonthHeader(
+        currentMonth = currentMonth,
+        onPreviousMonth = { viewModel.previousMonth() },
+        onNextMonth = { viewModel.nextMonth() })
 
-    // Weekday Header
-    Row(modifier = Modifier.fillMaxWidth()) {
-      val daysOfWeek =
-          listOf(
-              stringResource(id = R.string.calendar_day_mon),
-              stringResource(id = R.string.calendar_day_tue),
-              stringResource(id = R.string.calendar_day_wed),
-              stringResource(id = R.string.calendar_day_thu),
-              stringResource(id = R.string.calendar_day_fri),
-              stringResource(id = R.string.calendar_day_sat),
-              stringResource(id = R.string.calendar_day_sun))
-      daysOfWeek.forEach { day ->
-        Text(
-            text = day,
-            modifier = Modifier.weight(1f),
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.bodyMedium,
-            color = Color.Gray)
-      }
-    }
+    CalendarWeekdayHeader()
 
     Spacer(modifier = Modifier.height(8.dp))
 
-    // Calendar Grid
-    val daysInMonth = currentMonth.lengthOfMonth()
-    val firstDayOfMonth = currentMonth.atDay(1)
-    val dayOfWeek = firstDayOfMonth.dayOfWeek.value // 1 (Mon) to 7 (Sun)
-    val daysInPreviousMonth = currentMonth.minusMonths(1).lengthOfMonth()
-
-    // Calculate days to display
-    // Previous month days
-    val prevMonthDays =
-        (1 until dayOfWeek).map {
-          currentMonth.minusMonths(1).atDay(daysInPreviousMonth - (dayOfWeek - 1 - it))
-        }
-
-    // Current month days
-    val currentMonthDays = (1..daysInMonth).map { currentMonth.atDay(it) }
-
-    // Next month days
-    // Calculate how many days needed to fill the last row
-    val totalDaysSoFar = prevMonthDays.size + currentMonthDays.size
-    val daysToFillLastRow = (7 - (totalDaysSoFar % 7)) % 7
-    val nextMonthDays = (1..daysToFillLastRow).map { currentMonth.plusMonths(1).atDay(it) }
-
-    val allDays = prevMonthDays + currentMonthDays + nextMonthDays
-    val totalRows = allDays.size / 7
-
-    Column {
-      for (row in 0 until totalRows) {
-        Row(modifier = Modifier.fillMaxWidth()) {
-          for (col in 0 until 7) {
-            val index = row * 7 + col
-            if (index < allDays.size) {
-              val date = allDays[index]
-              val isSelected = date == selectedDate
-              val isCurrentMonth = date.month == currentMonth.month
-              val hasEnrolledEvents = viewModel.hasEnrolledEventsOnDate(date)
-
-              // this is an circle indicator of the currently selected day
-              Box(
-                  modifier =
-                      Modifier.weight(1f)
-                          .aspectRatio(1f)
-                          .padding(4.dp)
-                          .background(
-                              color =
-                                  if (isSelected) MaterialTheme.colorScheme.primary
-                                  else Color.Transparent,
-                              shape = CircleShape)
-                          .clickable { viewModel.selectDate(date) },
-                  contentAlignment = Alignment.Center) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                      Text(
-                          text = date.dayOfMonth.toString(),
-                          color =
-                              if (isSelected) Color.White
-                              else if (isCurrentMonth) MaterialTheme.colorScheme.onSurface
-                              else Color.Gray,
-                          style = MaterialTheme.typography.bodyMedium)
-                      if (hasEnrolledEvents) {
-                        Box(
-                            modifier =
-                                Modifier.size(4.dp)
-                                    .background(
-                                        // indicator dot turns white if its on the selected day
-                                        color =
-                                            if (isSelected) Color.White
-                                            else MaterialTheme.colorScheme.primary,
-                                        shape = CircleShape))
-                      }
-                    }
-                  }
-            } else {
-              Spacer(modifier = Modifier.weight(1f))
-            }
-          }
-        }
-      }
-    }
+    CalendarGrid(
+        currentMonth = currentMonth,
+        selectedDate = selectedDate,
+        enrolledEventIds =
+            enrolledEventIds, // Pass individual IDs or a way to check, but logic is in VM
+        viewModel = viewModel // Passing viewModel for cleaner logic interaction in grid generation
+        )
 
     Spacer(modifier = Modifier.height(16.dp))
 
-    Text(
-        text =
-            stringResource(
-                id = R.string.calendar_events_for_date,
-                selectedDate.format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))),
-        style = MaterialTheme.typography.titleMedium,
-        modifier = Modifier.padding(horizontal = 16.dp))
+    CalendarEventsList(
+        selectedDate = selectedDate,
+        viewModel = viewModel,
+        enrolledEventIds = enrolledEventIds,
+        onEventClick = onEventClick)
+  }
+}
 
-    Spacer(modifier = Modifier.height(8.dp))
+@Composable
+private fun CalendarMonthHeader(
+    currentMonth: java.time.YearMonth,
+    onPreviousMonth: () -> Unit,
+    onNextMonth: () -> Unit
+) {
+  Row(
+      modifier = Modifier.fillMaxWidth().padding(16.dp),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically) {
+        IconButton(onClick = onPreviousMonth) {
+          Icon(
+              Icons.AutoMirrored.Filled.ArrowBack,
+              contentDescription = stringResource(id = R.string.calendar_previous_month))
+        }
+        Text(
+            text =
+                "${currentMonth.month.getDisplayName(TextStyle.FULL, Locale.getDefault())} ${currentMonth.year}",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold)
+        IconButton(onClick = onNextMonth) {
+          Icon(
+              Icons.AutoMirrored.Filled.ArrowForward,
+              contentDescription = stringResource(id = R.string.calendar_next_month))
+        }
+      }
+}
 
-    // Events List for Selected Date
-    val eventsForDate =
-        viewModel.getEventsForDate(selectedDate).sortedByDescending { it.id in enrolledEventIds }
+@Composable
+private fun CalendarWeekdayHeader() {
+  Row(modifier = Modifier.fillMaxWidth()) {
+    val daysOfWeek =
+        listOf(
+            stringResource(id = R.string.calendar_day_mon),
+            stringResource(id = R.string.calendar_day_tue),
+            stringResource(id = R.string.calendar_day_wed),
+            stringResource(id = R.string.calendar_day_thu),
+            stringResource(id = R.string.calendar_day_fri),
+            stringResource(id = R.string.calendar_day_sat),
+            stringResource(id = R.string.calendar_day_sun))
+    daysOfWeek.forEach { day ->
+      Text(
+          text = day,
+          modifier = Modifier.weight(1f),
+          textAlign = TextAlign.Center,
+          style = MaterialTheme.typography.bodyMedium,
+          color = Color.Gray)
+    }
+  }
+}
 
-    LazyColumn(
-        contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-          if (eventsForDate.isEmpty()) {
-            item {
-              Text(
-                  text = stringResource(id = R.string.calendar_no_events_on_day),
-                  style = MaterialTheme.typography.bodyMedium,
-                  color = Color.Gray,
-                  modifier = Modifier.fillMaxWidth(),
-                  textAlign = TextAlign.Center)
-            }
+@Composable
+private fun CalendarGrid(
+    currentMonth: java.time.YearMonth,
+    selectedDate: java.time.LocalDate,
+    enrolledEventIds: Set<String>,
+    viewModel: CalendarGridViewModel
+) {
+  val daysInMonth = currentMonth.lengthOfMonth()
+  val firstDayOfMonth = currentMonth.atDay(1)
+  val dayOfWeek = firstDayOfMonth.dayOfWeek.value // 1 (Mon) to 7 (Sun)
+  val daysInPreviousMonth = currentMonth.minusMonths(1).lengthOfMonth()
+
+  // Calculate days to display
+  // Previous month days
+  val prevMonthDays =
+      (1 until dayOfWeek).map {
+        currentMonth.minusMonths(1).atDay(daysInPreviousMonth - (dayOfWeek - 1 - it))
+      }
+
+  // Current month days
+  val currentMonthDays = (1..daysInMonth).map { currentMonth.atDay(it) }
+
+  // Next month days
+  // Calculate how many days needed to fill the last row
+  val totalDaysSoFar = prevMonthDays.size + currentMonthDays.size
+  val daysToFillLastRow = (7 - (totalDaysSoFar % 7)) % 7
+  val nextMonthDays = (1..daysToFillLastRow).map { currentMonth.plusMonths(1).atDay(it) }
+
+  val allDays = prevMonthDays + currentMonthDays + nextMonthDays
+  val totalRows = allDays.size / 7
+
+  Column {
+    for (row in 0 until totalRows) {
+      Row(modifier = Modifier.fillMaxWidth()) {
+        for (col in 0 until 7) {
+          val index = row * 7 + col
+          if (index < allDays.size) {
+            val date = allDays[index]
+            val isSelected = date == selectedDate
+            val isCurrentMonth = date.month == currentMonth.month
+            val hasEnrolledEvents = viewModel.hasEnrolledEventsOnDate(date)
+
+            // this is an circle indicator of the currently selected day
+            Box(
+                modifier =
+                    Modifier.weight(1f)
+                        .aspectRatio(1f)
+                        .padding(4.dp)
+                        .background(
+                            color =
+                                if (isSelected) MaterialTheme.colorScheme.primary
+                                else Color.Transparent,
+                            shape = CircleShape)
+                        .clickable { viewModel.selectDate(date) },
+                contentAlignment = Alignment.Center) {
+                  Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = date.dayOfMonth.toString(),
+                        color =
+                            if (isSelected) Color.White
+                            else if (isCurrentMonth) MaterialTheme.colorScheme.onSurface
+                            else Color.Gray,
+                        style = MaterialTheme.typography.bodyMedium)
+                    if (hasEnrolledEvents) {
+                      Box(
+                          modifier =
+                              Modifier.size(4.dp)
+                                  .background(
+                                      // indicator dot turns white if its on the selected day
+                                      color =
+                                          if (isSelected) Color.White
+                                          else MaterialTheme.colorScheme.primary,
+                                      shape = CircleShape))
+                    }
+                  }
+                }
           } else {
-            items(eventsForDate) { event ->
-              CompactEventCard(
-                  event = event,
-                  isEnrolled = enrolledEventIds.contains(event.id),
-                  onClick = { onEventClick(event.id) })
-            }
+            Spacer(modifier = Modifier.weight(1f))
           }
         }
+      }
+    }
   }
+}
+
+@Composable
+private fun CalendarEventsList(
+    selectedDate: java.time.LocalDate,
+    viewModel: CalendarGridViewModel,
+    enrolledEventIds: Set<String>,
+    onEventClick: (String) -> Unit
+) {
+  Text(
+      text =
+          stringResource(
+              id = R.string.calendar_events_for_date,
+              selectedDate.format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))),
+      style = MaterialTheme.typography.titleMedium,
+      modifier = Modifier.padding(horizontal = 16.dp))
+
+  Spacer(modifier = Modifier.height(8.dp))
+
+  // Events List for Selected Date
+  val eventsForDate =
+      viewModel.getEventsForDate(selectedDate).sortedByDescending { it.id in enrolledEventIds }
+
+  LazyColumn(
+      contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        if (eventsForDate.isEmpty()) {
+          item {
+            Text(
+                text = stringResource(id = R.string.calendar_no_events_on_day),
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Gray,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center)
+          }
+        } else {
+          items(eventsForDate) { event ->
+            CompactEventCard(
+                event = event,
+                isEnrolled = enrolledEventIds.contains(event.id),
+                onClick = { onEventClick(event.id) })
+          }
+        }
+      }
 }
