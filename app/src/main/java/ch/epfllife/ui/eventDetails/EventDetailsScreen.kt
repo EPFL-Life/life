@@ -108,7 +108,6 @@ fun EventDetailsContent(
     onEnrollClick: () -> Unit,
     onUnenrollClick: () -> Unit = {},
 ) {
-  val context = LocalContext.current
 
   val (formattedDate, formattedTime) =
       remember(event.time) {
