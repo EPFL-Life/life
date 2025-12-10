@@ -69,7 +69,9 @@ fun AssociationBrowser(
           Pair(R.string.associations_no_all_title, R.string.associations_no_all_description)
         }
     val filteredAssociations =
-        shownAssociations.filter { it.name.contains(query, ignoreCase = true) }.sortedBy { it.name }
+        shownAssociations
+            .filter { it.name.contains(query, ignoreCase = true) }
+            .sortedBy { it.name.lowercase() }
     ListView(
         list = filteredAssociations,
         emptyTitle = stringResource(id = title),
