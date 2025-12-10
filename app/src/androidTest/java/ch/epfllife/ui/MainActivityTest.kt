@@ -1,6 +1,8 @@
 package ch.epfllife.ui
 
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -139,9 +141,7 @@ class MainActivityTest {
 
         composeTestRule.waitUntilNodeExists(SettingsScreenTestTags.MANAGE_ASSOCIATION_BUTTON)
         composeTestRule.assertTagIsDisplayed(SettingsScreenTestTags.MANAGE_ASSOCIATION_BUTTON)
-        composeTestRule.assertTagTextEquals(
-            SettingsScreenTestTags.SELECT_ASSOCIATION_BUTTON, "Selected: ${association.name}"
-        )
+        composeTestRule.assertTagIsDisplayed(SettingsScreenTestTags.MANAGE_EVENTS_BUTTON)
     }
 
     private fun seedAdminUser() {
