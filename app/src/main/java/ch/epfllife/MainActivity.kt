@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.credentials.CredentialManager
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -331,11 +332,21 @@ fun App(auth: Auth, db: Db, languageRepository: LanguageRepository) {
                     associationId = associationId,
                     onBack = { navController.popBackStack() },
                     onSubmitSuccess = { updatedAssociation ->
-                      navController.previousBackStackEntry?.savedStateHandle?.let { handle ->
+                      val applySelection: (SavedStateHandle) -> Unit = { handle ->
                         handle[selectedAssociationIdKey] = updatedAssociation.id
                         handle[selectedAssociationNameKey] = updatedAssociation.name
                       }
-                      navController.popBackStack()
+                      navController.previousBackStackEntry?.savedStateHandle?.let(applySelection)
+                      val settingsEntry =
+                          runCatching { navController.getBackStackEntry(Screen.Settings.route) }
+                              .getOrNull()
+                      settingsEntry?.savedStateHandle?.let(applySelection)
+
+                      val poppedToSettings =
+                          navController.popBackStack(Screen.Settings.route, false)
+                      if (!poppedToSettings) {
+                        navController.popBackStack()
+                      }
                     })
               }
 
