@@ -164,99 +164,124 @@ class WebScraper(BaseScraper):
         try:
             logger.debug(f"  Parsing {'detailed' if is_detailed_page else 'list'} page element")
             
-            selectors_config = self.config.get("selectors", {})
-            
- 
-            
-            # 1. Extract title
-            title = self._extract_text_with_selectors(
-                element, 
-                self.config.selectors.get("title", detailed=is_detailed_page),
-                field_name="title",
-                default_selectors=["h1", "h2"] if is_detailed_page else ["h2", ".title"]
-            )
+            # Extract basic fields
+            title = self._extract_title_from_element(element, is_detailed_page)
             if not title:
                 return None
             
-            # 2. Generate ID
             event_id = Event.generate_id(title, self.source_name)
             
-            # 3. Extract date
-            date_str = self._extract_text_with_selectors(
-                element,
-                self.config.selectors.get("date", is_detailed_page),
-                field_name="date",
-                default_selectors=[".date", "time"],
-                default_value="Date TBA"
-            )
-            # 4. Extract description
-            description = self._extract_text_with_selectors(
-                element,
-                self.config.selectors.get("description", is_detailed_page),
-                field_name="description",
-                default_selectors=[".content", "article"] if is_detailed_page else [],
-                default_value=f"Event organized by {self.source_name}. {title}. Visit event page for details."
-            )
-            # 5. Extract location
-            location_name = self._extract_text_with_selectors(
-                element,
-                self.config.selectors.get("location", is_detailed_page),
-                field_name="location",
-                default_selectors=[".location", ".venue"],
-                default_value="EPFL Campus (check event for exact location)"
-            )
-            location = Location(
-                latitude=self.config.coordinates["latitude"],
-                longitude=self.config.coordinates["longitude"],
-                name=location_name[:100]
-            )
-                
-            # 6. Extract image URL
-            image_url = self._extract_image_url(
-                element,
-                self.config.selectors.get("image", is_detailed_page),
-                default_selectors=["img"]
-            )
+            # Extract remaining fields
+            date_str = self._extract_date_from_element(element, is_detailed_page)
+            description = self._extract_description_from_element(element, is_detailed_page, title)
+            location = self._create_location_from_element(element, is_detailed_page)
             
-                
-            # 7. Get association from config
+            # Get association from config
             association = self.config.association
             if not association:
                 self.logger.error("No association found in config")
                 return None
-        
-            # 8. Extract price
-            price_text = self._extract_text_with_selectors(
-                element,
-                self.config.selectors.get("price", is_detailed_page),
-                field_name="price",
-                default_selectors=[".price", ".cost"],
-                default_value=""
-            )
-            price = self._parse_price(price_text)
-
-            # 9. Generate tags
-            tags = self._generate_tags(title, description)
-
-            # 10. Create Event object
-            event = Event(
-                id=event_id,
-                title=self._safe_truncate(title, "title"),
-                description=self._safe_truncate(description, "description"),
-                location=location,
-                time=date_str,
-                association=association,
-                tags=tags,
-                price=price,
-                picture_url=image_url
-            )
             
-            return event
+            # Extract remaining fields
+            price = self._extract_price_from_element(element, is_detailed_page)
+            tags = self._generate_tags(title, description)
+            image_url = self._extract_image_url(element, self._get_image_selectors(is_detailed_page))
+            
+            # Create Event object
+            return self._create_event_from_fields(
+                event_id, title, description, location, date_str, 
+                association, tags, price, image_url
+            )
                 
         except Exception as e:
             self.logger.error(f"Error parsing event: {e}")
             return None
         
+    def _extract_title_from_element(self, element, is_detailed_page: bool) -> Optional[str]:
+        """Extract title from element"""
+        return self._extract_text_with_selectors(
+            element, 
+            self.config.selectors.get("title", detailed=is_detailed_page),
+            field_name="title",
+            default_selectors=["h1", "h2"] if is_detailed_page else ["h2", ".title"]
+        )
+    
+    def _extract_date_from_element(self, element, is_detailed_page: bool) -> str:
+        """Extract date from element"""
+        return self._extract_text_with_selectors(
+            element,
+            self.config.selectors.get("date", is_detailed_page),
+            field_name="date",
+            default_selectors=[".date", "time"],
+            default_value="Date TBA"
+        )
+    
+    def _extract_description_from_element(self, element, is_detailed_page: bool, title: str) -> str:
+        """Extract description from element"""
+        return self._extract_text_with_selectors(
+            element,
+            self.config.selectors.get("description", is_detailed_page),
+            field_name="description",
+            default_selectors=[".content", "article"] if is_detailed_page else [],
+            default_value=f"Event organized by {self.source_name}. {title}. Visit event page for details."
+        )
+    
+    def _create_location_from_element(self, element, is_detailed_page: bool) -> Location:
+        """Create Location object from element"""
+        location_name = self._extract_text_with_selectors(
+            element,
+            self.config.selectors.get("location", is_detailed_page),
+            field_name="location",
+            default_selectors=[".location", ".venue"],
+            default_value="EPFL Campus (check event for exact location)"
+        )
+        
+    def _create_location_from_element(self, element, is_detailed_page: bool) -> Location:
+        """Create Location object from element"""
+        location_name = self._extract_text_with_selectors(
+            element,
+            self.config.selectors.get("location", is_detailed_page),
+            field_name="location",
+            default_selectors=[".location", ".venue"],
+            default_value="EPFL Campus (check event for exact location)"
+        )
+        return Location(
+            latitude=self.config.coordinates["latitude"],
+            longitude=self.config.coordinates["longitude"],
+            name=location_name[:100]
+        )
+    
+    def _extract_price_from_element(self, element, is_detailed_page: bool) -> Price:
+        """Extract price from element"""
+        price_text = self._extract_text_with_selectors(
+            element,
+            self.config.selectors.get("price", is_detailed_page),
+            field_name="price",
+            default_selectors=[".price", ".cost"],
+            default_value=""
+        )
+        return self._parse_price(price_text)
+    
+    def _get_image_selectors(self, is_detailed_page: bool) -> List[str]:
+        """Get image selectors based on page type"""
+        return self.config.selectors.get("image", is_detailed_page)
+    
+    def _create_event_from_fields(self, event_id: str, title: str, description: str, 
+                                location: Location, date_str: str, association: Association,
+                                tags: List[str], price: Price, image_url: Optional[str]) -> Event:
+        """Create Event object from all extracted fields"""
+        return Event(
+            id=event_id,
+            title=self._safe_truncate(title, "title"),
+            description=self._safe_truncate(description, "description"),
+            location=location,
+            time=date_str,
+            association=association,
+            tags=tags,
+            price=price,
+            picture_url=image_url
+        )
+    
 
     def _extract_text_with_selectors(self, element, selectors: List[str], 
                                 field_name: str, 

@@ -3,6 +3,9 @@ from dataclasses import dataclass, field
 from typing import List
 from models.event_models import Association, EventCategory
 
+DEFAULT_LOCATION_NAME = "EPFL Campus"
+DEFAULT_COORDINATES = {"latitude": 46.5191, "longitude": 6.5668, "name": DEFAULT_LOCATION_NAME}
+
 @dataclass
 class SelectorConfig:
     """Configuration for CSS selectors"""
@@ -39,16 +42,16 @@ class WebsiteConfig:
     base_domain: str
     selectors: SelectorConfig
     association: Association
-    coordinates: dict = field(default_factory=lambda: {"latitude": 46.5191, "longitude": 6.5668, "name": "EPFL Campus"})
-    default_location: str = "EPFL Campus"
+    coordinates: dict = field(default_factory=lambda: DEFAULT_COORDINATES.copy())
+    default_location: str = DEFAULT_LOCATION_NAME
 
 
 ESN_EPFL_CONFIG = WebsiteConfig(
     name="ESN EPFL Lausanne",
     url="https://epfl.esn.ch/events",
     base_domain="https://epfl.esn.ch",
-    default_location="EPFL Campus",
-    coordinates={"latitude": 46.5191, "longitude": 6.5668, "name": "EPFL Campus"},
+    default_location=DEFAULT_LOCATION_NAME,
+    coordinates={"latitude": DEFAULT_COORDINATES.copy()},
     
     selectors=SelectorConfig(
         event_container=[".views-row", ".node.node-event", ".view-content .views-row"],
