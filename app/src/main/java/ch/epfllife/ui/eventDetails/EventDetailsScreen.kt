@@ -20,11 +20,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import ch.epfllife.R
 import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.map.Location
@@ -217,10 +219,31 @@ fun EventDetailsContent(
                           MaterialTheme.typography.titleMedium.copy(
                               fontWeight = FontWeight.SemiBold),
                   )
+                  var isExpanded by remember { mutableStateOf(false) }
+                  var showShowMore by remember { mutableStateOf(false) }
+
                   Text(
                       event.description,
                       style = MaterialTheme.typography.bodyMedium,
+                      maxLines = if (isExpanded) Int.MAX_VALUE else 3,
+                      overflow = TextOverflow.Ellipsis,
+                      onTextLayout = { textLayoutResult ->
+                        // check if we have 3 line overflow (otherwise no modification needed)
+                        if (textLayoutResult.hasVisualOverflow) {
+                          showShowMore = true
+                        }
+                      },
                       modifier = Modifier.testTag(EventDetailsTestTags.EVENT_DESCRIPTION))
+
+                  if (showShowMore) {
+                    Text(
+                        text =
+                            if (isExpanded) stringResource(id = R.string.show_less)
+                            else stringResource(id = R.string.show_more),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray,
+                        modifier = Modifier.clickable { isExpanded = !isExpanded })
+                  }
                 }
 
                 // Map
