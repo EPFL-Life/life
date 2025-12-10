@@ -13,9 +13,9 @@ import ch.epfllife.example_data.ExampleEvents
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.authentication.SignInResult
 import ch.epfllife.model.db.Db
+import ch.epfllife.ui.composables.EPFLLogoTestTags
 import ch.epfllife.ui.eventDetails.EventDetailsTestTags
 import ch.epfllife.ui.eventDetails.MapScreenTestTags
-import ch.epfllife.ui.home.HomeScreenTestTags
 import ch.epfllife.utils.FakeCredentialManager
 import ch.epfllife.utils.navigateToEvent
 import ch.epfllife.utils.navigateToTab
@@ -100,9 +100,7 @@ class NavigationTest {
     composeTestRule
         .onNodeWithTag(NavigationTestTags.HOMESCREEN_SCREEN, useUnmergedTree = true)
         .assertIsDisplayed()
-    composeTestRule
-        .onNodeWithTag(HomeScreenTestTags.EPFLLOGO, useUnmergedTree = true)
-        .assertIsDisplayed()
+    composeTestRule.onNodeWithTag(EPFLLogoTestTags.LOGO, useUnmergedTree = true).assertIsDisplayed()
     composeTestRule
         .onNodeWithTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU, useUnmergedTree = true)
         .assertIsDisplayed()
@@ -177,9 +175,7 @@ class NavigationTest {
     setUpApp()
     composeTestRule.navigateToTab(Tab.Settings)
     composeTestRule.navigateToTab(Tab.HomeScreen)
-    composeTestRule
-        .onNodeWithTag(HomeScreenTestTags.EPFLLOGO, useUnmergedTree = true)
-        .assertIsDisplayed()
+    composeTestRule.onNodeWithTag(EPFLLogoTestTags.LOGO, useUnmergedTree = true).assertIsDisplayed()
   }
 
   @Test
@@ -226,9 +222,7 @@ class NavigationTest {
     setUpApp()
     composeTestRule.navigateToTab(Tab.Calendar)
     composeTestRule.navigateToTab(Tab.HomeScreen)
-    composeTestRule
-        .onNodeWithTag(HomeScreenTestTags.EPFLLOGO, useUnmergedTree = true)
-        .assertIsDisplayed()
+    composeTestRule.onNodeWithTag(EPFLLogoTestTags.LOGO, useUnmergedTree = true).assertIsDisplayed()
   }
 
   @Test

@@ -14,6 +14,7 @@ import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventRepositoryLocal
 import ch.epfllife.model.user.UserRepositoryLocal
 import ch.epfllife.ui.composables.DisplayedEventsTestTags
+import ch.epfllife.ui.composables.EPFLLogoTestTags
 import ch.epfllife.ui.composables.EventCardTestTags
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.theme.Theme
@@ -76,7 +77,7 @@ class HomeScreenTest {
     composeTestRule.onNodeWithTag(NavigationTestTags.HOMESCREEN_SCREEN).assertIsDisplayed()
 
     // Check if EPFL logo is displayed
-    composeTestRule.onNodeWithTag(HomeScreenTestTags.EPFLLOGO).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(EPFLLogoTestTags.LOGO).assertIsDisplayed()
   }
 
   @Test
