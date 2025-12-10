@@ -125,4 +125,16 @@
     <string name="show_more">Show more…</string>
     <string name="show_less">Show less</string>
 
+    <string name="calendar_previous_month">Previous Month</string>
+    <string name="calendar_next_month">Next Month</string>
+    <string name="calendar_day_mon">Mon</string>
+    <string name="calendar_day_tue">Tue</string>
+    <string name="calendar_day_wed">Wed</string>
+    <string name="calendar_day_thu">Thu</string>
+    <string name="calendar_day_fri">Fri</string>
+    <string name="calendar_day_sat">Sat</string>
+    <string name="calendar_day_sun">Sun</string>
+    <string name="calendar_events_for_date">Events for %1$s</string>
+    <string name="calendar_no_events_on_day">No events on this day.</string>
+
 </resources>
