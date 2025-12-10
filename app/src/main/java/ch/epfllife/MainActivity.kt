@@ -342,11 +342,7 @@ fun App(auth: Auth, db: Db, languageRepository: LanguageRepository) {
                               .getOrNull()
                       settingsEntry?.savedStateHandle?.let(applySelection)
 
-                      val poppedToSettings =
-                          navController.popBackStack(Screen.Settings.route, false)
-                      if (!poppedToSettings) {
-                        navController.popBackStack()
-                      }
+                      navController.popBackStack(Screen.Settings.route, false)
                     })
               }
 
