@@ -17,7 +17,7 @@ sealed interface SelectAssociationUIState {
   data class Success(
       val associations: List<Association>,
       val selectedAssociationId: String? = null,
-      val canAddAssociation: Boolean = false
+      val canAddAssociation: Boolean = false,
   ) : SelectAssociationUIState
 }
 
@@ -28,34 +28,33 @@ class SelectAssociationViewModel(private val db: Db) : ViewModel() {
   val uiState: StateFlow<SelectAssociationUIState> = _uiState
 
   init {
-    loadAssociations()
+    db.assocRepo.listenAll(viewModelScope, ::updateAssociations)
   }
 
-  private fun loadAssociations() {
-    viewModelScope.launch {
-      try {
-        val user = db.userRepo.getCurrentUser()
-        if (user == null) {
-          _uiState.value = SelectAssociationUIState.Error("User not logged in")
-          return@launch
-        }
-
-        val allAssociations = db.assocRepo.getAllAssociations()
-        val filteredAssociations =
-            when (user.role) {
-              UserRole.ADMIN -> allAssociations
-              UserRole.ASSOCIATION_ADMIN ->
-                  allAssociations.filter { user.managedAssociationIds.contains(it.id) }
-              UserRole.USER -> emptyList()
-            }
-
-        _uiState.value =
-            SelectAssociationUIState.Success(
-                associations = filteredAssociations,
-                canAddAssociation = user.role == UserRole.ADMIN)
-      } catch (e: Exception) {
-        _uiState.value = SelectAssociationUIState.Error(e.message ?: "Unknown error")
+  private suspend fun updateAssociations(assocs: List<Association>) {
+    try {
+      val user = db.userRepo.getCurrentUser()
+      if (user == null) {
+        _uiState.value = SelectAssociationUIState.Error("User not logged in")
+        return
       }
+
+      val allAssociations = assocs
+      val filteredAssociations =
+          when (user.role) {
+            UserRole.ADMIN -> allAssociations
+            UserRole.ASSOCIATION_ADMIN ->
+                allAssociations.filter { user.managedAssociationIds.contains(it.id) }
+            UserRole.USER -> emptyList()
+          }
+
+      _uiState.value =
+          SelectAssociationUIState.Success(
+              associations = filteredAssociations,
+              canAddAssociation = user.role == UserRole.ADMIN,
+          )
+    } catch (e: Exception) {
+      _uiState.value = SelectAssociationUIState.Error(e.message ?: "Unknown error")
     }
   }
 
@@ -68,7 +67,7 @@ class SelectAssociationViewModel(private val db: Db) : ViewModel() {
 
   fun reload(onComplete: (() -> Unit)? = null) {
     viewModelScope.launch {
-      loadAssociations()
+      updateAssociations(db.assocRepo.getAllAssociations())
       onComplete?.invoke()
     }
   }
