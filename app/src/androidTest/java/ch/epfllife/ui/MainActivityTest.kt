@@ -139,6 +139,33 @@ class MainActivityTest {
     composeTestRule.assertTagIsDisplayed(SettingsScreenTestTags.MANAGE_EVENTS_BUTTON)
   }
 
+  @Test
+  fun addAssociationFromSelectAssociation_returnsToSettingsScreen() {
+    seedAdminUser()
+    val association = ExampleAssociations.sampleAssociation.copy(name = "Select Flow Assoc")
+
+    composeTestRule.setContent { ThemedApp(auth, db) }
+    composeTestRule.waitForIdle()
+
+    composeTestRule.navigateToTab(Tab.Settings)
+    composeTestRule
+        .onNodeWithTag(SettingsScreenTestTags.SELECT_ASSOCIATION_BUTTON, useUnmergedTree = true)
+        .performClick()
+
+    composeTestRule
+        .onNodeWithTag(SelectAssociationTestTags.ADD_NEW_BUTTON, useUnmergedTree = true)
+        .performClick()
+
+    composeTestRule.enterAssociationForm(association)
+    composeTestRule
+        .onNodeWithTag(AddEditAssociationTestTags.SUBMIT_BUTTON, useUnmergedTree = true)
+        .performScrollTo()
+        .performClick()
+
+    composeTestRule.waitUntilNodeExists(NavigationTestTags.SETTINGS_SCREEN)
+    composeTestRule.assertTagIsDisplayed(SettingsScreenTestTags.MANAGE_ASSOCIATION_BUTTON)
+  }
+
   private fun seedAdminUser() {
     val userRepo = db.userRepo as UserRepositoryLocal
     runBlocking {
