@@ -130,161 +130,204 @@ fun EventDetailsContent(
           .background(MaterialTheme.colorScheme.surface)
           .testTag(EventDetailsTestTags.CONTENT)) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
-          Box(Modifier.fillMaxWidth()) {
-            AsyncImage(
-                model =
-                    ImageRequest.Builder(context)
-                        .data(
-                            event.pictureUrl
-                                ?: "https://www.epfl.ch/campus/services/events/wp-content/uploads/2024/09/WEB_Image-Home-Events_ORGANISER.png")
-                        .crossfade(true)
-                        .build(),
-                contentDescription = "Event Image",
-                modifier =
-                    Modifier.fillMaxWidth()
-                        .height(260.dp)
-                        .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
-                        .testTag(EventDetailsTestTags.EVENT_IMAGE),
-                contentScale = ContentScale.Crop)
-          }
+          EventImage(event.pictureUrl)
 
           Column(
               Modifier.fillMaxWidth().padding(16.dp),
               verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                EventHeader(
+                    title = event.title,
+                    associationName = event.association.name,
+                    price = event.price.toString(),
+                    onAssociationClick = { onAssociationClick(event.association.id) })
 
-                // Title + Association + Price
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                  Column {
-                    Text(
-                        event.title,
-                        style =
-                            MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                        modifier = Modifier.testTag(EventDetailsTestTags.EVENT_TITLE))
-                    Text(
-                        event.association.name,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier =
-                            Modifier.testTag(EventDetailsTestTags.EVENT_ASSOCIATION).clickable {
-                              onAssociationClick(event.association.id)
-                            })
-                  }
-                  Text(
-                      "${event.price}",
-                      style =
-                          MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium),
-                      modifier = Modifier.testTag(EventDetailsTestTags.EVENT_PRICE))
-                }
+                EventDateTimeLocation(
+                    formattedDate = formattedDate,
+                    formattedTime = formattedTime,
+                    formattedLocation = formattedLocation)
 
-                // Date + Time + Location
-                Row(
-                    Modifier.fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
-                        .padding(12.dp)) {
-                      Row(Modifier.weight(1f)) {
-                        Icon(
-                            Icons.Default.CalendarToday,
-                            contentDescription = "Date",
-                        )
-                        Spacer(Modifier.width(8.dp))
-                        Column {
-                          Text(
-                              formattedDate,
-                              style = MaterialTheme.typography.bodyMedium,
-                              modifier = Modifier.testTag(EventDetailsTestTags.EVENT_TIME))
-                          Text(
-                              formattedLocation,
-                              style = MaterialTheme.typography.bodySmall,
-                              maxLines = 3,
-                              overflow = TextOverflow.Ellipsis,
-                              modifier = Modifier.testTag(EventDetailsTestTags.EVENT_LOCATION))
-                        }
-                      }
+                EventDescription(event.description)
 
-                      Spacer(Modifier.width(16.dp))
+                EventMapSection(
+                    location = event.location, onOpenMap = { onOpenMap(event.location) })
 
-                      Row {
-                        Icon(Icons.Default.AccessTime, contentDescription = "Time")
-                        Spacer(Modifier.width(8.dp))
-                        Text(formattedTime, style = MaterialTheme.typography.bodyMedium)
-                      }
-                    }
-
-                // Description
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                  Text(
-                      "Description",
-                      style =
-                          MaterialTheme.typography.titleMedium.copy(
-                              fontWeight = FontWeight.SemiBold),
-                  )
-                  var isExpanded by remember { mutableStateOf(false) }
-                  var showShowMore by remember { mutableStateOf(false) }
-
-                  Text(
-                      event.description,
-                      style = MaterialTheme.typography.bodyMedium,
-                      maxLines = if (isExpanded) Int.MAX_VALUE else 3,
-                      overflow = TextOverflow.Ellipsis,
-                      onTextLayout = { textLayoutResult ->
-                        // check if we have 3 line overflow (otherwise no modification needed)
-                        if (textLayoutResult.hasVisualOverflow) {
-                          showShowMore = true
-                        }
-                      },
-                      modifier = Modifier.testTag(EventDetailsTestTags.EVENT_DESCRIPTION))
-
-                  if (showShowMore) {
-                    Text(
-                        text =
-                            if (isExpanded) stringResource(id = R.string.show_less)
-                            else stringResource(id = R.string.show_more),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.Gray,
-                        modifier = Modifier.clickable { isExpanded = !isExpanded })
-                  }
-                }
-
-                // Map
-                Box(Modifier.fillMaxWidth().height(200.dp).clip(RoundedCornerShape(8.dp))) {
-                  Map(
-                      target = event.location,
-                      enableControls = false,
-                      locationPermissionRequest = {
-                        val granted =
-                            ContextCompat.checkSelfPermission(
-                                context, Manifest.permission.ACCESS_FINE_LOCATION) ==
-                                PackageManager.PERMISSION_GRANTED
-                        it(granted)
-                      },
-                  )
-
-                  Spacer(
-                      Modifier.matchParentSize()
-                          .clickable { onOpenMap(event.location) }
-                          .testTag(EventDetailsTestTags.VIEW_LOCATION_BUTTON))
-                }
-
-                // Enroll Button
-                Button(
-                    onClick = if (isEnrolled) onUnenrollClick else onEnrollClick,
-                    modifier =
-                        Modifier.fillMaxWidth()
-                            .padding(top = 8.dp)
-                            .testTag(EventDetailsTestTags.ENROLL_BUTTON),
-                    shape = RoundedCornerShape(6.dp),
-                    colors =
-                        ButtonDefaults.buttonColors(
-                            containerColor = if (isEnrolled) Color.Gray else LifeRed,
-                            contentColor = Color.White)) {
-                      Text(if (isEnrolled) "Unenroll" else "Enrol in event")
-                    }
+                EventEnrollmentSection(
+                    isEnrolled = isEnrolled,
+                    onEnrollClick = onEnrollClick,
+                    onUnenrollClick = onUnenrollClick)
               }
         }
 
         BackButton(
             modifier = Modifier.align(Alignment.TopStart).testTag(EventDetailsTestTags.BACK_BUTTON),
             onGoBack = onGoBack)
+      }
+}
+
+@Composable
+private fun EventImage(pictureUrl: String?) {
+  val context = LocalContext.current
+  Box(Modifier.fillMaxWidth()) {
+    AsyncImage(
+        model =
+            ImageRequest.Builder(context)
+                .data(
+                    pictureUrl
+                        ?: "https://www.epfl.ch/campus/services/events/wp-content/uploads/2024/09/WEB_Image-Home-Events_ORGANISER.png")
+                .crossfade(true)
+                .build(),
+        contentDescription = "Event Image",
+        modifier =
+            Modifier.fillMaxWidth()
+                .height(260.dp)
+                .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
+                .testTag(EventDetailsTestTags.EVENT_IMAGE),
+        contentScale = ContentScale.Crop)
+  }
+}
+
+@Composable
+private fun EventHeader(
+    title: String,
+    associationName: String,
+    price: String,
+    onAssociationClick: () -> Unit
+) {
+  Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+    Column {
+      Text(
+          title,
+          style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+          modifier = Modifier.testTag(EventDetailsTestTags.EVENT_TITLE))
+      Text(
+          associationName,
+          style = MaterialTheme.typography.bodyMedium,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
+          modifier =
+              Modifier.testTag(EventDetailsTestTags.EVENT_ASSOCIATION).clickable {
+                onAssociationClick()
+              })
+    }
+    Text(
+        price,
+        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium),
+        modifier = Modifier.testTag(EventDetailsTestTags.EVENT_PRICE))
+  }
+}
+
+@Composable
+private fun EventDateTimeLocation(
+    formattedDate: String,
+    formattedTime: String,
+    formattedLocation: String
+) {
+  Row(
+      Modifier.fillMaxWidth()
+          .clip(RoundedCornerShape(8.dp))
+          .background(MaterialTheme.colorScheme.surfaceVariant)
+          .padding(12.dp)) {
+        Row(Modifier.weight(1f)) {
+          Icon(
+              Icons.Default.CalendarToday,
+              contentDescription = "Date",
+          )
+          Spacer(Modifier.width(8.dp))
+          Column {
+            Text(
+                formattedDate,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.testTag(EventDetailsTestTags.EVENT_TIME))
+            Text(
+                formattedLocation,
+                style = MaterialTheme.typography.bodySmall,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.testTag(EventDetailsTestTags.EVENT_LOCATION))
+          }
+        }
+
+        Spacer(Modifier.width(16.dp))
+
+        Row {
+          Icon(Icons.Default.AccessTime, contentDescription = "Time")
+          Spacer(Modifier.width(8.dp))
+          Text(formattedTime, style = MaterialTheme.typography.bodyMedium)
+        }
+      }
+}
+
+@Composable
+private fun EventDescription(description: String) {
+  Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Text(
+        "Description",
+        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+    )
+    var isExpanded by remember { mutableStateOf(false) }
+    var showShowMore by remember { mutableStateOf(false) }
+
+    Text(
+        description,
+        style = MaterialTheme.typography.bodyMedium,
+        maxLines = if (isExpanded) Int.MAX_VALUE else 3,
+        overflow = TextOverflow.Ellipsis,
+        onTextLayout = { textLayoutResult ->
+          if (textLayoutResult.hasVisualOverflow) {
+            showShowMore = true
+          }
+        },
+        modifier = Modifier.testTag(EventDetailsTestTags.EVENT_DESCRIPTION))
+
+    if (showShowMore) {
+      Text(
+          text =
+              if (isExpanded) stringResource(id = R.string.show_less)
+              else stringResource(id = R.string.show_more),
+          style = MaterialTheme.typography.bodySmall,
+          color = Color.Gray,
+          modifier = Modifier.clickable { isExpanded = !isExpanded })
+    }
+  }
+}
+
+@Composable
+private fun EventMapSection(location: Location, onOpenMap: () -> Unit) {
+  val context = LocalContext.current
+  Box(Modifier.fillMaxWidth().height(200.dp).clip(RoundedCornerShape(8.dp))) {
+    Map(
+        target = location,
+        enableControls = false,
+        locationPermissionRequest = {
+          val granted =
+              ContextCompat.checkSelfPermission(
+                  context, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                  PackageManager.PERMISSION_GRANTED
+          it(granted)
+        },
+    )
+
+    Spacer(
+        Modifier.matchParentSize()
+            .clickable { onOpenMap() }
+            .testTag(EventDetailsTestTags.VIEW_LOCATION_BUTTON))
+  }
+}
+
+@Composable
+private fun EventEnrollmentSection(
+    isEnrolled: Boolean,
+    onEnrollClick: () -> Unit,
+    onUnenrollClick: () -> Unit
+) {
+  Button(
+      onClick = if (isEnrolled) onUnenrollClick else onEnrollClick,
+      modifier =
+          Modifier.fillMaxWidth().padding(top = 8.dp).testTag(EventDetailsTestTags.ENROLL_BUTTON),
+      shape = RoundedCornerShape(6.dp),
+      colors =
+          ButtonDefaults.buttonColors(
+              containerColor = if (isEnrolled) Color.Gray else LifeRed,
+              contentColor = Color.White)) {
+        Text(if (isEnrolled) "Unenroll" else "Enrol in event")
       }
 }
