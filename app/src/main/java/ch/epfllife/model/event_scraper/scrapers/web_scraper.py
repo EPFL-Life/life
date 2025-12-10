@@ -136,7 +136,7 @@ class WebScraper(BaseScraper):
     
     def _find_event_elements(self, soup: BeautifulSoup) -> List[Any]:
         """Find event elements using configured CSS selectors"""
-        selectors = self.config.get("selectors", {}).get("event_container", [])
+        selectors = self.config.selectors.event_container
         
         for selector in selectors:
             elements = soup.select(selector)
@@ -226,15 +226,7 @@ class WebScraper(BaseScraper):
             default_value=f"Event organized by {self.source_name}. {title}. Visit event page for details."
         )
     
-    def _create_location_from_element(self, element, is_detailed_page: bool) -> Location:
-        """Create Location object from element"""
-        location_name = self._extract_text_with_selectors(
-            element,
-            self.config.selectors.get("location", is_detailed_page),
-            field_name="location",
-            default_selectors=[".location", ".venue"],
-            default_value="EPFL Campus (check event for exact location)"
-        )
+
         
     def _create_location_from_element(self, element, is_detailed_page: bool) -> Location:
         """Create Location object from element"""
@@ -300,7 +292,7 @@ class WebScraper(BaseScraper):
             elem = element.select_one(selector)
             if elem and elem.text.strip():
                 
-                from config import MAX_FIELD_LENGTHS
+                
                 max_len = MAX_FIELD_LENGTHS.get(field_name, 500)
                 return elem.text.strip()[:max_len]
         
