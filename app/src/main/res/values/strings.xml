@@ -63,6 +63,17 @@
     <string name="calendar_upcoming_events_title">Upcoming Events</string>
     <string name="calendar_no_events_placeholder">No events found</string>
     <string name="calendar_search_hint">Search events</string>
+    <string name="calendar_previous_month">Previous month</string>
+    <string name="calendar_next_month">Next month</string>
+    <string name="calendar_day_mon">Mon</string>
+    <string name="calendar_day_tue">Tue</string>
+    <string name="calendar_day_wed">Wed</string>
+    <string name="calendar_day_thu">Thu</string>
+    <string name="calendar_day_fri">Fri</string>
+    <string name="calendar_day_sat">Sat</string>
+    <string name="calendar_day_sun">Sun</string>
+    <string name="calendar_events_for_date">Events for %1$s</string>
+    <string name="calendar_no_events_on_day">No events on this day.</string>
 
     <!-- Errors -->
     <string name="error_association_not_found">Association not found</string>
@@ -122,6 +133,8 @@
 
     <!-- Extra -->
     <string name="search_bar_placeholder">Search…</string>
+    <string name="show_less">Show less</string>
+    <string name="show_more">Show more</string>
 
     <string name="delete_association_button">Delete Association</string>
     <string name="delete_association_title">Delete Association</string>
