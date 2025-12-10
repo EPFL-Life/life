@@ -31,6 +31,7 @@ object ManageEventsTestTags {
   const val ADD_EVENT_BUTTON = "ManageEvents_AddEventButton"
   const val EMPTY_TEXT = "ManageEvents_EmptyText"
   const val FILTER_TOGGLE = "ManageEvents_FilterToggle"
+  const val BACK_BUTTON = "ManageEvents_BackButton"
 }
 
 @Composable
@@ -137,6 +138,8 @@ fun ManageEventsScreen(
       }
     }
 
-    BackButton(modifier = Modifier.align(Alignment.TopStart), onGoBack = onGoBack)
+    BackButton(
+        modifier = Modifier.align(Alignment.TopStart).testTag(ManageEventsTestTags.BACK_BUTTON),
+        onGoBack = onGoBack)
   }
 }
