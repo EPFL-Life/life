@@ -286,7 +286,13 @@ fun App(
                     db = db,
                     associationId = associationId,
                     onBack = { navController.popBackStack() },
-                    onSubmitSuccess = { navController.popBackStack() })
+                    onSubmitSuccess = { updatedAssociation ->
+                      navController.previousBackStackEntry?.savedStateHandle?.let { handle ->
+                        handle[selectedAssociationIdKey] = updatedAssociation.id
+                        handle[selectedAssociationNameKey] = updatedAssociation.name
+                      }
+                      navController.popBackStack()
+                    })
               }
 
           composable(
