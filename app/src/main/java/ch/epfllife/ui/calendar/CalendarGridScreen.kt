@@ -52,8 +52,6 @@ fun CalendarGridScreen(
     CalendarGrid(
         currentMonth = currentMonth,
         selectedDate = selectedDate,
-        enrolledEventIds =
-            enrolledEventIds, // Pass individual IDs or a way to check, but logic is in VM
         viewModel = viewModel // Passing viewModel for cleaner logic interaction in grid generation
         )
 
@@ -122,32 +120,11 @@ private fun CalendarWeekdayHeader() {
 private fun CalendarGrid(
     currentMonth: java.time.YearMonth,
     selectedDate: java.time.LocalDate,
-    enrolledEventIds: Set<String>,
     viewModel: CalendarGridViewModel
 ) {
-  val daysInMonth = currentMonth.lengthOfMonth()
-  val firstDayOfMonth = currentMonth.atDay(1)
-  val dayOfWeek = firstDayOfMonth.dayOfWeek.value // 1 (Mon) to 7 (Sun)
-  val daysInPreviousMonth = currentMonth.minusMonths(1).lengthOfMonth()
-
-  // Calculate days to display
-  // Previous month days
-  val prevMonthDays =
-      (1 until dayOfWeek).map {
-        currentMonth.minusMonths(1).atDay(daysInPreviousMonth - (dayOfWeek - 1 - it))
-      }
-
-  // Current month days
-  val currentMonthDays = (1..daysInMonth).map { currentMonth.atDay(it) }
-
-  // Next month days
-  // Calculate how many days needed to fill the last row
-  val totalDaysSoFar = prevMonthDays.size + currentMonthDays.size
-  val daysToFillLastRow = (7 - (totalDaysSoFar % 7)) % 7
-  val nextMonthDays = (1..daysToFillLastRow).map { currentMonth.plusMonths(1).atDay(it) }
-
-  val allDays = prevMonthDays + currentMonthDays + nextMonthDays
-  val totalRows = allDays.size / 7
+  val allDays = viewModel.calculateCalendarDays(currentMonth)
+  val totalRows =
+      (allDays.size + 6) / 7 // Ensure we cover all days, though typically it's exact multiples of 7
 
   Column {
     for (row in 0 until totalRows) {
@@ -160,40 +137,13 @@ private fun CalendarGrid(
             val isCurrentMonth = date.month == currentMonth.month
             val hasEnrolledEvents = viewModel.hasEnrolledEventsOnDate(date)
 
-            // this is an circle indicator of the currently selected day
-            Box(
-                modifier =
-                    Modifier.weight(1f)
-                        .aspectRatio(1f)
-                        .padding(4.dp)
-                        .background(
-                            color =
-                                if (isSelected) MaterialTheme.colorScheme.primary
-                                else Color.Transparent,
-                            shape = CircleShape)
-                        .clickable { viewModel.selectDate(date) },
-                contentAlignment = Alignment.Center) {
-                  Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = date.dayOfMonth.toString(),
-                        color =
-                            if (isSelected) Color.White
-                            else if (isCurrentMonth) MaterialTheme.colorScheme.onSurface
-                            else Color.Gray,
-                        style = MaterialTheme.typography.bodyMedium)
-                    if (hasEnrolledEvents) {
-                      Box(
-                          modifier =
-                              Modifier.size(4.dp)
-                                  .background(
-                                      // indicator dot turns white if its on the selected day
-                                      color =
-                                          if (isSelected) Color.White
-                                          else MaterialTheme.colorScheme.primary,
-                                      shape = CircleShape))
-                    }
-                  }
-                }
+            CalendarDayCell(
+                date = date,
+                isSelected = isSelected,
+                isCurrentMonth = isCurrentMonth,
+                hasEnrolledEvents = hasEnrolledEvents,
+                onDateClick = { viewModel.selectDate(it) },
+                modifier = Modifier.weight(1f))
           } else {
             Spacer(modifier = Modifier.weight(1f))
           }
@@ -201,6 +151,45 @@ private fun CalendarGrid(
       }
     }
   }
+}
+
+@Composable
+private fun CalendarDayCell(
+    date: java.time.LocalDate,
+    isSelected: Boolean,
+    isCurrentMonth: Boolean,
+    hasEnrolledEvents: Boolean,
+    onDateClick: (java.time.LocalDate) -> Unit,
+    modifier: Modifier = Modifier
+) {
+  Box(
+      modifier =
+          modifier
+              .aspectRatio(1f)
+              .padding(4.dp)
+              .background(
+                  color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
+                  shape = CircleShape)
+              .clickable { onDateClick(date) },
+      contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+          Text(
+              text = date.dayOfMonth.toString(),
+              color =
+                  if (isSelected) Color.White
+                  else if (isCurrentMonth) MaterialTheme.colorScheme.onSurface else Color.Gray,
+              style = MaterialTheme.typography.bodyMedium)
+          if (hasEnrolledEvents) {
+            Box(
+                modifier =
+                    Modifier.size(4.dp)
+                        .background(
+                            color =
+                                if (isSelected) Color.White else MaterialTheme.colorScheme.primary,
+                            shape = CircleShape))
+          }
+        }
+      }
 }
 
 @Composable
