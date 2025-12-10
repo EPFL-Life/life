@@ -16,9 +16,11 @@ import androidx.test.uiautomator.UiDevice
 import ch.epfllife.ThemedApp
 import ch.epfllife.example_data.ExampleAssociations
 import ch.epfllife.example_data.ExampleEvents
+import ch.epfllife.example_data.ExampleUsers
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.authentication.SignInResult
 import ch.epfllife.model.db.Db
+import ch.epfllife.model.user.UserRepositoryLocal
 import ch.epfllife.ui.admin.AddEditEventTestTags
 import ch.epfllife.ui.admin.ManageEventsTestTags
 import ch.epfllife.ui.admin.SelectAssociationTestTags
@@ -50,6 +52,11 @@ class AdminEndToEndTest {
     runBlocking {
       db.assocRepo.createAssociation(ExampleAssociations.association2)
       db.eventRepo.createEvent(ExampleEvents.event2)
+
+      // Setup Admin User
+      val userRepo = db.userRepo as UserRepositoryLocal
+      userRepo.createUser(ExampleUsers.adminUser)
+      userRepo.simulateLogin(ExampleUsers.adminUser.id)
     }
   }
 

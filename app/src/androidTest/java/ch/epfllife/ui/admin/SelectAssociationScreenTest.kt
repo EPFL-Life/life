@@ -5,12 +5,12 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import ch.epfllife.example_data.ExampleAssociations
+import ch.epfllife.example_data.ExampleUsers
 import ch.epfllife.model.association.Association
-import ch.epfllife.model.association.AssociationRepository
 import ch.epfllife.model.db.Db
-import ch.epfllife.model.event.Event
+import ch.epfllife.model.user.UserRole
 import ch.epfllife.ui.theme.Theme
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -24,7 +24,8 @@ class SelectAssociationScreenTest {
   @Test
   fun displaysAssociationsFromRepository() {
     val db =
-        fakeDbWithAssociations(ExampleAssociations.association1, ExampleAssociations.association2)
+        fakeDbWithAssociationsAndRole(
+            UserRole.ADMIN, ExampleAssociations.association1, ExampleAssociations.association2)
 
     composeTestRule.setContent {
       Theme {
@@ -48,7 +49,8 @@ class SelectAssociationScreenTest {
   @Test
   fun selectingAssociationCallsBackWithCorrectData() {
     val db =
-        fakeDbWithAssociations(ExampleAssociations.association1, ExampleAssociations.association2)
+        fakeDbWithAssociationsAndRole(
+            UserRole.ADMIN, ExampleAssociations.association1, ExampleAssociations.association2)
     var selectedAssociation: Association? = null
 
     composeTestRule.setContent {
@@ -72,15 +74,9 @@ class SelectAssociationScreenTest {
     assertEquals(ExampleAssociations.association2.id, selectedAssociation?.id)
   }
 
-  private fun fakeDbWithAssociations(vararg associations: Association): Db {
-    val baseDb = Db.freshLocal()
-    val fakeRepo = FakeAssociationRepository(associations.toList())
-    return baseDb.copy(assocRepo = fakeRepo)
-  }
-
   @Test
   fun addNewAssociationButtonInvokesCallback() {
-    val db = fakeDbWithAssociations(ExampleAssociations.association1)
+    val db = fakeDbWithAssociationsAndRole(UserRole.ADMIN, ExampleAssociations.association1)
     var addNewClicked = false
 
     composeTestRule.setContent {
@@ -99,34 +95,50 @@ class SelectAssociationScreenTest {
 
     Assert.assertTrue(addNewClicked)
   }
-}
 
-private class FakeAssociationRepository(
-    private val associations: List<Association>,
-) : AssociationRepository {
+  @Test
+  fun addNewAssociationButtonVisibleForAdmin() {
+    val db = fakeDbWithAssociationsAndRole(UserRole.ADMIN, ExampleAssociations.association1)
+    composeTestRule.setContent {
+      Theme {
+        SelectAssociationScreen(
+            db = db, onGoBack = {}, onAssociationSelected = {}, onAddNewAssociation = {})
+      }
+    }
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag(SelectAssociationTestTags.ADD_NEW_BUTTON).assertIsDisplayed()
+  }
 
-  override suspend fun getAllAssociations(): List<Association> = associations
+  @Test
+  fun addNewAssociationButtonHiddenForNonAdmin() {
+    val db = fakeDbWithAssociationsAndRole(UserRole.USER, ExampleAssociations.association1)
+    composeTestRule.setContent {
+      Theme {
+        SelectAssociationScreen(
+            db = db, onGoBack = {}, onAssociationSelected = {}, onAddNewAssociation = {})
+      }
+    }
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag(SelectAssociationTestTags.ADD_NEW_BUTTON).assertDoesNotExist()
+  }
 
-  override suspend fun getAssociation(associationId: String): Association? =
-      associations.firstOrNull { it.id == associationId }
+  private fun fakeDbWithAssociationsAndRole(role: UserRole, vararg associations: Association): Db {
+    val db = Db.freshLocal()
+    val assocRepo = db.assocRepo as ch.epfllife.model.association.AssociationRepositoryLocal
+    val userRepo = db.userRepo as ch.epfllife.model.user.UserRepositoryLocal
 
-  override fun getNewUid(): String = "fake-id"
+    runBlocking {
+      associations.forEach { assocRepo.createAssociation(it) }
 
-  override suspend fun createAssociation(association: Association): Result<Unit> =
-      Result.failure(UnsupportedOperationException("Not needed"))
-
-  override suspend fun deleteAssociation(associationId: String): Result<Unit> =
-      Result.failure(UnsupportedOperationException("Not needed"))
-
-  override suspend fun updateAssociation(
-      associationId: String,
-      newAssociation: Association,
-  ): Result<Unit> = Result.failure(UnsupportedOperationException("Not needed"))
-
-  override suspend fun getEventsForAssociation(associationId: String): Result<List<Event>> =
-      Result.success(emptyList())
-
-  override fun listenAll(scope: CoroutineScope, onChange: suspend (List<Association>) -> Unit) {
-    throw UnsupportedOperationException("Not needed")
+      val user =
+          when (role) {
+            UserRole.ADMIN -> ExampleUsers.adminUser
+            UserRole.ASSOCIATION_ADMIN -> ExampleUsers.associationAdminUser
+            else -> ExampleUsers.user1
+          }
+      userRepo.createUser(user)
+      userRepo.simulateLogin(user.id)
+    }
+    return db
   }
 }
