@@ -121,6 +121,8 @@
 
 
     <!-- Extra -->
-    <string name="search_bar_placeholder">Search...</string>
+    <string name="search_bar_placeholder">Search…</string>
+    <string name="show_more">Show more…</string>
+    <string name="show_less">Show less</string>
 
 </resources>
