@@ -145,3 +145,54 @@ private fun InfoItem(
         color = MaterialTheme.colorScheme.onSurfaceVariant)
   }
 }
+
+@Composable
+fun CompactEventCard(
+    event: Event,
+    isEnrolled: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+  Card(
+      onClick = onClick,
+      shape = RoundedCornerShape(12.dp),
+      elevation = CardDefaults.elevatedCardElevation(2.dp),
+      modifier = modifier.fillMaxWidth().testTag(EventCardTestTags.getEventCardTestTag(event.id))) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween) {
+              Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = event.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold)
+                Text(
+                    text = event.association.name,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+              }
+
+              Spacer(modifier = Modifier.width(8.dp))
+
+              Column(horizontalAlignment = Alignment.End) {
+                if (isEnrolled) {
+                  Box(
+                      modifier =
+                          Modifier.background(color = Enrolled, shape = RoundedCornerShape(6.dp))
+                              .padding(horizontal = 8.dp, vertical = 3.dp)) {
+                        Text(
+                            text = stringResource(R.string.home_enrolled_events),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White)
+                      }
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = event.price.formatPrice(),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+              }
+            }
+      }
+}

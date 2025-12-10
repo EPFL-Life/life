@@ -1,13 +1,21 @@
 package ch.epfllife.ui.calendar
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -20,6 +28,7 @@ import ch.epfllife.ui.composables.DisplayedSubscriptionFilter
 import ch.epfllife.ui.composables.EPFLLogo
 import ch.epfllife.ui.composables.ListView
 import ch.epfllife.ui.composables.SearchBar
+import ch.epfllife.ui.home.HomeScreenTestTags
 import ch.epfllife.ui.home.HomeViewModel
 import ch.epfllife.ui.navigation.NavigationTestTags
 import java.time.LocalDate
@@ -70,6 +79,8 @@ fun CalendarScreen(
             "${date.month.getDisplayName(TextStyle.FULL, Locale.getDefault())} ${date.year}"
           }
 
+  var isGridView by remember { mutableStateOf(false) }
+
   Column(
       modifier =
           modifier
@@ -82,38 +93,51 @@ fun CalendarScreen(
 
     Spacer(Modifier.height(12.dp))
 
-    SearchBar(query = query, onQueryChange = { query = it })
+      IconButton(
+          onClick = { isGridView = !isGridView }, modifier = Modifier.align(Alignment.CenterEnd)) {
+            Icon(
+                imageVector = if (isGridView) Icons.Default.List else Icons.Default.DateRange,
+                contentDescription =
+                    if (isGridView) "Switch to List View" else "Switch to Grid View")
+          }
+    }
 
-    Spacer(Modifier.height(12.dp))
+    if (isGridView) {
+      CalendarGridScreen(db = db, onEventClick = onEventClick)
+    } else {
+      SearchBar(query = query, onQueryChange = { query = it })
 
-    DisplayedSubscriptionFilter(
-        selected = selected,
-        onSelected = { selected = it },
-        subscribedLabel = stringResource(id = R.string.calendar_filter_enrolled),
-        allLabel = stringResource(id = R.string.calendar_filter_all_events),
-    )
+      Spacer(Modifier.height(12.dp))
 
-    Spacer(Modifier.height(12.dp))
+      DisplayedSubscriptionFilter(
+          selected = selected,
+          onSelected = { selected = it },
+          subscribedLabel = stringResource(id = R.string.calendar_filter_enrolled),
+          allLabel = stringResource(id = R.string.calendar_filter_all_events),
+      )
 
-    ListView(
-        list = grouped.toList(),
-        emptyTitle = stringResource(id = R.string.calendar_no_events_placeholder),
-        onRefresh = { signalFinished -> viewModel.refresh(signalFinished) },
-    ) { list ->
-      list.forEach { (month, events) ->
-        item {
-          Text(
-              text = month,
-              style = MaterialTheme.typography.titleMedium,
-              modifier =
-                  Modifier.padding(vertical = 8.dp)
-                      .align(Alignment.Start)
-                      .testTag(CalendarTestTags.MONTH_HEADER),
-          )
-        }
+      Spacer(Modifier.height(12.dp))
 
-        items(events, key = { it.id }) { event ->
-          CalendarCard(event = event, onClick = { onEventClick(event.id) })
+      ListView(
+          list = grouped.toList(),
+          emptyTitle = stringResource(id = R.string.calendar_no_events_placeholder),
+          onRefresh = { signalFinished -> viewModel.refresh(signalFinished) },
+      ) { list ->
+        list.forEach { (month, events) ->
+          item {
+            Text(
+                text = month,
+                style = MaterialTheme.typography.titleMedium,
+                modifier =
+                    Modifier.padding(vertical = 8.dp)
+                        .align(Alignment.Start)
+                        .testTag(CalendarTestTags.MONTH_HEADER),
+            )
+          }
+
+          items(events, key = { it.id }) { event ->
+            CalendarCard(event = event, onClick = { onEventClick(event.id) })
+          }
         }
       }
     }
