@@ -25,7 +25,7 @@ class AssociationCardTest {
   fun isClickable() {
     composeTestRule.assertClickable(
         { clickHandler -> AssociationCard(association, onClick = clickHandler) },
-        AssociationCardTestTags.ASSOCIATION_CARD,
+        AssociationCardTestTags.getAssociationCardTestTag(association.id),
     )
   }
 

@@ -24,8 +24,6 @@ import ch.epfllife.ui.composables.SettingsButton
 object SelectAssociationTestTags {
   const val ASSOCIATION_LIST = "SelectAssociation_AssociationList"
   const val ADD_NEW_BUTTON = "SelectAssociation_AddNewButton"
-
-  fun associationCard(id: String) = "SelectAssociation_Card_$id"
 }
 
 @Composable
@@ -91,7 +89,6 @@ fun SelectAssociationScreen(
                 associations.forEach { association ->
                   AssociationCard(
                       association = association,
-                      testTag = SelectAssociationTestTags.associationCard(association.id),
                       onClick = {
                         viewModel.selectAssociation(association.id)
                         onAssociationSelected(association)
