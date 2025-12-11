@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.credentials.CredentialManager
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -43,6 +44,7 @@ import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.navigation.Screen
 import ch.epfllife.ui.navigation.Tab
 import ch.epfllife.ui.settings.SettingsScreen
+import ch.epfllife.ui.settings.SettingsViewModel
 import ch.epfllife.ui.theme.Theme
 import com.google.firebase.Firebase
 import com.google.firebase.database.database
@@ -202,6 +204,7 @@ fun App(
           composable(Screen.Settings.route) {
             SettingsScreen(
                 auth = auth,
+                viewModel = viewModel { SettingsViewModel(auth, db) },
                 onSignedOut = { navigationActions.navigateTo(Screen.SignIn) },
                 onAdminConsoleClick = { navigationActions.navigateToAssociationAdmin() })
           }
