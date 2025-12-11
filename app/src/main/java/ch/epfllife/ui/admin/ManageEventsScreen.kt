@@ -4,6 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.FilterAlt
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,6 +30,7 @@ object ManageEventsTestTags {
   const val TITLE = "ManageEvents_Title"
   const val ADD_EVENT_BUTTON = "ManageEvents_AddEventButton"
   const val EMPTY_TEXT = "ManageEvents_EmptyText"
+  const val FILTER_TOGGLE = "ManageEvents_FilterToggle"
 }
 
 @Composable
@@ -75,18 +78,39 @@ fun ManageEventsScreen(
         }
 
         is ManageEventsUIState.Success -> {
-          val events = (uiState as ManageEventsUIState.Success).events
-          val enrolledEventsIds = (uiState as ManageEventsUIState.Success).enrolledEvents
+          val successState = uiState as ManageEventsUIState.Success
+          val events = successState.events
+          val enrolledEventsIds = successState.enrolledEvents
+          val isFutureFilterEnabled = successState.isFutureFilterEnabled
+
           Column(
               modifier =
                   Modifier.fillMaxWidth()
                       .verticalScroll(rememberScrollState())
                       .padding(top = 72.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
               verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(
-                    text = stringResource(R.string.manage_events_title),
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                    modifier = Modifier.testTag(ManageEventsTestTags.TITLE))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically) {
+                      Text(
+                          text = stringResource(R.string.manage_events_title),
+                          style =
+                              MaterialTheme.typography.titleLarge.copy(
+                                  fontWeight = FontWeight.Bold),
+                          modifier = Modifier.testTag(ManageEventsTestTags.TITLE))
+                      IconButton(
+                          onClick = { viewModel.toggleFutureFilter() },
+                          modifier = Modifier.testTag(ManageEventsTestTags.FILTER_TOGGLE)) {
+                            Icon(
+                                imageVector = Icons.Outlined.FilterAlt,
+                                contentDescription =
+                                    stringResource(R.string.toggle_future_events_filter),
+                                tint =
+                                    if (isFutureFilterEnabled) MaterialTheme.colorScheme.primary
+                                    else MaterialTheme.colorScheme.onSurfaceVariant)
+                          }
+                    }
                 HorizontalDivider()
 
                 SettingsButton(
