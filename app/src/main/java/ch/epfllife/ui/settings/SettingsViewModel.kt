@@ -35,4 +35,23 @@ class SettingsViewModel(private val auth: Auth, private val db: Db) : ViewModel(
     auth.signOut()
     mutUiState.value = mutUiState.value.copy(signInState = SignInState.SignedOut)
   }
+
+  fun deleteAssociation(
+      associationId: String,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    viewModelScope.launch {
+      try {
+        val result = db.assocRepo.deleteAssociation(associationId)
+        if (result.isSuccess) {
+          onSuccess()
+        } else {
+          onFailure(Exception("Failed to delete association"))
+        }
+      } catch (e: Exception) {
+        onFailure(e)
+      }
+    }
+  }
 }
