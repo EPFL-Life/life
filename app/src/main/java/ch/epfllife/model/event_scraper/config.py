@@ -13,6 +13,7 @@ FIRESTORE_COLLECTIONS = {
     "USERS": "users"
 }
 
+
 # Request configuration
 REQUEST_TIMEOUT = 30
 REQUEST_HEADERS = {
