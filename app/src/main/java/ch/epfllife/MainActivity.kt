@@ -57,20 +57,23 @@ private const val selectedAssociationNameKey = "selectedAssociationName"
 
 class MainActivity : ComponentActivity() {
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-    // Keep cached data across app restarts
-    Firebase.database.setPersistenceEnabled(true)
-    setContent {
-      ThemedApp(auth = Auth(CredentialManager.create(LocalContext.current)), db = Db.firestore)
+        // Keep cached data across app restarts
+        Firebase.database.setPersistenceEnabled(true)
+        setContent {
+            ThemedApp(
+                auth = Auth(CredentialManager.create(LocalContext.current)),
+                db = Db.firestore
+            )
+        }
     }
-  }
 }
 
 @Composable
 fun ThemedApp(auth: Auth, db: Db) {
-  Theme { Surface(modifier = Modifier.fillMaxSize()) { App(auth, db) } }
+    Theme { Surface(modifier = Modifier.fillMaxSize()) { App(auth, db) } }
 }
 
 /**
@@ -84,153 +87,155 @@ fun App(
     auth: Auth,
     db: Db,
 ) {
-  val navController = rememberNavController()
-  val navigationActions = NavigationActions(navController)
-  val startDestination =
-      if (auth.auth.currentUser == null) Screen.SignIn.route else Screen.HomeScreen.route
+    val navController = rememberNavController()
+    val navigationActions = NavigationActions(navController)
+    val startDestination =
+        if (auth.auth.currentUser == null) Screen.SignIn.route else Screen.HomeScreen.route
 
-  // keep the current destination of the nav
-  val backStackEntry by navController.currentBackStackEntryAsState()
-  val currentRoute = backStackEntry?.destination?.route
+    // keep the current destination of the nav
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = backStackEntry?.destination?.route
 
-  // list with all the tabs available
-  val allTabs = Tab.tabs
+    // list with all the tabs available
+    val allTabs = Tab.tabs
 
-  // we obtain the current Tab, if we don't find the route, will be redirected to the HomeScreen
-  val selectedTab =
-      remember(currentRoute) {
-        allTabs.firstOrNull { it.destination.route == currentRoute } ?: Tab.HomeScreen
-      }
-
-  val showBottomBar =
-      when (currentRoute) {
-        Screen.HomeScreen.route,
-        Screen.AssociationBrowser.route,
-        Screen.Calendar.route,
-        Screen.Settings.route -> true
-
-        else -> false
-      }
-
-  Scaffold(
-      bottomBar = {
-        if (showBottomBar) {
-          BottomNavigationMenu(
-              selectedTab = selectedTab,
-              onTabSelected = { tab -> navigationActions.navigateTo(tab.destination) },
-              modifier = Modifier.testTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU),
-          )
+    // we obtain the current Tab, if we don't find the route, will be redirected to the HomeScreen
+    val selectedTab =
+        remember(currentRoute) {
+            allTabs.firstOrNull { it.destination.route == currentRoute } ?: Tab.HomeScreen
         }
-      }) { innerPadding ->
+
+    val showBottomBar =
+        when (currentRoute) {
+            Screen.HomeScreen.route,
+            Screen.AssociationBrowser.route,
+            Screen.Calendar.route,
+            Screen.Settings.route -> true
+
+            else -> false
+        }
+
+    Scaffold(
+        bottomBar = {
+            if (showBottomBar) {
+                BottomNavigationMenu(
+                    selectedTab = selectedTab,
+                    onTabSelected = { tab -> navigationActions.navigateTo(tab.destination) },
+                    modifier = Modifier.testTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU),
+                )
+            }
+        }) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = startDestination,
             modifier = Modifier.padding(innerPadding),
         ) {
-          composable(Screen.SignIn.route) {
-            SignInScreen(
-                auth = auth,
-                onSignedIn = { navigationActions.navigateTo(Screen.HomeScreen) },
-            )
-          }
+            composable(Screen.SignIn.route) {
+                SignInScreen(
+                    auth = auth,
+                    onSignedIn = { navigationActions.navigateTo(Screen.HomeScreen) },
+                )
+            }
 
-          // pass navigation callback to HomeScreen
-          composable(Screen.HomeScreen.route) {
-            HomeScreen(
-                onEventClick = { id -> navigationActions.navigateToEventDetails(id) }, db = db)
-          }
+            // pass navigation callback to HomeScreen
+            composable(Screen.HomeScreen.route) {
+                HomeScreen(
+                    onEventClick = { id -> navigationActions.navigateToEventDetails(id) }, db = db
+                )
+            }
 
-          composable(Screen.AssociationBrowser.route) {
-            AssociationBrowser(
-                onAssociationClick = { associationId ->
-                  navigationActions.navigateToAssociationDetails(associationId)
-                },
-                db = db,
-            )
-          }
+            composable(Screen.AssociationBrowser.route) {
+                AssociationBrowser(
+                    onAssociationClick = { associationId ->
+                        navigationActions.navigateToAssociationDetails(associationId)
+                    },
+                    db = db,
+                )
+            }
 
-          composable(Screen.Calendar.route) {
-            CalendarScreen(
-                onEventClick = { eventId -> navigationActions.navigateToEventDetails(eventId) },
-                db = db,
-            )
-          }
+            composable(Screen.Calendar.route) {
+                CalendarScreen(
+                    onEventClick = { eventId -> navigationActions.navigateToEventDetails(eventId) },
+                    db = db,
+                )
+            }
 
-          composable(
-              route = Screen.AssociationDetails.route + "/{associationId}",
-              arguments = listOf(navArgument("associationId") { type = NavType.StringType }),
-          ) { backStackEntry ->
-            val associationId = backStackEntry.arguments?.getString("associationId") ?: ""
-            AssociationDetailsScreen(
-                associationId = associationId,
-                onGoBack = { navController.popBackStack() },
-                onEventClick = { id -> navigationActions.navigateToEventDetails(id) },
-                db = db,
-            )
-          }
+            composable(
+                route = Screen.AssociationDetails.route + "/{associationId}",
+                arguments = listOf(navArgument("associationId") { type = NavType.StringType }),
+            ) { backStackEntry ->
+                val associationId = backStackEntry.arguments?.getString("associationId") ?: ""
+                AssociationDetailsScreen(
+                    associationId = associationId,
+                    onGoBack = { navController.popBackStack() },
+                    onEventClick = { id -> navigationActions.navigateToEventDetails(id) },
+                    db = db,
+                )
+            }
 
-          // Event details route
-          composable(
-              route = Screen.EventDetails.route + "/{eventId}",
-              arguments = listOf(navArgument("eventId") { type = NavType.StringType }),
-          ) { backStackEntry ->
-            val eventId =
-                backStackEntry.arguments?.getString("eventId")
-                    ?: error("eventId is required for EventDetails screen")
-            EventDetailsScreen(
-                eventId = eventId,
-                onGoBack = { navigationActions.goBack() },
-                onOpenMap = { location ->
-                  val encodedLocation = Uri.encode(Json.encodeToString(location))
-                  navigationActions.navigateToScreenWithId(Screen.Map, encodedLocation)
-                },
-                onAssociationClick = { associationId ->
-                  navigationActions.navigateToAssociationDetails(associationId)
-                },
-                db = db,
-            )
-          }
+            // Event details route
+            composable(
+                route = Screen.EventDetails.route + "/{eventId}",
+                arguments = listOf(navArgument("eventId") { type = NavType.StringType }),
+            ) { backStackEntry ->
+                val eventId =
+                    backStackEntry.arguments?.getString("eventId")
+                        ?: error("eventId is required for EventDetails screen")
+                EventDetailsScreen(
+                    eventId = eventId,
+                    onGoBack = { navigationActions.goBack() },
+                    onOpenMap = { location ->
+                        val encodedLocation = Uri.encode(Json.encodeToString(location))
+                        navigationActions.navigateToScreenWithId(Screen.Map, encodedLocation)
+                    },
+                    onAssociationClick = { associationId ->
+                        navigationActions.navigateToAssociationDetails(associationId)
+                    },
+                    db = db,
+                )
+            }
 
-          composable(
-              route = Screen.Map.route + "/{location}",
-              arguments = listOf(navArgument("location") { type = NavType.StringType }),
-          ) { backStackEntry ->
-            val encodedLocation =
-                backStackEntry.arguments?.getString("location")
-                    ?: error("eventId is required for EventDetails screen")
-            val location = Json.decodeFromString<Location>(encodedLocation)
-            MapScreen(location = location, onGoBack = { navigationActions.goBack() })
-          }
+            composable(
+                route = Screen.Map.route + "/{location}",
+                arguments = listOf(navArgument("location") { type = NavType.StringType }),
+            ) { backStackEntry ->
+                val encodedLocation =
+                    backStackEntry.arguments?.getString("location")
+                        ?: error("eventId is required for EventDetails screen")
+                val location = Json.decodeFromString<Location>(encodedLocation)
+                MapScreen(location = location, onGoBack = { navigationActions.goBack() })
+            }
 
-          composable(Screen.Settings.route) {
-            SettingsScreen(
-                auth = auth,
-                viewModel = viewModel { SettingsViewModel(auth, db) },
-                onSignedOut = { navigationActions.navigateTo(Screen.SignIn) },
-                onAdminConsoleClick = { navigationActions.navigateToAssociationAdmin() })
-          }
+            composable(Screen.Settings.route) {
+                SettingsScreen(
+                    auth = auth,
+                    viewModel = viewModel { SettingsViewModel(auth, db) },
+                    onSignedOut = { navigationActions.navigateTo(Screen.SignIn) },
+                    onAdminConsoleClick = { navigationActions.navigateToAssociationAdmin() })
+            }
 
-          // this composable is a bit chunky but it keeps the complexity low so this is preferable
-          composable(
-              route = Screen.AssociationAdmin.route,
-              arguments =
-                  listOf(
-                      navArgument(Screen.AssociationAdmin.ARG_ASSOCIATION_ID) {
-                        type = NavType.StringType
-                        nullable = true
-                        defaultValue = null
-                      })) { backStackEntry ->
+            // this composable is a bit chunky but it keeps the complexity low so this is preferable
+            composable(
+                route = Screen.AssociationAdmin.route,
+                arguments =
+                    listOf(
+                        navArgument(Screen.AssociationAdmin.ARG_ASSOCIATION_ID) {
+                            type = NavType.StringType
+                            nullable = true
+                            defaultValue = null
+                        })
+            ) { backStackEntry ->
                 val argAssociationId =
                     backStackEntry.arguments?.getString(Screen.AssociationAdmin.ARG_ASSOCIATION_ID)
 
                 val selectedAssociationId by
-                    backStackEntry.savedStateHandle
-                        .getStateFlow(selectedAssociationIdKey, null as String?)
-                        .collectAsState()
+                backStackEntry.savedStateHandle
+                    .getStateFlow(selectedAssociationIdKey, null as String?)
+                    .collectAsState()
                 val selectedAssociationName by
-                    backStackEntry.savedStateHandle
-                        .getStateFlow(selectedAssociationNameKey, null as String?)
-                        .collectAsState()
+                backStackEntry.savedStateHandle
+                    .getStateFlow(selectedAssociationNameKey, null as String?)
+                    .collectAsState()
 
                 val finalAssociationId = selectedAssociationId ?: argAssociationId
 
@@ -240,75 +245,88 @@ fun App(
                     associationId = finalAssociationId,
                     associationName = selectedAssociationName,
                     onSelectAssociationClick = {
-                      navigationActions.navigateTo(Screen.SelectAssociation)
+                        navigationActions.navigateTo(Screen.SelectAssociation)
                     },
                     onManageAssociationClick = { id ->
-                      navigationActions.navigateToAddEditAssociation(id)
+                        navigationActions.navigateToAddEditAssociation(id)
                     },
                     onManageAssociationEventsClick = { id ->
-                      navigationActions.navigateToManageEvents(id)
+                        navigationActions.navigateToManageEvents(id)
                     },
                     onAssociationDeleted = {
-                      // Clear selection -> automatic update so we dont get double deletes
-                      backStackEntry.savedStateHandle.set(selectedAssociationIdKey, null as String?)
-                      backStackEntry.savedStateHandle.set(
-                          selectedAssociationNameKey, null as String?)
+                        // Clear selection -> automatic update so we dont get double deletes
+                        backStackEntry.savedStateHandle.set(
+                            selectedAssociationIdKey,
+                            null as String?
+                        )
+                        backStackEntry.savedStateHandle.set(
+                            selectedAssociationNameKey, null as String?
+                        )
                     },
                     onGoBack = { navigationActions.goBack() })
-              }
+            }
 
-          composable(Screen.SelectAssociation.route) {
-            SelectAssociationScreen(
-                db = db,
-                onGoBack = { navController.popBackStack() },
-                onAssociationSelected = { association ->
-                  val previousEntry = navController.previousBackStackEntry
-                  previousEntry?.savedStateHandle?.set(selectedAssociationIdKey, association.id)
-                  previousEntry?.savedStateHandle?.set(selectedAssociationNameKey, association.name)
-                  navController.popBackStack()
-                },
-                onAddNewAssociation = { navigationActions.navigateToAddEditAssociation() })
-          }
+            composable(Screen.SelectAssociation.route) {
+                SelectAssociationScreen(
+                    db = db,
+                    onGoBack = { navController.popBackStack() },
+                    onAssociationSelected = { association ->
+                        val previousEntry = navController.previousBackStackEntry
+                        previousEntry?.savedStateHandle?.set(
+                            selectedAssociationIdKey,
+                            association.id
+                        )
+                        previousEntry?.savedStateHandle?.set(
+                            selectedAssociationNameKey,
+                            association.name
+                        )
+                        navController.popBackStack()
+                    },
+                    onAddNewAssociation = { navigationActions.navigateToAddEditAssociation() })
+            }
 
-          composable(
-              route = Screen.AddEditAssociation.route,
-              arguments =
-                  listOf(
-                      navArgument(Screen.AddEditAssociation.ASSOCIATION_ID_ARG) {
-                        type = NavType.StringType
-                        nullable = true
-                        defaultValue = null
-                      })) { backStackEntry ->
+            composable(
+                route = Screen.AddEditAssociation.route,
+                arguments =
+                    listOf(
+                        navArgument(Screen.AddEditAssociation.ASSOCIATION_ID_ARG) {
+                            type = NavType.StringType
+                            nullable = true
+                            defaultValue = null
+                        })
+            ) { backStackEntry ->
                 val associationId =
                     backStackEntry.arguments?.getString(
-                        Screen.AddEditAssociation.ASSOCIATION_ID_ARG)
+                        Screen.AddEditAssociation.ASSOCIATION_ID_ARG
+                    )
 
                 AddEditAssociationScreen(
                     db = db,
                     associationId = associationId,
                     onBack = { navController.popBackStack() },
                     onSubmitSuccess = { updatedAssociation ->
-                      val applySelection: (SavedStateHandle) -> Unit = { handle ->
-                        handle[selectedAssociationIdKey] = updatedAssociation.id
-                        handle[selectedAssociationNameKey] = updatedAssociation.name
-                      }
-                      navController.previousBackStackEntry?.savedStateHandle?.let(applySelection)
-                      val settingsEntry = run {
-                        navController.getBackStackEntry(Screen.Settings.route)
-                      }
-                      settingsEntry.savedStateHandle.let(applySelection)
+                        val applySelection: (SavedStateHandle) -> Unit = { handle ->
+                            handle[selectedAssociationIdKey] = updatedAssociation.id
+                            handle[selectedAssociationNameKey] = updatedAssociation.name
+                        }
+                        navController.previousBackStackEntry?.savedStateHandle?.let(applySelection)
+                        val settingsEntry = run {
+                            navController.getBackStackEntry(Screen.Settings.route)
+                        }
+                        settingsEntry.savedStateHandle.let(applySelection)
 
-                      navController.popBackStack(Screen.Settings.route, false)
+                        navController.popBackStack(Screen.AssociationAdmin.route, false)
                     })
-              }
+            }
 
-          composable(
-              route = Screen.ManageEvents.route,
-              arguments =
-                  listOf(
-                      navArgument(Screen.ManageEvents.ARG_ASSOCIATION_ID) {
-                        type = NavType.StringType
-                      })) { backStackEntry ->
+            composable(
+                route = Screen.ManageEvents.route,
+                arguments =
+                    listOf(
+                        navArgument(Screen.ManageEvents.ARG_ASSOCIATION_ID) {
+                            type = NavType.StringType
+                        })
+            ) { backStackEntry ->
                 val associationId =
                     backStackEntry.arguments?.getString(Screen.ManageEvents.ARG_ASSOCIATION_ID)
                         ?: ""
@@ -319,17 +337,18 @@ fun App(
                     onGoBack = { navigationActions.goBack() },
                     onAddNewEvent = { navigationActions.navigateToAddEditEvent(associationId) },
                     onEditEvent = { eventId ->
-                      navigationActions.navigateToAddEditEvent(associationId, eventId)
+                        navigationActions.navigateToAddEditEvent(associationId, eventId)
                     })
-              }
+            }
 
-          composable(
-              route = Screen.AddEditEvent.ROUTE_ADD,
-              arguments =
-                  listOf(
-                      navArgument(Screen.AddEditEvent.ARG_ASSOCIATION_ID) {
-                        type = NavType.StringType
-                      })) { backStackEntry ->
+            composable(
+                route = Screen.AddEditEvent.ROUTE_ADD,
+                arguments =
+                    listOf(
+                        navArgument(Screen.AddEditEvent.ARG_ASSOCIATION_ID) {
+                            type = NavType.StringType
+                        })
+            ) { backStackEntry ->
                 val associationId =
                     backStackEntry.arguments?.getString(Screen.AddEditEvent.ARG_ASSOCIATION_ID)
                         ?: ""
@@ -341,21 +360,22 @@ fun App(
                     onBack = { navigationActions.goBack() },
                     onSubmitSuccess = { navigationActions.goBack() },
                     onPreviewLocation = { location ->
-                      val encoded = Uri.encode(Json.encodeToString(location))
-                      navigationActions.navigateToScreenWithId(Screen.Map, encoded)
+                        val encoded = Uri.encode(Json.encodeToString(location))
+                        navigationActions.navigateToScreenWithId(Screen.Map, encoded)
                     })
-              }
+            }
 
-          composable(
-              route = Screen.AddEditEvent.ROUTE_EDIT,
-              arguments =
-                  listOf(
-                      navArgument(Screen.AddEditEvent.ARG_ASSOCIATION_ID) {
-                        type = NavType.StringType
-                      },
-                      navArgument(Screen.AddEditEvent.ARG_EVENT_ID) {
-                        type = NavType.StringType
-                      })) { backStackEntry ->
+            composable(
+                route = Screen.AddEditEvent.ROUTE_EDIT,
+                arguments =
+                    listOf(
+                        navArgument(Screen.AddEditEvent.ARG_ASSOCIATION_ID) {
+                            type = NavType.StringType
+                        },
+                        navArgument(Screen.AddEditEvent.ARG_EVENT_ID) {
+                            type = NavType.StringType
+                        })
+            ) { backStackEntry ->
                 val associationId =
                     backStackEntry.arguments?.getString(Screen.AddEditEvent.ARG_ASSOCIATION_ID)
                         ?: ""
@@ -370,10 +390,10 @@ fun App(
                     onBack = { navigationActions.goBack() },
                     onSubmitSuccess = { navigationActions.goBack() },
                     onPreviewLocation = { location ->
-                      val encoded = Uri.encode(Json.encodeToString(location))
-                      navigationActions.navigateToScreenWithId(Screen.Map, encoded)
+                        val encoded = Uri.encode(Json.encodeToString(location))
+                        navigationActions.navigateToScreenWithId(Screen.Map, encoded)
                     })
-              }
+            }
         }
-      }
+    }
 }
