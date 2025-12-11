@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,9 +39,7 @@ import ch.epfllife.utils.ToastHelper
 
 object SettingsScreenTestTags {
   const val SIGN_OUT_BUTTON = "signOutButton"
-  const val SELECT_ASSOCIATION_BUTTON = "selectAssociationButton"
-  const val MANAGE_ASSOCIATION_BUTTON = "manageAssociationButton"
-  const val MANAGE_EVENTS_BUTTON = "manageAssociationEventsButton"
+  const val ADMIN_CONSOLE_BUTTON = "adminConsoleButton"
 }
 
 @Composable
@@ -50,12 +49,7 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = viewModel { SettingsViewModel(auth, Db.firestore) },
     onSignedOut: () -> Unit,
     toastHelper: ToastHelper = SystemToastHelper(),
-    onSelectAssociationClick: () -> Unit,
-    onManageAssociationClick: (String) -> Unit,
-    onManageAssociationEventsClick: (String) -> Unit,
-    selectedAssociationId: String? = null,
-    selectedAssociationName: String? = null,
-    onAddNewAssociationClick: () -> Unit
+    onAdminConsoleClick: () -> Unit
 ) {
   val context = LocalContext.current
   val uiState by viewModel.uiState.collectAsState()
@@ -83,6 +77,15 @@ fun SettingsScreen(
 
         Spacer(Modifier.height(32.dp))
 
+        if (uiState.userRole == UserRole.ADMIN || uiState.userRole == UserRole.ASSOCIATION_ADMIN) {
+          SettingsButton(
+              text = stringResource(R.string.admin_console),
+              onClick = onAdminConsoleClick,
+              modifier =
+                  Modifier.fillMaxWidth().testTag(SettingsScreenTestTags.ADMIN_CONSOLE_BUTTON))
+          Spacer(Modifier.height(32.dp))
+        }
+
         Button(
             modifier = Modifier.fillMaxWidth().testTag(SettingsScreenTestTags.SIGN_OUT_BUTTON),
             onClick = { viewModel.signOut() },
@@ -96,38 +99,5 @@ fun SettingsScreen(
                         MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold))
               }
             }
-        Spacer(Modifier.height(20.dp))
-
-        // Select Association
-        // Select Association
-        if (uiState.userRole == UserRole.ADMIN || uiState.userRole == UserRole.ASSOCIATION_ADMIN) {
-          SettingsButton(
-              text =
-                  selectedAssociationName?.let {
-                    stringResource(R.string.settings_selected_association, it)
-                  } ?: stringResource(R.string.settings_screen_association),
-              onClick = onSelectAssociationClick,
-              modifier =
-                  Modifier.fillMaxWidth().testTag(SettingsScreenTestTags.SELECT_ASSOCIATION_BUTTON))
-
-          Spacer(Modifier.height(16.dp))
-
-          if (!selectedAssociationName.isNullOrBlank() && !selectedAssociationId.isNullOrBlank()) {
-            val associationName = selectedAssociationName
-            val associationId = selectedAssociationId
-            SettingsButton(
-                text = stringResource(R.string.manage_association, associationName),
-                onClick = { onManageAssociationClick(associationId) },
-                modifier =
-                    Modifier.fillMaxWidth()
-                        .testTag(SettingsScreenTestTags.MANAGE_ASSOCIATION_BUTTON))
-            Spacer(Modifier.height(16.dp))
-            SettingsButton(
-                text = stringResource(R.string.manage_association_events, associationName),
-                onClick = { onManageAssociationEventsClick(associationId) },
-                modifier =
-                    Modifier.fillMaxWidth().testTag(SettingsScreenTestTags.MANAGE_EVENTS_BUTTON))
-          }
-        }
       }
 }

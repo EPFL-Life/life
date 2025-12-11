@@ -137,4 +137,14 @@
     <string name="calendar_events_for_date">Events for %1$s</string>
     <string name="calendar_no_events_on_day">No events on this day.</string>
 
+    <!-- Admin Association-->
+    <string name="delete_association_button">Delete Association</string>
+    <string name="delete_association_title">Delete Association</string>
+    <string name="delete_association_confirmation">Are you sure you want to delete this association? This action cannot be undone.</string>
+    <string name="delete_association_success">Association deleted successfully</string>
+    <string name="delete_association_failure">Failed to delete association</string>
+    <string name="delete_button">Delete</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="admin_console">Admin Console</string>
+
 </resources>

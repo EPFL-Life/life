@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.credentials.CredentialManager
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -28,6 +27,7 @@ import ch.epfllife.model.db.Db
 import ch.epfllife.model.map.Location
 import ch.epfllife.ui.admin.AddEditAssociationScreen
 import ch.epfllife.ui.admin.AddEditEventScreen
+import ch.epfllife.ui.admin.AssociationAdminScreen
 import ch.epfllife.ui.admin.ManageEventsScreen
 import ch.epfllife.ui.admin.SelectAssociationScreen
 import ch.epfllife.ui.association.AssociationBrowser
@@ -43,7 +43,6 @@ import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.navigation.Screen
 import ch.epfllife.ui.navigation.Tab
 import ch.epfllife.ui.settings.SettingsScreen
-import ch.epfllife.ui.settings.SettingsViewModel
 import ch.epfllife.ui.theme.Theme
 import com.google.firebase.Firebase
 import com.google.firebase.database.database
@@ -200,32 +199,59 @@ fun App(
             MapScreen(location = location, onGoBack = { navigationActions.goBack() })
           }
 
-          composable(Screen.Settings.route) { backStackEntry ->
-            val selectedAssociationId by
-                backStackEntry.savedStateHandle
-                    .getStateFlow(selectedAssociationIdKey, null as String?)
-                    .collectAsState()
-            val selectedAssociationName by
-                backStackEntry.savedStateHandle
-                    .getStateFlow(selectedAssociationNameKey, null as String?)
-                    .collectAsState()
+          composable(Screen.Settings.route) {
             SettingsScreen(
                 auth = auth,
-                viewModel = viewModel { SettingsViewModel(auth, db) },
                 onSignedOut = { navigationActions.navigateTo(Screen.SignIn) },
-                onSelectAssociationClick = {
-                  navigationActions.navigateTo(Screen.SelectAssociation)
-                },
-                onManageAssociationClick = { associationId ->
-                  navigationActions.navigateToAddEditAssociation(associationId)
-                },
-                onManageAssociationEventsClick = { associationId ->
-                  navigationActions.navigateToManageEvents(associationId)
-                },
-                selectedAssociationId = selectedAssociationId,
-                selectedAssociationName = selectedAssociationName,
-                onAddNewAssociationClick = { navigationActions.navigateToAddEditAssociation() })
+                onAdminConsoleClick = { navigationActions.navigateToAssociationAdmin() })
           }
+
+          // this composable is a bit chunky but it keeps the complexity low so this is preferable
+          composable(
+              route = Screen.AssociationAdmin.route,
+              arguments =
+                  listOf(
+                      navArgument(Screen.AssociationAdmin.ARG_ASSOCIATION_ID) {
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = null
+                      })) { backStackEntry ->
+                val argAssociationId =
+                    backStackEntry.arguments?.getString(Screen.AssociationAdmin.ARG_ASSOCIATION_ID)
+
+                val selectedAssociationId by
+                    backStackEntry.savedStateHandle
+                        .getStateFlow(selectedAssociationIdKey, null as String?)
+                        .collectAsState()
+                val selectedAssociationName by
+                    backStackEntry.savedStateHandle
+                        .getStateFlow(selectedAssociationNameKey, null as String?)
+                        .collectAsState()
+
+                val finalAssociationId = selectedAssociationId ?: argAssociationId
+
+                AssociationAdminScreen(
+                    auth = auth,
+                    db = db,
+                    associationId = finalAssociationId,
+                    associationName = selectedAssociationName,
+                    onSelectAssociationClick = {
+                      navigationActions.navigateTo(Screen.SelectAssociation)
+                    },
+                    onManageAssociationClick = { id ->
+                      navigationActions.navigateToAddEditAssociation(id)
+                    },
+                    onManageAssociationEventsClick = { id ->
+                      navigationActions.navigateToManageEvents(id)
+                    },
+                    onAssociationDeleted = {
+                      // Clear selection -> automatic update so we dont get double deletes
+                      backStackEntry.savedStateHandle.set(selectedAssociationIdKey, null as String?)
+                      backStackEntry.savedStateHandle.set(
+                          selectedAssociationNameKey, null as String?)
+                    },
+                    onGoBack = { navigationActions.goBack() })
+              }
 
           composable(Screen.SelectAssociation.route) {
             SelectAssociationScreen(
@@ -235,10 +261,7 @@ fun App(
                   val previousEntry = navController.previousBackStackEntry
                   previousEntry?.savedStateHandle?.set(selectedAssociationIdKey, association.id)
                   previousEntry?.savedStateHandle?.set(selectedAssociationNameKey, association.name)
-                  val popped = navController.popBackStack()
-                  if (!popped) {
-                    navigationActions.navigateTo(Screen.Settings)
-                  }
+                  navController.popBackStack()
                 },
                 onAddNewAssociation = { navigationActions.navigateToAddEditAssociation() })
           }

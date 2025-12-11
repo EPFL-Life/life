@@ -58,6 +58,15 @@ sealed class Screen(
     fun createRouteEdit(associationId: String, eventId: String) =
         "add_edit_event/$associationId/$eventId"
   }
+
+  object AssociationAdmin :
+      Screen("association_admin?associationId={associationId}", "AssociationAdmin") {
+    const val ARG_ASSOCIATION_ID = "associationId"
+
+    fun createRoute(associationId: String? = null) =
+        if (associationId == null) "association_admin"
+        else "association_admin?associationId=$associationId"
+  }
 }
 
 open class NavigationActions(
@@ -115,6 +124,10 @@ open class NavigationActions(
         else Screen.AddEditEvent.createRouteEdit(associationId, eventId)
 
     navController.navigate(route)
+  }
+
+  fun navigateToAssociationAdmin(associationId: String? = null) {
+    navController.navigate(Screen.AssociationAdmin.createRoute(associationId))
   }
 
   /** Navigate back to the previous screen. */
