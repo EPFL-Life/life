@@ -6,6 +6,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -14,6 +18,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,6 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.R
 import ch.epfllife.model.db.Db
+import ch.epfllife.model.event.EventCategory
+import ch.epfllife.model.event.displayString
 import ch.epfllife.ui.association.SocialIcons
 import ch.epfllife.ui.composables.BackButton
 import ch.epfllife.ui.composables.SubmitButton
@@ -34,6 +43,7 @@ object AddEditAssociationTestTags {
   const val NAME_FIELD = "AddEditAssociation_NameField"
   const val DESCRIPTION_FIELD = "AddEditAssociation_DescriptionField"
   const val ABOUT_FIELD = "AddEditAssociation_AboutField"
+  const val EVENT_CATEGORY_FIELD = "AddEditAssociation_EventCategoryField"
   const val SUBMIT_BUTTON = "AddEditAssociation_SubmitButton"
 }
 
@@ -56,6 +66,7 @@ fun AddEditAssociationScreen(
           CircularProgressIndicator()
         }
       }
+
       is AddEditAssociationUIState.Error -> {
         Column(
             modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -69,6 +80,7 @@ fun AddEditAssociationScreen(
               Button(onClick = onBack) { Text(stringResource(R.string.back_button_description)) }
             }
       }
+
       is AddEditAssociationUIState.Success -> {
         AddEditAssociationContent(viewModel = viewModel, onSubmitSuccess = onSubmitSuccess)
       }
@@ -80,6 +92,7 @@ fun AddEditAssociationScreen(
   }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AddEditAssociationContent(
     viewModel: AddEditAssociationViewModel,
@@ -87,6 +100,9 @@ private fun AddEditAssociationContent(
 ) {
   val scrollState = rememberScrollState()
   val formState = viewModel.formState
+  var isCategoryMenuExpanded by remember { mutableStateOf(false) }
+  val categories = EventCategory.entries
+
   val associationNameForTitle =
       formState.name.takeIf { it.isNotBlank() } ?: viewModel.initialAssociationName
   val headerText =
@@ -143,6 +159,36 @@ private fun AddEditAssociationContent(
                 Modifier.fillMaxWidth()
                     .height(120.dp)
                     .testTag(AddEditAssociationTestTags.ABOUT_FIELD))
+
+        ExposedDropdownMenuBox(
+            expanded = isCategoryMenuExpanded,
+            onExpandedChange = { isCategoryMenuExpanded = !isCategoryMenuExpanded }) {
+              OutlinedTextField(
+                  value = formState.eventCategory.displayString(),
+                  onValueChange = {},
+                  readOnly = true,
+                  label = { Text(stringResource(R.string.event_category_label)) },
+                  trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(isCategoryMenuExpanded)
+                  },
+                  modifier =
+                      Modifier.menuAnchor()
+                          .fillMaxWidth()
+                          .testTag(AddEditAssociationTestTags.EVENT_CATEGORY_FIELD))
+
+              ExposedDropdownMenu(
+                  expanded = isCategoryMenuExpanded,
+                  onDismissRequest = { isCategoryMenuExpanded = false }) {
+                    categories.forEach { category ->
+                      DropdownMenuItem(
+                          text = { Text(category.displayString()) },
+                          onClick = {
+                            viewModel.updateEventCategory(category)
+                            isCategoryMenuExpanded = false
+                          })
+                    }
+                  }
+            }
 
         // --- Social Pages ---
         Text(
