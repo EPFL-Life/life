@@ -3,7 +3,8 @@ import os
 from datetime import timedelta
 
 # configuration of Firebase
-FIREBASE_CREDENTIALS = "serviceAccountKey.json"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FIREBASE_CREDENTIALS = os.path.join(BASE_DIR, "serviceAccountKey.json")
 
 # Firestore collection names (MUST match Android app)
 FIRESTORE_COLLECTIONS = {
@@ -11,6 +12,7 @@ FIRESTORE_COLLECTIONS = {
     "ASSOCIATIONS": "associations",
     "USERS": "users"
 }
+
 
 # Request configuration
 REQUEST_TIMEOUT = 30
@@ -36,6 +38,7 @@ DEFAULT_EPFL_LOCATION = {
 MAX_FIELD_LENGTHS = {
     "title": 200,
     "description": 2000,
+    "location": 100,
 }
 
 

@@ -49,6 +49,7 @@ object AssociationDetailsTestTags {
   const val UNSUBSCRIBE_BUTTON = "unsubscribe_button"
   const val LOADING_INDICATOR = "loading_indicator"
   const val ERROR_MESSAGE = "error_message"
+  const val CONTENT = "association_details_content"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -119,147 +120,155 @@ fun AssociationDetailsContent(
   val scrollState = rememberScrollState()
   val context = LocalContext.current
 
-  Box(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface)) {
-    // Header Image
-    Column(modifier = Modifier.fillMaxWidth().verticalScroll(scrollState)) {
-      Box(modifier = Modifier.fillMaxWidth()) {
-        AsyncImage(
-            model =
-                ImageRequest.Builder(LocalContext.current)
-                    .data(association.pictureUrl)
-                    .crossfade(true)
-                    .build(),
-            contentDescription = stringResource(R.string.association_image_description),
-            contentScale = ContentScale.Crop,
-            modifier =
-                Modifier.fillMaxWidth()
-                    .height(240.dp)
-                    .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
-                    .testTag(AssociationDetailsTestTags.ASSOCIATION_IMAGE),
-        )
-      }
+  Box(
+      modifier =
+          modifier
+              .fillMaxSize()
+              .background(MaterialTheme.colorScheme.surface)
+              .testTag(AssociationDetailsTestTags.CONTENT)) {
+        // Header Image
+        Column(modifier = Modifier.fillMaxWidth().verticalScroll(scrollState)) {
+          Box(modifier = Modifier.fillMaxWidth()) {
+            AsyncImage(
+                model =
+                    ImageRequest.Builder(LocalContext.current)
+                        .data(association.pictureUrl)
+                        .crossfade(true)
+                        .build(),
+                contentDescription = stringResource(R.string.association_image_description),
+                contentScale = ContentScale.Crop,
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .height(240.dp)
+                        .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
+                        .testTag(AssociationDetailsTestTags.ASSOCIATION_IMAGE),
+            )
+          }
 
-      // Content Below Header
-      Column(
-          modifier = Modifier.fillMaxWidth().padding(16.dp),
-          verticalArrangement = Arrangement.spacedBy(8.dp),
-      ) {
-        Text(
-            text = association.name,
-            style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-            modifier = Modifier.testTag(AssociationDetailsTestTags.NAME_TEXT),
-        )
-        Text(
-            text = association.description,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.testTag(AssociationDetailsTestTags.DESCRIPTION_TEXT),
-        )
+          // Content Below Header
+          Column(
+              modifier = Modifier.fillMaxWidth().padding(16.dp),
+              verticalArrangement = Arrangement.spacedBy(8.dp),
+          ) {
+            Text(
+                text = association.name,
+                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                modifier = Modifier.testTag(AssociationDetailsTestTags.NAME_TEXT),
+            )
+            Text(
+                text = association.description,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.testTag(AssociationDetailsTestTags.DESCRIPTION_TEXT),
+            )
 
-        // Subscribe Button
-        val subscribeButtonTag =
-            if (isSubscribed) {
-              AssociationDetailsTestTags.UNSUBSCRIBE_BUTTON
-            } else {
-              AssociationDetailsTestTags.SUBSCRIBE_BUTTON
+            // Subscribe Button
+            val subscribeButtonTag =
+                if (isSubscribed) {
+                  AssociationDetailsTestTags.UNSUBSCRIBE_BUTTON
+                } else {
+                  AssociationDetailsTestTags.SUBSCRIBE_BUTTON
+                }
+
+            Button(
+                onClick = if (isSubscribed) onUnsubscribeClick else onSubscribeClick,
+                modifier = Modifier.fillMaxWidth().testTag(subscribeButtonTag),
+                shape = RoundedCornerShape(6.dp),
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = if (isSubscribed) Color.Gray else LifeRed,
+                        contentColor = Color.White,
+                    ),
+            ) {
+              Text(
+                  text =
+                      if (isSubscribed) stringResource(R.string.unsubscribe_from, association.name)
+                      else stringResource(R.string.subscribe_to, association.name))
             }
 
-        Button(
-            onClick = if (isSubscribed) onUnsubscribeClick else onSubscribeClick,
-            modifier = Modifier.fillMaxWidth().testTag(subscribeButtonTag),
-            shape = RoundedCornerShape(6.dp),
-            colors =
-                ButtonDefaults.buttonColors(
-                    containerColor = if (isSubscribed) Color.Gray else LifeRed,
-                    contentColor = Color.White,
-                ),
-        ) {
-          Text(
-              text =
-                  if (isSubscribed) stringResource(R.string.unsubscribe_from, association.name)
-                  else stringResource(R.string.subscribe_to, association.name))
-        }
+            HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
 
-        HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
+            // About Section
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.testTag(AssociationDetailsTestTags.ABOUT_SECTION),
+            ) {
+              Text(
+                  stringResource(R.string.about_section_title),
+                  style =
+                      MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+              )
+              Text(
+                  association.about ?: stringResource(R.string.about_placeholder),
+                  style = MaterialTheme.typography.bodyMedium,
+              )
+            }
 
-        // About Section
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.testTag(AssociationDetailsTestTags.ABOUT_SECTION),
-        ) {
-          Text(
-              stringResource(R.string.about_section_title),
-              style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-          )
-          Text(
-              association.about ?: stringResource(R.string.about_placeholder),
-              style = MaterialTheme.typography.bodyMedium,
-          )
-        }
+            HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
 
-        HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
+            // Social Pages
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+              Text(
+                  stringResource(R.string.social_pages_title),
+                  style =
+                      MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+              )
 
-        // Social Pages
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-          Text(
-              stringResource(R.string.social_pages_title),
-              style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-          )
+              Row(
+                  horizontalArrangement = Arrangement.spacedBy(24.dp),
+                  verticalAlignment = Alignment.CenterVertically,
+                  modifier = Modifier.testTag(AssociationDetailsTestTags.SOCIAL_LINKS_ROW),
+              ) {
+                association.socialLinks
+                    ?.toList()
+                    ?.sortedBy { (platform, _) ->
+                      SocialIcons.platformOrder.indexOf(platform.lowercase()).takeIf { it >= 0 }
+                          ?: Int.MAX_VALUE
+                    }
+                    ?.forEach { (platform, url) ->
+                      val iconRes = SocialIcons.getIcon(platform) ?: R.drawable.ic_default
+                      IconButton(
+                          onClick = {
+                            val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+                            context.startActivity(intent)
+                          }) {
+                            Icon(
+                                painter = painterResource(id = iconRes),
+                                contentDescription = platform,
+                                tint = Color.Unspecified,
+                                modifier = Modifier.size(32.dp),
+                            )
+                          }
+                    }
+              }
+            }
 
-          Row(
-              horizontalArrangement = Arrangement.spacedBy(24.dp),
-              verticalAlignment = Alignment.CenterVertically,
-              modifier = Modifier.testTag(AssociationDetailsTestTags.SOCIAL_LINKS_ROW),
-          ) {
-            association.socialLinks
-                ?.toList()
-                ?.sortedBy { (platform, _) ->
-                  SocialIcons.platformOrder.indexOf(platform.lowercase()).takeIf { it >= 0 }
-                      ?: Int.MAX_VALUE
-                }
-                ?.forEach { (platform, url) ->
-                  val iconRes = SocialIcons.getIcon(platform) ?: R.drawable.ic_default
-                  IconButton(
-                      onClick = {
-                        val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                        context.startActivity(intent)
-                      }) {
-                        Icon(
-                            painter = painterResource(id = iconRes),
-                            contentDescription = platform,
-                            tint = Color.Unspecified,
-                            modifier = Modifier.size(32.dp),
-                        )
-                      }
-                }
+            HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
+
+            // Upcoming Events (dummy data)
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.testTag(AssociationDetailsTestTags.UPCOMING_EVENTS_COLUMN),
+            ) {
+              Text(
+                  stringResource(R.string.upcoming_events_title),
+                  style =
+                      MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+              )
+
+              events.forEach { event ->
+                EventCard(
+                    event = event,
+                    isEnrolled = enrolledEventIds.contains(event.id),
+                    onClick = { onEventClick(event.id) })
+              }
+            }
           }
         }
-
-        HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
-
-        // Upcoming Events (dummy data)
-        Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.testTag(AssociationDetailsTestTags.UPCOMING_EVENTS_COLUMN),
-        ) {
-          Text(
-              stringResource(R.string.upcoming_events_title),
-              style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-          )
-
-          events.forEach { event ->
-            EventCard(
-                event = event,
-                isEnrolled = enrolledEventIds.contains(event.id),
-                onClick = { onEventClick(event.id) })
-          }
-        }
+        BackButton(
+            modifier =
+                Modifier.align(Alignment.TopStart).testTag(AssociationDetailsTestTags.BACK_BUTTON),
+            onGoBack = onGoBack,
+        )
       }
-    }
-    BackButton(
-        modifier =
-            Modifier.align(Alignment.TopStart).testTag(AssociationDetailsTestTags.BACK_BUTTON),
-        onGoBack = onGoBack,
-    )
-  }
 }

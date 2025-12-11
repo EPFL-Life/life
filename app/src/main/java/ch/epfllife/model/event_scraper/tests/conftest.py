@@ -1,7 +1,11 @@
 
-import pytest
+
 import sys
 import os
 
-# Add project root to Python path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# Set up path to include project root
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, project_root)
+
+# Set environment variable for Firebase credentials
+os.environ['FIREBASE_CREDENTIALS_PATH'] = os.path.join(project_root, "serviceAccountKey.json")

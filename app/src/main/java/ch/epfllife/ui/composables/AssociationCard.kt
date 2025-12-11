@@ -23,16 +23,10 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 
 @Composable
-fun AssociationCard(
-    association: Association,
-    modifier: Modifier = Modifier,
-    testTag: String? = null,
-    onClick: () -> Unit
-) {
+fun AssociationCard(association: Association, modifier: Modifier = Modifier, onClick: () -> Unit) {
   val baseModifier = modifier.fillMaxWidth().padding(5.dp)
   val taggedModifier =
-      if (testTag != null) baseModifier.testTag(testTag)
-      else baseModifier.testTag(AssociationCardTestTags.ASSOCIATION_CARD)
+      baseModifier.testTag(AssociationCardTestTags.getAssociationCardTestTag(association.id))
   Card(
       onClick = onClick,
       shape = RoundedCornerShape(12.dp),
@@ -83,8 +77,9 @@ fun AssociationCard(
 }
 
 object AssociationCardTestTags {
-  const val ASSOCIATION_CARD = "association_card"
   const val ASSOCIATION_LOGO = "association_logo"
   const val ASSOCIATION_NAME = "association_name"
   const val ASSOCIATION_DESCRIPTION = "association_description"
+
+  fun getAssociationCardTestTag(assocId: String) = "associationCard_$assocId"
 }

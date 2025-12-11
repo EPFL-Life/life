@@ -9,6 +9,7 @@ import ch.epfllife.example_data.ExampleUsers
 import ch.epfllife.model.association.Association
 import ch.epfllife.model.db.Db
 import ch.epfllife.model.user.UserRole
+import ch.epfllife.ui.composables.AssociationCardTestTags
 import ch.epfllife.ui.theme.Theme
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
@@ -38,11 +39,11 @@ class SelectAssociationScreenTest {
 
     composeTestRule
         .onNodeWithTag(
-            SelectAssociationTestTags.associationCard(ExampleAssociations.association1.id))
+            AssociationCardTestTags.getAssociationCardTestTag(ExampleAssociations.association1.id))
         .assertIsDisplayed()
     composeTestRule
         .onNodeWithTag(
-            SelectAssociationTestTags.associationCard(ExampleAssociations.association2.id))
+            AssociationCardTestTags.getAssociationCardTestTag(ExampleAssociations.association2.id))
         .assertIsDisplayed()
   }
 
@@ -67,7 +68,7 @@ class SelectAssociationScreenTest {
 
     composeTestRule
         .onNodeWithTag(
-            SelectAssociationTestTags.associationCard(ExampleAssociations.association2.id))
+            AssociationCardTestTags.getAssociationCardTestTag(ExampleAssociations.association2.id))
         .performClick()
 
     assertNotNull(selectedAssociation)

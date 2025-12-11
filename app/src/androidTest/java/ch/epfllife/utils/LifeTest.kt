@@ -15,6 +15,9 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import ch.epfllife.model.authentication.Auth
+import ch.epfllife.ui.association.AssociationDetailsTestTags
+import ch.epfllife.ui.composables.AssociationCardTestTags
+import ch.epfllife.ui.composables.DisplayedEventsTestTags
 import ch.epfllife.ui.composables.EventCardTestTags
 import ch.epfllife.ui.eventDetails.EventDetailsTestTags
 import ch.epfllife.ui.home.HomeScreenTestTags
@@ -71,6 +74,22 @@ fun ComposeContentTestRule.navigateToEvent(eventId: String) {
   this.onNodeWithTag(EventCardTestTags.getEventCardTestTag(eventId)).performClick()
   // Wait for screen to load
   this.waitUntil(3000) { this.onNodeWithTag(EventDetailsTestTags.CONTENT).isDisplayed() }
+  this.waitForIdle()
+}
+
+fun ComposeContentTestRule.navigateToAssociation(associationId: String) {
+  this.navigateToTab(Tab.AssociationBrowser)
+  this.onNodeWithTag(DisplayedEventsTestTags.BUTTON_ALL).performClick()
+  // Wait for assoc cards to load
+  this.waitUntil(3000) {
+    this.onNodeWithTag(AssociationCardTestTags.getAssociationCardTestTag(associationId))
+        .isDisplayed()
+  }
+  this.waitForIdle()
+  this.onNodeWithTag(AssociationCardTestTags.getAssociationCardTestTag(associationId))
+      .performClick()
+  // Wait for screen to load
+  this.waitUntil(3000) { this.onNodeWithTag(AssociationDetailsTestTags.CONTENT).isDisplayed() }
   this.waitForIdle()
 }
 

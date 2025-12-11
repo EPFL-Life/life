@@ -11,14 +11,22 @@ import androidx.test.espresso.NoActivityResumedException
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import ch.epfllife.ThemedApp
+import ch.epfllife.example_data.ExampleAssociations
+import ch.epfllife.example_data.ExampleEvents
+import ch.epfllife.example_data.ExampleUsers
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.authentication.SignInResult
 import ch.epfllife.model.db.Db
+import ch.epfllife.ui.association.AssociationDetailsTestTags
 import ch.epfllife.ui.authentication.SignInScreenTestTags
+import ch.epfllife.ui.composables.AssociationCardTestTags
+import ch.epfllife.ui.composables.DisplayedEventsTestTags
+import ch.epfllife.ui.composables.EventCardTestTags
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.navigation.Tab
 import ch.epfllife.ui.settings.SettingsScreenTestTags
 import ch.epfllife.utils.FakeCredentialManager
+import ch.epfllife.utils.navigateToAssociation
 import ch.epfllife.utils.setUpEmulator
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
@@ -32,6 +40,7 @@ class EndToEndTest {
 
   @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
   private val auth = Auth(FakeCredentialManager.withDefaultTestUser)
+  private val db = Db.firestore
 
   @Before
   fun setup() {
@@ -50,11 +59,11 @@ class EndToEndTest {
       val signInResult = auth.signInWithCredential(FakeCredentialManager.defaultUserCredentials)
       Assert.assertTrue("Sign in must succeed", signInResult is SignInResult.Success)
     }
-    composeTestRule.setContent { ThemedApp(auth, Db.firestore) }
+    composeTestRule.setContent { ThemedApp(auth, db) }
   }
 
   fun useLoggedOutApp() {
-    composeTestRule.setContent { ThemedApp(auth, Db.firestore) }
+    composeTestRule.setContent { ThemedApp(auth, db) }
   }
 
   @Test
@@ -113,6 +122,41 @@ class EndToEndTest {
     composeTestRule.onNodeWithTag(NavigationTestTags.getTabTestTag(tab)).performClick()
     Espresso.pressBack()
     assertBackPressWouldExit()
+  }
+
+  @Test
+  fun subscribeToAssociation() = runTest {
+    // Setup
+    useLoggedInApp()
+    val association = ExampleAssociations.association1
+    val event = ExampleEvents.event1
+    db.userRepo.createUser(ExampleUsers.user1.copy(id = Firebase.auth.currentUser!!.uid))
+    db.assocRepo.createAssociation(association)
+    db.eventRepo.createEvent(event)
+
+    // Subscribe
+    composeTestRule.navigateToAssociation(association.id)
+    composeTestRule.onNodeWithTag(AssociationDetailsTestTags.SUBSCRIBE_BUTTON).performClick()
+    // If we leave too quickly, the coroutine gets cancelled
+    Thread.sleep(300)
+
+    // Verify subscription in association browser
+    composeTestRule.onNodeWithTag(AssociationDetailsTestTags.BACK_BUTTON).performClick()
+    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_SUBSCRIBED).performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.waitUntil {
+      composeTestRule
+          .onNodeWithTag(AssociationCardTestTags.getAssociationCardTestTag(association.id))
+          .isDisplayed()
+    }
+
+    // Verify subscription in home screen by viewing this association's events
+    composeTestRule.onNodeWithTag(NavigationTestTags.HOMESCREEN_TAB).performClick()
+    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_SUBSCRIBED).performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.waitUntil {
+      composeTestRule.onNodeWithTag(EventCardTestTags.getEventCardTestTag(event.id)).isDisplayed()
+    }
   }
 
   private fun assertBackPressWouldExit() {
