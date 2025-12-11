@@ -48,7 +48,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: "temurin"
-          java-version: "17"
+          java-version: "21"
 
 
       # Caching is a very useful part of a CI, as a workflow is executed in a clean environement every time,
@@ -158,17 +158,6 @@ jobs:
           DEBUG_KEYSTORE_PATH: ./debug.keystore
           MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
 
-      # Start Firebase emulators for instrumentation tests
-      - name: Start Firebase emulators
-        run: |
-          if [ -e "firebase.json" ] && jq -e '.emulators' firebase.json >/dev/null; then
-            echo "Starting Firebase emulators for instrumentation tests..."
-            firebase emulators:start --only auth,firestore --project demo-project &
-            echo "Firebase emulators started"
-          else
-            echo "Firebase emulators not configured, skipping emulator startup..."
-          fi
-
       - name: Run instrumentation tests
         timeout-minutes: 25
         uses: reactivecircus/android-emulator-runner@v2
@@ -180,7 +169,7 @@ jobs:
           force-avd-creation: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -skin 1080x2400
           disable-animations: true
-          script: ./gradlew connectedCheck --parallel --build-cache
+          script: firebase emulators:exec --project epfl-life "./gradlew connectedCheck --parallel --build-cache"
         env:
           DEBUG_KEYSTORE_PATH: ./debug.keystore
           MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
