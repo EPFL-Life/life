@@ -99,7 +99,7 @@ fun HomeScreen(
 
 object HomeScreenTestTags {
 
-  const val BOTTON_SUBSCRIBED = "BUTTON_SUBSCRIBED"
+  const val BUTTON_SUBSCRIBED = "BUTTON_SUBSCRIBED"
   const val BUTTON_ALL = "BUTTON_ALL"
 }
 
