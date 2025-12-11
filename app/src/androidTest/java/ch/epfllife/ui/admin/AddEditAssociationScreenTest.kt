@@ -6,10 +6,13 @@ import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import ch.epfllife.example_data.ExampleAssociations
 import ch.epfllife.model.association.Association
 import ch.epfllife.model.db.Db
+import ch.epfllife.model.event.EventCategory
+import ch.epfllife.model.event.displayString
 import ch.epfllife.ui.association.SocialIcons
 import ch.epfllife.ui.theme.Theme
 import kotlinx.coroutines.runBlocking
@@ -61,6 +64,13 @@ class AddEditAssociationScreenTest {
         .onNodeWithTag(AddEditAssociationTestTags.NAME_FIELD)
         .assert(hasText("", substring = false))
     composeTestRule.onNodeWithTag(AddEditAssociationTestTags.SUBMIT_BUTTON).assertIsNotEnabled()
+
+    val targetCategory = EventCategory.SPORTS
+    composeTestRule.onNodeWithTag(AddEditAssociationTestTags.EVENT_CATEGORY_FIELD).performClick()
+    composeTestRule.onNodeWithText(targetCategory.displayString()).performClick()
+    composeTestRule
+        .onNodeWithTag(AddEditAssociationTestTags.EVENT_CATEGORY_FIELD)
+        .assert(hasText(targetCategory.displayString(), substring = false))
   }
 
   @Test
