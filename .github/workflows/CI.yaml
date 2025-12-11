@@ -171,7 +171,7 @@ jobs:
           force-avd-creation: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -skin 1080x2400
           disable-animations: true
-          script: firebase emulators:exec --project demo-project "./gradlew connectedCheck --parallel --build-cache"
+          script: firebase emulators:exec --project epfl-life "./gradlew connectedCheck --parallel --build-cache"
         env:
           DEBUG_KEYSTORE_PATH: ./debug.keystore
           MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
