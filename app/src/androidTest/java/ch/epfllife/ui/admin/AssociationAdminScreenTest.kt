@@ -2,9 +2,12 @@ package ch.epfllife.ui.admin
 
 import android.view.View
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import ch.epfllife.R
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.db.Db
 import ch.epfllife.utils.FakeCredentialManager
@@ -37,6 +40,7 @@ class AssociationAdminScreenTest {
   private fun setContent(
       associationId: String? = this.associationId,
       associationName: String? = "Satellite",
+      db: Db = Db.freshLocal(),
       onSelectAssociationClick: () -> Unit = {},
       onManageAssociationClick: (String) -> Unit = {},
       onManageAssociationEventsClick: (String) -> Unit = {},
@@ -47,7 +51,7 @@ class AssociationAdminScreenTest {
     composeTestRule.setContent {
       AssociationAdminScreen(
           auth = auth,
-          db = Db.freshLocal(),
+          db = db,
           associationId = associationId,
           associationName = associationName,
           onSelectAssociationClick = onSelectAssociationClick,
@@ -125,5 +129,62 @@ class AssociationAdminScreenTest {
         .onNodeWithTag(AssociationAdminScreenTestTags.MANAGE_EVENTS_BUTTON)
         .performClick()
     Assert.assertEquals(associationId, manageEventsClickedId)
+  }
+
+  @Test
+  fun deleteAssociationButtonShowsDialogAndDeletesUser() {
+    var deleted = false
+    val db = fakeDbWithAssociation(associationId)
+    setContent(db = db, toastHelper = fakeToastHelper, onAssociationDeleted = { deleted = true })
+
+    composeTestRule
+        .onNodeWithTag(AssociationAdminScreenTestTags.DELETE_ASSOCIATION_BUTTON)
+        .performClick()
+
+    composeTestRule
+        .onNodeWithText(
+            composeTestRule.activity.getString(R.string.delete_association_confirmation))
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText(composeTestRule.activity.getString(R.string.delete_button))
+        .performClick()
+    composeTestRule.waitForIdle()
+
+    Assert.assertTrue(deleted)
+  }
+
+  @Test
+  fun deleteAssociationButtonShowsDialogAndCanCancel() {
+    var deleted = false
+    val db = fakeDbWithAssociation(associationId)
+    setContent(db = db, toastHelper = fakeToastHelper, onAssociationDeleted = { deleted = true })
+
+    composeTestRule
+        .onNodeWithTag(AssociationAdminScreenTestTags.DELETE_ASSOCIATION_BUTTON)
+        .performClick()
+
+    composeTestRule
+        .onNodeWithText(composeTestRule.activity.getString(R.string.cancel_button))
+        .performClick()
+    composeTestRule.waitForIdle()
+
+    Assert.assertFalse(deleted)
+    composeTestRule
+        .onNodeWithText(
+            composeTestRule.activity.getString(R.string.delete_association_confirmation))
+        .assertDoesNotExist()
+  }
+
+  // im aware that fake repos are a bad approach but otherwise >80% is impossible ¯\_(ツ)_/¯
+  private fun fakeDbWithAssociation(id: String): Db {
+    val db = Db.freshLocal()
+    val assoc =
+        ch.epfllife.model.association.Association(
+            id = id,
+            name = "Satellite",
+            description = "Sat",
+            eventCategory = ch.epfllife.model.event.EventCategory.ACADEMIC)
+    kotlinx.coroutines.runBlocking { db.assocRepo.createAssociation(assoc) }
+    return db
   }
 }
