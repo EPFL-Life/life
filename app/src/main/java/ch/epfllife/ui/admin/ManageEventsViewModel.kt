@@ -17,8 +17,11 @@ sealed interface ManageEventsUIState {
 
   data class Error(val messageRes: Int) : ManageEventsUIState
 
-  data class Success(val events: List<Event>, val enrolledEvents: List<String>) :
-      ManageEventsUIState
+  data class Success(
+      val events: List<Event>,
+      val enrolledEvents: List<String>,
+      val isFutureFilterEnabled: Boolean
+  ) : ManageEventsUIState
 }
 
 class ManageEventsViewModel(private val db: Db, val associationId: String) : ViewModel() {
@@ -27,6 +30,8 @@ class ManageEventsViewModel(private val db: Db, val associationId: String) : Vie
   val uiState: StateFlow<ManageEventsUIState> = _uiState
 
   private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+  private var allEventsCache: List<Event> = emptyList()
+  private var isFutureFilterEnabled = false
 
   init {
     viewModelScope.launch { loadEvents() }
@@ -39,6 +44,14 @@ class ManageEventsViewModel(private val db: Db, val associationId: String) : Vie
     }
   }
 
+  fun toggleFutureFilter() {
+    val currentState = _uiState.value
+    if (currentState is ManageEventsUIState.Success) {
+      isFutureFilterEnabled = !isFutureFilterEnabled
+      updateUiState(currentState.enrolledEvents)
+    }
+  }
+
   private suspend fun loadEvents() {
     _uiState.value = ManageEventsUIState.Loading
 
@@ -48,21 +61,33 @@ class ManageEventsViewModel(private val db: Db, val associationId: String) : Vie
 
     result.fold(
         onSuccess = { events ->
-          val today = LocalDate.now()
-          val filtered =
-              events
-                  .filter { event ->
-                    val eventDate = event.startDateOrNull()
-                    eventDate == null || !eventDate.isBefore(today)
-                  }
-                  .sortedBy { it.startDateOrNull() ?: LocalDate.MAX }
-
-          _uiState.value = ManageEventsUIState.Success(filtered, enrolledEvents = enrolledEventIds)
+          allEventsCache = events
+          updateUiState(enrolledEventIds)
         },
         onFailure = { e ->
           Log.e("ManageEventsVM", "Failed to load events for association $associationId", e)
           _uiState.value = ManageEventsUIState.Error(R.string.error_loading_events_generic)
         })
+  }
+
+  private fun updateUiState(enrolledEventIds: List<String>) {
+    val today = LocalDate.now()
+    val filtered =
+        if (isFutureFilterEnabled) {
+              allEventsCache.filter { event ->
+                val eventDate = event.startDateOrNull()
+                eventDate == null || !eventDate.isBefore(today)
+              }
+            } else {
+              allEventsCache
+            }
+            .sortedBy { it.startDateOrNull() ?: LocalDate.MAX }
+
+    _uiState.value =
+        ManageEventsUIState.Success(
+            filtered,
+            enrolledEvents = enrolledEventIds,
+            isFutureFilterEnabled = isFutureFilterEnabled)
   }
 
   private fun Event.startDateOrNull(): LocalDate? {

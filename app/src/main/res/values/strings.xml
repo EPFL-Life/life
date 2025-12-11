@@ -80,7 +80,6 @@
     <string name="add_new_association">Add New Association</string>
     <string name="manage_association">Manage %1$s</string>
     <string name="manage_association_fallback">Manage association</string>
-    <string name="manage_association_events">Manage %1$s\'s events</string>
     <string name="general_info">General Information</string>
     <string name="association_name_required">Association Name*</string>
     <string name="short_description_required">Short Description*</string>
@@ -139,6 +138,7 @@
 
     <!-- Admin Association-->
     <string name="delete_association_button">Delete Association</string>
+    <string name="toggle_future_events_filter">Toggle future events filter</string>
     <string name="delete_association_title">Delete Association</string>
     <string name="delete_association_confirmation">Are you sure you want to delete this association? This action cannot be undone.</string>
     <string name="delete_association_success">Association deleted successfully</string>
