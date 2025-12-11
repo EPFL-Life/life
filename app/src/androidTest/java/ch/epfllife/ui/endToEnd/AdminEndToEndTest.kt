@@ -76,6 +76,13 @@ class AdminEndToEndTest {
 
     // 3. Select Association
     // Go to Admin Console
+    composeTestRule.waitUntil(10000) {
+      try {
+        composeTestRule.onNodeWithTag(SettingsScreenTestTags.ADMIN_CONSOLE_BUTTON).isDisplayed()
+      } catch (e: Exception) {
+        false
+      }
+    }
     composeTestRule.onNodeWithTag(SettingsScreenTestTags.ADMIN_CONSOLE_BUTTON).performClick()
     composeTestRule.onNodeWithTag(AssociationAdminScreenTestTags.SCREEN).assertIsDisplayed()
 
@@ -160,8 +167,6 @@ class AdminEndToEndTest {
     // We are in ManageEventsScreen, which doesn't have bottom bar.
     // We need to go back to SettingsScreen first.
     composeTestRule.onNodeWithContentDescription("Back").performClick()
-    // We need to go back to AssociationAdminScreen, then SettingsScreen.
-    composeTestRule.onNodeWithContentDescription("Back").performClick() // Back to Admin Console
 
     composeTestRule.waitUntil(10000) {
       try {
