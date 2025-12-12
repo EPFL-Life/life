@@ -84,6 +84,7 @@
     <string name="association_name_required">Association Name*</string>
     <string name="short_description_required">Short Description*</string>
     <string name="about_association_required">About the Association*</string>
+    <string name="event_category_label">Event Category</string>
     <string name="upload_images">Upload Images</string>
     <string name="logo_url">Logo URL</string>
     <string name="banner_url">Banner URL</string>
@@ -116,7 +117,6 @@
     <string name="event_price_optional">Price (optional)</string>
     <string name="event_tags">Tags (comma separated)</string>
     <string name="event_picture_url">Picture URL</string>
-
 
 
     <!-- Extra -->

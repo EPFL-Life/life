@@ -30,7 +30,8 @@ data class AssociationFormState(
     var socialMedia: List<SocialMediaEntry> =
         SocialIcons.platformOrder.map { SocialMediaEntry(it) },
     var logoUrl: String = "",
-    var bannerUrl: String = ""
+    var bannerUrl: String = "",
+    var eventCategory: EventCategory = EventCategory.OTHER
 )
 
 sealed interface AddEditAssociationUIState {
@@ -103,7 +104,8 @@ class AddEditAssociationViewModel(
             about = assoc.about ?: "",
             socialMedia = socialList,
             logoUrl = assoc.logoUrl ?: "",
-            bannerUrl = assoc.pictureUrl ?: "")
+            bannerUrl = assoc.pictureUrl ?: "",
+            eventCategory = assoc.eventCategory)
   }
 
   // URL Validation
@@ -150,6 +152,10 @@ class AddEditAssociationViewModel(
     val updatedList =
         formState.socialMedia.map { if (it.platform == platform) it.copy(link = sanitised) else it }
     formState = formState.copy(socialMedia = updatedList)
+  }
+
+  fun updateEventCategory(category: EventCategory) {
+    formState = formState.copy(eventCategory = category)
   }
 
   fun updateLogoUrl(url: String) {
@@ -212,7 +218,7 @@ class AddEditAssociationViewModel(
         description = formState.description.trim(),
         pictureUrl = formState.bannerUrl.ifBlank { null },
         logoUrl = formState.logoUrl.ifBlank { null },
-        eventCategory = associationSnapshot?.eventCategory ?: EventCategory.OTHER,
+        eventCategory = formState.eventCategory,
         about = formState.about.trim().ifBlank { null },
         socialLinks = if (socialLinks.isEmpty()) null else socialLinks)
   }
