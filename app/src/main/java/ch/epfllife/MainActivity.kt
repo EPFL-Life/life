@@ -289,16 +289,12 @@ fun App(
                     onSubmitSuccess = { updatedAssociation ->
                       val createdNewAssociation = associationId == null
                       val handle =
-                          try {
-                            navController
-                                .getBackStackEntry(Screen.AssociationAdmin.route)
-                                .savedStateHandle
-                          } catch (_: Exception) {
-                            navController.previousBackStackEntry?.savedStateHandle
-                          }
+                          navController
+                              .getBackStackEntry(Screen.AssociationAdmin.route)
+                              .savedStateHandle
 
-                      handle?.set(selectedAssociationIdKey, updatedAssociation.id)
-                      handle?.set(selectedAssociationNameKey, updatedAssociation.name)
+                      handle[selectedAssociationIdKey] = updatedAssociation.id
+                      handle[selectedAssociationNameKey] = updatedAssociation.name
 
                       if (createdNewAssociation) {
                         navController.popBackStack(Screen.AssociationAdmin.route, false)
