@@ -288,25 +288,20 @@ fun App(
                     onBack = { navController.popBackStack() },
                     onSubmitSuccess = { updatedAssociation ->
                       val createdNewAssociation = associationId == null
-                      val adminHandle =
-                          runCatching {
-                                navController
-                                    .getBackStackEntry(Screen.AssociationAdmin.route)
-                                    .savedStateHandle
-                              }
-                              .getOrNull()
-                      val targetHandle =
-                          adminHandle ?: navController.previousBackStackEntry?.savedStateHandle
-                      targetHandle?.let { handle ->
-                        handle[selectedAssociationIdKey] = updatedAssociation.id
-                        handle[selectedAssociationNameKey] = updatedAssociation.name
-                      }
+                      val handle =
+                          try {
+                            navController
+                                .getBackStackEntry(Screen.AssociationAdmin.route)
+                                .savedStateHandle
+                          } catch (_: Exception) {
+                            navController.previousBackStackEntry?.savedStateHandle
+                          }
+
+                      handle?.set(selectedAssociationIdKey, updatedAssociation.id)
+                      handle?.set(selectedAssociationNameKey, updatedAssociation.name)
+
                       if (createdNewAssociation) {
-                        val popped =
-                            navController.popBackStack(Screen.AssociationAdmin.route, false)
-                        if (!popped) {
-                          navController.popBackStack()
-                        }
+                        navController.popBackStack(Screen.AssociationAdmin.route, false)
                       } else {
                         navController.popBackStack()
                       }
