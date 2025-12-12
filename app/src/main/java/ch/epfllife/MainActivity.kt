@@ -286,7 +286,22 @@ fun App(
                     db = db,
                     associationId = associationId,
                     onBack = { navController.popBackStack() },
-                    onSubmitSuccess = { navController.popBackStack() })
+                    onSubmitSuccess = { updatedAssociation ->
+                      val createdNewAssociation = associationId == null
+                      val handle =
+                          navController
+                              .getBackStackEntry(Screen.AssociationAdmin.route)
+                              .savedStateHandle
+
+                      handle[selectedAssociationIdKey] = updatedAssociation.id
+                      handle[selectedAssociationNameKey] = updatedAssociation.name
+
+                      if (createdNewAssociation) {
+                        navController.popBackStack(Screen.AssociationAdmin.route, false)
+                      } else {
+                        navController.popBackStack()
+                      }
+                    })
               }
 
           composable(

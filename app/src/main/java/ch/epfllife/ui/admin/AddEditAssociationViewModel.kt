@@ -180,7 +180,7 @@ class AddEditAssociationViewModel(
     return hasRequiredFields && urlsAreValid
   }
 
-  fun submit(onSuccess: () -> Unit) {
+  fun submit(onSuccess: (Association) -> Unit) {
     if (!isFormValid()) return
 
     viewModelScope.launch() {
@@ -195,7 +195,7 @@ class AddEditAssociationViewModel(
       result
           .onSuccess {
             _uiState.value = AddEditAssociationUIState.Success
-            onSuccess()
+            onSuccess(association)
           }
           .onFailure {
             Log.e("AddEditAssociationVM", "Failed to submit association", it)
