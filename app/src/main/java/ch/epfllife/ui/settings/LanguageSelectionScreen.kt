@@ -8,12 +8,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import ch.epfllife.R
 import ch.epfllife.model.enums.AppLanguage
 import ch.epfllife.model.user.LanguageRepository
 import kotlinx.coroutines.launch
+
+object LanguageSelectionTags {
+  const val SYSTEM = "language-system"
+  const val ENGLISH = "language-english"
+  const val FRENCH = "language-french"
+}
 
 @Composable
 fun LanguageSelectionScreen(languageRepository: LanguageRepository, onBack: () -> Unit) {
@@ -41,7 +48,15 @@ fun LanguageSelectionScreen(languageRepository: LanguageRepository, onBack: () -
                   containerColor =
                       if (isSelected) MaterialTheme.colorScheme.primary
                       else MaterialTheme.colorScheme.surfaceVariant),
-          modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+          modifier =
+              Modifier.fillMaxWidth()
+                  .padding(vertical = 4.dp)
+                  .testTag(
+                      when (lang) {
+                        AppLanguage.SYSTEM -> LanguageSelectionTags.SYSTEM
+                        AppLanguage.ENGLISH -> LanguageSelectionTags.ENGLISH
+                        AppLanguage.FRENCH -> LanguageSelectionTags.FRENCH
+                      })) {
             Text(
                 text =
                     when (lang) {
