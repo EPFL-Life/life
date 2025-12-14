@@ -7,6 +7,7 @@ import ch.epfllife.ThemedApp
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.authentication.SignInResult
 import ch.epfllife.model.db.Db
+import ch.epfllife.model.user.LanguageRepository
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.navigation.Tab
 import ch.epfllife.utils.FakeCredentialManager
@@ -37,7 +38,8 @@ class MainActivityTest {
 
   @Test
   fun themedApp_startsWithHomeScreen() {
-    composeTestRule.setContent { ThemedApp(auth, db) }
+    val languageRepository = LanguageRepository(db.userRepo)
+    composeTestRule.setContent { ThemedApp(auth, db, languageRepository) }
 
     composeTestRule.waitForIdle()
 
@@ -49,7 +51,8 @@ class MainActivityTest {
 
   @Test
   fun themedApp_showsBottomNavigationOnMainScreens() {
-    composeTestRule.setContent { ThemedApp(auth, db) }
+    val languageRepository = LanguageRepository(db.userRepo)
+    composeTestRule.setContent { ThemedApp(auth, db, languageRepository) }
 
     composeTestRule.waitForIdle()
 
@@ -77,7 +80,8 @@ class MainActivityTest {
 
   @Test
   fun themedApp_hasAllBottomNavigationTabs() {
-    composeTestRule.setContent { ThemedApp(auth, db) }
+    val languageRepository = LanguageRepository(db.userRepo)
+    composeTestRule.setContent { ThemedApp(auth, db, languageRepository) }
 
     composeTestRule.waitForIdle()
 

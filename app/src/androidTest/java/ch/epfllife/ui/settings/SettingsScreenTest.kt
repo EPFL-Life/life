@@ -43,7 +43,11 @@ class SettingsScreenTest {
   @Test
   fun contentIsDisplayed() {
     composeTestRule.setContent {
-      SettingsScreen(auth = auth, onSignedOut = {}, onAdminConsoleClick = {})
+      SettingsScreen(
+          auth = auth,
+          onSignedOut = {},
+          onAdminConsoleClick = {},
+          onNavigateToLanguageSelection = {})
     }
     listOf(NavigationTestTags.SETTINGS_SCREEN, SettingsScreenTestTags.SIGN_OUT_BUTTON)
         .map(composeTestRule::assertTagIsDisplayed)
@@ -59,7 +63,8 @@ class SettingsScreenTest {
           auth = auth,
           onSignedOut = { clicked = true },
           toastHelper = fakeToastHelper,
-          onAdminConsoleClick = {})
+          onAdminConsoleClick = {},
+          onNavigateToLanguageSelection = {})
     }
     composeTestRule.onNodeWithTag(SettingsScreenTestTags.SIGN_OUT_BUTTON).performClick()
     composeTestRule.waitForIdle()
@@ -78,7 +83,8 @@ class SettingsScreenTest {
           auth = auth,
           viewModel = SettingsViewModel(auth, db),
           onSignedOut = {},
-          onAdminConsoleClick = { clicked = true })
+          onAdminConsoleClick = { clicked = true },
+          onNavigateToLanguageSelection = {})
     }
 
     composeTestRule.onNodeWithTag(SettingsScreenTestTags.ADMIN_CONSOLE_BUTTON).performClick()
@@ -93,7 +99,8 @@ class SettingsScreenTest {
           auth = auth,
           viewModel = SettingsViewModel(auth, db),
           onSignedOut = {},
-          onAdminConsoleClick = {})
+          onAdminConsoleClick = {},
+          onNavigateToLanguageSelection = {})
     }
     composeTestRule.onNodeWithTag(SettingsScreenTestTags.ADMIN_CONSOLE_BUTTON).assertDoesNotExist()
   }
@@ -106,7 +113,8 @@ class SettingsScreenTest {
           auth = auth,
           viewModel = SettingsViewModel(auth, db),
           onSignedOut = {},
-          onAdminConsoleClick = {})
+          onAdminConsoleClick = {},
+          onNavigateToLanguageSelection = {})
     }
     composeTestRule.waitUntil(5000) {
       try {
@@ -126,7 +134,8 @@ class SettingsScreenTest {
           auth = auth,
           viewModel = SettingsViewModel(auth, db),
           onSignedOut = {},
-          onAdminConsoleClick = {})
+          onAdminConsoleClick = {},
+          onNavigateToLanguageSelection = {})
     }
     composeTestRule.waitUntil(5000) {
       try {
