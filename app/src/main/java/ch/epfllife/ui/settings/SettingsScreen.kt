@@ -49,7 +49,8 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = viewModel { SettingsViewModel(auth, Db.firestore) },
     onSignedOut: () -> Unit,
     toastHelper: ToastHelper = SystemToastHelper(),
-    onAdminConsoleClick: () -> Unit
+    onAdminConsoleClick: () -> Unit,
+    onNavigateToLanguageSelection: () -> Unit
 ) {
   val context = LocalContext.current
   val uiState by viewModel.uiState.collectAsState()
@@ -85,6 +86,11 @@ fun SettingsScreen(
                   Modifier.fillMaxWidth().testTag(SettingsScreenTestTags.ADMIN_CONSOLE_BUTTON))
           Spacer(Modifier.height(32.dp))
         }
+
+        SettingsButton(
+            text = stringResource(R.string.app_language),
+            onClick = { onNavigateToLanguageSelection() })
+        Spacer(Modifier.height(32.dp))
 
         Button(
             modifier = Modifier.fillMaxWidth().testTag(SettingsScreenTestTags.SIGN_OUT_BUTTON),

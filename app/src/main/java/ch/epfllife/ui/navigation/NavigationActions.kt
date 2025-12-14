@@ -20,6 +20,8 @@ sealed class Screen(
 
   object Settings : Screen(route = "settings", name = "Settings", isTopLevelDestination = true)
 
+  object LanguageSelection : Screen(route = "language_selection", name = "LanguageSelection")
+
   object AssociationDetails : Screen(route = "associationdetails", name = "AssociationDetails")
 
   object EventDetails : Screen(route = "eventdetails", name = "EventDetails")

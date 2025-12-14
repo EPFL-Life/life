@@ -25,7 +25,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.db.Db
+import ch.epfllife.model.enums.AppLanguage
 import ch.epfllife.model.map.Location
+import ch.epfllife.model.user.LanguageRepository
 import ch.epfllife.ui.admin.AddEditAssociationScreen
 import ch.epfllife.ui.admin.AddEditEventScreen
 import ch.epfllife.ui.admin.AssociationAdminScreen
@@ -35,6 +37,7 @@ import ch.epfllife.ui.association.AssociationBrowser
 import ch.epfllife.ui.association.AssociationDetailsScreen
 import ch.epfllife.ui.authentication.SignInScreen
 import ch.epfllife.ui.calendar.CalendarScreen
+import ch.epfllife.ui.composables.LanguageProvider
 import ch.epfllife.ui.eventDetails.EventDetailsScreen
 import ch.epfllife.ui.eventDetails.MapScreen
 import ch.epfllife.ui.home.HomeScreen
@@ -43,6 +46,7 @@ import ch.epfllife.ui.navigation.NavigationActions
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.navigation.Screen
 import ch.epfllife.ui.navigation.Tab
+import ch.epfllife.ui.settings.LanguageSelectionScreen
 import ch.epfllife.ui.settings.SettingsScreen
 import ch.epfllife.ui.settings.SettingsViewModel
 import ch.epfllife.ui.theme.Theme
@@ -61,15 +65,26 @@ class MainActivity : ComponentActivity() {
 
     // Keep cached data across app restarts
     Firebase.database.setPersistenceEnabled(true)
+
+    val db = Db.firestore
+    val userRepository = db.userRepo
+    val languageRepository = LanguageRepository(userRepository)
+
     setContent {
-      ThemedApp(auth = Auth(CredentialManager.create(LocalContext.current)), db = Db.firestore)
+      val language by languageRepository.languageFlow.collectAsState(initial = AppLanguage.SYSTEM)
+      LanguageProvider(language = language) {
+        ThemedApp(
+            auth = Auth(CredentialManager.create(LocalContext.current)),
+            db = db,
+            languageRepository = languageRepository)
+      }
     }
   }
 }
 
 @Composable
-fun ThemedApp(auth: Auth, db: Db) {
-  Theme { Surface(modifier = Modifier.fillMaxSize()) { App(auth, db) } }
+fun ThemedApp(auth: Auth, db: Db, languageRepository: LanguageRepository) {
+  Theme { Surface(modifier = Modifier.fillMaxSize()) { App(auth, db, languageRepository) } }
 }
 
 /**
@@ -79,10 +94,7 @@ fun ThemedApp(auth: Auth, db: Db) {
  * @param auth The auth handler.
  */
 @Composable
-fun App(
-    auth: Auth,
-    db: Db,
-) {
+fun App(auth: Auth, db: Db, languageRepository: LanguageRepository) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
   val startDestination =
@@ -206,7 +218,15 @@ fun App(
                 auth = auth,
                 viewModel = viewModel { SettingsViewModel(auth, db) },
                 onSignedOut = { navigationActions.navigateTo(Screen.SignIn) },
-                onAdminConsoleClick = { navigationActions.navigateToAssociationAdmin() })
+                onAdminConsoleClick = { navigationActions.navigateToAssociationAdmin() },
+                onNavigateToLanguageSelection = {
+                  navController.navigate(Screen.LanguageSelection.route)
+                })
+          }
+
+          composable(Screen.LanguageSelection.route) {
+            LanguageSelectionScreen(
+                languageRepository = languageRepository, onBack = { navController.popBackStack() })
           }
 
           // this composable is a bit chunky but it keeps the complexity low so this is preferable

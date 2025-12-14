@@ -52,6 +52,8 @@
     <string name="signout_successful">Sign out successful</string>
     <string name="settings_title">Settings</string>
     <string name="sign_out">Sign Out</string>
+    <string name="app_language">App Language</string>
+    <string name="select_language">Select App Language</string>
 
 
     <!-- Calendar screen-->
@@ -142,7 +144,7 @@
     <string name="delete_association_title">Delete Association</string>
     <string name="delete_association_confirmation">Are you sure you want to delete this association? This action cannot be undone.</string>
     <string name="delete_association_success">Association deleted successfully</string>
-    <string name="delete_association_failure">Failed to delete association</string>
+    <string name="delete_association_failure" >Failed to delete association</string>
     <string name="delete_button">Delete</string>
     <string name="cancel_button">Cancel</string>
     <string name="admin_console">Admin Console</string>
