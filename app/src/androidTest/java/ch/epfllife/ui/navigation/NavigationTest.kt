@@ -13,6 +13,7 @@ import ch.epfllife.example_data.ExampleEvents
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.authentication.SignInResult
 import ch.epfllife.model.db.Db
+import ch.epfllife.model.user.LanguageRepository
 import ch.epfllife.ui.composables.EPFLLogoTestTags
 import ch.epfllife.ui.eventDetails.EventDetailsTestTags
 import ch.epfllife.ui.eventDetails.MapScreenTestTags
@@ -54,7 +55,8 @@ class NavigationTest {
   }
 
   private fun setUpApp() {
-    composeTestRule.setContent { ThemedApp(auth, db) }
+    val languageRepository = LanguageRepository(db.userRepo)
+    composeTestRule.setContent { ThemedApp(auth, db, languageRepository) }
   }
 
   @Test

@@ -17,6 +17,7 @@ import ch.epfllife.example_data.ExampleUsers
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.authentication.SignInResult
 import ch.epfllife.model.db.Db
+import ch.epfllife.model.user.LanguageRepository
 import ch.epfllife.ui.association.AssociationDetailsTestTags
 import ch.epfllife.ui.authentication.SignInScreenTestTags
 import ch.epfllife.ui.composables.AssociationCardTestTags
@@ -59,11 +60,13 @@ class EndToEndTest {
       val signInResult = auth.signInWithCredential(FakeCredentialManager.defaultUserCredentials)
       Assert.assertTrue("Sign in must succeed", signInResult is SignInResult.Success)
     }
-    composeTestRule.setContent { ThemedApp(auth, db) }
+    val languageRepository = LanguageRepository(db.userRepo)
+    composeTestRule.setContent { ThemedApp(auth, db, languageRepository) }
   }
 
   fun useLoggedOutApp() {
-    composeTestRule.setContent { ThemedApp(auth, db) }
+    val languageRepository = LanguageRepository(db.userRepo)
+    composeTestRule.setContent { ThemedApp(auth, db, languageRepository) }
   }
 
   @Test
