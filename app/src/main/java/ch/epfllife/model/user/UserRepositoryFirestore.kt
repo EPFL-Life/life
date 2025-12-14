@@ -1,6 +1,7 @@
 package ch.epfllife.model.user
 
 import android.util.Log
+import ch.epfllife.model.enums.AppLanguage
 import ch.epfllife.model.firestore.FirestoreCollections
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
@@ -123,7 +124,19 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
         val settingsMap = document["userSettings"] as? Map<*, *>
         // Get "isDarkMode" from the map, defaulting to 'false' if it or the map doesn't exist
         val isDarkMode = settingsMap?.get("isDarkMode") as? Boolean ?: false
-        val userSettings = UserSettings(isDarkMode = isDarkMode)
+
+        // Read persisted language; accept enum name or locale tag, default to SYSTEM on unknown
+        val language =
+            when (val raw = settingsMap?.get("language")) {
+              is AppLanguage -> raw
+              is String -> {
+                AppLanguage.values().firstOrNull { it.name == raw }
+                    ?: AppLanguage.fromTag(raw.lowercase())
+              }
+              else -> AppLanguage.SYSTEM
+            }
+
+        val userSettings = UserSettings(isDarkMode = isDarkMode, language = language)
 
         // 5. Construct the User object
         User(

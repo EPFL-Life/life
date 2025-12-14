@@ -1,0 +1,149 @@
+<resources>
+        <string name="app_name">EPFL Life</string>
+        <string name="default_web_client_id">85738580828-ovg7unu9rcn0cckulm8immn9dkv1eu77.apps.googleusercontent.com</string>
+
+        <!-- SignIn Screen -->
+        <string name="signin_welcome">Bienvenue</string>
+        <string name="signin_epfllife_logo_alt_text">Logo EPFLLife</string>
+        <string name="signin_google_logo_alt_text">Logo Google</string>
+        <string name="signin_success_message">Connexion réussie</string>
+        <string name="signin_failure_message">Échec de la connexion</string>
+        <string name="signin_cancelled_message">Connexion annulée par l’utilisateur</string>
+        <string name="signin_with_google">Se connecter avec Google</string>
+
+        <!-- Home screen -->
+        <string name="home_empty_title">Il n’y a rien ici !</string>
+        <string name="home_empty_description">
+        Abonnez-vous à des associations pour remplir votre fil.
+        Commencez en appuyant sur l’icône « Associations » dans la barre de navigation ci-dessous.
+    </string>
+        <string name="home_no_events_title">Aucun événement disponible</string>
+        <string name="home_no_events_description">Aucun événement n’est actuellement publié. Revenez bientôt !</string>
+        <string name="home_enrolled_events">Inscrit</string>
+        <string name="home_enroll_events">S’inscrire</string>
+
+        <!-- Association Browser screen -->
+        <string name="associations_empty_title">Aucune association suivie pour le moment !</string>
+        <string name="associations_empty_description">Appuyez sur le bouton « Toutes les associations » ci-dessus pour parcourir et vous abonner à celles qui vous plaisent</string>
+        <string name="associations_no_all_title">Aucune association disponible</string>
+        <string name="associations_no_all_description">Aucune association à afficher pour le moment. Veuillez réessayer plus tard.</string>
+
+        <!-- Association and Home screen filter -->
+        <string name="subscribed_filter">Pour vous</string>
+        <string name="all_events_filter">Tous les événements</string>
+        <string name="all_associations_filter">Toutes les associations</string>
+
+        <!-- Association Details Screen -->
+        <string name="association_image_description">Image de l’association</string>
+        <string name="back_button_description">Retour</string>
+        <string name="subscribe_to">S’abonner à %1$s</string>
+        <string name="unsubscribe_from">Se désabonner de %1$s</string>
+        <string name="about_section_title">À propos</string>
+        <string name="social_pages_title">Pages sociales</string>
+        <string name="instagram_description">Instagram</string>
+        <string name="telegram_description">Telegram</string>
+        <string name="whatsapp_description">WhatsApp</string>
+        <string name="linkedin_description">LinkedIn</string>
+        <string name="website_description">Site web</string>
+        <string name="about_placeholder">Aucune description disponible.</string>
+        <string name="upcoming_events_title">Événements à venir</string>
+
+        <!-- Settings screen-->
+        <string name="signout_successful">Déconnexion réussie</string>
+        <string name="settings_title">Paramètres</string>
+        <string name="sign_out">Se déconnecter</string>
+    <string name="app_language">Langue de l\'application</string>
+    <string name="select_language">Sélectionnez la langue de l\'application</string>
+
+        <!-- Calendar screen-->
+        <string name="calendar_filter_enrolled">Inscrit</string>
+        <string name="calendar_filter_all_events">Tous les événements</string>
+        <string name="calendar_current_month_format">%1$s</string>
+        <string name="calendar_card_date_day_format">%1$s %2$d</string>
+        <string name="calendar_card_date_range_format">%1$s %2$d-%3$d</string>
+        <string name="calendar_upcoming_events_title">Événements à venir</string>
+        <string name="calendar_no_events_placeholder">Aucun événement trouvé</string>
+        <string name="calendar_search_hint">Rechercher des événements</string>
+
+        <!-- Errors -->
+        <string name="error_association_not_found">Association introuvable</string>
+        <string name="error_loading_association">Échec du chargement de l’association</string>
+        <string name="error_enroll_failed">Échec de l’inscription : veuillez réessayer.</string>
+        <string name="error_unenroll_failed">Échec de la désinscription : veuillez réessayer.</string>
+        <string name="error_event_not_found">Échec de la désinscription : veuillez réessayer.</string>
+        <string name="error_loading_event">Échec du chargement de l’événement</string>
+        <string name="error_loading_associations">Échec du chargement des associations : %1$s</string>
+        <string name="retry">Réessayer</string>
+
+        <!-- Admin Association-->
+        <string name="settings_screen_association">Sélectionner une association</string>
+        <string name="add_new_association">Ajouter une nouvelle association</string>
+        <string name="manage_association">Gérer %1$s</string>
+        <string name="manage_association_fallback">Gérer l’association</string>
+        <string name="general_info">Informations générales</string>
+        <string name="association_name_required">Nom de l’association*</string>
+        <string name="short_description_required">Courte description*</string>
+        <string name="about_association_required">À propos de l’association*</string>
+        <string name="event_category_label">Catégorie d’événement</string>
+        <string name="upload_images">Téléverser des images</string>
+        <string name="logo_url">URL du logo</string>
+        <string name="banner_url">URL de la bannière</string>
+        <string name="submit">Soumettre</string>
+        <string name="settings_selected_association">Sélectionné : %1$s</string>
+
+        <!-- Manage events -->
+        <string name="manage_events_title">Gérer les événements</string>
+        <string name="add_new_event">Ajouter un nouvel événement</string>
+        <string name="manage_events_empty">Aucun événement à venir pour cette association.</string>
+        <string name="error_loading_events">Échec du chargement des événements : %1$s</string>
+        <string name="error_loading_events_generic">Échec du chargement des événements</string>
+
+        <!-- Add/Edit event form -->
+        <string name="edit_event">Modifier l’événement</string>
+        <string name="event_title_required">Titre*</string>
+        <string name="event_description_required">Description*</string>
+        <string name="event_location_section_title">Lieu</string>
+        <string name="event_location_name_label">Nom du lieu*</string>
+        <string name="event_location_search">Rechercher un lieu</string>
+        <string name="event_location_searching">Recherche du lieu…</string>
+        <string name="event_location_coordinates">Coordonnées du lieu</string>
+        <string name="event_location_latitude">Latitude</string>
+        <string name="event_location_longitude">Longitude</string>
+        <string name="event_location_no_match">Aucun lieu correspondant trouvé.</string>
+        <string name="event_location_lookup_failed">Échec de la récupération du lieu. Réessayez.</string>
+        <string name="event_location_resolved_description">Résultat : %1$s</string>
+        <string name="event_location_query_too_short">Tapez au moins 3 caractères.</string>
+        <string name="event_time_required">Date et heure*</string>
+        <string name="event_price_optional">Prix (optionnel)</string>
+        <string name="event_tags">Étiquettes (séparées par des virgules)</string>
+        <string name="event_picture_url">URL de l’image</string>
+
+        <!-- Extra -->
+        <string name="search_bar_placeholder">Rechercher…</string>
+        <string name="show_more">Afficher plus…</string>
+        <string name="show_less">Afficher moins</string>
+
+        <string name="calendar_previous_month">Mois précédent</string>
+        <string name="calendar_next_month">Mois suivant</string>
+        <string name="calendar_day_mon">Lun</string>
+        <string name="calendar_day_tue">Mar</string>
+        <string name="calendar_day_wed">Mer</string>
+        <string name="calendar_day_thu">Jeu</string>
+        <string name="calendar_day_fri">Ven</string>
+        <string name="calendar_day_sat">Sam</string>
+        <string name="calendar_day_sun">Dim</string>
+        <string name="calendar_events_for_date">Événements du %1$s</string>
+    <string name="calendar_no_events_on_day">Aucun événement ce jour-là.</string>
+
+    <!-- Admin Association-->
+    <string name="delete_association_button">Supprimer l’association</string>
+    <string name="toggle_future_events_filter">Basculer le filtre des événements futurs</string>
+    <string name="delete_association_title">Supprimer l’association</string>
+    <string name="delete_association_confirmation">Êtes-vous sûr de vouloir supprimer cette association? Cette action est irréversible.</string>
+    <string name="delete_association_success">Association supprimée avec succès</string>
+    <string name="delete_association_failure">Échec de la suppression de l’association</string>
+    <string name="delete_button">Supprimer</string>
+    <string name="cancel_button">Annuler</string>
+    <string name="admin_console">Console d’administration</string>
+
+</resources>
