@@ -45,7 +45,7 @@ class EventDetailsViewModelTest : FirestoreLifeTest() {
     val state = viewModel.uiState.first { it !is EventDetailsUIState.Loading }
     assertTrue(state is EventDetailsUIState.Error)
     val errorState = state as EventDetailsUIState.Error
-    assertEquals(context.getString(R.string.error_loading_event), errorState.message)
+    assertEquals(context.getString(R.string.error_event_not_found), errorState.message)
   }
 
   @Test

@@ -4,12 +4,14 @@ import android.Manifest
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.NavHostController
 import androidx.test.rule.GrantPermissionRule
 import ch.epfllife.ThemedApp
 import ch.epfllife.example_data.ExampleEvents
+import ch.epfllife.example_data.ExampleUsers
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.authentication.SignInResult
 import ch.epfllife.model.db.Db
@@ -370,5 +372,30 @@ class NavigationTest {
     composeTestRule
         .onNodeWithTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU, useUnmergedTree = true)
         .assertIsDisplayed()
+  }
+
+  @Test
+  fun navigateToEventDetails_canOpenAttendeesList_andShowsAttendees() {
+    val testEvent = ExampleEvents.event1
+    val attendee1 = ExampleUsers.user1.copy(enrolledEvents = listOf(testEvent.id))
+    val attendee2 = ExampleUsers.user2.copy(enrolledEvents = listOf(testEvent.id))
+
+    runTest {
+      Assert.assertTrue(db.assocRepo.createAssociation(testEvent.association).isSuccess)
+      Assert.assertTrue(db.eventRepo.createEvent(testEvent).isSuccess)
+      Assert.assertTrue(db.userRepo.createUser(attendee1).isSuccess)
+      Assert.assertTrue(db.userRepo.createUser(attendee2).isSuccess)
+    }
+
+    setUpApp()
+    composeTestRule.navigateToEvent(testEvent.id)
+
+    // Click on the attendee count row on the event details screen
+    composeTestRule.onNodeWithText("2 attending").assertIsDisplayed().performClick()
+
+    // Attendee list screen should be displayed and show the attendee names
+    composeTestRule.onNodeWithText("Event Attendees").assertIsDisplayed()
+    composeTestRule.onNodeWithText(attendee1.name).assertIsDisplayed()
+    composeTestRule.onNodeWithText(attendee2.name).assertIsDisplayed()
   }
 }
