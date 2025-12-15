@@ -39,14 +39,13 @@ class EditDisplayNameViewModel(private val db: Db) : ViewModel() {
 
   private fun loadUser() {
     viewModelScope.launch {
-      try {
-        val user = userRepo.getCurrentUser() ?: throw IllegalStateException("User not found")
-
+      val user = userRepo.getCurrentUser()
+      if (user != null) {
         userSnapshot = user
         displayName = user.name
         _uiState.value = EditDisplayNameUiState.Success
-      } catch (e: Exception) {
-        Log.e("EditDisplayNameVM", "Failed to load user", e)
+      } else {
+        Log.e("EditDisplayNameVM", "User not found")
         _uiState.value = EditDisplayNameUiState.Error(R.string.error_loading_user)
       }
     }
