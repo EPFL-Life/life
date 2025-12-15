@@ -48,7 +48,6 @@ class EditDisplayNameScreenTest {
       }
     }
 
-
     composeTestRule
         .onNode(hasSetTextAction() and hasText(user.name, substring = false))
         .assertIsDisplayed()
@@ -96,10 +95,7 @@ class EditDisplayNameScreenTest {
     composeTestRule.setContent {
       Theme {
         EditDisplayNameScreen(
-            db = db,
-            viewModel = viewModel,
-            onBack = { backCalled = true },
-            onSubmitSuccess = {})
+            db = db, viewModel = viewModel, onBack = { backCalled = true }, onSubmitSuccess = {})
       }
     }
 
