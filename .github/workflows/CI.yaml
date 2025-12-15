@@ -13,11 +13,9 @@ on:
       - reopened
 
 jobs:
-  epfllife-ci:
-    name: CI - EPFL Life
-    # Execute the CI on the course's runners
+  app-ci:
+    name: App CI
     runs-on: ubuntu-latest
-
     env:
       app_name: EPFLLifeDebug
 
@@ -159,7 +157,7 @@ jobs:
           MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
 
       - name: Run instrumentation tests
-        timeout-minutes: 25
+        timeout-minutes: 60
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
@@ -185,13 +183,99 @@ jobs:
           name: Coverage report
           path: app/build/reports/jacoco/jacocoTestReport
 
-      - name: Sonar analysis
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew sonar --info
-
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
           path: app/build/outputs/apk/debug/*.apk
+
+  scraper-ci:
+    name: Event scraper CI
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./${{ env.base_folder }}/event_scraper
+
+    steps:
+      # Get repo
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      # Install Python dependencies and run tests
+      - name: Run Python tests
+        run: |
+          pip install -r requirements.txt
+          pytest --cov=. --cov-report=xml
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: Coverage report Python
+          path: event_scraper/coverage.xml
+
+  sonar-analysis:
+    name: Sonar Analysis
+    runs-on: ubuntu-latest
+    needs: [app-ci, scraper-ci]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of Sonar analysis (if we use Sonar Later)
+
+      # Shouldn't be here, but better safe than sorry
+      - name: Remove current gradle cache
+        run: rm -rf ~/.gradle
+
+      # Load cache, or it would download all dependencies again
+      - name: Retrieve gradle cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+
+      - name: Cache SonarQube packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Grant execute permission for gradlew
+        run: |
+          chmod +x ./gradlew
+
+      # The environment changed, so we have to download the artifacts again
+      - name: Download Python coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: Coverage report Python
+          path: ./python-coverage/
+
+      - name: Download Android coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: Coverage report
+          path: ./android-coverage/
+
+      # This is what we actually want to do in this job
+      - name: Sonar analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        # Runs the gradle plugin
+        # Need to make sure, that it is correctly configured
+        # to find the coverage reports
+        run: ./gradlew sonar --info
