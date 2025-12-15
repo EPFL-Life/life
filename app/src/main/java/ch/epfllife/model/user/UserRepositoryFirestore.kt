@@ -251,6 +251,21 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     return updateUser(currentUser.id, updatedUser)
   }
 
+  override suspend fun getUsersEnrolledInEvent(eventId: String): List<User> {
+    return try {
+      val snapshot =
+          db.collection(FirestoreCollections.USERS)
+              .whereArrayContains("enrolledEvents", eventId)
+              .get()
+              .await()
+
+      snapshot.documents.mapNotNull { documentToUser(it) }
+    } catch (e: Exception) {
+      Log.e("UserRepository", "Error getting users enrolled in event $eventId", e)
+      emptyList()
+    }
+  }
+
   override suspend fun unsubscribeFromAssociation(associationId: String): Result<Unit> {
     val currentUser = getCurrentUser()
 

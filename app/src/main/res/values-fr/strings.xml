@@ -48,6 +48,9 @@
         <string name="about_placeholder">Aucune description disponible.</string>
         <string name="upcoming_events_title">Événements à venir</string>
 
+        <!-- Attendee List Screen -->
+        <string name="attendees">Participants à l\'événement</string>
+
         <!-- Settings screen-->
         <string name="signout_successful">Déconnexion réussie</string>
         <string name="settings_title">Paramètres</string>
