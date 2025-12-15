@@ -32,6 +32,7 @@ import ch.epfllife.ui.admin.AddEditEventTestTags
 import ch.epfllife.ui.admin.AssociationAdminScreenTestTags
 import ch.epfllife.ui.admin.ManageEventsTestTags
 import ch.epfllife.ui.admin.SelectAssociationTestTags
+import ch.epfllife.ui.calendar.CalendarTestTags
 import ch.epfllife.ui.composables.AssociationCardTestTags
 import ch.epfllife.ui.composables.DisplayedEventsTestTags
 import ch.epfllife.ui.navigation.NavigationTestTags
@@ -289,6 +290,15 @@ class AdminEndToEndTest {
     composeTestRule.navigateToTab(Tab.HomeScreen)
     composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_ALL).performClick()
     composeTestRule.waitForIdle()
+    composeTestRule.waitUntil { composeTestRule.onNodeWithText(eventTitle).isDisplayed() }
+
+    // Verify event in calendar list
+    composeTestRule.navigateToTab(Tab.Calendar)
+    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_ALL).performClick()
+    composeTestRule.waitUntil { composeTestRule.onNodeWithText(eventTitle).isDisplayed() }
+
+    // Verify event in calendar grid
+    composeTestRule.onNodeWithTag(CalendarTestTags.GRID_VIEW_TOGGLE).performClick()
     composeTestRule.waitUntil { composeTestRule.onNodeWithText(eventTitle).isDisplayed() }
   }
 }
