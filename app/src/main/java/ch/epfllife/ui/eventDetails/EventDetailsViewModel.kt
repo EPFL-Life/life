@@ -16,7 +16,8 @@ import kotlinx.coroutines.launch
 sealed class EventDetailsUIState {
   object Loading : EventDetailsUIState()
 
-  data class Success(val event: Event, val isEnrolled: Boolean) : EventDetailsUIState()
+  data class Success(val event: Event, val isEnrolled: Boolean, val attendees: List<User>) :
+      EventDetailsUIState()
 
   data class Error(val message: String) : EventDetailsUIState()
 }
@@ -39,14 +40,21 @@ class EventDetailsViewModel(
     viewModelScope.launch {
       try {
         val event = db.eventRepo.getEvent(eventId)
-        currentUser = db.userRepo.getCurrentUser()
+        val user = db.userRepo.getCurrentUser()
+        currentUser = user
 
-        if (event != null) {
-          _uiState.value = EventDetailsUIState.Success(event, isEnrolled = isEnrolled(event))
-        } else {
+        if (event == null) {
           _uiState.value =
               EventDetailsUIState.Error(context.getString(R.string.error_event_not_found))
+          return@launch
         }
+        val attendees = db.userRepo.getUsersEnrolledInEvent(eventId)
+
+        _uiState.value =
+            EventDetailsUIState.Success(
+                event = event,
+                isEnrolled = user?.enrolledEvents?.contains(eventId) == true,
+                attendees = attendees)
       } catch (e: Exception) {
         _uiState.value = EventDetailsUIState.Error(context.getString(R.string.error_loading_event))
       }
@@ -60,8 +68,9 @@ class EventDetailsViewModel(
   fun enrollInEvent(event: Event, context: Context) {
     viewModelScope.launch {
       try {
-        if (isEnrolled(event)) {
-          _uiState.value = EventDetailsUIState.Success(event, isEnrolled = true)
+        val currentState = _uiState.value
+        if (isEnrolled(event) && currentState is EventDetailsUIState.Success) {
+          _uiState.value = currentState.copy(isEnrolled = true)
           return@launch
         }
 
@@ -69,7 +78,7 @@ class EventDetailsViewModel(
             .subscribeToEvent(event.id)
             .fold(
                 onSuccess = { loadEvent(event.id, context) },
-                onFailure = { _ ->
+                onFailure = {
                   _uiState.value =
                       EventDetailsUIState.Error(context.getString(R.string.error_enroll_failed))
                 })
@@ -82,8 +91,9 @@ class EventDetailsViewModel(
   fun unenrollFromEvent(event: Event, context: Context) {
     viewModelScope.launch {
       try {
-        if (!isEnrolled(event)) {
-          _uiState.value = EventDetailsUIState.Success(event, isEnrolled = false)
+        val currentState = _uiState.value
+        if (!isEnrolled(event) && currentState is EventDetailsUIState.Success) {
+          _uiState.value = currentState.copy(isEnrolled = false)
           return@launch
         }
 
@@ -91,7 +101,7 @@ class EventDetailsViewModel(
             .unsubscribeFromEvent(event.id)
             .fold(
                 onSuccess = { loadEvent(event.id, context) },
-                onFailure = { _ ->
+                onFailure = {
                   _uiState.value =
                       EventDetailsUIState.Error(context.getString(R.string.error_unenroll_failed))
                 })

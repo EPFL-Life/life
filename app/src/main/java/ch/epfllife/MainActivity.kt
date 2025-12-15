@@ -28,6 +28,7 @@ import ch.epfllife.model.db.Db
 import ch.epfllife.model.enums.AppLanguage
 import ch.epfllife.model.map.Location
 import ch.epfllife.model.user.LanguageRepository
+import ch.epfllife.model.user.User
 import ch.epfllife.ui.admin.AddEditAssociationScreen
 import ch.epfllife.ui.admin.AddEditEventScreen
 import ch.epfllife.ui.admin.AssociationAdminScreen
@@ -38,6 +39,7 @@ import ch.epfllife.ui.association.AssociationDetailsScreen
 import ch.epfllife.ui.authentication.SignInScreen
 import ch.epfllife.ui.calendar.CalendarScreen
 import ch.epfllife.ui.composables.LanguageProvider
+import ch.epfllife.ui.eventDetails.AttendeeListScreen
 import ch.epfllife.ui.eventDetails.EventDetailsScreen
 import ch.epfllife.ui.eventDetails.MapScreen
 import ch.epfllife.ui.home.HomeScreen
@@ -199,8 +201,21 @@ fun App(auth: Auth, db: Db, languageRepository: LanguageRepository) {
                 onAssociationClick = { associationId ->
                   navigationActions.navigateToAssociationDetails(associationId)
                 },
+                onOpenAttendees = { attendees: List<User> ->
+                  navController.currentBackStackEntry?.savedStateHandle?.set("attendees", attendees)
+                  navController.navigate(Screen.AttendeeList.route)
+                },
                 db = db,
             )
+          }
+
+          composable(Screen.AttendeeList.route) {
+            AttendeeListScreen(
+                attendees =
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.get<List<User>>("attendees") ?: emptyList(),
+                onBack = { navController.popBackStack() })
           }
 
           composable(
