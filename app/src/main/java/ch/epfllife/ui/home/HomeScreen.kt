@@ -9,6 +9,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -35,7 +36,7 @@ fun HomeScreen(
     onEventClick: (eventId: String) -> Unit,
 ) {
   LaunchedEffect(Unit) { viewModel.refresh() }
-  var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
+  var selected by rememberSaveable { mutableStateOf(SubscriptionFilter.Subscribed) }
 
   val allEvents by viewModel.allEvents.collectAsState()
   val subscribedEventsCombined by viewModel.allEventsSubscribedAssociations.collectAsState()
