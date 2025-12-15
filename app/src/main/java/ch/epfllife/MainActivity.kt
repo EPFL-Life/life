@@ -46,6 +46,7 @@ import ch.epfllife.ui.navigation.NavigationActions
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.navigation.Screen
 import ch.epfllife.ui.navigation.Tab
+import ch.epfllife.ui.settings.EditDisplayNameScreen
 import ch.epfllife.ui.settings.LanguageSelectionScreen
 import ch.epfllife.ui.settings.SettingsScreen
 import ch.epfllife.ui.settings.SettingsViewModel
@@ -219,9 +220,17 @@ fun App(auth: Auth, db: Db, languageRepository: LanguageRepository) {
                 viewModel = viewModel { SettingsViewModel(auth, db) },
                 onSignedOut = { navigationActions.navigateTo(Screen.SignIn) },
                 onAdminConsoleClick = { navigationActions.navigateToAssociationAdmin() },
+                onNavigateToDisplayName = { navigationActions.navigateToEditDisplayName() },
                 onNavigateToLanguageSelection = {
                   navController.navigate(Screen.LanguageSelection.route)
                 })
+          }
+
+          composable(Screen.EditDisplayName.route) {
+            EditDisplayNameScreen(
+                db = db,
+                onBack = { navController.popBackStack() },
+                onSubmitSuccess = { navController.popBackStack() })
           }
 
           composable(Screen.LanguageSelection.route) {
