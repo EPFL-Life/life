@@ -57,8 +57,6 @@
         <!-- Language screen-->
         <string name="select_language">Sélectionnez la langue de l\'application</string>
         <string name="system_default">Système par défaut</string>
-        <string name="english" translatable="false">English</string>
-        <string name="french" translatable="false">Français</string>
 
         <!-- Edit display name-->
         <string name="display_name">Nom d\'affichage</string>
