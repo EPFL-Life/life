@@ -50,7 +50,7 @@ class EventDetailsViewModelTest : FirestoreLifeTest() {
 
   @Test
   fun loadEvent_repositoryThrowsException_returnsErrorWithCorrectMessage() = runTest {
-    // Arrange: Create event and user, then delete event to trigger exception path
+    // Arrange: Create event and user, then delete event so getEvent returns null
     val event = ExampleEvents.event1
     db.eventRepo.createEvent(event)
 
@@ -62,14 +62,14 @@ class EventDetailsViewModelTest : FirestoreLifeTest() {
 
     db.eventRepo.deleteEvent(event.id)
 
-    // Act: Load deleted event to trigger catch block
+    // Act: Load deleted event
     viewModel.loadEvent(event.id, context)
 
-    // Assert: Hits line 51: context.getString(R.string.error_loading_event)
+    // Assert: Hits line 48: context.getString(R.string.error_event_not_found)
     val state = viewModel.uiState.first { it !is EventDetailsUIState.Loading }
     assertTrue(state is EventDetailsUIState.Error)
     val errorState = state as EventDetailsUIState.Error
-    assertEquals(context.getString(R.string.error_loading_event), errorState.message)
+    assertEquals(context.getString(R.string.error_event_not_found), errorState.message)
   }
 
   @Test

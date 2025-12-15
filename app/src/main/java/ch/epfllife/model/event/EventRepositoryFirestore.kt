@@ -26,18 +26,14 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
     task.documents.map { doc -> async { documentToEvent(doc) } }.mapNotNull { it.await() }
   }
 
-  override suspend fun getEvent(eventId: String): Event {
+  override suspend fun getEvent(eventId: String): Event? {
     return try {
       val doc = db.collection(FirestoreCollections.EVENTS).document(eventId).get().await()
-
-      if (!doc.exists()) {
-        throw NoSuchElementException("Event with id $eventId not found")
-      }
-
-      documentToEvent(doc) ?: throw IllegalStateException("Failed to parse event with id $eventId")
+      if (!doc.exists()) return null
+      documentToEvent(doc)
     } catch (e: Exception) {
       Log.e("EventRepoFirestore", "Error getting event $eventId", e)
-      throw e
+      null
     }
   }
 
