@@ -2,8 +2,7 @@ package ch.epfllife.ui.settings
 
 import android.view.View
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.isDisplayed
+import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -47,7 +46,8 @@ class SettingsScreenTest {
           auth = auth,
           onSignedOut = {},
           onAdminConsoleClick = {},
-          onNavigateToLanguageSelection = {})
+          onNavigateToLanguageSelection = {},
+          onNavigateToDisplayName = {})
     }
     listOf(NavigationTestTags.SETTINGS_SCREEN, SettingsScreenTestTags.SIGN_OUT_BUTTON)
         .map(composeTestRule::assertTagIsDisplayed)
@@ -64,10 +64,12 @@ class SettingsScreenTest {
           onSignedOut = { clicked = true },
           toastHelper = fakeToastHelper,
           onAdminConsoleClick = {},
-          onNavigateToLanguageSelection = {})
+          onNavigateToLanguageSelection = {},
+          onNavigateToDisplayName = {})
     }
     composeTestRule.onNodeWithTag(SettingsScreenTestTags.SIGN_OUT_BUTTON).performClick()
     composeTestRule.waitForIdle()
+    Assert.assertTrue(clicked)
     Assert.assertNull(Firebase.auth.currentUser)
     Assert.assertEquals(
         composeTestRule.activity.getString(R.string.signout_successful),
@@ -84,7 +86,8 @@ class SettingsScreenTest {
           viewModel = SettingsViewModel(auth, db),
           onSignedOut = {},
           onAdminConsoleClick = { clicked = true },
-          onNavigateToLanguageSelection = {})
+          onNavigateToLanguageSelection = {},
+          onNavigateToDisplayName = {})
     }
 
     composeTestRule.onNodeWithTag(SettingsScreenTestTags.ADMIN_CONSOLE_BUTTON).performClick()
@@ -100,7 +103,8 @@ class SettingsScreenTest {
           viewModel = SettingsViewModel(auth, db),
           onSignedOut = {},
           onAdminConsoleClick = {},
-          onNavigateToLanguageSelection = {})
+          onNavigateToLanguageSelection = {},
+          onNavigateToDisplayName = {})
     }
     composeTestRule.onNodeWithTag(SettingsScreenTestTags.ADMIN_CONSOLE_BUTTON).assertDoesNotExist()
   }
@@ -114,7 +118,8 @@ class SettingsScreenTest {
           viewModel = SettingsViewModel(auth, db),
           onSignedOut = {},
           onAdminConsoleClick = {},
-          onNavigateToLanguageSelection = {})
+          onNavigateToLanguageSelection = {},
+          onNavigateToDisplayName = {})
     }
     composeTestRule.waitUntil(5000) {
       try {
@@ -135,7 +140,8 @@ class SettingsScreenTest {
           viewModel = SettingsViewModel(auth, db),
           onSignedOut = {},
           onAdminConsoleClick = {},
-          onNavigateToLanguageSelection = {})
+          onNavigateToLanguageSelection = {},
+          onNavigateToDisplayName = {})
     }
     composeTestRule.waitUntil(5000) {
       try {
@@ -145,6 +151,27 @@ class SettingsScreenTest {
       }
     }
     composeTestRule.onNodeWithTag(SettingsScreenTestTags.ADMIN_CONSOLE_BUTTON).assertIsDisplayed()
+  }
+
+  @Test
+  fun displayNameButtonInvokesCallback() {
+    val db = fakeDbWithUserRole(UserRole.USER)
+    var clicked = false
+
+    composeTestRule.setContent {
+      SettingsScreen(
+          auth = auth,
+          viewModel = SettingsViewModel(auth, db),
+          onSignedOut = {},
+          onAdminConsoleClick = {},
+          onNavigateToLanguageSelection = {},
+          onNavigateToDisplayName = { clicked = true })
+    }
+
+    val displayNameLabel = composeTestRule.activity.getString(R.string.display_name)
+    composeTestRule.onNode(hasText(displayNameLabel) and hasClickAction()).performClick()
+
+    Assert.assertTrue(clicked)
   }
 
   private fun fakeDbWithUserRole(role: UserRole): Db {

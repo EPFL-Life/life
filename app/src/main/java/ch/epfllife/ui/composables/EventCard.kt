@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import ch.epfllife.R
 import ch.epfllife.model.event.Event
 import ch.epfllife.ui.theme.Enrolled
-import ch.epfllife.ui.theme.LifeRed
 import coil.compose.AsyncImage
 
 object EventCardTestTags {
@@ -78,17 +77,8 @@ fun EventCard(
                               style = MaterialTheme.typography.labelSmall,
                               color = Color.White)
                         }
-                  } else {
-                    Box(
-                        modifier =
-                            Modifier.background(color = LifeRed, shape = RoundedCornerShape(12.dp))
-                                .padding(horizontal = 10.dp, vertical = 4.dp)) {
-                          Text(
-                              text = stringResource(R.string.home_enroll_events),
-                              style = MaterialTheme.typography.labelSmall,
-                              color = Color.White)
-                        }
                   }
+
                   Spacer(Modifier.weight(1f))
                   Text(
                       text = event.price.formatPrice(),

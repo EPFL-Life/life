@@ -50,7 +50,8 @@ fun SettingsScreen(
     onSignedOut: () -> Unit,
     toastHelper: ToastHelper = SystemToastHelper(),
     onAdminConsoleClick: () -> Unit,
-    onNavigateToLanguageSelection: () -> Unit
+    onNavigateToLanguageSelection: () -> Unit,
+    onNavigateToDisplayName: () -> Unit
 ) {
   val context = LocalContext.current
   val uiState by viewModel.uiState.collectAsState()
@@ -86,6 +87,10 @@ fun SettingsScreen(
                   Modifier.fillMaxWidth().testTag(SettingsScreenTestTags.ADMIN_CONSOLE_BUTTON))
           Spacer(Modifier.height(32.dp))
         }
+
+        SettingsButton(
+            text = stringResource(R.string.display_name), onClick = { onNavigateToDisplayName() })
+        Spacer(Modifier.height(32.dp))
 
         SettingsButton(
             text = stringResource(R.string.app_language),

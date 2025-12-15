@@ -52,8 +52,17 @@
         <string name="signout_successful">Déconnexion réussie</string>
         <string name="settings_title">Paramètres</string>
         <string name="sign_out">Se déconnecter</string>
-    <string name="app_language">Langue de l\'application</string>
-    <string name="select_language">Sélectionnez la langue de l\'application</string>
+        <string name="app_language">Langue de l\'application</string>
+
+        <!-- Language screen-->
+        <string name="select_language">Sélectionnez la langue de l\'application</string>
+        <string name="system_default">Système par défaut</string>
+
+        <!-- Edit display name-->
+        <string name="display_name">Nom d\'affichage</string>
+        <string name="edit_display_name">Modifier le nom d\'affichage</string>
+        <string name="display_name_helper">Utilisez votre nom complet pour que vos amis puissent facilement vous retrouver sur les listes de participants à l\'événement.</string>
+
 
         <!-- Calendar screen-->
         <string name="calendar_filter_enrolled">Inscrit</string>
@@ -74,6 +83,8 @@
         <string name="error_loading_event">Échec du chargement de l’événement</string>
         <string name="error_loading_associations">Échec du chargement des associations : %1$s</string>
         <string name="retry">Réessayer</string>
+        <string name="error_loading_user">Impossible de charger le profil utilisateur</string>
+        <string name="error_updating_profile">Impossible de mettre à jour le profil : veuillez réessayer.</string>
 
         <!-- Admin Association-->
         <string name="settings_screen_association">Sélectionner une association</string>

@@ -21,6 +21,8 @@ sealed class Screen(
 
   object Settings : Screen(route = "settings", name = "Settings", isTopLevelDestination = true)
 
+  object EditDisplayName : Screen(route = "edit_display_name", name = "EditDisplayName")
+
   object LanguageSelection : Screen(route = "language_selection", name = "LanguageSelection")
 
   object AssociationDetails : Screen(route = "associationdetails", name = "AssociationDetails")
@@ -117,6 +119,10 @@ open class NavigationActions(
 
   fun navigateToAddEditAssociation(associationId: String? = null) {
     navController.navigate(Screen.AddEditAssociation.createRoute(associationId))
+  }
+
+  fun navigateToEditDisplayName() {
+    navController.navigate(Screen.EditDisplayName.route)
   }
 
   fun navigateToManageEvents(associationId: String) {

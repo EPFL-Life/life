@@ -41,6 +41,7 @@ object CalendarTestTags {
   const val EVENT_TITLE = "event_title"
   const val EVENT_ASSOCIATION = "event_association"
   const val EVENT_ARROW = "event_arrow"
+  const val GRID_VIEW_TOGGLE = "calendar_grid_view_toggle"
 }
 
 @Composable
@@ -92,10 +93,14 @@ fun CalendarScreen(
 
     Spacer(Modifier.height(12.dp))
 
-    IconButton(onClick = { isGridView = !isGridView }, modifier = Modifier.align(Alignment.End)) {
+    IconButton(
+        onClick = { isGridView = !isGridView },
+        modifier = Modifier.align(Alignment.End).testTag(CalendarTestTags.GRID_VIEW_TOGGLE),
+    ) {
       Icon(
           imageVector = if (isGridView) Icons.Default.List else Icons.Default.DateRange,
-          contentDescription = if (isGridView) "Switch to List View" else "Switch to Grid View")
+          contentDescription = if (isGridView) "Switch to List View" else "Switch to Grid View",
+      )
     }
 
     if (isGridView) {
