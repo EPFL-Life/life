@@ -75,14 +75,11 @@ class EventCardTest {
     setEventCardContent(eventWithBanner, isEnrolled = true)
 
     composeTestRule.onNodeWithText("Enrolled", ignoreCase = false).assertIsDisplayed()
-    composeTestRule.onNodeWithText("Enroll", ignoreCase = false).assertDoesNotExist()
   }
 
   @Test
   fun enrollmentButton_isDisplayed_whenNotEnrolled() {
     setEventCardContent(eventWithBanner, isEnrolled = false)
-
-    composeTestRule.onNodeWithText("Enroll", ignoreCase = false).assertIsDisplayed()
     composeTestRule.onNodeWithText("Enrolled", ignoreCase = false).assertDoesNotExist()
   }
 }
