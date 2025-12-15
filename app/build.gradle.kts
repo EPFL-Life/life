@@ -111,6 +111,8 @@ android {
       resources.srcDirs("src/testDebug/resources")
     }
   }
+
+  bundle { language { enableSplit = false } }
 }
 
 sonar {
