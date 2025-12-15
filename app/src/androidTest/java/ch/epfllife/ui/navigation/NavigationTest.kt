@@ -14,9 +14,11 @@ import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.authentication.SignInResult
 import ch.epfllife.model.db.Db
 import ch.epfllife.model.user.LanguageRepository
+import ch.epfllife.ui.composables.DisplayedEventsTestTags
 import ch.epfllife.ui.composables.EPFLLogoTestTags
 import ch.epfllife.ui.eventDetails.EventDetailsTestTags
 import ch.epfllife.ui.eventDetails.MapScreenTestTags
+import ch.epfllife.ui.home.HomeScreenTestTags
 import ch.epfllife.utils.FakeCredentialManager
 import ch.epfllife.utils.navigateToEvent
 import ch.epfllife.utils.navigateToTab
@@ -370,5 +372,115 @@ class NavigationTest {
     composeTestRule
         .onNodeWithTag(NavigationTestTags.BOTTOM_NAVIGATION_MENU, useUnmergedTree = true)
         .assertIsDisplayed()
+  }
+
+  @Test
+  fun homeScreen_filterStateRestored_defaultSubscribed() {
+    setUpApp()
+
+    // 1. Verify initial state is Subscribed/For You
+    composeTestRule.onNodeWithTag(HomeScreenTestTags.BUTTON_SUBSCRIBED).assertIsDisplayed()
+
+    // 2. Navigate away (to a different top-level tab)
+    composeTestRule.navigateToTab(Tab.Calendar)
+
+    // 3. Return to Home
+    composeTestRule.navigateToTab(Tab.HomeScreen)
+
+    // 4. ASSERT: Filter must still be in Subscribed state
+    composeTestRule.onNodeWithTag(HomeScreenTestTags.BUTTON_SUBSCRIBED).assertIsDisplayed()
+  }
+
+  @Test
+  fun homeScreen_filterStateRestored_afterSelectingAll() {
+    setUpApp()
+
+    // 1. ACTION: Change filter to ALL
+    composeTestRule.onNodeWithTag(HomeScreenTestTags.BUTTON_ALL).performClick()
+
+    // 2. Navigate away
+    composeTestRule.navigateToTab(Tab.AssociationBrowser)
+
+    // 3. Return to Home
+    composeTestRule.navigateToTab(Tab.HomeScreen)
+
+    // 4. ASSERT: Filter must still be in ALL state
+    composeTestRule.onNodeWithTag(HomeScreenTestTags.BUTTON_ALL).assertIsDisplayed()
+  }
+
+  @Test
+  fun associationBrowser_filterStateRestored_defaultSubscribed() {
+    setUpApp()
+
+    // 1. Navigate to Association Browser
+    composeTestRule.navigateToTab(Tab.AssociationBrowser)
+
+    // 2. ASSERT: Initial state is Subscribed/For You
+    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_SUBSCRIBED).assertIsDisplayed()
+
+    // 3. Navigate away
+    composeTestRule.navigateToTab(Tab.Settings)
+
+    // 4. Return to Association Browser
+    composeTestRule.navigateToTab(Tab.AssociationBrowser)
+
+    // 5. ASSERT: Filter must still be in Subscribed state
+    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_SUBSCRIBED).assertIsDisplayed()
+  }
+
+  @Test
+  fun associationBrowser_filterStateRestored_afterSelectingAll() {
+    setUpApp()
+
+    composeTestRule.navigateToTab(Tab.AssociationBrowser)
+    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_ALL).performClick()
+
+    // 3. Navigate away
+    composeTestRule.navigateToTab(Tab.Calendar)
+
+    // 4. Return to Association Browser
+    composeTestRule.navigateToTab(Tab.AssociationBrowser)
+
+    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_ALL).assertIsDisplayed()
+  }
+
+  @Test
+  fun calendarScreen_filterStateRestored_defaultSubscribed() {
+    setUpApp()
+
+    // 1. Navigate to Calendar
+    composeTestRule.navigateToTab(Tab.Calendar)
+
+    // 2. ASSERT: Initial state is Subscribed/Enrolled
+    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_SUBSCRIBED).assertIsDisplayed()
+
+    // 3. Navigate away
+    composeTestRule.navigateToTab(Tab.HomeScreen)
+
+    // 4. Return to Calendar
+    composeTestRule.navigateToTab(Tab.Calendar)
+
+    // 5. ASSERT: Filter must still be in Subscribed state
+    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_SUBSCRIBED).assertIsDisplayed()
+  }
+
+  @Test
+  fun calendarScreen_filterStateRestored_afterSelectingAll() {
+    setUpApp()
+
+    // 1. Navigate to Calendar
+    composeTestRule.navigateToTab(Tab.Calendar)
+
+    // 2. ACTION: Change filter to ALL
+    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_ALL).performClick()
+
+    // 3. Navigate away
+    composeTestRule.navigateToTab(Tab.Settings)
+
+    // 4. Return to Calendar
+    composeTestRule.navigateToTab(Tab.Calendar)
+
+    // 5. ASSERT: Filter must still be in ALL state
+    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_ALL).assertIsDisplayed()
   }
 }
