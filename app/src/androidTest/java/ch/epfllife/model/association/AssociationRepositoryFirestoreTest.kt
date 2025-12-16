@@ -1,8 +1,12 @@
 package ch.epfllife.model.association
 
+import android.net.Uri
 import ch.epfllife.example_data.ExampleAssociations
 import ch.epfllife.utils.FirestoreLifeTest
+import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.UploadTask
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -311,5 +315,66 @@ class AssociationRepositoryFirestoreTest : FirestoreLifeTest() {
 
     advanceUntilIdle()
     assertEquals(emptyList<Association>(), assocList)
+  }
+
+  // Mocks for Storage test
+  // we use mocks because otherwise testing was very unreliable...
+  @Mock private lateinit var mockStorageReference: StorageReference
+  @Mock private lateinit var mockImageReference: StorageReference
+  @Mock private lateinit var mockUploadTask: UploadTask
+  @Mock private lateinit var mockUriTask: Task<Uri>
+  @Mock private lateinit var mockUri: Uri
+
+  @Test
+  fun uploadAssociationImage_returnsSuccess() = runTest {
+    // Arrange
+    val associationId = "assoc123"
+    val imageUri = android.net.Uri.parse("content://media/external/images/media/1")
+    val imageType = AssociationImageType.LOGO
+    val expectedUrl = "https://firebasestorage.googleapis.com/v0/b/bucket/o/logo.jpg"
+
+    // Use real FirebaseOptions
+    val realOptions =
+        com.google.firebase.FirebaseOptions.Builder()
+            .setApiKey("test-api-key")
+            .setApplicationId("test-app-id")
+            .setStorageBucket("test-bucket")
+            .build()
+
+    val mockFirebaseApp = org.mockito.Mockito.mock(com.google.firebase.FirebaseApp::class.java)
+
+    // Mock Storage hierarchy
+    whenever(mockStorage.reference).thenReturn(mockStorageReference)
+    whenever(mockStorage.app).thenReturn(mockFirebaseApp) // Mock app for logging
+    whenever(mockFirebaseApp.options).thenReturn(realOptions)
+    // whenever(mockOptions.storageBucket).thenReturn("test-bucket") // not needed
+
+    whenever(mockStorageReference.child("associations/$associationId/logo.jpg"))
+        .thenReturn(mockImageReference)
+    whenever(mockImageReference.path).thenReturn("associations/$associationId/logo.jpg")
+
+    // Mock PutFile
+    whenever(
+            mockImageReference.putFile(
+                org.mockito.kotlin.any(),
+                org.mockito.kotlin.any<com.google.firebase.storage.StorageMetadata>()))
+        .thenReturn(mockUploadTask)
+    whenever(mockUploadTask.isComplete).thenReturn(true)
+    whenever(mockUploadTask.isSuccessful).thenReturn(true)
+    whenever(mockUploadTask.result).thenReturn(null) // or mock snapshot
+
+    // Mock Download URL
+    whenever(mockImageReference.downloadUrl).thenReturn(mockUriTask)
+    whenever(mockUriTask.isComplete).thenReturn(true)
+    whenever(mockUriTask.isSuccessful).thenReturn(true)
+    whenever(mockUriTask.result).thenReturn(mockUri)
+    whenever(mockUri.toString()).thenReturn(expectedUrl)
+
+    // Act
+    val result = db.assocRepo.uploadAssociationImage(associationId, imageUri, imageType)
+
+    // Assert
+    assert(result.isSuccess)
+    assertEquals(expectedUrl, result.getOrNull())
   }
 }

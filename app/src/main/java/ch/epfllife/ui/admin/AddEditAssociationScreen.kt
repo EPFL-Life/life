@@ -268,7 +268,8 @@ private fun AddEditAssociationContent(
                     logoEventLauncher.launch(
                         PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                   },
-                  modifier = Modifier.weight(1f))
+                  modifier =
+                      Modifier.weight(1f).testTag(AddEditAssociationTestTags.UPLOAD_LOGO_BUTTON))
 
               ImageUploadField(
                   label = "Banner",
@@ -278,7 +279,8 @@ private fun AddEditAssociationContent(
                     bannerLauncher.launch(
                         PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                   },
-                  modifier = Modifier.weight(1f))
+                  modifier =
+                      Modifier.weight(1f).testTag(AddEditAssociationTestTags.UPLOAD_BANNER_BUTTON))
             }
 
         Spacer(Modifier.height(24.dp))
