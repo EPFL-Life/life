@@ -2,6 +2,7 @@ package ch.epfllife.ui.composables
 
 import android.content.Context
 import android.content.res.Configuration
+import androidx.activity.compose.LocalActivityResultRegistryOwner
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
@@ -16,10 +17,26 @@ import java.util.Locale
  */
 @Composable
 fun LanguageProvider(language: AppLanguage, content: @Composable () -> Unit) {
+
   val baseContext = LocalContext.current
   val localizedContext = remember(language) { baseContext.updateLocale(language) }
 
-  CompositionLocalProvider(LocalContext provides localizedContext) { content() }
+  // DO NOT REMOVE THIS otherwise ActivityResultRegistryOwner will crash the app!!!
+  // Explicitly capture and re-provide the registry owner to ensure it's not lost.
+  // We expect it to be present from the hosting Activity.
+  //
+  // LocalActivityResultRegistryOwner provides registryOwner explicitly passes that correct owner
+  // down to the children, ensuring rememberLauncherForActivityResult works regardless of the
+  // Context wrapping.
+  val registryOwner =
+      LocalActivityResultRegistryOwner.current
+          ?: throw IllegalStateException("LocalActivityResultRegistryOwner not present")
+
+  CompositionLocalProvider(
+      LocalContext provides localizedContext,
+      LocalActivityResultRegistryOwner provides registryOwner) {
+        content()
+      }
 }
 
 /** Returns a Context with the specified locale applied. */
