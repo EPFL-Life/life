@@ -4,6 +4,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -281,9 +282,21 @@ class AdminEndToEndTest {
     composeTestRule.onNodeWithTag(AddEditEventTestTags.SUBMIT_BUTTON).performClick()
     composeTestRule.waitForIdle()
 
+    Espresso.closeSoftKeyboard()
+    composeTestRule.waitForIdle()
     // Verify event created on manage events screen
-    composeTestRule.waitUntil { composeTestRule.onNodeWithText(eventTitle).isDisplayed() }
+    // Ensure that the event is displayed
+    composeTestRule.waitUntil(timeoutMillis = 15000) {
+      composeTestRule
+          .onAllNodesWithTag(AddEditEventTestTags.TITLE_FIELD)
+          .fetchSemanticsNodes()
+          .isEmpty()
+    }
 
+    composeTestRule.onNodeWithTag(ManageEventsTestTags.TITLE).assertIsDisplayed()
+    composeTestRule.waitForIdle()
+    // Verify event created on manage events screen (may require scrolling on small devices)
+    composeTestRule.onNodeWithText(eventTitle).performScrollTo().assertIsDisplayed()
     // Verify event created on home screen
     composeTestRule.onNodeWithTag(ManageEventsTestTags.BACK_BUTTON).performClick()
     composeTestRule.onNodeWithTag(AssociationAdminScreenTestTags.BACK_BUTTON).performClick()
