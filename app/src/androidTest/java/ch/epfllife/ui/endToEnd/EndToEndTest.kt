@@ -1,7 +1,6 @@
 package ch.epfllife.ui.endToEnd
 
 import androidx.activity.ComponentActivity
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -11,7 +10,6 @@ import androidx.test.espresso.Espresso
 import androidx.test.espresso.NoActivityResumedException
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
-import ch.epfllife.LocalActivity
 import ch.epfllife.ThemedApp
 import ch.epfllife.example_data.ExampleAssociations
 import ch.epfllife.example_data.ExampleEvents
@@ -19,7 +17,6 @@ import ch.epfllife.example_data.ExampleUsers
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.authentication.SignInResult
 import ch.epfllife.model.db.Db
-import ch.epfllife.model.user.LanguageRepository
 import ch.epfllife.ui.association.AssociationDetailsTestTags
 import ch.epfllife.ui.authentication.SignInScreenTestTags
 import ch.epfllife.ui.composables.AssociationCardTestTags
@@ -62,21 +59,11 @@ class EndToEndTest {
       val signInResult = auth.signInWithCredential(FakeCredentialManager.defaultUserCredentials)
       Assert.assertTrue("Sign in must succeed", signInResult is SignInResult.Success)
     }
-    val languageRepository = LanguageRepository(db.userRepo)
-    composeTestRule.setContent {
-      CompositionLocalProvider(LocalActivity provides composeTestRule.activity) {
-        ThemedApp(auth, db, languageRepository)
-      }
-    }
+    composeTestRule.setContent { ThemedApp(auth, db) }
   }
 
   fun useLoggedOutApp() {
-    val languageRepository = LanguageRepository(db.userRepo)
-    composeTestRule.setContent {
-      CompositionLocalProvider(LocalActivity provides composeTestRule.activity) {
-        ThemedApp(auth, db, languageRepository)
-      }
-    }
+    composeTestRule.setContent { ThemedApp(auth, db) }
   }
 
   @Test

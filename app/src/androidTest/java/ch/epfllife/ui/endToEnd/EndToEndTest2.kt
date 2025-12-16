@@ -10,7 +10,6 @@ import ch.epfllife.ThemedApp
 import ch.epfllife.example_data.ExampleAssociations
 import ch.epfllife.example_data.ExampleEvents
 import ch.epfllife.example_data.ExampleUsers
-import ch.epfllife.model.user.LanguageRepository
 import ch.epfllife.ui.composables.DisplayedEventsTestTags
 import ch.epfllife.ui.eventDetails.EventDetailsTestTags
 import ch.epfllife.utils.FirestoreLifeTest
@@ -26,8 +25,7 @@ class EndToEndTest2 : FirestoreLifeTest() {
   @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
   private fun setUpApp() {
-    val languageRepository = LanguageRepository(db.userRepo)
-    composeTestRule.setContent { ThemedApp(auth, db, languageRepository) }
+    composeTestRule.setContent { ThemedApp(auth, db) }
   }
 
   private suspend fun prepareData() {

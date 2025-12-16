@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -31,7 +30,7 @@ fun AssociationBrowser(
     onAssociationClick: (associationId: String) -> Unit,
 ) {
   LaunchedEffect(Unit) { viewModel.refresh() }
-  var selected by rememberSaveable { mutableStateOf(SubscriptionFilter.Subscribed) }
+  var selected by remember { mutableStateOf(SubscriptionFilter.Subscribed) }
 
   // Replaced hardcoded lists with data from ViewModel
   val subscribedAssociations by viewModel.subscribedAssociations.collectAsState()

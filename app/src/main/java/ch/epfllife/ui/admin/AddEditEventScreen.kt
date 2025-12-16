@@ -94,8 +94,7 @@ fun AddEditEventScreen(
       }
       is AddEditEventUIState.Error -> {
         Column(
-            modifier =
-                Modifier.fillMaxSize().padding(16.dp).testTag(AddEditEventTestTags.ERROR_BOX),
+            modifier = Modifier.fillMaxSize().padding(16.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally) {
               Text(
