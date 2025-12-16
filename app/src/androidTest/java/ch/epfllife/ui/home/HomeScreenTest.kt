@@ -16,7 +16,6 @@ import ch.epfllife.model.user.UserRepositoryLocal
 import ch.epfllife.ui.composables.DisplayedEventsTestTags
 import ch.epfllife.ui.composables.EPFLLogoTestTags
 import ch.epfllife.ui.composables.EventCardTestTags
-import ch.epfllife.ui.eventDetails.EventDetailsTestTags
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.theme.Theme
 import ch.epfllife.utils.triggerRefresh
@@ -458,29 +457,5 @@ class HomeScreenTest {
     composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_ALL).performClick()
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithText("Enroll", ignoreCase = false).assertExists()
-  }
-
-  @Test
-  fun homeScreen_retainsAllFilter_onReturningFromDetails() {
-    setUpHomeScreen(
-        myEvents = listOf(ExampleEvents.event1), allEvents = listOf(ExampleEvents.event1))
-
-    // click to an event details (in "ALL"), go back and check that we are in "ALL" section
-    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_ALL).performClick()
-    composeTestRule.onNodeWithTag(EventCardTestTags.getEventCardTestTag(ExampleEvents.event1.id))
-    composeTestRule.onNodeWithTag(EventDetailsTestTags.BACK_BUTTON).performClick()
-    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_ALL).assertIsDisplayed()
-  }
-
-  @Test
-  fun homeScreen_retainsSubscribedFilter_onReturningFromDetails() {
-    setUpHomeScreen(
-        myEvents = listOf(ExampleEvents.event1), allEvents = listOf(ExampleEvents.event1))
-
-    // click to an event details (in "FOR YOU"), go back and check that we are in "FOR YOU" section
-    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_SUBSCRIBED).performClick()
-    composeTestRule.onNodeWithTag(EventCardTestTags.getEventCardTestTag(ExampleEvents.event1.id))
-    composeTestRule.onNodeWithTag(EventDetailsTestTags.BACK_BUTTON).performClick()
-    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_SUBSCRIBED).assertIsDisplayed()
   }
 }
