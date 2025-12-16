@@ -47,7 +47,6 @@ import ch.epfllife.utils.setUpEmulator
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
@@ -250,7 +249,6 @@ class AdminEndToEndTest {
     composeTestRule.onNodeWithText(newTitle).assertIsDisplayed()
   }
 
-  @Ignore
   @Test
   fun createEventAsAssocAdmin() {
     val assoc = ExampleAssociations.association2
