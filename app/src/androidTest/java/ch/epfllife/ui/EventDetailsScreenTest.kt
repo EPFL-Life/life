@@ -10,10 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.unit.dp
 import androidx.test.core.app.ApplicationProvider
 import ch.epfllife.R
@@ -228,9 +230,14 @@ class EventDetailsScreenTest {
       }
     }
 
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithText(showMore).assertIsDisplayed()
+    // "Show more" is only displayed if the description text overflows (set via onTextLayout),
+    // and it may be initially off-screen due to the scrollable layout on smaller devices.
+    composeTestRule.waitUntil(timeoutMillis = 5_000) {
+      composeTestRule.onAllNodesWithText(showMore).fetchSemanticsNodes().isNotEmpty()
+    }
+
+    composeTestRule.onNodeWithText(showMore).performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithText(showMore).performClick()
-    composeTestRule.onNodeWithText(showLess).assertIsDisplayed()
+    composeTestRule.onNodeWithText(showLess).performScrollTo().assertIsDisplayed()
   }
 }
