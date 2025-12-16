@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -26,9 +25,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.db.Db
-import ch.epfllife.model.enums.AppLanguage
 import ch.epfllife.model.map.Location
-import ch.epfllife.model.user.LanguageRepository
 import ch.epfllife.model.user.User
 import ch.epfllife.ui.admin.AddEditAssociationScreen
 import ch.epfllife.ui.admin.AddEditEventScreen
@@ -39,7 +36,6 @@ import ch.epfllife.ui.association.AssociationBrowser
 import ch.epfllife.ui.association.AssociationDetailsScreen
 import ch.epfllife.ui.authentication.SignInScreen
 import ch.epfllife.ui.calendar.CalendarScreen
-import ch.epfllife.ui.composables.LanguageProvider
 import ch.epfllife.ui.eventDetails.AttendeeListScreen
 import ch.epfllife.ui.eventDetails.EventDetailsScreen
 import ch.epfllife.ui.eventDetails.MapScreen
@@ -50,7 +46,6 @@ import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.navigation.Screen
 import ch.epfllife.ui.navigation.Tab
 import ch.epfllife.ui.settings.EditDisplayNameScreen
-import ch.epfllife.ui.settings.LanguageSelectionScreen
 import ch.epfllife.ui.settings.SettingsScreen
 import ch.epfllife.ui.settings.SettingsViewModel
 import ch.epfllife.ui.theme.Theme
@@ -62,11 +57,6 @@ import kotlinx.serialization.json.Json
 private const val selectedAssociationIdKey = "selectedAssociationId"
 private const val selectedAssociationNameKey = "selectedAssociationName"
 
-val LocalActivity =
-    androidx.compose.runtime.staticCompositionLocalOf<ComponentActivity> {
-      error("LocalActivity not provided")
-    }
-
 class MainActivity : ComponentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,26 +66,19 @@ class MainActivity : ComponentActivity() {
     Firebase.database.setPersistenceEnabled(true)
 
     val db = Db.firestore
-    val userRepository = db.userRepo
-    val languageRepository = LanguageRepository(userRepository)
 
     setContent {
-      val language by languageRepository.languageFlow.collectAsState(initial = AppLanguage.SYSTEM)
-      CompositionLocalProvider(LocalActivity provides this) {
-        LanguageProvider(language = language) {
-          ThemedApp(
-              auth = Auth(CredentialManager.create(LocalContext.current)),
-              db = db,
-              languageRepository = languageRepository)
-        }
-      }
+      ThemedApp(
+          auth = Auth(CredentialManager.create(LocalContext.current)),
+          db = db,
+      )
     }
   }
 }
 
 @Composable
-fun ThemedApp(auth: Auth, db: Db, languageRepository: LanguageRepository) {
-  Theme { Surface(modifier = Modifier.fillMaxSize()) { App(auth, db, languageRepository) } }
+fun ThemedApp(auth: Auth, db: Db) {
+  Theme { Surface(modifier = Modifier.fillMaxSize()) { App(auth, db) } }
 }
 
 /**
@@ -105,7 +88,7 @@ fun ThemedApp(auth: Auth, db: Db, languageRepository: LanguageRepository) {
  * @param auth The auth handler.
  */
 @Composable
-fun App(auth: Auth, db: Db, languageRepository: LanguageRepository) {
+fun App(auth: Auth, db: Db) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
   val startDestination =
@@ -244,9 +227,7 @@ fun App(auth: Auth, db: Db, languageRepository: LanguageRepository) {
                 onSignedOut = { navigationActions.navigateTo(Screen.SignIn) },
                 onAdminConsoleClick = { navigationActions.navigateToAssociationAdmin() },
                 onNavigateToDisplayName = { navigationActions.navigateToEditDisplayName() },
-                onNavigateToLanguageSelection = {
-                  navController.navigate(Screen.LanguageSelection.route)
-                })
+            )
           }
 
           composable(Screen.EditDisplayName.route) {
@@ -254,11 +235,6 @@ fun App(auth: Auth, db: Db, languageRepository: LanguageRepository) {
                 db = db,
                 onBack = { navController.popBackStack() },
                 onSubmitSuccess = { navController.popBackStack() })
-          }
-
-          composable(Screen.LanguageSelection.route) {
-            LanguageSelectionScreen(
-                languageRepository = languageRepository, onBack = { navController.popBackStack() })
           }
 
           // this composable is a bit chunky but it keeps the complexity low so this is preferable

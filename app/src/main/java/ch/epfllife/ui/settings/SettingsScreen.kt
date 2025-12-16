@@ -50,7 +50,6 @@ fun SettingsScreen(
     onSignedOut: () -> Unit,
     toastHelper: ToastHelper = SystemToastHelper(),
     onAdminConsoleClick: () -> Unit,
-    onNavigateToLanguageSelection: () -> Unit,
     onNavigateToDisplayName: () -> Unit
 ) {
   val context = LocalContext.current
@@ -90,11 +89,6 @@ fun SettingsScreen(
 
         SettingsButton(
             text = stringResource(R.string.display_name), onClick = { onNavigateToDisplayName() })
-        Spacer(Modifier.height(32.dp))
-
-        SettingsButton(
-            text = stringResource(R.string.app_language),
-            onClick = { onNavigateToLanguageSelection() })
         Spacer(Modifier.height(32.dp))
 
         Button(

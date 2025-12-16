@@ -2,7 +2,6 @@ package ch.epfllife.ui.authentication
 
 import android.view.View
 import androidx.activity.ComponentActivity
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -10,7 +9,6 @@ import androidx.compose.ui.test.performClick
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.GetCredentialUnknownException
-import ch.epfllife.LocalActivity
 import ch.epfllife.R
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.user.UserRepositoryFirestore
@@ -55,11 +53,8 @@ class SignInScreenTest {
 
   @Test
   fun contentIsDisplayed() {
-    val activity = composeTestRule.activity
     composeTestRule.setContent {
-      CompositionLocalProvider(LocalActivity provides activity) {
-        SignInScreen(auth, onSignedIn = {}, toastHelper = fakeToastHelper)
-      }
+      SignInScreen(auth, onSignedIn = {}, toastHelper = fakeToastHelper)
     }
     listOf(
             NavigationTestTags.SIGN_IN_SCREEN,
@@ -75,11 +70,8 @@ class SignInScreenTest {
   fun canSignIn() {
     Assert.assertNull(Firebase.auth.currentUser)
     var clicked = false
-    val activity = composeTestRule.activity
     composeTestRule.setContent {
-      CompositionLocalProvider(LocalActivity provides activity) {
-        SignInScreen(auth, onSignedIn = { clicked = true }, toastHelper = fakeToastHelper)
-      }
+      SignInScreen(auth, onSignedIn = { clicked = true }, toastHelper = fakeToastHelper)
     }
     composeTestRule.onNodeWithTag(SignInScreenTestTags.SIGN_IN_BUTTON).performClick()
     composeTestRule.waitUntil(5000) { clicked }
@@ -156,13 +148,8 @@ class SignInScreenTest {
     val viewModel = SignInViewModel(auth, repo)
 
     // Act
-    val activity = composeTestRule.activity
     composeTestRule.setContent {
-      androidx.compose.runtime.CompositionLocalProvider(
-          ch.epfllife.LocalActivity provides activity) {
-            SignInScreen(
-                auth = auth, authViewModel = viewModel, onSignedIn = { onSignedInCalled = true })
-          }
+      SignInScreen(auth = auth, authViewModel = viewModel, onSignedIn = { onSignedInCalled = true })
     }
     composeTestRule.onNodeWithTag(SignInScreenTestTags.SIGN_IN_BUTTON).performClick()
     composeTestRule.waitUntil(5000) { onSignedInCalled }
@@ -200,13 +187,9 @@ class SignInScreenTest {
   private fun assertSignInProblem(testAuth: Auth, message: Int) {
 
     var onSignedInCalled = false
-    val activity = composeTestRule.activity
     composeTestRule.setContent {
-      androidx.compose.runtime.CompositionLocalProvider(
-          ch.epfllife.LocalActivity provides activity) {
-            SignInScreen(
-                testAuth, onSignedIn = { onSignedInCalled = true }, toastHelper = fakeToastHelper)
-          }
+      SignInScreen(
+          testAuth, onSignedIn = { onSignedInCalled = true }, toastHelper = fakeToastHelper)
     }
     composeTestRule.onNodeWithTag(SignInScreenTestTags.SIGN_IN_BUTTON).performClick()
 

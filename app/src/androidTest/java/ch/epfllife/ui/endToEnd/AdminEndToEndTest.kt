@@ -1,11 +1,9 @@
 package ch.epfllife.ui.endToEnd
 
 import androidx.activity.ComponentActivity
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -19,7 +17,6 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
-import ch.epfllife.LocalActivity
 import ch.epfllife.ThemedApp
 import ch.epfllife.example_data.ExampleAssociations
 import ch.epfllife.example_data.ExampleEvents
@@ -28,7 +25,6 @@ import ch.epfllife.model.association.Association
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.authentication.SignInResult
 import ch.epfllife.model.db.Db
-import ch.epfllife.model.user.LanguageRepository
 import ch.epfllife.model.user.User
 import ch.epfllife.model.user.UserRepositoryLocal
 import ch.epfllife.ui.admin.AddEditEventTestTags
@@ -47,7 +43,6 @@ import ch.epfllife.utils.setUpEmulator
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
@@ -73,12 +68,7 @@ class AdminEndToEndTest {
       val signInResult = auth.signInWithCredential(FakeCredentialManager.defaultUserCredentials)
       Assert.assertTrue("Sign in must succeed", signInResult is SignInResult.Success)
     }
-    val languageRepository = LanguageRepository(db.userRepo)
-    composeTestRule.setContent {
-      CompositionLocalProvider(LocalActivity provides composeTestRule.activity) {
-        ThemedApp(auth, db, languageRepository)
-      }
-    }
+    composeTestRule.setContent { ThemedApp(auth, db) }
   }
 
   private fun loginAsAdmin(): User {
@@ -250,7 +240,6 @@ class AdminEndToEndTest {
     composeTestRule.onNodeWithText(newTitle).assertIsDisplayed()
   }
 
-  @Ignore
   @Test
   fun createEventAsAssocAdmin() {
     val assoc = ExampleAssociations.association2
@@ -290,21 +279,9 @@ class AdminEndToEndTest {
     composeTestRule.onNodeWithTag(AddEditEventTestTags.SUBMIT_BUTTON).performClick()
     composeTestRule.waitForIdle()
 
-    Espresso.closeSoftKeyboard()
-    composeTestRule.waitForIdle()
     // Verify event created on manage events screen
-    // Ensure that the event is displayed
-    composeTestRule.waitUntil(timeoutMillis = 15000) {
-      composeTestRule
-          .onAllNodesWithTag(AddEditEventTestTags.TITLE_FIELD)
-          .fetchSemanticsNodes()
-          .isEmpty()
-    }
+    composeTestRule.waitUntil { composeTestRule.onNodeWithText(eventTitle).isDisplayed() }
 
-    composeTestRule.onNodeWithTag(ManageEventsTestTags.TITLE).assertIsDisplayed()
-    composeTestRule.waitForIdle()
-    // Verify event created on manage events screen (may require scrolling on small devices)
-    composeTestRule.onNodeWithText(eventTitle).performScrollTo().assertIsDisplayed()
     // Verify event created on home screen
     composeTestRule.onNodeWithTag(ManageEventsTestTags.BACK_BUTTON).performClick()
     composeTestRule.onNodeWithTag(AssociationAdminScreenTestTags.BACK_BUTTON).performClick()
