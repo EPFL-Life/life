@@ -37,5 +37,18 @@ data class Db(
           assocRepo = AssociationRepositoryLocal(eventRepo),
       )
     }
+
+    // we need this because the storage coroutine takes too long(>1min) so we mock this to reduce
+    // test flakiness
+    // Problem: normally we use FirebaseStorage.getInstance() but this connects to the real storage
+    // (for unit tests this is not optimal as are not testing the connection)
+    // -> here we just inject a mock storage whenever needed
+    fun forTest(storage: FirebaseStorage): Db {
+      return Db(
+          userRepo = UserRepositoryFirestore(Firebase.firestore),
+          eventRepo = EventRepositoryFirestore(Firebase.firestore),
+          assocRepo = AssociationRepositoryFirestore(Firebase.firestore, storage),
+      )
+    }
   }
 }
