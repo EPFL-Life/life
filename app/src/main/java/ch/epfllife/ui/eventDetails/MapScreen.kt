@@ -21,7 +21,7 @@ fun MapScreen(location: Location, onGoBack: () -> Unit) {
   Box(modifier = Modifier.fillMaxSize().testTag(NavigationTestTags.MAP_SCREEN)) {
     Map(
         target = location,
-        enableControls = true,
+        enableControls = false,
         locationPermissionRequest = { LocationPermissionRequest(it) },
     )
     BackButton(
