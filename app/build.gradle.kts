@@ -266,12 +266,15 @@ tasks.named("build") {
   dependsOn("assembleAndroidTest")
 }
 
-gradle.addListener(object : TestListener {
-    override fun beforeSuite(suite: TestDescriptor) {}
-    override fun afterSuite(suite: TestDescriptor, result: TestResult) {}
-    override fun beforeTest(testDescriptor: TestDescriptor) {
+gradle.addListener(
+    object : TestListener {
+      override fun beforeSuite(suite: TestDescriptor) {}
+
+      override fun afterSuite(suite: TestDescriptor, result: TestResult) {}
+
+      override fun beforeTest(testDescriptor: TestDescriptor) {
         println("executing ${testDescriptor.name}")
-    }
-    override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {
-    }
-})
+      }
+
+      override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {}
+    })
