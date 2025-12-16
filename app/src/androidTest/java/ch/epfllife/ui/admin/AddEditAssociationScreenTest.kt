@@ -241,6 +241,20 @@ class AddEditAssociationScreenTest {
     assertEquals(created.socialLinks?.get(targetPlatform), socialUrl)
   }
 
+  @Test
+  fun verifyUploadButtonsExist() {
+    // Arrange
+    val db = Db.freshLocal()
+
+    // Act
+    setContent(db = db)
+    composeTestRule.waitForIdle()
+
+    // Assert
+    composeTestRule.onNodeWithTag(AddEditAssociationTestTags.UPLOAD_LOGO_BUTTON).assertExists()
+    composeTestRule.onNodeWithTag(AddEditAssociationTestTags.UPLOAD_BANNER_BUTTON).assertExists()
+  }
+
   private fun waitUntilTrue(timeoutMillis: Long = 20_000, condition: () -> Boolean) {
     val timeoutAt = System.currentTimeMillis() + timeoutMillis
     while (!condition()) {
