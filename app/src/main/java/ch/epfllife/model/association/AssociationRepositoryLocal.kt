@@ -1,5 +1,6 @@
 package ch.epfllife.model.association
 
+import android.net.Uri
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventRepository
 import kotlinx.coroutines.CoroutineScope
@@ -102,5 +103,14 @@ class AssociationRepositoryLocal(private val eventRepository: EventRepository) :
     associationsListeners.add { scope.launch { onChange(it) } }
     // send initial data
     scope.launch { onChange(associations.toList()) }
+  }
+
+  override suspend fun uploadAssociationImage(
+      associationId: String,
+      imageUri: Uri,
+      imageType: AssociationImageType
+  ): Result<String> {
+    // Stub implementation (return like if upload successful)
+    return Result.success(imageUri.toString())
   }
 }
