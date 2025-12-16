@@ -152,9 +152,9 @@ private fun AddEditEventContent(
 
   fun showTimePicker(selectedDate: LocalDate) {
     val initial = parseCurrentDateTime()
-    activity?.let {
+    activity?.let { act ->
       TimePickerDialog(
-              context,
+              act,
               { _, hourOfDay, minute ->
                 val combinedDateTime =
                     LocalDateTime.of(selectedDate, LocalTime.of(hourOfDay, minute))
@@ -169,9 +169,9 @@ private fun AddEditEventContent(
 
   fun showDatePicker() {
     val initial = parseCurrentDateTime()
-    activity?.let {
+    activity?.let { act ->
       DatePickerDialog(
-              context,
+              act,
               { _, year, month, dayOfMonth ->
                 val selectedDate = LocalDate.of(year, month + 1, dayOfMonth)
                 showTimePicker(selectedDate)
