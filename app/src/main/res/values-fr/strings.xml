@@ -137,8 +137,12 @@
         <string name="show_more">Afficher plus…</string>
         <string name="show_less">Afficher moins</string>
         <string name="share">Partager</string>
+    <string name="share_sender_unknown">Quelqu\'une</string>
+    <string name="share_invite_message">Vous êtes invité à %1$s par %2$s ! Téléchargez l\'application EPFL Life pour en savoir plus.</string>
 
-        <string name="calendar_previous_month">Mois précédent</string>
+
+
+    <string name="calendar_previous_month">Mois précédent</string>
         <string name="calendar_next_month">Mois suivant</string>
         <string name="calendar_day_mon">Lun</string>
         <string name="calendar_day_tue">Mar</string>
