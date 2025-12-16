@@ -28,7 +28,7 @@ class AddEditAssociationScreenTest {
       db: Db = Db.freshLocal(),
       associationId: String? = null,
       viewModel: AddEditAssociationViewModel? = null,
-      onSubmitSuccess: () -> Unit = {},
+      onSubmitSuccess: (Association) -> Unit = {},
   ) {
     composeTestRule.setContent {
       Theme {

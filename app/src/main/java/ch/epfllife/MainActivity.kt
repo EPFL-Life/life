@@ -293,9 +293,8 @@ fun App(auth: Auth, db: Db, languageRepository: LanguageRepository) {
                     },
                     onAssociationDeleted = {
                       // Clear selection -> automatic update so we dont get double deletes
-                      backStackEntry.savedStateHandle.set(selectedAssociationIdKey, null as String?)
-                      backStackEntry.savedStateHandle.set(
-                          selectedAssociationNameKey, null as String?)
+                      backStackEntry.savedStateHandle[selectedAssociationIdKey] = null as String?
+                      backStackEntry.savedStateHandle[selectedAssociationNameKey] = null as String?
                     },
                     onGoBack = { navigationActions.goBack() })
               }
@@ -330,7 +329,22 @@ fun App(auth: Auth, db: Db, languageRepository: LanguageRepository) {
                     db = db,
                     associationId = associationId,
                     onBack = { navController.popBackStack() },
-                    onSubmitSuccess = { navController.popBackStack() })
+                    onSubmitSuccess = { updatedAssociation ->
+                      val createdNewAssociation = associationId == null
+                      val handle =
+                          navController
+                              .getBackStackEntry(Screen.AssociationAdmin.route)
+                              .savedStateHandle
+
+                      handle[selectedAssociationIdKey] = updatedAssociation.id
+                      handle[selectedAssociationNameKey] = updatedAssociation.name
+
+                      if (createdNewAssociation) {
+                        navController.popBackStack(Screen.AssociationAdmin.route, false)
+                      } else {
+                        navController.popBackStack()
+                      }
+                    })
               }
 
           composable(
