@@ -1,8 +1,11 @@
 package ch.epfllife.ui.admin
 
 import android.Manifest
+import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.Context
+import android.content.ContextWrapper
 import android.content.pm.PackageManager
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -51,6 +54,13 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import okhttp3.OkHttpClient
+
+fun Context.findActivity(): Activity? =
+    when (this) {
+      is Activity -> this
+      is ContextWrapper -> baseContext.findActivity()
+      else -> null
+    }
 
 object AddEditEventTestTags {
   const val TITLE_FIELD = "AddEditEvent_TitleField"
@@ -129,6 +139,7 @@ private fun AddEditEventContent(
   val dateTimeFormatter = remember { DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm") }
   val interactionSource = remember { MutableInteractionSource() }
 
+  val activity = remember(context) { context.findActivity() }
   fun parseCurrentDateTime(): LocalDateTime {
     return try {
       LocalDateTime.parse(formState.time, dateTimeFormatter)
@@ -139,30 +150,35 @@ private fun AddEditEventContent(
 
   fun showTimePicker(selectedDate: LocalDate) {
     val initial = parseCurrentDateTime()
-    TimePickerDialog(
-            context,
-            { _, hourOfDay, minute ->
-              val combinedDateTime = LocalDateTime.of(selectedDate, LocalTime.of(hourOfDay, minute))
-              viewModel.updateTime(combinedDateTime.format(dateTimeFormatter))
-            },
-            initial.hour,
-            initial.minute,
-            true)
-        .show()
+    activity?.let {
+      TimePickerDialog(
+              context,
+              { _, hourOfDay, minute ->
+                val combinedDateTime =
+                    LocalDateTime.of(selectedDate, LocalTime.of(hourOfDay, minute))
+                viewModel.updateTime(combinedDateTime.format(dateTimeFormatter))
+              },
+              initial.hour,
+              initial.minute,
+              true)
+          .show()
+    }
   }
 
   fun showDatePicker() {
     val initial = parseCurrentDateTime()
-    DatePickerDialog(
-            context,
-            { _, year, month, dayOfMonth ->
-              val selectedDate = LocalDate.of(year, month + 1, dayOfMonth)
-              showTimePicker(selectedDate)
-            },
-            initial.year,
-            initial.monthValue - 1,
-            initial.dayOfMonth)
-        .show()
+    activity?.let {
+      DatePickerDialog(
+              context,
+              { _, year, month, dayOfMonth ->
+                val selectedDate = LocalDate.of(year, month + 1, dayOfMonth)
+                showTimePicker(selectedDate)
+              },
+              initial.year,
+              initial.monthValue - 1,
+              initial.dayOfMonth)
+          .show()
+    }
   }
 
   Column(
