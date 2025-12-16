@@ -8,6 +8,7 @@ import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventRepository
 import ch.epfllife.model.user.Price
+import ch.epfllife.model.user.User
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -27,7 +28,13 @@ class EventDetailsTest {
   private fun setEventContent(event: Event) {
     composeTestRule.setContent {
       EventDetailsContent(
-          event = event, onOpenMap = {}, onGoBack = {}, onEnrollClick = {}, onAssociationClick = {})
+          event = event,
+          attendees = emptyList(),
+          onAttendeesClick = {},
+          onOpenMap = {},
+          onGoBack = {},
+          onEnrollClick = {},
+          onAssociationClick = {})
     }
   }
 
@@ -37,11 +44,14 @@ class EventDetailsTest {
       EventDetailsContent(
           event = sampleEvent,
           isEnrolled = true,
+          attendees = emptyList(),
+          onAttendeesClick = {},
           onGoBack = {},
           onOpenMap = {},
           onEnrollClick = {},
           onUnenrollClick = {},
-          onAssociationClick = {})
+          onAssociationClick = {},
+      )
     }
     composeTestRule.onNodeWithTag(EventDetailsTestTags.ENROLL_BUTTON).assertIsDisplayed()
     composeTestRule.onNodeWithText("Unenroll").assertIsDisplayed()
@@ -54,6 +64,8 @@ class EventDetailsTest {
       EventDetailsContent(
           event = sampleEvent,
           isEnrolled = true,
+          attendees = emptyList(),
+          onAttendeesClick = {},
           onGoBack = {},
           onOpenMap = {},
           onEnrollClick = {},
@@ -113,6 +125,28 @@ class EventDetailsTest {
           state.message,
       )
     }
+  }
+
+  @Test
+  fun viewModel_LoadEventPopulatesAttendees() = runTest {
+    val db = Db.freshLocal()
+    assertTrue(db.eventRepo.createEvent(sampleEvent).isSuccess)
+
+    val attendee1 =
+        User(id = "att1", name = "Attendee One", enrolledEvents = listOf(sampleEvent.id))
+    val attendee2 =
+        User(id = "att2", name = "Attendee Two", enrolledEvents = listOf(sampleEvent.id))
+    assertTrue(db.userRepo.createUser(attendee1).isSuccess)
+    assertTrue(db.userRepo.createUser(attendee2).isSuccess)
+
+    val viewModel = EventDetailsViewModel(db)
+    viewModel.loadEvent(sampleEvent.id, ApplicationProvider.getApplicationContext())
+
+    composeTestRule.waitUntil(timeoutMillis = 5_000) {
+      viewModel.uiState.value is EventDetailsUIState.Success
+    }
+    val state = viewModel.uiState.value as EventDetailsUIState.Success
+    assertEquals(2, state.attendees.size)
   }
 
   @Test
@@ -189,6 +223,8 @@ class EventDetailsTest {
     composeTestRule.setContent {
       EventDetailsContent(
           event = sampleEvent,
+          attendees = emptyList(),
+          onAttendeesClick = {},
           onGoBack = {},
           onOpenMap = { clicked = true },
           onEnrollClick = {},
@@ -207,6 +243,8 @@ class EventDetailsTest {
     composeTestRule.setContent {
       EventDetailsContent(
           event = sampleEvent,
+          attendees = emptyList(),
+          onAttendeesClick = {},
           onGoBack = { backClicked = true },
           onEnrollClick = {},
           onOpenMap = {},
@@ -296,7 +334,7 @@ class EventDetailsTest {
   @Test
   fun uiState_SuccessContainsCorrectEvent() {
     val event = sampleEvent
-    val state = EventDetailsUIState.Success(event, false)
+    val state = EventDetailsUIState.Success(event, false, attendees = emptyList())
     assertEquals("Success state should contain the event", event, state.event)
     assertFalse("Success state should have correct enrollment status", state.isEnrolled)
   }
@@ -304,7 +342,7 @@ class EventDetailsTest {
   @Test
   fun uiState_SuccessCanBeEnrolled() {
     val event = sampleEvent
-    val state = EventDetailsUIState.Success(event, true)
+    val state = EventDetailsUIState.Success(event, true, attendees = emptyList())
     assertTrue("Success state should reflect enrollment", state.isEnrolled)
   }
 
@@ -348,6 +386,8 @@ class EventDetailsTest {
     composeTestRule.setContent {
       EventDetailsContent(
           event = sampleEvent,
+          attendees = emptyList(),
+          onAttendeesClick = {},
           onEnrollClick = {},
           onGoBack = { clickCount++ },
           onOpenMap = {},
@@ -370,6 +410,8 @@ class EventDetailsTest {
     composeTestRule.setContent {
       EventDetailsContent(
           event = sampleEvent,
+          attendees = emptyList(),
+          onAttendeesClick = {},
           onGoBack = { goBackCalled = true },
           onEnrollClick = {},
           onOpenMap = {},

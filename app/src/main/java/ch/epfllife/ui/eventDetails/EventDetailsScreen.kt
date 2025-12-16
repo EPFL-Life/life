@@ -11,6 +11,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Group
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -30,6 +31,7 @@ import ch.epfllife.R
 import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.map.Location
+import ch.epfllife.model.user.User
 import ch.epfllife.ui.composables.BackButton
 import ch.epfllife.ui.composables.Map
 import ch.epfllife.ui.theme.LifeRed
@@ -59,6 +61,7 @@ fun EventDetailsScreen(
     onGoBack: () -> Unit = {},
     onOpenMap: (Location) -> Unit,
     onAssociationClick: (String) -> Unit,
+    onOpenAttendees: (List<User>) -> Unit,
     viewModel: EventDetailsViewModel = viewModel { EventDetailsViewModel(db) },
 ) {
   val uiState by viewModel.uiState.collectAsState()
@@ -87,6 +90,8 @@ fun EventDetailsScreen(
       EventDetailsContent(
           event = state.event,
           isEnrolled = state.isEnrolled,
+          attendees = state.attendees,
+          onAttendeesClick = { onOpenAttendees(state.attendees) },
           onGoBack = onGoBack,
           onOpenMap = onOpenMap,
           onAssociationClick = onAssociationClick,
@@ -102,6 +107,8 @@ fun EventDetailsContent(
     modifier: Modifier = Modifier,
     event: Event,
     isEnrolled: Boolean = false,
+    attendees: List<User>,
+    onAttendeesClick: () -> Unit,
     onGoBack: () -> Unit,
     onOpenMap: (Location) -> Unit,
     onAssociationClick: (String) -> Unit,
@@ -144,6 +151,8 @@ fun EventDetailsContent(
                     formattedDate = formattedDate,
                     formattedTime = formattedTime,
                     formattedLocation = formattedLocation)
+
+                EventAttendanceRow(attendeeCount = attendees.size, onClick = onAttendeesClick)
 
                 EventDescription(event.description)
 
@@ -252,6 +261,23 @@ private fun EventDateTimeLocation(
           Spacer(Modifier.width(8.dp))
           Text(formattedTime, style = MaterialTheme.typography.bodyMedium)
         }
+      }
+}
+
+@Composable
+private fun EventAttendanceRow(attendeeCount: Int, onClick: () -> Unit) {
+  Row(
+      modifier = Modifier.fillMaxWidth().clickable { onClick() }.padding(vertical = 8.dp),
+      verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            imageVector = Icons.Default.Group,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        Spacer(Modifier.width(8.dp))
+        Text(
+            text = "$attendeeCount attending",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant)
       }
 }
 

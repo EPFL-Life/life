@@ -24,6 +24,8 @@ class LanguageRepositoryTest {
     override suspend fun updateUser(userId: String, newUser: User): Result<Unit> =
         Result.success(Unit)
 
+    override suspend fun getUsersEnrolledInEvent(eventId: String): List<User> = emptyList()
+
     override suspend fun deleteUser(userId: String): Result<Unit> = Result.success(Unit)
 
     override suspend fun subscribeToEvent(eventId: String): Result<Unit> = Result.success(Unit)
@@ -54,6 +56,8 @@ class LanguageRepositoryTest {
       lastUpdatedUser = newUser
       return Result.success(Unit)
     }
+
+    override suspend fun getUsersEnrolledInEvent(eventId: String): List<User> = emptyList()
 
     override suspend fun deleteUser(userId: String): Result<Unit> = Result.success(Unit)
 

@@ -48,6 +48,9 @@
     <string name="about_placeholder">No description available.</string>
     <string name="upcoming_events_title">Upcoming Events</string>
 
+    <!-- Attendee List Screen -->
+    <string name="attendees">Event Attendees</string>
+
     <!-- Settings screen-->
     <string name="signout_successful">Sign out successful</string>
     <string name="settings_title">Settings</string>

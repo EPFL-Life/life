@@ -120,9 +120,10 @@ sonar {
     property("sonar.projectKey", "EPFL-Life_life")
     property("sonar.organization", "epfl-life")
     property("sonar.host.url", "https://sonarcloud.io")
-    property(
-        "sonar.coverage.jacoco.xmlReportPaths",
-        "${project.layout.buildDirectory.get()}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
+    property("sonar.projectBaseDir", rootDir) // go up from app to root
+    property("sonar.sources", "app/src/main,event_scraper")
+    property("sonar.coverage.jacoco.xmlReportPaths", "android-coverage/jacocoTestReport.xml")
+    property("sonar.python.coverage.reportPaths", "python-coverage/coverage.xml")
   }
 }
 

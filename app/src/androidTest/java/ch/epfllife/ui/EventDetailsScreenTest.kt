@@ -9,8 +9,10 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import ch.epfllife.example_data.ExampleEvents
+import ch.epfllife.example_data.ExampleUsers
 import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.Event
+import ch.epfllife.model.user.User
 import ch.epfllife.ui.theme.Theme
 import org.junit.Before
 import org.junit.Rule
@@ -32,11 +34,17 @@ class EventDetailsScreenTest {
     sampleEvent = ExampleEvents.sampleEvent
   }
 
-  private fun setSuccessContent(event: Event = sampleEvent) {
+  private fun setSuccessContent(
+      event: Event = sampleEvent,
+      attendees: List<User> = emptyList(),
+      onAttendeesClick: () -> Unit = {},
+  ) {
     composeTestRule.setContent {
       Theme {
         EventDetailsContent(
             event = event,
+            attendees = attendees,
+            onAttendeesClick = onAttendeesClick,
             onGoBack = {},
             onOpenMap = {},
             onEnrollClick = {},
@@ -88,6 +96,7 @@ class EventDetailsScreenTest {
             onOpenMap = {},
             onGoBack = {},
             onAssociationClick = {},
+            onOpenAttendees = {},
         )
       }
     }
@@ -126,5 +135,21 @@ class EventDetailsScreenTest {
     setSuccessContent()
     composeTestRule.onNodeWithContentDescription("Back").assertIsDisplayed()
     composeTestRule.onNodeWithContentDescription("Back").performClick()
+  }
+
+  @Test
+  fun attendeeCount_isDisplayed() {
+    val attendees = listOf(ExampleUsers.user1, ExampleUsers.user2)
+    setSuccessContent(attendees = attendees)
+    composeTestRule.onNodeWithText("2 attending").assertIsDisplayed()
+  }
+
+  @Test
+  fun attendeeCount_click_triggersCallback() {
+    var clicked = false
+    val attendees = listOf(ExampleUsers.user1, ExampleUsers.user2)
+    setSuccessContent(attendees = attendees, onAttendeesClick = { clicked = true })
+    composeTestRule.onNodeWithText("2 attending").performClick()
+    org.junit.Assert.assertTrue("Attendee row should trigger callback", clicked)
   }
 }

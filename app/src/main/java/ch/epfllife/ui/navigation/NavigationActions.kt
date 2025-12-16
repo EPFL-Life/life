@@ -29,6 +29,8 @@ sealed class Screen(
 
   object EventDetails : Screen(route = "eventdetails", name = "EventDetails")
 
+  object AttendeeList : Screen(route = "attendees", name = "AttendeeList")
+
   object Map : Screen(route = "map", name = "Map")
 
   object SelectAssociation : Screen("selectassociation", name = "SelectAssociation")

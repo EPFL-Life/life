@@ -68,6 +68,10 @@ class UserRepositoryLocal(
     return Result.success(Unit)
   }
 
+  override suspend fun getUsersEnrolledInEvent(eventId: String): List<User> {
+    return users.values.filter { user -> user.enrolledEvents.contains(eventId) }
+  }
+
   override suspend fun deleteUser(userId: String): Result<Unit> {
 
     // remove user
