@@ -1,8 +1,13 @@
 package ch.epfllife.ui.admin
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
@@ -45,6 +50,8 @@ object AddEditAssociationTestTags {
   const val ABOUT_FIELD = "AddEditAssociation_AboutField"
   const val EVENT_CATEGORY_FIELD = "AddEditAssociation_EventCategoryField"
   const val SUBMIT_BUTTON = "AddEditAssociation_SubmitButton"
+  const val UPLOAD_LOGO_BUTTON = "AddEditAssociation_UploadLogoButton"
+  const val UPLOAD_BANNER_BUTTON = "AddEditAssociation_UploadBannerButton"
 }
 
 @Composable
@@ -73,7 +80,10 @@ fun AddEditAssociationScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally) {
               Text(
-                  text = stringResource(state.messageRes),
+                  text =
+                      stringResource(
+                          state.messageRes), // if debugging you can display the actual message with
+                  // state.message here (not user friendly though)
                   color = MaterialTheme.colorScheme.error,
                   style = MaterialTheme.typography.bodyLarge)
               Spacer(modifier = Modifier.height(16.dp))
@@ -224,6 +234,17 @@ private fun AddEditAssociationContent(
           }
         }
 
+        // Image Pickers
+        val logoEventLauncher =
+            rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.PickVisualMedia(),
+                onResult = { uri -> if (uri != null) viewModel.onLogoSelected(uri) })
+
+        val bannerLauncher =
+            rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.PickVisualMedia(),
+                onResult = { uri -> if (uri != null) viewModel.onBannerSelected(uri) })
+
         // --- Upload Images (URLs) ---
         Text(
             text = stringResource(R.string.upload_images),
@@ -231,17 +252,45 @@ private fun AddEditAssociationContent(
             style = MaterialTheme.typography.titleSmall)
         HorizontalDivider(color = MaterialTheme.colorScheme.outline)
 
-        OutlinedTextField(
-            value = formState.logoUrl,
-            onValueChange = { viewModel.updateLogoUrl(it) },
-            label = { Text(stringResource(R.string.logo_url)) },
-            modifier = Modifier.fillMaxWidth())
+        // TODO remove text field
+        Row(verticalAlignment = Alignment.CenterVertically) {
+          OutlinedTextField(
+              value = formState.logoUrl,
+              onValueChange = { viewModel.updateLogoUrl(it) },
+              label = { Text(stringResource(R.string.logo_url)) },
+              modifier = Modifier.weight(1f))
+          Spacer(Modifier.width(8.dp))
+          Button(
+              onClick = {
+                logoEventLauncher.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+              },
+              modifier = Modifier.testTag(AddEditAssociationTestTags.UPLOAD_LOGO_BUTTON)) {
+                Icon(
+                    imageVector = androidx.compose.material.icons.Icons.Default.Upload,
+                    contentDescription = "Upload Logo")
+              }
+        }
 
-        OutlinedTextField(
-            value = formState.bannerUrl,
-            onValueChange = { viewModel.updateBannerUrl(it) },
-            label = { Text(stringResource(R.string.banner_url)) },
-            modifier = Modifier.fillMaxWidth())
+        // TODO remove text field
+        Row(verticalAlignment = Alignment.CenterVertically) {
+          OutlinedTextField(
+              value = formState.bannerUrl,
+              onValueChange = { viewModel.updateBannerUrl(it) },
+              label = { Text(stringResource(R.string.banner_url)) },
+              modifier = Modifier.weight(1f))
+          Spacer(Modifier.width(8.dp))
+          Button(
+              onClick = {
+                bannerLauncher.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+              },
+              modifier = Modifier.testTag(AddEditAssociationTestTags.UPLOAD_BANNER_BUTTON)) {
+                Icon(
+                    imageVector = androidx.compose.material.icons.Icons.Default.Upload,
+                    contentDescription = "Upload Banner")
+              }
+        }
 
         Spacer(Modifier.height(24.dp))
 
