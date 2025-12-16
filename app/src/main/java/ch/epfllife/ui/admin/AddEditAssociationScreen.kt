@@ -47,7 +47,6 @@ import ch.epfllife.ui.association.SocialIcons
 import ch.epfllife.ui.composables.BackButton
 import ch.epfllife.ui.composables.SubmitButton
 import coil.compose.AsyncImage
-import com.google.android.material.progressindicator.CircularProgressIndicator
 
 object AddEditAssociationTestTags {
   const val HEADER = "AddEditAssociation_Header"

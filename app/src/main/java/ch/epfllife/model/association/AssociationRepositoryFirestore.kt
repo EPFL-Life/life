@@ -225,34 +225,6 @@ class AssociationRepositoryFirestore(
               e.cause?.message?.contains("404") == true ||
               (e is StorageException && e.errorCode == StorageException.ERROR_OBJECT_NOT_FOUND)
 
-      //      if (is404) {
-      //        Log.w(
-      //            "AssociationRepo",
-      //            "First attempt failed with 404. Trying fallback bucket:
-      // gs://epfl-life.appspot.com")
-      //        try {
-      //          val fallbackStorage =
-      //              FirebaseStorage.getInstance("gs://epfl-life.appspot.com")
-      //          val fallbackRef =
-      //              fallbackStorage.reference.child(
-      //                  "associations/$associationId/${imageType.name.lowercase()}.jpg")
-      //
-      //          val metadata =
-      //              StorageMetadata.Builder()
-      //                  .setContentType("image/jpeg")
-      //                  .build()
-      //
-      //          fallbackRef.putFile(imageUri, metadata).await()
-      //          val fallbackUrl = fallbackRef.downloadUrl.await()
-      //          Log.d("AssociationRepo", "Fallback upload success: $fallbackUrl")
-      //          return Result.success(fallbackUrl.toString())
-      //        } catch (fallbackEx: Exception) {
-      //          Log.e("AssociationRepo", "Fallback upload also failed", fallbackEx)
-      //          // Return original error to avoid confusion, or the fallback error?
-      //          // Returning original error is usually safer as it reflects the primary config.
-      //        }
-      //      }
-
       Log.e("AssociationRepo", "Error uploading image at step: ${e.stackTrace.firstOrNull()}", e)
       Result.failure(e)
     }
