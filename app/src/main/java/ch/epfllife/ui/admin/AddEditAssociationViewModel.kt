@@ -50,7 +50,7 @@ class AddEditAssociationViewModel(
   // this upload the LOGO image instantly and returns the URL of the uploaded image
   fun onLogoSelected(uri: android.net.Uri) {
     viewModelScope.launch {
-      isUploading = true
+      isUploadingLogo = true
       try {
         Log.d("AddEditAssociationVM", "onLogoSelected: $uri")
         repo
@@ -65,7 +65,7 @@ class AddEditAssociationViewModel(
                       R.string.error_loading_association, "Logo Upload Failed: ${e.message}")
             }
       } finally {
-        isUploading = false
+        isUploadingLogo = false
       }
     }
   }
@@ -73,7 +73,7 @@ class AddEditAssociationViewModel(
   // this upload the BANNER image instantly and returns the URL of the uploaded image
   fun onBannerSelected(uri: android.net.Uri) {
     viewModelScope.launch {
-      isUploading = true
+      isUploadingBanner = true
       try {
         Log.d("AddEditAssociationVM", "onBannerSelected: $uri")
         repo
@@ -88,7 +88,7 @@ class AddEditAssociationViewModel(
                       R.string.error_loading_association, "Banner Upload Failed: ${e.message}")
             }
       } finally {
-        isUploading = false
+        isUploadingBanner = false
       }
     }
   }
@@ -98,7 +98,10 @@ class AddEditAssociationViewModel(
   var formState by mutableStateOf(AssociationFormState())
     private set
 
-  var isUploading by mutableStateOf(false)
+  var isUploadingLogo by mutableStateOf(false)
+    private set
+
+  var isUploadingBanner by mutableStateOf(false)
     private set
 
   private val _uiState =
