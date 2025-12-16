@@ -64,6 +64,17 @@ import kotlinx.serialization.json.Json
 private const val selectedAssociationIdKey = "selectedAssociationId"
 private const val selectedAssociationNameKey = "selectedAssociationName"
 
+internal fun extractDeepLinkEventId(intent: Intent?): String? =
+    intent
+        ?.data
+        ?.takeIf { it.host == "epfllife.app" }
+        ?.pathSegments
+        ?.takeIf { it.size >= 2 && it[0] == "event" }
+        ?.get(1)
+
+internal fun getOptionalStringArg(arguments: Bundle?, key: String): String? =
+    arguments?.getString(key)
+
 class MainActivity : ComponentActivity() {
   private val deepLinkEventIdState = mutableStateOf<String?>(null)
 
@@ -96,14 +107,6 @@ class MainActivity : ComponentActivity() {
     setIntent(intent)
     deepLinkEventIdState.value = extractDeepLinkEventId(intent)
   }
-
-  private fun extractDeepLinkEventId(intent: Intent?): String? =
-      intent
-          ?.data
-          ?.takeIf { it.host == "epfllife.app" }
-          ?.pathSegments
-          ?.takeIf { it.size >= 2 && it[0] == "event" }
-          ?.get(1)
 }
 
 @Composable
@@ -362,8 +365,8 @@ fun App(
                         defaultValue = null
                       })) { backStackEntry ->
                 val associationId =
-                    backStackEntry.arguments?.getString(
-                        Screen.AddEditAssociation.ASSOCIATION_ID_ARG)
+                    getOptionalStringArg(
+                        backStackEntry.arguments, Screen.AddEditAssociation.ASSOCIATION_ID_ARG)
 
                 AddEditAssociationScreen(
                     db = db,
