@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -59,6 +58,9 @@ object EventDetailsTestTags {
   const val CONTENT = "eventDetailsContent"
 }
 
+private const val DEFAULT_EVENT_IMAGE_URL =
+    "https://www.epfl.ch/campus/services/events/wp-content/uploads/2024/09/WEB_Image-Home-Events_ORGANISER.png"
+
 @Composable
 fun EventDetailsScreen(
     eventId: String,
@@ -71,29 +73,6 @@ fun EventDetailsScreen(
 ) {
   val uiState by viewModel.uiState.collectAsState()
   val context = LocalContext.current
-
-  val onShareEvent =
-      remember(eventId, context) {
-        {
-          val link = "https://epfllife.app/event/${Uri.encode(eventId)}"
-          val sendIntent =
-              Intent(Intent.ACTION_SEND).apply {
-                type = "text/plain"
-                putExtra(Intent.EXTRA_TEXT, link)
-              }
-
-          val chooser = Intent.createChooser(sendIntent, context.getString(R.string.share))
-          if (context !is Activity) {
-            chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-          }
-
-          try {
-            context.startActivity(chooser)
-          } catch (_: ActivityNotFoundException) {
-            // No compatible activity to handle sharing on this device.
-          }
-        }
-      }
 
   LaunchedEffect(eventId) { viewModel.loadEvent(eventId, context) }
 
@@ -115,6 +94,38 @@ fun EventDetailsScreen(
     }
 
     is EventDetailsUIState.Success -> {
+      val onShareEvent =
+          remember(state.event.title, state.senderName, state.event.pictureUrl, context) {
+            {
+              val imageUrl =
+                  state.event.pictureUrl?.trim().takeUnless { it.isNullOrEmpty() }
+                      ?: DEFAULT_EVENT_IMAGE_URL
+              val message =
+                  context.getString(
+                      R.string.share_invite_message,
+                      state.event.title,
+                      state.senderName,
+                  )
+              val messageWithImage = "$message\n\n$imageUrl"
+              val sendIntent =
+                  Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, messageWithImage)
+                  }
+
+              val chooser = Intent.createChooser(sendIntent, context.getString(R.string.share))
+              if (context !is Activity) {
+                chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+              }
+
+              try {
+                context.startActivity(chooser)
+              } catch (_: ActivityNotFoundException) {
+                // No compatible activity to handle sharing on this device.
+              }
+            }
+          }
+
       EventDetailsContent(
           event = state.event,
           isEnrolled = state.isEnrolled,
@@ -141,7 +152,7 @@ fun EventDetailsContent(
     onOpenMap: (Location) -> Unit,
     onAssociationClick: (String) -> Unit,
     onEnrollClick: () -> Unit,
-    onShare: () -> Unit,
+    onShare: () -> Unit = {},
     onUnenrollClick: () -> Unit = {},
 ) {
 
