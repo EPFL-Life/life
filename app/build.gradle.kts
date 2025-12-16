@@ -34,6 +34,7 @@ android {
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     vectorDrawables { useSupportLibrary = true }
+    testInstrumentationRunnerArguments["log"] = "true"
     manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
   }
 
