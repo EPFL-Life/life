@@ -9,6 +9,7 @@ import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.NavHostController
 import androidx.test.rule.GrantPermissionRule
 import ch.epfllife.ThemedApp
+import ch.epfllife.example_data.ExampleAssociations
 import ch.epfllife.example_data.ExampleEvents
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.authentication.SignInResult
@@ -482,5 +483,33 @@ class NavigationTest {
 
     // 5. ASSERT: Filter must still be in ALL state
     composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_ALL).assertIsDisplayed()
+  }
+
+  @Test
+  fun homeScreen_retainsAllFilter_onReturningFromDetails() {
+    prepareEventDataForPersistence()
+    setUpApp()
+
+    composeTestRule.navigateToEvent(ExampleEvents.event1.id)
+    composeTestRule.waitForIdle()
+
+    composeTestRule
+        .onNodeWithTag(EventDetailsTestTags.BACK_BUTTON, useUnmergedTree = true)
+        .performClick()
+    composeTestRule.waitForIdle()
+
+    composeTestRule.onNodeWithTag(HomeScreenTestTags.BUTTON_ALL).assertIsDisplayed()
+  }
+
+  private fun prepareEventDataForPersistence() = runTest {
+    val event1 = ExampleEvents.event1
+    val event2 = ExampleEvents.event2
+    val assoc1 = ExampleAssociations.association1
+
+    Assert.assertTrue(db.assocRepo.createAssociation(assoc1).isSuccess)
+    Assert.assertTrue(db.eventRepo.createEvent(event1).isSuccess)
+    Assert.assertTrue(db.eventRepo.createEvent(event2).isSuccess)
+
+    db.userRepo.subscribeToEvent(event1.id)
   }
 }
