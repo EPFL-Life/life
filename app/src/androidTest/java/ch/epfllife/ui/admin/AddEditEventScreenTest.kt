@@ -1,6 +1,7 @@
 package ch.epfllife.ui.admin
 
 import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.hasText
@@ -116,5 +117,14 @@ class AddEditEventScreenTest {
     composeTestRule
         .onNodeWithTag(AddEditEventTestTags.TIME_FIELD)
         .assert(hasText(":", substring = true))
+  }
+
+  @Test
+  fun displayErrorStateWhenRepositoryFails() {
+    val db = Db.freshLocal()
+
+    setContent(db = db, associationId = "non-existent-id")
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag(AddEditEventTestTags.ERROR_BOX).assertIsDisplayed()
   }
 }
