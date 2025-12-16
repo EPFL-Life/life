@@ -7,11 +7,13 @@ import ch.epfllife.model.event.Event
 import ch.epfllife.model.firestore.FirestoreCollections
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
+import org.mockito.Mockito
 
 /**
  * Base class for all tests that interact with the Firebase Emulator regarding Firestore. This class
@@ -21,7 +23,8 @@ import org.junit.Before
 open class FirestoreLifeTest {
 
   // Repositories pointing to the emulator
-  protected val db = Db.firestore
+  protected val mockStorage = Mockito.mock(FirebaseStorage::class.java)
+  protected val db = Db.forTest(mockStorage)
 
   // Use a fake auth instance for testing
   protected val auth = Auth(FakeCredentialManager.withDefaultTestUser)
