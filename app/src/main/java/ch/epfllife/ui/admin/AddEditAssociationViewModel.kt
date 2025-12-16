@@ -50,42 +50,55 @@ class AddEditAssociationViewModel(
   // this upload the LOGO image instantly and returns the URL of the uploaded image
   fun onLogoSelected(uri: android.net.Uri) {
     viewModelScope.launch {
-      Log.d("AddEditAssociationVM", "onLogoSelected: $uri")
-      repo
-          .uploadAssociationImage(
-              stableId, uri, ch.epfllife.model.association.AssociationImageType.LOGO)
-          .onSuccess { url -> updateLogoUrl(url) }
-          .onFailure { e ->
-            Log.e("AddEditAssociationVM", "Failed to upload logo", e)
-            _uiState.value =
-                // TODO possibly replace this with a toast popup to improve user experience
-                AddEditAssociationUIState.Error(
-                    R.string.error_loading_association, "Logo Upload Failed: ${e.message}")
-          }
+      isUploading = true
+      try {
+        Log.d("AddEditAssociationVM", "onLogoSelected: $uri")
+        repo
+            .uploadAssociationImage(
+                stableId, uri, ch.epfllife.model.association.AssociationImageType.LOGO)
+            .onSuccess { url -> updateLogoUrl(url) }
+            .onFailure { e ->
+              Log.e("AddEditAssociationVM", "Failed to upload logo", e)
+              _uiState.value =
+                  // TODO possibly replace this with a toast popup to improve user experience
+                  AddEditAssociationUIState.Error(
+                      R.string.error_loading_association, "Logo Upload Failed: ${e.message}")
+            }
+      } finally {
+        isUploading = false
+      }
     }
   }
 
   // this upload the BANNER image instantly and returns the URL of the uploaded image
   fun onBannerSelected(uri: android.net.Uri) {
     viewModelScope.launch {
-      Log.d("AddEditAssociationVM", "onBannerSelected: $uri")
-      repo
-          .uploadAssociationImage(
-              stableId, uri, ch.epfllife.model.association.AssociationImageType.BANNER)
-          .onSuccess { url -> updateBannerUrl(url) }
-          .onFailure { e ->
-            Log.e("AddEditAssociationVM", "Failed to upload banner", e)
-            _uiState.value =
-                // TODO possibly replace this with a toast popup to improve user experience
-                AddEditAssociationUIState.Error(
-                    R.string.error_loading_association, "Banner Upload Failed: ${e.message}")
-          }
+      isUploading = true
+      try {
+        Log.d("AddEditAssociationVM", "onBannerSelected: $uri")
+        repo
+            .uploadAssociationImage(
+                stableId, uri, ch.epfllife.model.association.AssociationImageType.BANNER)
+            .onSuccess { url -> updateBannerUrl(url) }
+            .onFailure { e ->
+              Log.e("AddEditAssociationVM", "Failed to upload banner", e)
+              _uiState.value =
+                  // TODO possibly replace this with a toast popup to improve user experience
+                  AddEditAssociationUIState.Error(
+                      R.string.error_loading_association, "Banner Upload Failed: ${e.message}")
+            }
+      } finally {
+        isUploading = false
+      }
     }
   }
 
   private val repo = db.assocRepo
 
   var formState by mutableStateOf(AssociationFormState())
+    private set
+
+  var isUploading by mutableStateOf(false)
     private set
 
   private val _uiState =
