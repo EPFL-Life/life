@@ -281,11 +281,23 @@ class AdminEndToEndTest {
     composeTestRule.onNodeWithTag(AddEditEventTestTags.SUBMIT_BUTTON).performClick()
     composeTestRule.waitForIdle()
 
-    // Verify event created on manage events screen
-    composeTestRule.waitUntil { composeTestRule.onNodeWithText(eventTitle).isDisplayed() }
+    // Verify we navigated back to ManageEventsScreen (important: eventTitle text also exists on the
+    // edit screen because we just typed it, so waiting for text alone is flaky).
+    composeTestRule.waitUntil(timeoutMillis = 10_000) {
+      try {
+        composeTestRule.onNodeWithTag(ManageEventsTestTags.TITLE).isDisplayed()
+      } catch (e: Exception) {
+        false
+      }
+    }
+
+    // Verify event created on manage events screen (may require scrolling on small devices)
+    composeTestRule.onNodeWithText(eventTitle).performScrollTo().assertIsDisplayed()
 
     // Verify event created on home screen
-    composeTestRule.onNodeWithTag(ManageEventsTestTags.BACK_BUTTON).performClick()
+    composeTestRule
+        .onNodeWithTag(ManageEventsTestTags.BACK_BUTTON)
+        .performClick() // back to admin console
     composeTestRule.onNodeWithTag(AssociationAdminScreenTestTags.BACK_BUTTON).performClick()
     composeTestRule.navigateToTab(Tab.HomeScreen)
     composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_ALL).performClick()
