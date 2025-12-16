@@ -136,6 +136,7 @@
         <string name="search_bar_placeholder">Rechercher…</string>
         <string name="show_more">Afficher plus…</string>
         <string name="show_less">Afficher moins</string>
+        <string name="share">Partager</string>
 
         <string name="calendar_previous_month">Mois précédent</string>
         <string name="calendar_next_month">Mois suivant</string>

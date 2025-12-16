@@ -1,5 +1,6 @@
 package ch.epfllife
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -9,8 +10,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -62,6 +65,7 @@ private const val selectedAssociationIdKey = "selectedAssociationId"
 private const val selectedAssociationNameKey = "selectedAssociationName"
 
 class MainActivity : ComponentActivity() {
+  private val deepLinkEventIdState = mutableStateOf<String?>(null)
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -73,21 +77,47 @@ class MainActivity : ComponentActivity() {
     val userRepository = db.userRepo
     val languageRepository = LanguageRepository(userRepository)
 
+    deepLinkEventIdState.value = extractDeepLinkEventId(intent)
+
     setContent {
       val language by languageRepository.languageFlow.collectAsState(initial = AppLanguage.SYSTEM)
       LanguageProvider(language = language) {
         ThemedApp(
             auth = Auth(CredentialManager.create(LocalContext.current)),
             db = db,
-            languageRepository = languageRepository)
+            languageRepository = languageRepository,
+            deepLinkEventId = deepLinkEventIdState.value)
       }
     }
   }
+
+  override fun onNewIntent(intent: Intent) {
+    super.onNewIntent(intent)
+    setIntent(intent)
+    deepLinkEventIdState.value = extractDeepLinkEventId(intent)
+  }
+
+  private fun extractDeepLinkEventId(intent: Intent?): String? =
+      intent
+          ?.data
+          ?.takeIf { it.host == "epfllife.app" }
+          ?.pathSegments
+          ?.takeIf { it.size >= 2 && it[0] == "event" }
+          ?.get(1)
 }
 
 @Composable
-fun ThemedApp(auth: Auth, db: Db, languageRepository: LanguageRepository) {
-  Theme { Surface(modifier = Modifier.fillMaxSize()) { App(auth, db, languageRepository) } }
+fun ThemedApp(
+    auth: Auth,
+    db: Db,
+    languageRepository: LanguageRepository,
+    deepLinkEventId: String? = null
+) {
+  Theme {
+    Surface(modifier = Modifier.fillMaxSize()) {
+      App(auth, db, languageRepository, deepLinkEventId = deepLinkEventId)
+    }
+  }
 }
 
 /**
@@ -97,11 +127,20 @@ fun ThemedApp(auth: Auth, db: Db, languageRepository: LanguageRepository) {
  * @param auth The auth handler.
  */
 @Composable
-fun App(auth: Auth, db: Db, languageRepository: LanguageRepository) {
+fun App(
+    auth: Auth,
+    db: Db,
+    languageRepository: LanguageRepository,
+    deepLinkEventId: String? = null
+) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
   val startDestination =
       if (auth.auth.currentUser == null) Screen.SignIn.route else Screen.HomeScreen.route
+
+  LaunchedEffect(deepLinkEventId) {
+    deepLinkEventId?.let { eventId -> navigationActions.navigateToEventDetails(eventId) }
+  }
 
   // keep the current destination of the nav
   val backStackEntry by navController.currentBackStackEntryAsState()

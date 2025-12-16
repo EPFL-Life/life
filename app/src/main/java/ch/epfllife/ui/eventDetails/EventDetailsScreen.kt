@@ -1,7 +1,11 @@
 package ch.epfllife.ui.eventDetails
 
 import android.Manifest
+import android.app.Activity
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -34,6 +38,7 @@ import ch.epfllife.model.map.Location
 import ch.epfllife.model.user.User
 import ch.epfllife.ui.composables.BackButton
 import ch.epfllife.ui.composables.Map
+import ch.epfllife.ui.composables.ShareButton
 import ch.epfllife.ui.theme.LifeRed
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -67,6 +72,29 @@ fun EventDetailsScreen(
   val uiState by viewModel.uiState.collectAsState()
   val context = LocalContext.current
 
+  val onShareEvent =
+      remember(eventId, context) {
+        {
+          val link = "https://epfllife.app/event/${Uri.encode(eventId)}"
+          val sendIntent =
+              Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, link)
+              }
+
+          val chooser = Intent.createChooser(sendIntent, context.getString(R.string.share))
+          if (context !is Activity) {
+            chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+          }
+
+          try {
+            context.startActivity(chooser)
+          } catch (_: ActivityNotFoundException) {
+            // No compatible activity to handle sharing on this device.
+          }
+        }
+      }
+
   LaunchedEffect(eventId) { viewModel.loadEvent(eventId, context) }
 
   when (val state = uiState) {
@@ -97,7 +125,7 @@ fun EventDetailsScreen(
           onAssociationClick = onAssociationClick,
           onEnrollClick = { viewModel.enrollInEvent(state.event, context) },
           onUnenrollClick = { viewModel.unenrollFromEvent(state.event, context) },
-      )
+          onShare = onShareEvent)
     }
   }
 }
@@ -113,6 +141,7 @@ fun EventDetailsContent(
     onOpenMap: (Location) -> Unit,
     onAssociationClick: (String) -> Unit,
     onEnrollClick: () -> Unit,
+    onShare: () -> Unit,
     onUnenrollClick: () -> Unit = {},
 ) {
 
@@ -136,7 +165,9 @@ fun EventDetailsContent(
           .background(MaterialTheme.colorScheme.surface)
           .testTag(EventDetailsTestTags.CONTENT)) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
-          EventImage(event.pictureUrl)
+          EventImage(event.pictureUrl) {
+            ShareButton(modifier = Modifier.align(Alignment.TopEnd), onShare = onShare)
+          }
 
           Column(
               Modifier.fillMaxWidth().padding(16.dp),
@@ -173,9 +204,14 @@ fun EventDetailsContent(
 }
 
 @Composable
-private fun EventImage(pictureUrl: String?) {
+private fun EventImage(
+    pictureUrl: String?,
+    modifier: Modifier = Modifier,
+    overlayContent: @Composable BoxScope.() -> Unit
+) {
   val context = LocalContext.current
-  Box(Modifier.fillMaxWidth()) {
+
+  Box(modifier = modifier.fillMaxWidth().height(260.dp)) {
     AsyncImage(
         model =
             ImageRequest.Builder(context)
@@ -186,11 +222,12 @@ private fun EventImage(pictureUrl: String?) {
                 .build(),
         contentDescription = "Event Image",
         modifier =
-            Modifier.fillMaxWidth()
-                .height(260.dp)
+            Modifier.matchParentSize()
                 .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
                 .testTag(EventDetailsTestTags.EVENT_IMAGE),
         contentScale = ContentScale.Crop)
+
+    overlayContent()
   }
 }
 

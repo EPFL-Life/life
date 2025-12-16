@@ -48,6 +48,7 @@ class EventDetailsScreenTest {
             onGoBack = {},
             onOpenMap = {},
             onEnrollClick = {},
+            onShare = {},
             onAssociationClick = {})
       }
     }
