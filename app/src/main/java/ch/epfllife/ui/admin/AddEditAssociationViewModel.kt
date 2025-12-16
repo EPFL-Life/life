@@ -37,7 +37,7 @@ data class AssociationFormState(
 sealed interface AddEditAssociationUIState {
   object Loading : AddEditAssociationUIState
 
-  data class Error(val messageRes: Int) : AddEditAssociationUIState
+  data class Error(val messageRes: Int, val message: String? = null) : AddEditAssociationUIState
 
   object Success : AddEditAssociationUIState
 }
@@ -46,6 +46,42 @@ class AddEditAssociationViewModel(
     private val db: Db,
     private val associationId: String? = null,
 ) : ViewModel() {
+
+  // this upload the LOGO image instantly and returns the URL of the uploaded image
+  fun onLogoSelected(uri: android.net.Uri) {
+    viewModelScope.launch {
+      Log.d("AddEditAssociationVM", "onLogoSelected: $uri")
+      repo
+          .uploadAssociationImage(
+              stableId, uri, ch.epfllife.model.association.AssociationImageType.LOGO)
+          .onSuccess { url -> updateLogoUrl(url) }
+          .onFailure { e ->
+            Log.e("AddEditAssociationVM", "Failed to upload logo", e)
+            _uiState.value =
+                // TODO possibly replace this with a toast popup to improve user experience
+                AddEditAssociationUIState.Error(
+                    R.string.error_loading_association, "Logo Upload Failed: ${e.message}")
+          }
+    }
+  }
+
+  // this upload the BANNER image instantly and returns the URL of the uploaded image
+  fun onBannerSelected(uri: android.net.Uri) {
+    viewModelScope.launch {
+      Log.d("AddEditAssociationVM", "onBannerSelected: $uri")
+      repo
+          .uploadAssociationImage(
+              stableId, uri, ch.epfllife.model.association.AssociationImageType.BANNER)
+          .onSuccess { url -> updateBannerUrl(url) }
+          .onFailure { e ->
+            Log.e("AddEditAssociationVM", "Failed to upload banner", e)
+            _uiState.value =
+                // TODO possibly replace this with a toast popup to improve user experience
+                AddEditAssociationUIState.Error(
+                    R.string.error_loading_association, "Banner Upload Failed: ${e.message}")
+          }
+    }
+  }
 
   private val repo = db.assocRepo
 
@@ -204,16 +240,16 @@ class AddEditAssociationViewModel(
     }
   }
 
+  private val stableId: String by lazy { associationId ?: repo.getNewUid() }
+
   private fun buildAssociation(): Association {
     val socialLinks =
         formState.socialMedia
             .filter { it.enabled && it.link.isNotBlank() }
             .associate { it.platform to it.link.trim() }
 
-    val associationUid = associationId ?: repo.getNewUid()
-
     return Association(
-        id = associationUid,
+        id = stableId,
         name = formState.name.trim(),
         description = formState.description.trim(),
         pictureUrl = formState.bannerUrl.ifBlank { null },
