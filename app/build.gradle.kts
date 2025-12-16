@@ -1,5 +1,8 @@
 import java.io.FileInputStream
 import java.util.Properties
+import org.gradle.api.tasks.testing.TestDescriptor
+import org.gradle.api.tasks.testing.TestListener
+import org.gradle.api.tasks.testing.TestResult
 
 plugins {
   jacoco
@@ -262,3 +265,13 @@ tasks.named("build") {
   dependsOn("assembleUnitTest")
   dependsOn("assembleAndroidTest")
 }
+
+gradle.addListener(object : TestListener {
+    override fun beforeSuite(suite: TestDescriptor) {}
+    override fun afterSuite(suite: TestDescriptor, result: TestResult) {}
+    override fun beforeTest(testDescriptor: TestDescriptor) {
+        println("executing ${testDescriptor.name}")
+    }
+    override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {
+    }
+})
