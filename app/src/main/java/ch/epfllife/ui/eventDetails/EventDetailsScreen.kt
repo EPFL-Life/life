@@ -1,10 +1,6 @@
 package ch.epfllife.ui.eventDetails
 
 import android.Manifest
-import android.app.Activity
-import android.content.ActivityNotFoundException
-import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -38,7 +34,6 @@ import ch.epfllife.model.map.Location
 import ch.epfllife.model.user.User
 import ch.epfllife.ui.composables.BackButton
 import ch.epfllife.ui.composables.Map
-import ch.epfllife.ui.composables.ShareButton
 import ch.epfllife.ui.theme.LifeRed
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -57,35 +52,6 @@ object EventDetailsTestTags {
   const val VIEW_LOCATION_BUTTON = "viewLocationButton"
   const val ENROLL_BUTTON = "enrollButton"
   const val CONTENT = "eventDetailsContent"
-}
-
-private const val DEFAULT_EVENT_IMAGE_URL =
-    "https://www.epfl.ch/campus/services/events/wp-content/uploads/2024/09/WEB_Image-Home-Events_ORGANISER.png"
-
-internal fun resolveShareImageUrl(pictureUrl: String?): String =
-    pictureUrl?.trim().takeUnless { it.isNullOrEmpty() } ?: DEFAULT_EVENT_IMAGE_URL
-
-internal fun buildShareMessage(
-    context: Context,
-    eventTitle: String,
-    senderName: String,
-    pictureUrl: String?,
-): String {
-  val imageUrl = resolveShareImageUrl(pictureUrl)
-  val message = context.getString(R.string.share_invite_message, eventTitle, senderName)
-  return "$message\n\n$imageUrl"
-}
-
-internal fun buildShareChooserIntent(context: Context, shareText: String): Intent {
-  val sendIntent =
-      Intent(Intent.ACTION_SEND).apply {
-        type = "text/plain"
-        putExtra(Intent.EXTRA_TEXT, shareText)
-      }
-
-  return Intent.createChooser(sendIntent, context.getString(R.string.share)).apply {
-    if (context !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-  }
 }
 
 @Composable
@@ -121,26 +87,6 @@ fun EventDetailsScreen(
     }
 
     is EventDetailsUIState.Success -> {
-      val onShareEvent =
-          remember(state.event.title, state.senderName, state.event.pictureUrl, context) {
-            {
-              val messageWithImage =
-                  buildShareMessage(
-                      context = context,
-                      eventTitle = state.event.title,
-                      senderName = state.senderName,
-                      pictureUrl = state.event.pictureUrl,
-                  )
-              val chooser = buildShareChooserIntent(context, messageWithImage)
-
-              try {
-                context.startActivity(chooser)
-              } catch (_: ActivityNotFoundException) {
-                // No compatible activity to handle sharing on this device.
-              }
-            }
-          }
-
       EventDetailsContent(
           event = state.event,
           isEnrolled = state.isEnrolled,
@@ -151,7 +97,7 @@ fun EventDetailsScreen(
           onAssociationClick = onAssociationClick,
           onEnrollClick = { viewModel.enrollInEvent(state.event, context) },
           onUnenrollClick = { viewModel.unenrollFromEvent(state.event, context) },
-          onShare = onShareEvent)
+      )
     }
   }
 }
@@ -167,7 +113,6 @@ fun EventDetailsContent(
     onOpenMap: (Location) -> Unit,
     onAssociationClick: (String) -> Unit,
     onEnrollClick: () -> Unit,
-    onShare: () -> Unit = {},
     onUnenrollClick: () -> Unit = {},
 ) {
 
@@ -191,9 +136,7 @@ fun EventDetailsContent(
           .background(MaterialTheme.colorScheme.surface)
           .testTag(EventDetailsTestTags.CONTENT)) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
-          EventImage(event.pictureUrl) {
-            ShareButton(modifier = Modifier.align(Alignment.TopEnd), onShare = onShare)
-          }
+          EventImage(event.pictureUrl)
 
           Column(
               Modifier.fillMaxWidth().padding(16.dp),
@@ -230,14 +173,9 @@ fun EventDetailsContent(
 }
 
 @Composable
-private fun EventImage(
-    pictureUrl: String?,
-    modifier: Modifier = Modifier,
-    overlayContent: @Composable BoxScope.() -> Unit
-) {
+private fun EventImage(pictureUrl: String?) {
   val context = LocalContext.current
-
-  Box(modifier = modifier.fillMaxWidth().height(260.dp)) {
+  Box(Modifier.fillMaxWidth()) {
     AsyncImage(
         model =
             ImageRequest.Builder(context)
@@ -248,12 +186,11 @@ private fun EventImage(
                 .build(),
         contentDescription = "Event Image",
         modifier =
-            Modifier.matchParentSize()
+            Modifier.fillMaxWidth()
+                .height(260.dp)
                 .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
                 .testTag(EventDetailsTestTags.EVENT_IMAGE),
         contentScale = ContentScale.Crop)
-
-    overlayContent()
   }
 }
 

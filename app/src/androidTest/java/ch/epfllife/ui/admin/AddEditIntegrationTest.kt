@@ -16,7 +16,6 @@ import ch.epfllife.model.association.Association
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.authentication.SignInResult
 import ch.epfllife.model.db.Db
-import ch.epfllife.model.user.LanguageRepository
 import ch.epfllife.model.user.UserRepositoryLocal
 import ch.epfllife.ui.admin.AddEditAssociationTestTags
 import ch.epfllife.ui.admin.AssociationAdminScreenTestTags
@@ -55,8 +54,7 @@ class AddEditIntegrationTest {
   fun createAndUpdateAssociationFromSettings_selectsItOnReturn() {
     seedAdminUser()
     val association = ExampleAssociations.sampleAssociation.copy(name = "New Admin Assoc")
-    val languageRepository = LanguageRepository(db.userRepo)
-    composeTestRule.setContent { ThemedApp(auth, db, languageRepository) }
+    composeTestRule.setContent { ThemedApp(auth, db) }
     composeTestRule.waitForIdle()
     composeTestRule.navigateToTab(Tab.Settings)
 

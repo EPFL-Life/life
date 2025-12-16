@@ -79,6 +79,7 @@ android {
       excludes += "META-INF/NOTICE.txt"
     }
   }
+  androidResources { generateLocaleConfig = true }
 
   testOptions {
     animationsDisabled = true
