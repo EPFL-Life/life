@@ -270,6 +270,10 @@ private fun AddEditAssociationContent(
                     imageVector = androidx.compose.material.icons.Icons.Default.Upload,
                     contentDescription = "Upload Logo")
               }
+          if (viewModel.isUploading) {
+            Spacer(Modifier.width(8.dp))
+            CircularProgressIndicator(modifier = Modifier.size(24.dp))
+          }
         }
 
         // TODO remove text field
@@ -290,6 +294,10 @@ private fun AddEditAssociationContent(
                     imageVector = androidx.compose.material.icons.Icons.Default.Upload,
                     contentDescription = "Upload Banner")
               }
+          if (viewModel.isUploading) {
+            Spacer(Modifier.width(8.dp))
+            CircularProgressIndicator(modifier = Modifier.size(24.dp))
+          }
         }
 
         Spacer(Modifier.height(24.dp))
@@ -300,7 +308,7 @@ private fun AddEditAssociationContent(
                 Modifier.fillMaxWidth()
                     .height(50.dp)
                     .testTag(AddEditAssociationTestTags.SUBMIT_BUTTON),
-            enabled = viewModel.isFormValid(),
+            enabled = viewModel.isFormValid() && !viewModel.isUploading,
             onClick = { viewModel.submit(onSubmitSuccess) })
 
         Spacer(Modifier.height(24.dp))
