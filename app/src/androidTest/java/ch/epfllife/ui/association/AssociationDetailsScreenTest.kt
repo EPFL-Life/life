@@ -514,4 +514,12 @@ private class FakeAssociationRepository(
 
   override fun listenAll(scope: CoroutineScope, onChange: suspend (List<Association>) -> Unit) =
       throw UnsupportedOperationException("Not used in these tests")
+
+  override suspend fun uploadAssociationImage(
+      associationId: String,
+      imageUri: android.net.Uri,
+      imageType: ch.epfllife.model.association.AssociationImageType
+  ): Result<String> {
+    throw UnsupportedOperationException("Not used in these tests")
+  }
 }
