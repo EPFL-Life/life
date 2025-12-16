@@ -1,5 +1,6 @@
 package ch.epfllife.model.association
 
+import android.net.Uri
 import android.util.Log
 import ch.epfllife.model.event.Event
 import ch.epfllife.model.event.EventCategory
@@ -9,10 +10,16 @@ import ch.epfllife.model.firestore.createListenAll
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageException
+import com.google.firebase.storage.StorageMetadata
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.tasks.await
 
-class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : AssociationRepository {
+class AssociationRepositoryFirestore(
+    private val db: FirebaseFirestore,
+    private val storage: FirebaseStorage
+) : AssociationRepository {
 
   override fun getNewUid(): String {
     return db.collection(FirestoreCollections.ASSOCIATIONS).document().id
@@ -181,4 +188,73 @@ class AssociationRepositoryFirestore(private val db: FirebaseFirestore) : Associ
           ::documentToAssociation,
           onChange,
       )
+
+  override suspend fun uploadAssociationImage(
+      associationId: String,
+      imageUri: Uri,
+      imageType: AssociationImageType
+  ): Result<String> {
+    return try {
+      val storageRef = storage.reference
+
+      Log.d("AssociationRepo", "Storage Bucket: ${storage.app.options.storageBucket}")
+
+      val imageRef =
+          storageRef.child("associations/$associationId/${imageType.name.lowercase()}.jpg")
+
+      Log.d("AssociationRepo", "Starting upload for $associationId to path: ${imageRef.path}")
+
+      val metadata = StorageMetadata.Builder().setContentType("image/jpeg").build()
+
+      // Upload with metadata
+      imageRef.putFile(imageUri, metadata).await()
+
+      Log.d("AssociationRepo", "PutFile completed. Fetching Download URL...")
+
+      val downloadUrl = imageRef.downloadUrl.await()
+
+      Log.d("AssociationRepo", "Download URL fetched: $downloadUrl")
+
+      Result.success(downloadUrl.toString())
+    } catch (e: Exception) {
+      // a lot of debugging before figuring out how to upload...
+
+      // this happens when the file does not exist OR the path is wrong
+      val is404 =
+          e.message?.contains("404") == true ||
+              e.cause?.message?.contains("404") == true ||
+              (e is StorageException && e.errorCode == StorageException.ERROR_OBJECT_NOT_FOUND)
+
+      //      if (is404) {
+      //        Log.w(
+      //            "AssociationRepo",
+      //            "First attempt failed with 404. Trying fallback bucket:
+      // gs://epfl-life.appspot.com")
+      //        try {
+      //          val fallbackStorage =
+      //              FirebaseStorage.getInstance("gs://epfl-life.appspot.com")
+      //          val fallbackRef =
+      //              fallbackStorage.reference.child(
+      //                  "associations/$associationId/${imageType.name.lowercase()}.jpg")
+      //
+      //          val metadata =
+      //              StorageMetadata.Builder()
+      //                  .setContentType("image/jpeg")
+      //                  .build()
+      //
+      //          fallbackRef.putFile(imageUri, metadata).await()
+      //          val fallbackUrl = fallbackRef.downloadUrl.await()
+      //          Log.d("AssociationRepo", "Fallback upload success: $fallbackUrl")
+      //          return Result.success(fallbackUrl.toString())
+      //        } catch (fallbackEx: Exception) {
+      //          Log.e("AssociationRepo", "Fallback upload also failed", fallbackEx)
+      //          // Return original error to avoid confusion, or the fallback error?
+      //          // Returning original error is usually safer as it reflects the primary config.
+      //        }
+      //      }
+
+      Log.e("AssociationRepo", "Error uploading image at step: ${e.stackTrace.firstOrNull()}", e)
+      Result.failure(e)
+    }
+  }
 }

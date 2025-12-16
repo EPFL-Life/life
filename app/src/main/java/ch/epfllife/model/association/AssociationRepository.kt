@@ -60,4 +60,18 @@ interface AssociationRepository {
   suspend fun getEventsForAssociation(associationId: String): Result<List<Event>>
 
   fun listenAll(scope: CoroutineScope, onChange: suspend (List<Association>) -> Unit)
+
+  /**
+   * Uploads an image for the association to the storage.
+   *
+   * @param associationId The unique ID of the association.
+   * @param imageUri The URI of the image to upload.
+   * @param imageType The type of image (LOGO or BANNER).
+   * @return A Result object containing the download URL of the uploaded image.
+   */
+  suspend fun uploadAssociationImage(
+      associationId: String,
+      imageUri: android.net.Uri,
+      imageType: AssociationImageType
+  ): Result<String>
 }
