@@ -513,27 +513,29 @@ class NavigationTest {
     Assert.assertTrue(db.eventRepo.createEvent(event2).isSuccess)
 
     db.userRepo.subscribeToEvent(event1.id)
-  fun navigateToEventDetails_canOpenAttendeesList_andShowsAttendees() {
-    val testEvent = ExampleEvents.event1
-    val attendee1 = ExampleUsers.user1.copy(enrolledEvents = listOf(testEvent.id))
-    val attendee2 = ExampleUsers.user2.copy(enrolledEvents = listOf(testEvent.id))
 
-    runTest {
-      Assert.assertTrue(db.assocRepo.createAssociation(testEvent.association).isSuccess)
-      Assert.assertTrue(db.eventRepo.createEvent(testEvent).isSuccess)
-      Assert.assertTrue(db.userRepo.createUser(attendee1).isSuccess)
-      Assert.assertTrue(db.userRepo.createUser(attendee2).isSuccess)
+    fun navigateToEventDetails_canOpenAttendeesList_andShowsAttendees() {
+      val testEvent = ExampleEvents.event1
+      val attendee1 = ExampleUsers.user1.copy(enrolledEvents = listOf(testEvent.id))
+      val attendee2 = ExampleUsers.user2.copy(enrolledEvents = listOf(testEvent.id))
+
+      runTest {
+        Assert.assertTrue(db.assocRepo.createAssociation(testEvent.association).isSuccess)
+        Assert.assertTrue(db.eventRepo.createEvent(testEvent).isSuccess)
+        Assert.assertTrue(db.userRepo.createUser(attendee1).isSuccess)
+        Assert.assertTrue(db.userRepo.createUser(attendee2).isSuccess)
+      }
+
+      setUpApp()
+      composeTestRule.navigateToEvent(testEvent.id)
+
+      // Click on the attendee count row on the event details screen
+      composeTestRule.onNodeWithText("2 attending").assertIsDisplayed().performClick()
+
+      // Attendee list screen should be displayed and show the attendee names
+      composeTestRule.onNodeWithText("Event Attendees").assertIsDisplayed()
+      composeTestRule.onNodeWithText(attendee1.name).assertIsDisplayed()
+      composeTestRule.onNodeWithText(attendee2.name).assertIsDisplayed()
     }
-
-    setUpApp()
-    composeTestRule.navigateToEvent(testEvent.id)
-
-    // Click on the attendee count row on the event details screen
-    composeTestRule.onNodeWithText("2 attending").assertIsDisplayed().performClick()
-
-    // Attendee list screen should be displayed and show the attendee names
-    composeTestRule.onNodeWithText("Event Attendees").assertIsDisplayed()
-    composeTestRule.onNodeWithText(attendee1.name).assertIsDisplayed()
-    composeTestRule.onNodeWithText(attendee2.name).assertIsDisplayed()
   }
 }
