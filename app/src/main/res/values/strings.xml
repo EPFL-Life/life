@@ -55,13 +55,6 @@
     <string name="signout_successful">Sign out successful</string>
     <string name="settings_title">Settings</string>
     <string name="sign_out">Sign Out</string>
-    <string name="app_language">App Language</string>
-
-    <!-- Language screen-->
-    <string name="select_language">Select App Language</string>
-    <string name="system_default">System Default</string>
-    <string name="english" translatable="false">English</string>
-    <string name="french" translatable="false">Français</string>
 
     <!-- Edit display name-->
     <string name="display_name">Display name</string>
@@ -142,9 +135,6 @@ Use your full name so friends can easily find you in event participant lists.
     <string name="search_bar_placeholder">Search…</string>
     <string name="show_more">Show more…</string>
     <string name="show_less">Show less</string>
-    <string name="share">Share</string>
-    <string name="share_sender_unknown">Someone</string>
-    <string name="share_invite_message">You have been invited to %1$s by %2$s! Download the EPFL Life app to check it out.</string>
 
     <string name="calendar_previous_month">Previous Month</string>
     <string name="calendar_next_month">Next Month</string>

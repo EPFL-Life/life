@@ -59,8 +59,6 @@ object AddEditEventTestTags {
   const val TIME_PICKER_BOX = "AddEditEvent_TimePickerBox"
   const val LOCATION_FIELD = "AddEditEvent_LocationField"
   const val SUBMIT_BUTTON = "AddEditEvent_SubmitButton"
-
-  const val ERROR_BOX = "AddEditEvent_ErrorBox"
 }
 
 @Composable
@@ -92,8 +90,7 @@ fun AddEditEventScreen(
       }
       is AddEditEventUIState.Error -> {
         Column(
-            modifier =
-                Modifier.fillMaxSize().padding(16.dp).testTag(AddEditEventTestTags.ERROR_BOX),
+            modifier = Modifier.fillMaxSize().padding(16.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally) {
               Text(

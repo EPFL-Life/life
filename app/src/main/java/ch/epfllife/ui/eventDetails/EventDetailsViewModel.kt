@@ -16,12 +16,8 @@ import kotlinx.coroutines.launch
 sealed class EventDetailsUIState {
   object Loading : EventDetailsUIState()
 
-  data class Success(
-      val event: Event,
-      val isEnrolled: Boolean,
-      val attendees: List<User>,
-      val senderName: String = "",
-  ) : EventDetailsUIState()
+  data class Success(val event: Event, val isEnrolled: Boolean, val attendees: List<User>) :
+      EventDetailsUIState()
 
   data class Error(val message: String) : EventDetailsUIState()
 }
@@ -46,9 +42,6 @@ class EventDetailsViewModel(
         val event = db.eventRepo.getEvent(eventId)
         val user = db.userRepo.getCurrentUser()
         currentUser = user
-        val senderName =
-            user?.name?.takeIf { it.isNotBlank() }
-                ?: context.getString(R.string.share_sender_unknown)
 
         if (event == null) {
           _uiState.value =
@@ -61,8 +54,7 @@ class EventDetailsViewModel(
             EventDetailsUIState.Success(
                 event = event,
                 isEnrolled = user?.enrolledEvents?.contains(eventId) == true,
-                attendees = attendees,
-                senderName = senderName)
+                attendees = attendees)
       } catch (e: Exception) {
         _uiState.value = EventDetailsUIState.Error(context.getString(R.string.error_loading_event))
       }
