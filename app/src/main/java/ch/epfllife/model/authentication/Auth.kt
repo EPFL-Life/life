@@ -39,9 +39,7 @@ class Auth(val credentialManager: CredentialManager, val auth: FirebaseAuth = Fi
       val activity =
           context.getActivity()
               ?: run {
-                Log.e(
-                    "Auth",
-                    "Context is not an Activity context. Context type: ${context.javaClass.name}")
+                Log.e("Auth", "Context is not an Activity context")
                 return SignInResult.Failure
               }
       val credential = getCredential(credentialManager, activity)
@@ -116,12 +114,10 @@ private fun Context.getActivity(): Activity? {
     if (context is Activity) {
       return context
     }
-    Log.d("Auth", "Unwrapping context: ${context.javaClass.name}")
     context = context.baseContext
   }
   if (context is Activity) {
     return context
   }
-  Log.d("Auth", "Final context is not Activity: ${context.javaClass.name}")
   return null
 }

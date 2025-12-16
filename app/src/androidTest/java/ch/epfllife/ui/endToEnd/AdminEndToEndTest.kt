@@ -1,6 +1,7 @@
 package ch.epfllife.ui.endToEnd
 
 import androidx.activity.ComponentActivity
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -18,6 +19,7 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
+import ch.epfllife.LocalActivity
 import ch.epfllife.ThemedApp
 import ch.epfllife.example_data.ExampleAssociations
 import ch.epfllife.example_data.ExampleEvents
@@ -45,7 +47,6 @@ import ch.epfllife.utils.setUpEmulator
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
@@ -72,7 +73,11 @@ class AdminEndToEndTest {
       Assert.assertTrue("Sign in must succeed", signInResult is SignInResult.Success)
     }
     val languageRepository = LanguageRepository(db.userRepo)
-    composeTestRule.setContent { ThemedApp(auth, db, languageRepository) }
+    composeTestRule.setContent {
+      CompositionLocalProvider(LocalActivity provides composeTestRule.activity) {
+        ThemedApp(auth, db, languageRepository)
+      }
+    }
   }
 
   private fun loginAsAdmin(): User {
@@ -244,7 +249,6 @@ class AdminEndToEndTest {
     composeTestRule.onNodeWithText(newTitle).assertIsDisplayed()
   }
 
-  @Ignore
   @Test
   fun createEventAsAssocAdmin() {
     val assoc = ExampleAssociations.association2
