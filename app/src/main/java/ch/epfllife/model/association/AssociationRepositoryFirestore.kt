@@ -11,7 +11,6 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageException
 import com.google.firebase.storage.StorageMetadata
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.tasks.await
@@ -217,14 +216,6 @@ class AssociationRepositoryFirestore(
 
       Result.success(downloadUrl.toString())
     } catch (e: Exception) {
-      // a lot of debugging before figuring out how to upload...
-
-      // this happens when the file does not exist OR the path is wrong
-      val is404 =
-          e.message?.contains("404") == true ||
-              e.cause?.message?.contains("404") == true ||
-              (e is StorageException && e.errorCode == StorageException.ERROR_OBJECT_NOT_FOUND)
-
       Log.e("AssociationRepo", "Error uploading image at step: ${e.stackTrace.firstOrNull()}", e)
       Result.failure(e)
     }
