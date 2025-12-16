@@ -11,6 +11,7 @@ import ch.epfllife.model.user.UserRepositoryFirestore
 import ch.epfllife.model.user.UserRepositoryLocal
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
+import com.google.firebase.storage.FirebaseStorage
 
 data class Db(
     val userRepo: UserRepository,
@@ -23,7 +24,8 @@ data class Db(
       Db(
           userRepo = UserRepositoryFirestore(Firebase.firestore),
           eventRepo = EventRepositoryFirestore(Firebase.firestore),
-          assocRepo = AssociationRepositoryFirestore(Firebase.firestore),
+          assocRepo =
+              AssociationRepositoryFirestore(Firebase.firestore, FirebaseStorage.getInstance()),
       )
     }
 
