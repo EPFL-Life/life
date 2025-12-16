@@ -294,9 +294,8 @@ fun App(auth: Auth, db: Db, languageRepository: LanguageRepository) {
                     },
                     onAssociationDeleted = {
                       // Clear selection -> automatic update so we dont get double deletes
-                      backStackEntry.savedStateHandle.set(selectedAssociationIdKey, null as String?)
-                      backStackEntry.savedStateHandle.set(
-                          selectedAssociationNameKey, null as String?)
+                      backStackEntry.savedStateHandle[selectedAssociationIdKey] = null as String?
+                      backStackEntry.savedStateHandle[selectedAssociationNameKey] = null as String?
                     },
                     onGoBack = { navigationActions.goBack() })
               }
