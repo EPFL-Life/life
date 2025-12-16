@@ -1,8 +1,11 @@
 package ch.epfllife.model.authentication
 
+import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import android.credentials.GetCredentialException
 import android.os.Bundle
+import android.util.Log
 import androidx.credentials.Credential
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
@@ -33,11 +36,21 @@ sealed class SignInResult {
 class Auth(val credentialManager: CredentialManager, val auth: FirebaseAuth = Firebase.auth) {
   suspend fun signInFromContext(context: Context): SignInResult {
     try {
-      val credential = getCredential(credentialManager, context)
+      val activity =
+          context.getActivity()
+              ?: run {
+                Log.e(
+                    "Auth",
+                    "Context is not an Activity context. Context type: ${context.javaClass.name}")
+                return SignInResult.Failure
+              }
+      val credential = getCredential(credentialManager, activity)
       return signInWithCredential(credential)
     } catch (e: androidx.credentials.exceptions.GetCredentialCancellationException) {
+      Log.e("Auth", "Sign in cancelled", e)
       return SignInResult.Cancelled
     } catch (e: androidx.credentials.exceptions.GetCredentialException) {
+      Log.e("Auth", "Sign in failed with credential exception", e)
       return SignInResult.Failure
     }
   }
@@ -54,12 +67,16 @@ class Auth(val credentialManager: CredentialManager, val auth: FirebaseAuth = Fi
             this.auth.signInWithCredential(firebaseCred).await().user ?: return SignInResult.Failure
         SignInResult.Success(user)
       } catch (e: FirebaseAuthInvalidUserException) {
+        Log.e("Auth", "Invalid user", e)
         SignInResult.Failure
       } catch (e: FirebaseAuthInvalidCredentialsException) {
+        Log.e("Auth", "Invalid credentials", e)
         SignInResult.Failure
       } catch (e: FirebaseAuthUserCollisionException) {
+        Log.e("Auth", "User collision", e)
         SignInResult.Failure
       } catch (e: CancellationException) {
+        Log.e("Auth", "Sign in cancelled", e)
         SignInResult.Failure
       }
     } else {
@@ -92,3 +109,19 @@ private fun getSignInOptions(context: Context) =
 
 private fun signInRequest(signInOptions: GetSignInWithGoogleOption) =
     GetCredentialRequest.Builder().addCredentialOption(signInOptions).build()
+
+private fun Context.getActivity(): Activity? {
+  var context = this
+  while (context is ContextWrapper) {
+    if (context is Activity) {
+      return context
+    }
+    Log.d("Auth", "Unwrapping context: ${context.javaClass.name}")
+    context = context.baseContext
+  }
+  if (context is Activity) {
+    return context
+  }
+  Log.d("Auth", "Final context is not Activity: ${context.javaClass.name}")
+  return null
+}
