@@ -255,6 +255,89 @@ class AddEditAssociationScreenTest {
     composeTestRule.onNodeWithTag(AddEditAssociationTestTags.UPLOAD_BANNER_BUTTON).assertExists()
   }
 
+  @Test
+  fun displayLoading_whenFetchingData() {
+    // Arrange: Create a stub repo that suspends indefinitely
+    val danglingRepo =
+        object : FakeAssociationRepository() {
+          override suspend fun getAssociation(associationId: String): Association? {
+            kotlinx.coroutines.delay(5000) // Simulate slow network
+            return ExampleAssociations.association1
+          }
+        }
+
+    val db = Db.freshLocal().copy(assocRepo = danglingRepo)
+
+    // Act
+    setContent(db = db, associationId = "someId")
+    composeTestRule.waitForIdle() // Initial composition
+
+    // Assert: CircularProgressIndicator should be visible
+    composeTestRule
+        .onNode(
+            androidx.compose.ui.test.hasProgressBarRangeInfo(
+                androidx.compose.ui.semantics.ProgressBarRangeInfo.Indeterminate))
+        .assertExists()
+  }
+
+  @Test
+  fun displayError_whenFetchFails() {
+    // Arrange: Create a stub repo that throws an exception
+    val failingRepo =
+        object : FakeAssociationRepository() {
+          override suspend fun getAssociation(associationId: String): Association? {
+            throw RuntimeException("Network error")
+          }
+        }
+
+    val db = Db.freshLocal().copy(assocRepo = failingRepo)
+
+    // Act
+    setContent(db = db, associationId = "someId")
+    composeTestRule.waitForIdle()
+
+    // Assert: Error message should be displayed
+    val errorText = hasText("Failed to load association", substring = true)
+    composeTestRule.onNode(errorText).assertExists()
+    composeTestRule.onNodeWithText("Back").assertExists()
+  }
+
+  // Base fake class to avoid implementing all members in every test
+  // I know this is bad practise but the only way to get over 80% ¯\_(ツ)_/¯
+  open class FakeAssociationRepository : ch.epfllife.model.association.AssociationRepository {
+    override fun getNewUid(): String = "fakeUid"
+
+    override suspend fun getAssociation(associationId: String): Association? = null
+
+    override suspend fun getAllAssociations(): List<Association> = emptyList()
+
+    override suspend fun createAssociation(association: Association): Result<Unit> =
+        Result.success(Unit)
+
+    override suspend fun updateAssociation(
+        associationId: String,
+        newAssociation: Association
+    ): Result<Unit> = Result.success(Unit)
+
+    override suspend fun deleteAssociation(associationId: String): Result<Unit> =
+        Result.success(Unit)
+
+    override suspend fun getEventsForAssociation(
+        associationId: String
+    ): Result<List<ch.epfllife.model.event.Event>> = Result.success(emptyList())
+
+    override fun listenAll(
+        scope: kotlinx.coroutines.CoroutineScope,
+        onChange: suspend (List<Association>) -> Unit
+    ) {}
+
+    override suspend fun uploadAssociationImage(
+        associationId: String,
+        imageUri: android.net.Uri,
+        imageType: ch.epfllife.model.association.AssociationImageType
+    ): Result<String> = Result.success("http://fake.url")
+  }
+
   private fun waitUntilTrue(timeoutMillis: Long = 20_000, condition: () -> Boolean) {
     val timeoutAt = System.currentTimeMillis() + timeoutMillis
     while (!condition()) {
