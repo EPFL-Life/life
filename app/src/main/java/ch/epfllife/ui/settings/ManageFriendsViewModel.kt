@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ch.epfllife.model.user.User
 import ch.epfllife.model.user.UserRepository
-import ch.epfllife.model.user.UserRole
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -46,9 +45,7 @@ class ManageFriendsViewModel(private val userRepository: UserRepository) : ViewM
 
         // Filter:
         // 1. Exclude self
-        // 2. Exclude ADMIN and ASSOCIATION_ADMIN !!!IMPORTANT TO KEEP IN MIND
-        // 3. Keep only USER role (implicit)
-        allUsers = users.filter { it.id != currentUser.id && it.role == UserRole.USER }
+        allUsers = users.filter { it.id != currentUser.id }
 
         _uiState.value =
             ManageFriendsUiState.Success(currentUser = currentUser, users = filterUsers())
