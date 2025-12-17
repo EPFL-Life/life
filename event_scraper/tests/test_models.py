@@ -45,8 +45,8 @@ class TestLocation:
     def test_location_creation(self):
         """Test basic location creation"""
         loc = Location(latitude=10.0, longitude=20.0, name="Test Location")
-        assert loc.latitude == 10.0
-        assert loc.longitude == 20.0
+        assert loc.latitude == pytest.approx(10.0)
+        assert loc.longitude == pytest.approx(20.0)
         assert loc.name == "Test Location"
     
     def test_to_firestore_dict(self):
@@ -55,8 +55,8 @@ class TestLocation:
         result = loc.to_firestore_dict()
         
         assert isinstance(result, dict)
-        assert result["latitude"] == 46.5
-        assert result["longitude"] == 6.6
+        assert result["latitude"] == pytest.approx(46.5)
+        assert result["longitude"] == pytest.approx(6.6)
         assert result["name"] == "EPFL"
         assert len(result) == 3  # Only these 3 fields
 

@@ -89,8 +89,9 @@ class TestFirebaseDataConversion:
         
         assert isinstance(result, dict)
         assert set(result.keys()) == {"latitude", "longitude", "name"}
-        assert result["latitude"] == 46.5191
-        assert result["longitude"] == 6.5668
+        assert result["latitude"] == pytest.approx(46.5191)
+        assert result["longitude"] == pytest.approx(6.5668)
+
         assert result["name"] == "EPFL Campus"
 
 if __name__ == "__main__":
