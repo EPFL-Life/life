@@ -32,6 +32,10 @@ Students can log in via EPFL SSO and then see announcements and events in a feed
 - See friend's attendance
 - Automatic web/Telegram scraping
 
+## Wiki
+
+We now have a [wiki](https://github.com/EPFL-Life/life/wiki) explaining the app features.
+
 ## Figma
 
 https://www.figma.com/design/qNjleM72FjEUEppPUSS2Ok/EPFL-Life?node-id=0-1&t=auqmWM20TucyArQS-1
