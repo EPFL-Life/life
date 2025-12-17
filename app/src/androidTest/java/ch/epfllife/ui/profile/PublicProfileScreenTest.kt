@@ -1,8 +1,10 @@
 package ch.epfllife.ui.profile
 
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -33,12 +35,7 @@ class PublicProfileScreenTest {
     composeTestRule.setContent { PublicProfileScreen(db = db, userId = targetUser.id, onBack = {}) }
 
     composeTestRule.waitUntil(timeoutMillis = 5000) {
-      try {
-        composeTestRule.onNodeWithTag(PublicProfileTestTags.NAME_TEXT).assertIsDisplayed()
-        true
-      } catch (e: AssertionError) {
-        false
-      }
+      composeTestRule.onNodeWithTag(PublicProfileTestTags.NAME_TEXT).isDisplayed()
     }
 
     composeTestRule.onNodeWithTag(PublicProfileTestTags.NAME_TEXT).assertTextEquals("Target User")
@@ -63,12 +60,7 @@ class PublicProfileScreenTest {
     composeTestRule.setContent { PublicProfileScreen(db = db, userId = targetUser.id, onBack = {}) }
 
     composeTestRule.waitUntil(timeoutMillis = 5000) {
-      try {
-        composeTestRule.onNodeWithTag(PublicProfileTestTags.FOLLOW_BUTTON).assertIsDisplayed()
-        true
-      } catch (e: AssertionError) {
-        false
-      }
+      composeTestRule.onNodeWithTag(PublicProfileTestTags.FOLLOW_BUTTON).isDisplayed()
     }
 
     composeTestRule.onNodeWithTag(PublicProfileTestTags.FOLLOW_BUTTON).assertTextEquals("Unfollow")
@@ -89,12 +81,7 @@ class PublicProfileScreenTest {
     composeTestRule.setContent { PublicProfileScreen(db = db, userId = targetUser.id, onBack = {}) }
 
     composeTestRule.waitUntil(timeoutMillis = 5000) {
-      try {
-        composeTestRule.onNodeWithTag(PublicProfileTestTags.FOLLOW_BUTTON).assertIsDisplayed()
-        true
-      } catch (e: AssertionError) {
-        false
-      }
+      composeTestRule.onNodeWithTag(PublicProfileTestTags.FOLLOW_BUTTON).isDisplayed()
     }
 
     // Initial: Follow
@@ -105,14 +92,9 @@ class PublicProfileScreenTest {
 
     // Wait for update (Unfollow)
     composeTestRule.waitUntil(timeoutMillis = 5000) {
-      try {
-        composeTestRule
-            .onNodeWithTag(PublicProfileTestTags.FOLLOW_BUTTON)
-            .assertTextEquals("Unfollow")
-        true
-      } catch (e: AssertionError) {
-        false
-      }
+      composeTestRule
+          .onNode(hasTestTag(PublicProfileTestTags.FOLLOW_BUTTON).and(hasText("Unfollow")))
+          .isDisplayed()
     }
 
     // Click again (Unfollow -> Follow)
@@ -120,14 +102,9 @@ class PublicProfileScreenTest {
 
     // Wait for update (Follow)
     composeTestRule.waitUntil(timeoutMillis = 5000) {
-      try {
-        composeTestRule
-            .onNodeWithTag(PublicProfileTestTags.FOLLOW_BUTTON)
-            .assertTextEquals("Follow")
-        true
-      } catch (e: AssertionError) {
-        false
-      }
+      composeTestRule
+          .onNode(hasTestTag(PublicProfileTestTags.FOLLOW_BUTTON).and(hasText("Follow")))
+          .isDisplayed()
     }
   }
 }

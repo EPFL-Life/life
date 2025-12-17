@@ -2,6 +2,7 @@ package ch.epfllife.ui.settings
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -34,12 +35,7 @@ class ManageFriendsScreenTest {
 
     // Wait for loading to finish
     composeTestRule.waitUntil(timeoutMillis = 5000) {
-      try {
-        composeTestRule.onNodeWithTag(ManageFriendsTestTags.USER_LIST).assertIsDisplayed()
-        true
-      } catch (e: AssertionError) {
-        false
-      }
+      composeTestRule.onNodeWithTag(ManageFriendsTestTags.USER_LIST).isDisplayed()
     }
 
     composeTestRule.onNodeWithText("Other User").assertIsDisplayed()
@@ -63,12 +59,7 @@ class ManageFriendsScreenTest {
     }
 
     composeTestRule.waitUntil(timeoutMillis = 5000) {
-      try {
-        composeTestRule.onNodeWithTag(ManageFriendsTestTags.USER_LIST).assertIsDisplayed()
-        true
-      } catch (e: AssertionError) {
-        false
-      }
+      composeTestRule.onNodeWithTag(ManageFriendsTestTags.USER_LIST).isDisplayed()
     }
 
     composeTestRule.onNodeWithText("Other User").performClick()
@@ -90,12 +81,7 @@ class ManageFriendsScreenTest {
     composeTestRule.setContent { ManageFriendsScreen(db = db, onBack = {}, onUserClick = {}) }
 
     composeTestRule.waitUntil(timeoutMillis = 5000) {
-      try {
-        composeTestRule.onNodeWithTag(ManageFriendsTestTags.USER_LIST).assertIsDisplayed()
-        true
-      } catch (e: AssertionError) {
-        false
-      }
+      composeTestRule.onNodeWithTag(ManageFriendsTestTags.USER_LIST).isDisplayed()
     }
 
     // Initial state: both visible
