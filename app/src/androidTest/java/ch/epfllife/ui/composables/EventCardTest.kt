@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import ch.epfllife.example_data.ExampleEvents
 import ch.epfllife.model.event.Event
+import ch.epfllife.model.map.Location
 import ch.epfllife.ui.theme.Theme
 import ch.epfllife.utils.assertClickable
 import org.junit.Rule
@@ -68,6 +69,25 @@ class EventCardTest {
     composeTestRule.onNodeWithText(eventWithBanner.association.name).assertIsDisplayed()
     composeTestRule.onNodeWithText(eventWithBanner.location.name).assertIsDisplayed()
     composeTestRule.onNodeWithText(eventWithBanner.time).assertIsDisplayed()
+  }
+
+  @Test
+  fun location_isShortenedToTextBeforeFirstComma_onCard() {
+    val longLocationName = "Here, Blackwall Tunnel, Blackwall Reach, Greater London, United Kingdom"
+    val eventWithLongLocation =
+        eventWithBanner.copy(
+            location =
+                Location(
+                    latitude = eventWithBanner.location.latitude,
+                    longitude = eventWithBanner.location.longitude,
+                    name = longLocationName,
+                ),
+        )
+
+    setEventCardContent(eventWithLongLocation, isEnrolled = false)
+
+    composeTestRule.onNodeWithText("Here").assertIsDisplayed()
+    composeTestRule.onNodeWithText(longLocationName).assertDoesNotExist()
   }
 
   @Test
