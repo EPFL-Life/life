@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Optional, Dict, Any, List
 from enum import Enum
 import hashlib
+from google.cloud import firestore
 
 class EventCategory(Enum):
     """
@@ -111,12 +112,12 @@ class Event:
     #With default values
     picture_url: Optional[str] = None  
     
-    def to_firestore_dict(self) -> Dict[str, Any]:
+    def to_firestore_dict(self, db=None) -> Dict[str, Any]:
         """
         Convert to Firestore-compatible dictionary
         This is critical for app compatibility
         """
-        return {
+        event_dict = {
             "id": self.id,
             "title": self.title,
             "description": self.description,
@@ -127,6 +128,17 @@ class Event:
             "price": self.price.to_firestore_value(),
             "pictureUrl": self.picture_url
         }
+
+        # Important: Store association as a DocumentReference
+        if db:
+            # Create reference to association document
+            association_ref = db.collection("associations").document(self.association.id)
+            event_dict["association"] = association_ref
+        else:
+            # Fallback: use association ID string for testing without DB
+            event_dict["association"] = self.association.id
+
+        return event_dict
     
     @classmethod
     def generate_id(cls, title: str, source: str) -> str:
