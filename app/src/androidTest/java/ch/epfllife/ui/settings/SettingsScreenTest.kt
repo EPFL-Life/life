@@ -43,7 +43,11 @@ class SettingsScreenTest {
   fun contentIsDisplayed() {
     composeTestRule.setContent {
       SettingsScreen(
-          auth = auth, onSignedOut = {}, onAdminConsoleClick = {}, onNavigateToManageProfile = {})
+          auth = auth,
+          onSignedOut = {},
+          onAdminConsoleClick = {},
+          onNavigateToManageProfile = {},
+          onNavigateToManageFriends = {})
     }
     listOf(NavigationTestTags.SETTINGS_SCREEN, SettingsScreenTestTags.SIGN_OUT_BUTTON)
         .map(composeTestRule::assertTagIsDisplayed)
@@ -60,7 +64,8 @@ class SettingsScreenTest {
           onSignedOut = { clicked = true },
           toastHelper = fakeToastHelper,
           onAdminConsoleClick = {},
-          onNavigateToManageProfile = {})
+          onNavigateToManageProfile = {},
+          onNavigateToManageFriends = {})
     }
     composeTestRule.onNodeWithTag(SettingsScreenTestTags.SIGN_OUT_BUTTON).performClick()
     composeTestRule.waitForIdle()
@@ -81,7 +86,8 @@ class SettingsScreenTest {
           viewModel = SettingsViewModel(auth, db),
           onSignedOut = {},
           onAdminConsoleClick = { clicked = true },
-          onNavigateToManageProfile = {})
+          onNavigateToManageProfile = {},
+          onNavigateToManageFriends = {})
     }
 
     composeTestRule.onNodeWithTag(SettingsScreenTestTags.ADMIN_CONSOLE_BUTTON).performClick()
@@ -97,7 +103,8 @@ class SettingsScreenTest {
           viewModel = SettingsViewModel(auth, db),
           onSignedOut = {},
           onAdminConsoleClick = {},
-          onNavigateToManageProfile = {})
+          onNavigateToManageProfile = {},
+          onNavigateToManageFriends = {})
     }
     composeTestRule.onNodeWithTag(SettingsScreenTestTags.ADMIN_CONSOLE_BUTTON).assertDoesNotExist()
   }
@@ -111,7 +118,8 @@ class SettingsScreenTest {
           viewModel = SettingsViewModel(auth, db),
           onSignedOut = {},
           onAdminConsoleClick = {},
-          onNavigateToManageProfile = {})
+          onNavigateToManageProfile = {},
+          onNavigateToManageFriends = {})
     }
     composeTestRule.waitUntil(5000) {
       try {
@@ -132,7 +140,8 @@ class SettingsScreenTest {
           viewModel = SettingsViewModel(auth, db),
           onSignedOut = {},
           onAdminConsoleClick = {},
-          onNavigateToManageProfile = {})
+          onNavigateToManageProfile = {},
+          onNavigateToManageFriends = {})
     }
     composeTestRule.waitUntil(5000) {
       try {
@@ -155,7 +164,8 @@ class SettingsScreenTest {
           viewModel = SettingsViewModel(auth, db),
           onSignedOut = {},
           onAdminConsoleClick = {},
-          onNavigateToManageProfile = { clicked = true })
+          onNavigateToManageProfile = { clicked = true },
+          onNavigateToManageFriends = {})
     }
 
     composeTestRule.onNode(hasText("Manage Profile") and hasClickAction()).performClick()

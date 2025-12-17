@@ -5,6 +5,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -48,7 +49,8 @@ fun SettingsScreen(
     onSignedOut: () -> Unit,
     toastHelper: ToastHelper = SystemToastHelper(),
     onAdminConsoleClick: () -> Unit,
-    onNavigateToManageProfile: () -> Unit
+    onNavigateToManageProfile: () -> Unit,
+    onNavigateToManageFriends: () -> Unit
 ) {
   val context = LocalContext.current
   val uiState by viewModel.uiState.collectAsState()
@@ -80,6 +82,12 @@ fun SettingsScreen(
             text = "Manage Profile",
             icon = Icons.Default.Person,
             onClick = { onNavigateToManageProfile() })
+        Spacer(Modifier.height(32.dp))
+
+        SettingsButton(
+            text = "Manage friends",
+            icon = Icons.Default.Favorite,
+            onClick = { onNavigateToManageFriends() })
         Spacer(Modifier.height(32.dp))
 
         if (uiState.userRole == UserRole.ADMIN || uiState.userRole == UserRole.ASSOCIATION_ADMIN) {
