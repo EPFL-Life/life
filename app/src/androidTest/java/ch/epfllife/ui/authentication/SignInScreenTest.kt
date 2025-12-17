@@ -27,6 +27,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.auth
+import com.google.firebase.storage.FirebaseStorage
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
@@ -144,7 +145,7 @@ class SignInScreenTest {
   fun firstSignIn_createsUserInRepository() = runTest {
     var onSignedInCalled = false
 
-    val repo = UserRepositoryFirestore(FirebaseEmulator.firestore)
+    val repo = UserRepositoryFirestore(FirebaseEmulator.firestore, FirebaseStorage.getInstance())
     val viewModel = SignInViewModel(auth, repo)
 
     // Act
