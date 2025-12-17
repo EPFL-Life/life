@@ -9,9 +9,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import ch.epfllife.R
+import ch.epfllife.ui.navigation.NavigationTestTags
 
 @Composable
 fun BackButton(modifier: Modifier = Modifier, onGoBack: () -> Unit) {
@@ -19,6 +21,7 @@ fun BackButton(modifier: Modifier = Modifier, onGoBack: () -> Unit) {
       onClick = onGoBack,
       modifier =
           modifier
+              .testTag(NavigationTestTags.GO_BACK_BUTTON)
               .padding(16.dp)
               .size(40.dp)
               .background(Color.Black.copy(alpha = 0.4f), shape = CircleShape),

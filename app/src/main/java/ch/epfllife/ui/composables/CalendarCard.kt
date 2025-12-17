@@ -38,7 +38,11 @@ fun CalendarCard(event: Event, modifier: Modifier = Modifier, onClick: () -> Uni
       onClick = onClick,
       shape = RoundedCornerShape(12.dp),
       elevation = CardDefaults.elevatedCardElevation(5.dp),
-      modifier = modifier.fillMaxWidth().padding(5.dp).testTag(CalendarTestTags.EVENT_CARD)) {
+      modifier =
+          modifier
+              .fillMaxWidth()
+              .padding(5.dp)
+              .testTag(EventCardTestTags.getEventCardTestTag(event.id))) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
