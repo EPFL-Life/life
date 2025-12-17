@@ -155,4 +155,10 @@
     <string name="cancel_button">Annuler</string>
     <string name="admin_console">Console d’administration</string>
 
+    <!-- Friend Screen -->
+    <string name="manage_friends_title">Manage les amies</string>
+
+    <!-- Profile Screen -->
+    <string name="manage_profile_title">Manage ton profile</string>
+
 </resources>

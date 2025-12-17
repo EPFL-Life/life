@@ -159,4 +159,10 @@ Use your full name so friends can easily find you in event participant lists.
     <string name="cancel_button">Cancel</string>
     <string name="admin_console">Admin Console</string>
 
+    <!-- Friend Screen -->
+    <string name="manage_friends_title">Manage Friends</string>
+
+    <!-- Profile Screen -->
+    <string name="manage_profile_title">Manage Profile</string>
+
 </resources>
