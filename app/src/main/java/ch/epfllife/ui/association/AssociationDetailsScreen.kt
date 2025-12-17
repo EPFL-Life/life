@@ -52,6 +52,10 @@ object AssociationDetailsTestTags {
   const val CONTENT = "association_details_content"
 }
 
+private const val DEFAULT_ASSOCIATION_IMAGE_URL =
+    "https://firebasestorage.googleapis.com/v0/b/epfl-life.firebasestorage.app/o/assets%2Fdefault_assoc_banner.png?alt=media&token=45192f39-bb42-4592-a414-8af65f23b89e" +
+        ""
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AssociationDetailsScreen(
@@ -132,7 +136,7 @@ fun AssociationDetailsContent(
             AsyncImage(
                 model =
                     ImageRequest.Builder(LocalContext.current)
-                        .data(association.pictureUrl)
+                        .data(association.pictureUrl ?: DEFAULT_ASSOCIATION_IMAGE_URL)
                         .crossfade(true)
                         .build(),
                 contentDescription = stringResource(R.string.association_image_description),
