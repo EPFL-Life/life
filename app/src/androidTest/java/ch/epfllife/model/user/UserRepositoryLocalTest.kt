@@ -479,4 +479,36 @@ class UserRepositoryLocalTest {
     // assert: the action must fail
     assertTrue(result.isFailure)
   }
+
+  @Test
+  fun followAndUnfollow() = runTest {
+    val user1 = ExampleUsers.user1
+    repositoryUser.createUser(user1)
+    repositoryUser.simulateLogin(user1.id)
+    val user2 = ExampleUsers.user2
+    repositoryUser.createUser(user2)
+    repositoryUser.followUser(user2.id)
+    var updatedUser1 = repositoryUser.getUser(user1.id)
+    assertTrue(updatedUser1!!.following.contains(user2.id))
+    repositoryUser.unfollowUser(user2.id)
+    updatedUser1 = repositoryUser.getUser(user1.id)
+    assertTrue(updatedUser1!!.following.isEmpty())
+  }
+
+  @Test
+  fun cannotFollowSelf() = runTest {
+    val user1 = ExampleUsers.user1
+    repositoryUser.createUser(user1)
+    repositoryUser.simulateLogin(user1.id)
+    val result = repositoryUser.followUser(user1.id)
+    assertTrue(result.isFailure)
+    val updatedUser1 = repositoryUser.getUser(user1.id)
+    assertTrue(updatedUser1!!.following.isEmpty())
+  }
+
+  @Test
+  fun cannotFollowWithoutLogin() = runTest {
+    val result = repositoryUser.followUser("any")
+    assertTrue(result.isFailure)
+  }
 }
