@@ -1,16 +1,14 @@
 package ch.epfllife.ui.settings
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -78,12 +76,16 @@ fun SettingsScreen(
 
         Spacer(Modifier.height(32.dp))
 
-        SettingsButton(text = "Manage Profile", onClick = { onNavigateToManageProfile() })
+        SettingsButton(
+            text = "Manage Profile",
+            icon = Icons.Default.Person,
+            onClick = { onNavigateToManageProfile() })
         Spacer(Modifier.height(32.dp))
 
         if (uiState.userRole == UserRole.ADMIN || uiState.userRole == UserRole.ASSOCIATION_ADMIN) {
           SettingsButton(
               text = stringResource(R.string.admin_console),
+              icon = Icons.Default.Build,
               onClick = onAdminConsoleClick,
               modifier =
                   Modifier.fillMaxWidth().testTag(SettingsScreenTestTags.ADMIN_CONSOLE_BUTTON))
@@ -93,17 +95,30 @@ fun SettingsScreen(
         Spacer(Modifier.weight(1f))
 
         Button(
-            modifier = Modifier.fillMaxWidth().testTag(SettingsScreenTestTags.SIGN_OUT_BUTTON),
+            modifier =
+                Modifier.fillMaxWidth()
+                    .height(56.dp)
+                    .testTag(SettingsScreenTestTags.SIGN_OUT_BUTTON),
             onClick = { viewModel.signOut() },
-            shape = RoundedCornerShape(6.dp),
+            shape = RoundedCornerShape(12.dp),
             colors =
-                ButtonDefaults.buttonColors(containerColor = LifeRed, contentColor = Color.White)) {
-              Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart) {
-                Text(
-                    text = stringResource(R.string.sign_out),
-                    style =
-                        MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold))
-              }
+                ButtonDefaults.buttonColors(containerColor = LifeRed, contentColor = Color.White),
+            elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)) {
+              Row(
+                  modifier = Modifier.fillMaxWidth(),
+                  verticalAlignment = Alignment.CenterVertically,
+                  horizontalArrangement = Arrangement.Center) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(R.string.sign_out),
+                        style =
+                            MaterialTheme.typography.bodyLarge.copy(
+                                fontWeight = FontWeight.SemiBold))
+                  }
             }
 
         Spacer(Modifier.height(24.dp))
