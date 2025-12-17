@@ -2,8 +2,16 @@
 from dataclasses import dataclass, field
 from typing import List
 from models.event_models import Association, EventCategory
+from config import VENUE_SELECTOR
+from config import LOCATION_FIELD_SELECTOR
+from config import LOCATION_ELEMENT_SELECTOR
+from config import PRICE_FIELD_SELECTOR
+from config import COST_SELECTOR
+from config import PRICE_ELEMENT_SELECTOR
+from config import IMAGE_FIELD_SELECTOR
 
-DEFAULT_LOCATION_NAME = "EPFL Campus"
+
+DEFAULT_LOCATION_NAME = "EPFL Campus" 
 DEFAULT_COORDINATES = {"latitude": 46.5191, "longitude": 6.5668, "name": DEFAULT_LOCATION_NAME}
 
 @dataclass
@@ -76,17 +84,17 @@ ESN_EPFL_CONFIG = WebsiteConfig(
         event_container=[".views-row", ".node.node-event", ".view-content .views-row"],
         title=[".field-name-title h2", ".field-name-title h2 a", "h2", ".title"],
         date=[".date-display-single", ".field-name-field-date", "[class*='date-display']", ".field-name-field-date span"],
-        location=[".field-name-field-location", "[class*='location']", ".location", ".venue"],
+        location=[LOCATION_FIELD_SELECTOR, "[class*='location']", LOCATION_ELEMENT_SELECTOR, VENUE_SELECTOR ],
         description=[".field-name-body", ".description", "p"],
-        price=[".field-name-field-price", "[class*='price']", ".price", ".cost"],
-        image=[".field-name-field-image img", ".group-image img", "img[src*='events']", "img"],
+        price=[PRICE_FIELD_SELECTOR, "[class*='price']", PRICE_ELEMENT_SELECTOR, COST_SELECTOR],
+        image=[IMAGE_FIELD_SELECTOR , ".group-image img", "img[src*='events']", "img"],
         event_link=[".views-row h2 a"],
         detailed_title=["h1", ".field-name-title h2"],
         detailed_date=[".date-display-single"],
         detailed_description=[".field-name-body", ".content"],
-        detailed_location=[".field-name-field-location"],
-        detailed_price=[".field-name-field-price"],
-        detailed_image=[".field-name-field-image img", ".main-image img"],
+        detailed_location=[LOCATION_FIELD_SELECTOR],
+        detailed_price=[PRICE_FIELD_SELECTOR],
+        detailed_image=[IMAGE_FIELD_SELECTOR , ".main-image img"],
     ),
     
     association=Association(
@@ -123,16 +131,16 @@ AGEPOLY_CONFIG = WebsiteConfig(
         date=[".o-posts-grid-post-meta time", "time"],
 
         # Location - not shown in list view, use default EPFL location
-        location=[".field-name-field-location", "[class*='location']", ".location", ".venue"],  # Will use default location
+        location=[LOCATION_FIELD_SELECTOR, "[class*='location']", LOCATION_ELEMENT_SELECTOR, VENUE_SELECTOR],  # Will use default location
 
         # Description is in this specific div
         description=[".o-posts-grid-post-description"],
 
         # Price - not shown in list view
-        price=[".field-name-field-price", "[class*='price']", ".price", ".cost"],  # Default to free
+        price=[PRICE_FIELD_SELECTOR, "[class*='price']", PRICE_ELEMENT_SELECTOR, COST_SELECTOR],  # Default to free
 
         # Image - no images in list view
-        image=[".field-name-field-image img", ".group-image img", "img[src*='events']", "img"],
+        image=[IMAGE_FIELD_SELECTOR , ".group-image img", "img[src*='events']", "img"],
 
         # Link to detailed page is in the title anchor tag
         event_link=["h4.o-posts-grid-post-title a"],
@@ -142,8 +150,8 @@ AGEPOLY_CONFIG = WebsiteConfig(
         detailed_title=["h1.entry-title", "h1"],
         detailed_date=[".entry-meta time", "time.entry-date", "time"],
         detailed_description=[".entry-content", ".post-content", "article"],
-        detailed_location=[".event-location", ".venue", ".location"],
-        detailed_price=[".price", ".cost", ".event-price"],
+        detailed_location=[".event-location", VENUE_SELECTOR, LOCATION_ELEMENT_SELECTOR],
+        detailed_price=[PRICE_ELEMENT_SELECTOR, COST_SELECTOR, ".event-price"],
         detailed_image=[".wp-post-image", "img.attachment-post-thumbnail", ".entry-content img"],
     ),
 

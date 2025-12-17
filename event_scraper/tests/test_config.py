@@ -187,8 +187,8 @@ class TestConstants:
         assert "longitude" in DEFAULT_COORDINATES
         assert "name" in DEFAULT_COORDINATES
         
-        assert DEFAULT_COORDINATES["latitude"] == 46.5191
-        assert DEFAULT_COORDINATES["longitude"] == 6.5668
+        assert DEFAULT_COORDINATES["latitude"] == pytest.approx(46.5191)
+        assert DEFAULT_COORDINATES["longitude"] == pytest.approx(6.5668)
         assert DEFAULT_COORDINATES["name"] == DEFAULT_LOCATION_NAME
     
     def test_default_location_name(self):
