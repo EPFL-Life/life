@@ -73,6 +73,14 @@ sealed class Screen(
         if (associationId == null) "association_admin"
         else "association_admin?associationId=$associationId"
   }
+
+  object ManageFriends : Screen(route = "manage_friends", name = "ManageFriends")
+
+  object PublicProfile : Screen(route = "public_profile/{userId}", name = "PublicProfile") {
+    const val ARG_USER_ID = "userId"
+
+    fun createRoute(userId: String) = "public_profile/$userId"
+  }
 }
 
 open class NavigationActions(
@@ -138,6 +146,14 @@ open class NavigationActions(
 
   fun navigateToAssociationAdmin(associationId: String? = null) {
     navController.navigate(Screen.AssociationAdmin.createRoute(associationId))
+  }
+
+  fun navigateToManageFriends() {
+    navController.navigate(Screen.ManageFriends.route)
+  }
+
+  fun navigateToPublicProfile(userId: String) {
+    navController.navigate(Screen.PublicProfile.createRoute(userId))
   }
 
   /** Navigate back to the previous screen. */
