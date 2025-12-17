@@ -22,7 +22,7 @@ data class Db(
     // https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/lazy.html
     val firestore: Db by lazy {
       Db(
-          userRepo = UserRepositoryFirestore(Firebase.firestore),
+          userRepo = UserRepositoryFirestore(Firebase.firestore, FirebaseStorage.getInstance()),
           eventRepo = EventRepositoryFirestore(Firebase.firestore, FirebaseStorage.getInstance()),
           assocRepo =
               AssociationRepositoryFirestore(Firebase.firestore, FirebaseStorage.getInstance()),
@@ -45,7 +45,7 @@ data class Db(
     // -> here we just inject a mock storage whenever needed
     fun forTest(storage: FirebaseStorage): Db {
       return Db(
-          userRepo = UserRepositoryFirestore(Firebase.firestore),
+          userRepo = UserRepositoryFirestore(Firebase.firestore, storage),
           eventRepo = EventRepositoryFirestore(Firebase.firestore, storage),
           assocRepo = AssociationRepositoryFirestore(Firebase.firestore, storage),
       )
