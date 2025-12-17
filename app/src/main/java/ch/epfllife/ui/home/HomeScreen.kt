@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -81,18 +82,19 @@ fun HomeScreen(
               it.title.contains(query, ignoreCase = true) ||
                   it.association.name.contains(query, ignoreCase = true)
             }
-
-        ListView(
-            list = filteredEvents,
-            emptyTitle = stringResource(title),
-            emptyDescription = stringResource(description),
-            onRefresh = viewModel::refresh,
-        ) { list ->
-          items(list, key = { ev -> ev.id }) { ev ->
-            EventCard(
-                event = ev,
-                isEnrolled = enrolledEvents.contains(ev),
-                onClick = { onEventClick(ev.id) })
+        key(selected) {
+          ListView(
+              list = filteredEvents,
+              emptyTitle = stringResource(title),
+              emptyDescription = stringResource(description),
+              onRefresh = viewModel::refresh,
+          ) { list ->
+            items(list, key = { ev -> ev.id }) { ev ->
+              EventCard(
+                  event = ev,
+                  isEnrolled = enrolledEvents.contains(ev),
+                  onClick = { onEventClick(ev.id) })
+            }
           }
         }
       }

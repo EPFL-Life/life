@@ -118,23 +118,25 @@ fun CalendarScreen(
       )
 
       Spacer(Modifier.height(12.dp))
+      key(selected) {
+        ListView(
+            list = grouped.toList(),
+            emptyTitle = stringResource(id = R.string.calendar_no_events_placeholder),
+            onRefresh = { signalFinished -> viewModel.refresh(signalFinished) },
+        ) { list ->
+          list.forEach { (month, events) ->
+            item {
+              Text(
+                  text = month,
+                  style = MaterialTheme.typography.titleMedium,
+                  modifier =
+                      Modifier.padding(vertical = 8.dp).testTag(CalendarTestTags.MONTH_HEADER),
+              )
+            }
 
-      ListView(
-          list = grouped.toList(),
-          emptyTitle = stringResource(id = R.string.calendar_no_events_placeholder),
-          onRefresh = { signalFinished -> viewModel.refresh(signalFinished) },
-      ) { list ->
-        list.forEach { (month, events) ->
-          item {
-            Text(
-                text = month,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(vertical = 8.dp).testTag(CalendarTestTags.MONTH_HEADER),
-            )
-          }
-
-          items(events, key = { it.id }) { event ->
-            CalendarCard(event = event, onClick = { onEventClick(event.id) })
+            items(events, key = { it.id }) { event ->
+              CalendarCard(event = event, onClick = { onEventClick(event.id) })
+            }
           }
         }
       }

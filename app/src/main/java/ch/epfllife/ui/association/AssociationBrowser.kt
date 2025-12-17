@@ -78,14 +78,16 @@ fun AssociationBrowser(
         shownAssociations
             .filter { it.name.contains(query, ignoreCase = true) }
             .sortedBy { it.name.lowercase() }
-    ListView(
-        list = filteredAssociations,
-        emptyTitle = stringResource(id = title),
-        emptyDescription = stringResource(id = description),
-        onRefresh = viewModel::refresh,
-    ) { list ->
-      items(list, key = { assoc -> assoc.id }) { assoc ->
-        AssociationCard(association = assoc, onClick = { onAssociationClick(assoc.id) })
+    key(selected) {
+      ListView(
+          list = filteredAssociations,
+          emptyTitle = stringResource(id = title),
+          emptyDescription = stringResource(id = description),
+          onRefresh = viewModel::refresh,
+      ) { list ->
+        items(list, key = { assoc -> assoc.id }) { assoc ->
+          AssociationCard(association = assoc, onClick = { onAssociationClick(assoc.id) })
+        }
       }
     }
   }
