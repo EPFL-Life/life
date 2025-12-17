@@ -39,6 +39,7 @@ import ch.epfllife.utils.ToastHelper
 object SettingsScreenTestTags {
   const val SIGN_OUT_BUTTON = "signOutButton"
   const val ADMIN_CONSOLE_BUTTON = "adminConsoleButton"
+  const val MANAGE_FRIENDS_BUTTON = "manageFriendsButton"
 }
 
 @Composable
@@ -87,7 +88,8 @@ fun SettingsScreen(
         SettingsButton(
             text = stringResource(R.string.manage_friends_title),
             icon = Icons.Default.Favorite,
-            onClick = { onNavigateToManageFriends() })
+            onClick = { onNavigateToManageFriends() },
+            modifier = Modifier.testTag(SettingsScreenTestTags.MANAGE_FRIENDS_BUTTON))
         Spacer(Modifier.height(32.dp))
 
         if (uiState.userRole == UserRole.ADMIN || uiState.userRole == UserRole.ASSOCIATION_ADMIN) {

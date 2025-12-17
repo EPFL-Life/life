@@ -21,7 +21,7 @@ class CalendarCardTest {
   fun calendarCard_isClickable() {
     composeTestRule.assertClickable(
         { clickHandler -> Theme { CalendarCard(event = event, onClick = clickHandler) } },
-        CalendarTestTags.EVENT_CARD)
+        EventCardTestTags.getEventCardTestTag(event.id))
   }
 
   @Test
