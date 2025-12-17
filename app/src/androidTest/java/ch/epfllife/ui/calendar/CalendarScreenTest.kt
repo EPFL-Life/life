@@ -21,6 +21,7 @@ class CalendarScreenTest {
       allEvents: List<ch.epfllife.model.event.Event> = emptyList(),
       enrolledEvents: List<ch.epfllife.model.event.Event> = emptyList(),
       onEventClick: (String) -> Unit = {},
+      switchToListView: Boolean = true,
   ) {
     val eventRepo = EventRepositoryLocal()
     val userRepo = UserRepositoryLocal(eventRepo)
@@ -45,6 +46,11 @@ class CalendarScreenTest {
 
     composeTestRule.setContent { Theme { CalendarScreen(db = db, onEventClick = onEventClick) } }
     composeTestRule.waitForIdle()
+
+    if (switchToListView) {
+      composeTestRule.onNodeWithTag(CalendarTestTags.GRID_VIEW_TOGGLE).performClick()
+      composeTestRule.waitForIdle()
+    }
   }
 
   @get:Rule val composeTestRule = createComposeRule()
@@ -201,5 +207,18 @@ class CalendarScreenTest {
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_SUBSCRIBED).performClick()
     composeTestRule.waitForIdle()
+  }
+
+  @Test
+  fun calendarScreen_DefaultIsGridView() {
+    setUpCalendarScreen(switchToListView = false)
+
+    composeTestRule.waitForIdle()
+
+    // check that the toggle button has the "Switch to List View" content description
+    // which implies that we are currently in Grid View
+    composeTestRule
+        .onNodeWithTag(CalendarTestTags.GRID_VIEW_TOGGLE)
+        .assertContentDescriptionEquals("Switch to List View")
   }
 }
