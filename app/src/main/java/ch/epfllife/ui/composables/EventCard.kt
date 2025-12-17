@@ -75,7 +75,10 @@ fun EventCard(
                   Text(
                       text = event.title,
                       style = MaterialTheme.typography.titleMedium,
-                      fontWeight = FontWeight.SemiBold)
+                      fontWeight = FontWeight.SemiBold,
+                      maxLines = 2,
+                      overflow = TextOverflow.Ellipsis,
+                      modifier = Modifier.weight(1f, fill = false))
                   Spacer(Modifier.width(8.dp))
                   if (isEnrolled) {
                     Box(
@@ -87,9 +90,9 @@ fun EventCard(
                               style = MaterialTheme.typography.labelSmall,
                               color = Color.White)
                         }
+                    Spacer(Modifier.width(8.dp))
                   }
 
-                  Spacer(Modifier.weight(1f))
                   Text(
                       text = event.price.formatPrice(),
                       style = MaterialTheme.typography.bodyMedium,
@@ -164,11 +167,13 @@ fun CompactEventCard(
             modifier = Modifier.fillMaxWidth().padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween) {
-              Column(modifier = Modifier.weight(1f)) {
+              Column(modifier = Modifier.weight(1f, fill = false)) {
                 Text(
                     text = event.title,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold)
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis)
                 Text(
                     text = event.association.name,
                     style = MaterialTheme.typography.bodySmall,

@@ -202,11 +202,14 @@ private fun EventHeader(
     onAssociationClick: () -> Unit
 ) {
   Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-    Column {
+    Column(Modifier.weight(1f, fill = false)) {
       Text(
           title,
           style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-          modifier = Modifier.testTag(EventDetailsTestTags.EVENT_TITLE))
+          modifier = Modifier.testTag(EventDetailsTestTags.EVENT_TITLE),
+          maxLines = 2,
+          overflow = TextOverflow.Ellipsis,
+      )
       Text(
           associationName,
           style = MaterialTheme.typography.bodyMedium,
@@ -216,6 +219,7 @@ private fun EventHeader(
                 onAssociationClick()
               })
     }
+    Spacer(Modifier.width(8.dp))
     Text(
         price,
         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium),
