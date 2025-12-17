@@ -79,13 +79,13 @@ fun SettingsScreen(
         Spacer(Modifier.height(32.dp))
 
         SettingsButton(
-            text = "Manage Profile",
+            text = stringResource(R.string.manage_profile_title),
             icon = Icons.Default.Person,
             onClick = { onNavigateToManageProfile() })
         Spacer(Modifier.height(32.dp))
 
         SettingsButton(
-            text = "Manage friends",
+            text = stringResource(R.string.manage_friends_title),
             icon = Icons.Default.Favorite,
             onClick = { onNavigateToManageFriends() })
         Spacer(Modifier.height(32.dp))
