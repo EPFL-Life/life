@@ -45,7 +45,7 @@ import ch.epfllife.ui.navigation.NavigationActions
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.navigation.Screen
 import ch.epfllife.ui.navigation.Tab
-import ch.epfllife.ui.settings.EditDisplayNameScreen
+import ch.epfllife.ui.settings.ManageProfileScreen
 import ch.epfllife.ui.settings.SettingsScreen
 import ch.epfllife.ui.settings.SettingsViewModel
 import ch.epfllife.ui.theme.Theme
@@ -226,12 +226,12 @@ fun App(auth: Auth, db: Db) {
                 viewModel = viewModel { SettingsViewModel(auth, db) },
                 onSignedOut = { navigationActions.navigateTo(Screen.SignIn) },
                 onAdminConsoleClick = { navigationActions.navigateToAssociationAdmin() },
-                onNavigateToDisplayName = { navigationActions.navigateToEditDisplayName() },
+                onNavigateToManageProfile = { navigationActions.navigateToManageProfile() },
             )
           }
 
-          composable(Screen.EditDisplayName.route) {
-            EditDisplayNameScreen(
+          composable(Screen.ManageProfile.route) {
+            ManageProfileScreen(
                 db = db,
                 onBack = { navController.popBackStack() },
                 onSubmitSuccess = { navController.popBackStack() })
