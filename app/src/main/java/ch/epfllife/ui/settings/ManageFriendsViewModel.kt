@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 sealed class ManageFriendsUiState {
   data object Loading : ManageFriendsUiState()
 
-  data class Success(val users: List<User>) : ManageFriendsUiState()
+  data class Success(val currentUser: User, val users: List<User>) : ManageFriendsUiState()
 
   data class Error(val message: Int) : ManageFriendsUiState()
 }
@@ -50,7 +50,8 @@ class ManageFriendsViewModel(private val userRepository: UserRepository) : ViewM
         // 3. Keep only USER role (implicit)
         allUsers = users.filter { it.id != currentUser.id && it.role == UserRole.USER }
 
-        filterUsers()
+        _uiState.value =
+            ManageFriendsUiState.Success(currentUser = currentUser, users = filterUsers())
       } catch (_: Exception) {
         _uiState.value = ManageFriendsUiState.Error(ch.epfllife.R.string.error_loading_users)
       }
@@ -59,10 +60,15 @@ class ManageFriendsViewModel(private val userRepository: UserRepository) : ViewM
 
   fun onSearchQueryChanged(query: String) {
     _searchQuery.value = query
-    filterUsers()
+    val currentState = _uiState.value
+    if (currentState is ManageFriendsUiState.Success) {
+      _uiState.value = currentState.copy(users = filterUsers())
+    } else {
+      _uiState.value = ManageFriendsUiState.Error(ch.epfllife.R.string.error_loading_users)
+    }
   }
 
-  private fun filterUsers() {
+  private fun filterUsers(): List<User> {
     val query = _searchQuery.value
     val filtered =
         if (query.isBlank()) {
@@ -70,6 +76,6 @@ class ManageFriendsViewModel(private val userRepository: UserRepository) : ViewM
         } else {
           allUsers.filter { it.name.contains(query, ignoreCase = true) }
         }
-    _uiState.value = ManageFriendsUiState.Success(filtered)
+    return filtered
   }
 }
