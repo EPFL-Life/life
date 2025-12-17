@@ -95,4 +95,6 @@ interface UserRepository {
   suspend fun unsubscribeFromAssociation(associationId: String): Result<Unit>
 
   suspend fun getUsersEnrolledInEvent(eventId: String): List<User>
+
+  suspend fun uploadUserImage(userId: String, imageUri: android.net.Uri): Result<String>
 }

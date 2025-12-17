@@ -1,5 +1,6 @@
 package ch.epfllife.model.user
 
+import android.net.Uri
 import android.util.Log
 import ch.epfllife.model.enums.AppLanguage
 import ch.epfllife.model.firestore.FirestoreCollections
@@ -7,9 +8,14 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageMetadata
 import kotlinx.coroutines.tasks.await
 
-class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepository {
+class UserRepositoryFirestore(
+    private val db: FirebaseFirestore,
+    private val storage: FirebaseStorage
+) : UserRepository {
 
   override suspend fun getCurrentUser(): User? {
 
@@ -154,7 +160,8 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
                 },
             managedAssociationIds =
                 (document["managedAssociationIds"] as? List<*>)?.mapNotNull { it as? String }
-                    ?: emptyList())
+                    ?: emptyList(),
+            photoUrl = document.getString("photoUrl"))
       } catch (e: NullPointerException) {
         // this can happen when one of the required fields is not present
         Log.e("UserRepository", "Error converting document to User", e)
@@ -293,5 +300,19 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     val updatedUser = currentUser.copy(subscriptions = currentUser.subscriptions - associationId)
     // reused updateUser() method
     return updateUser(currentUser.id, updatedUser)
+  }
+
+  override suspend fun uploadUserImage(userId: String, imageUri: Uri): Result<String> {
+    return try {
+      val storageRef = storage.reference
+      val imageRef = storageRef.child("users/$userId/profile.jpg")
+      val metadata = StorageMetadata.Builder().setContentType("image/jpeg").build()
+      imageRef.putFile(imageUri, metadata).await()
+      val downloadUrl = imageRef.downloadUrl.await()
+      Result.success(downloadUrl.toString())
+    } catch (e: Exception) {
+      Log.e("UserRepository", "Error uploading user image", e)
+      Result.failure(e)
+    }
   }
 }
