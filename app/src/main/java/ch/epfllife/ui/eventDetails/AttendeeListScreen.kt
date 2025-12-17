@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import ch.epfllife.R
 import ch.epfllife.model.db.Db
 import ch.epfllife.model.user.User
+import ch.epfllife.model.user.sortUsers
 import ch.epfllife.ui.composables.BackButton
 import ch.epfllife.ui.composables.SearchBar
 import kotlin.collections.filter
@@ -32,8 +33,7 @@ fun AttendeeListScreen(attendees: List<User>, onBack: () -> Unit, db: Db) {
         if (currentUser == null) {
           attendees
         } else {
-          val following = currentUser.following.toSet()
-          attendees.sortedByDescending { it.id in following }
+          sortUsers(currentUser, attendees)
         }
       }
 

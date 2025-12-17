@@ -21,6 +21,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.epfllife.R
 import ch.epfllife.model.db.Db
 import ch.epfllife.model.user.User
+import ch.epfllife.model.user.sortUsers
 import ch.epfllife.ui.composables.BackButton
 import ch.epfllife.ui.composables.SearchBar
 import coil.compose.AsyncImage
@@ -77,10 +78,11 @@ fun ManageFriendsScreen(
                   style = MaterialTheme.typography.bodyLarge)
             }
           } else {
+            val sortedUsers = remember(state.users) { sortUsers(state.currentUser, state.users) }
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.fillMaxSize().testTag(ManageFriendsTestTags.USER_LIST)) {
-                  items(state.users) { user ->
+                  items(sortedUsers) { user ->
                     UserListItem(user = user, onClick = { onUserClick(user.id) })
                   }
                 }
