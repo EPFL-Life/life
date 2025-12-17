@@ -10,7 +10,8 @@ data class User(
     val role: UserRole = UserRole.USER,
     val managedAssociationIds: List<String> =
         emptyList(), // List of Assoc that this user can manage
-    val photoUrl: String? = null
+    val photoUrl: String? = null,
+    val following: List<String> = emptyList() // User IDs of followed users
 )
 
 enum class UserRole {
