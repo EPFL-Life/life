@@ -55,6 +55,8 @@
         <string name="signout_successful">Déconnexion réussie</string>
         <string name="settings_title">Paramètres</string>
         <string name="sign_out">Se déconnecter</string>
+    <string name="manage_friends_title">Gérer les amis</string>
+    <string name="manage_profile_title">Gérer le profil</string>
 
         <!-- Edit display name-->
         <string name="display_name">Nom d\'affichage</string>
@@ -155,10 +157,15 @@
     <string name="cancel_button">Annuler</string>
     <string name="admin_console">Console d’administration</string>
 
-    <!-- Friend Screen -->
-    <string name="manage_friends_title">Manage les amies</string>
 
-    <!-- Profile Screen -->
-    <string name="manage_profile_title">Manage ton profile</string>
+
+    <!-- Friend System -->
+    <string name="manage_friends_no_users_found">Aucun utilisateur trouvé</string>
+    <string name="user_not_logged_in">Utilisateur non connecté</string>
+    <string name="error_loading_users">Échec du chargement des utilisateurs</string>
+    <string name="follow_button_follow">Suivre</string>
+    <string name="follow_button_unfollow">Ne plus suivre</string>
+    <string name="error_user_not_found_or_logged_in">Utilisateur introuvable ou non connecté</string>
+    <string name="error_loading_profile">Échec du chargement du profil</string>
 
 </resources>
