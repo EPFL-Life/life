@@ -45,6 +45,8 @@ import ch.epfllife.ui.navigation.NavigationActions
 import ch.epfllife.ui.navigation.NavigationTestTags
 import ch.epfllife.ui.navigation.Screen
 import ch.epfllife.ui.navigation.Tab
+import ch.epfllife.ui.profile.PublicProfileScreen
+import ch.epfllife.ui.settings.ManageFriendsScreen
 import ch.epfllife.ui.settings.ManageProfileScreen
 import ch.epfllife.ui.settings.SettingsScreen
 import ch.epfllife.ui.settings.SettingsViewModel
@@ -206,7 +208,8 @@ fun App(auth: Auth, db: Db) {
                     navController.previousBackStackEntry
                         ?.savedStateHandle
                         ?.get<List<User>>("attendees") ?: emptyList(),
-                onBack = { navController.popBackStack() })
+                onBack = { navController.popBackStack() },
+                db = db)
           }
 
           composable(
@@ -227,7 +230,7 @@ fun App(auth: Auth, db: Db) {
                 onSignedOut = { navigationActions.navigateTo(Screen.SignIn) },
                 onAdminConsoleClick = { navigationActions.navigateToAssociationAdmin() },
                 onNavigateToManageProfile = { navigationActions.navigateToManageProfile() },
-            )
+                onNavigateToManageFriends = { navigationActions.navigateToManageFriends() })
           }
 
           composable(Screen.ManageProfile.route) {
@@ -236,6 +239,26 @@ fun App(auth: Auth, db: Db) {
                 onBack = { navController.popBackStack() },
                 onSubmitSuccess = { navController.popBackStack() })
           }
+
+          composable(Screen.ManageFriends.route) {
+            ManageFriendsScreen(
+                db = db,
+                onBack = { navController.popBackStack() },
+                onUserClick = { userId -> navigationActions.navigateToPublicProfile(userId) })
+          }
+
+          composable(
+              route = Screen.PublicProfile.route,
+              arguments =
+                  listOf(
+                      navArgument(Screen.PublicProfile.ARG_USER_ID) {
+                        type = NavType.StringType
+                      })) { backStackEntry ->
+                val userId =
+                    backStackEntry.arguments?.getString(Screen.PublicProfile.ARG_USER_ID) ?: ""
+                PublicProfileScreen(
+                    db = db, userId = userId, onBack = { navController.popBackStack() })
+              }
 
           // this composable is a bit chunky but it keeps the complexity low so this is preferable
           composable(
