@@ -477,4 +477,36 @@ class UserRepositoryFirebaseTest : FirestoreLifeTest() {
     // assert: the action must fail
     assertTrue(result.isFailure)
   }
+
+  @Test
+  fun followAndUnfollow() = runTest {
+    val authUid = signInTestUserUsingAuth()
+    val user1 = ExampleUsers.user1.copy(id = authUid)
+    db.userRepo.createUser(user1)
+    val user2 = ExampleUsers.user2
+    db.userRepo.createUser(user2)
+    db.userRepo.followUser(user2.id)
+    var updatedUser1 = db.userRepo.getUser(user1.id)
+    assertTrue(updatedUser1!!.following.contains(user2.id))
+    db.userRepo.unfollowUser(user2.id)
+    updatedUser1 = db.userRepo.getUser(user1.id)
+    assertTrue(updatedUser1!!.following.isEmpty())
+  }
+
+  @Test
+  fun cannotFollowSelf() = runTest {
+    val authUid = signInTestUserUsingAuth()
+    val user1 = ExampleUsers.user1.copy(id = authUid)
+    db.userRepo.createUser(user1)
+    val result = db.userRepo.followUser(user1.id)
+    assertTrue(result.isFailure)
+    val updatedUser1 = db.userRepo.getUser(user1.id)
+    assertTrue(updatedUser1!!.following.isEmpty())
+  }
+
+  @Test
+  fun cannotFollowWithoutLogin() = runTest {
+    val result = db.userRepo.followUser("any")
+    assertTrue(result.isFailure)
+  }
 }
