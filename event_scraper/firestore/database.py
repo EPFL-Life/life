@@ -182,10 +182,10 @@ class FirebaseDatabase:
             Dictionary for Firestore
         """
         # Start with event's own conversion
-        event_dict = event.to_firestore_dict()
+        event_dict = event.to_firestore_dict(db=self.db)
         
         # Convert association to dictionary
-        event_dict["association"] = self._association_to_firestore_dict(event.association)
+        # event_dict["association"] = self._association_to_firestore_dict(event.association)
         
         # Add timestamps
         event_dict["_uploadedAt"] = firestore.SERVER_TIMESTAMP

@@ -6,7 +6,7 @@ import logging
 from typing import List, Optional, Dict, Any
 from datetime import datetime
 import re
-from scrapers.website_config import WebsiteConfig
+from scrapers.website_config import WebsiteConfig, SelectorConfig
 
 from config import MAX_FIELD_LENGTHS
 
@@ -34,13 +34,34 @@ class WebScraper(BaseScraper):
                 - name: Website name
                 - url: Events page URL
                 - association: Association object for this website
-                - selectors: CSS selectors for parsing
+                - selectors: CSS selectors for parsing (dict or SelectorConfig)
         """
-        super().__init__(website_config.get("name", "Unknown Website"))
-        self.config = WebsiteConfig(**website_config)
-        self.base_url = website_config.get("url", "")
+        # Handle both dict and WebsiteConfig object
+        if hasattr(website_config, 'name'):  
+            # It's already a WebsiteConfig object
+            source_name = website_config.name
+            self.config = website_config
+        else:
+            # It's a dict - extract name and create WebsiteConfig
+            source_name = website_config.get("name", "Unknown Website")
+            
+            # Convert selectors dict to SelectorConfig if needed
+            selectors_data = website_config.get("selectors", {})
+            if isinstance(selectors_data, dict):
+                # Import here to avoid circular import
+                from scrapers.website_config import SelectorConfig
+                selectors = SelectorConfig(**selectors_data)
+                website_config["selectors"] = selectors
+            
+            # Create WebsiteConfig from dict
+            from scrapers.website_config import WebsiteConfig
+            self.config = WebsiteConfig(**website_config)
         
-        # Setup HTTP session
+        super().__init__(source_name)
+
+        self.base_url = self.config.base_domain  # or use self.config.url if that's what you need
+        
+        # Setup HTTP session (keep existing code)
         self.session = requests.Session()
         self.session.headers.update(config.REQUEST_HEADERS)
         self.session.timeout = config.REQUEST_TIMEOUT
@@ -52,9 +73,9 @@ class WebScraper(BaseScraper):
         events = []
         
         try:
-            logger.info(f"Fetching from {self.base_url}")
-            response = self.session.get(self.base_url)
-            response.raise_for_status()
+            target_url = self.config.url
+            logger.info(f"Fetching from {target_url}")
+            response = self.session.get(target_url)
             
             soup = BeautifulSoup(response.content, 'html.parser')
             
