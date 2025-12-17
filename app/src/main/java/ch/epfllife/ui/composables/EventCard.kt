@@ -78,7 +78,7 @@ fun EventCard(
                       fontWeight = FontWeight.SemiBold,
                       maxLines = 2,
                       overflow = TextOverflow.Ellipsis,
-                      modifier = Modifier.weight(1f, fill = false))
+                      modifier = Modifier.weight(1f))
                   Spacer(Modifier.width(8.dp))
                   if (isEnrolled) {
                     Box(
@@ -167,7 +167,7 @@ fun CompactEventCard(
             modifier = Modifier.fillMaxWidth().padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween) {
-              Column(modifier = Modifier.weight(1f, fill = false)) {
+              Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = event.title,
                     style = MaterialTheme.typography.titleMedium,
