@@ -1,5 +1,6 @@
 package ch.epfllife.ui.navigation
 
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 
 sealed class Screen(
@@ -99,7 +100,9 @@ open class NavigationActions(
     navController.navigate(screen.route) {
       if (screen.isTopLevelDestination) {
         launchSingleTop = true
-        popUpTo(screen.route) { inclusive = true }
+        popUpTo(navController.graph.findStartDestination().id) {
+          saveState = true // save the state of the composable
+        }
       }
       if (screen !is Screen.SignIn) {
         // Restore state when reselecting a previously selected item

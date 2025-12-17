@@ -130,4 +130,13 @@ class AddEditEventScreenTest {
 
     composeTestRule.onNodeWithTag(AddEditEventTestTags.IMAGE_UPLOAD_BUTTON).assertIsDisplayed()
   }
+
+  @Test
+  fun displayErrorStateWhenRepositoryFails() {
+    val db = Db.freshLocal()
+
+    setContent(db = db, associationId = "non-existent-id")
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag(AddEditEventTestTags.ERROR_BOX).assertIsDisplayed()
+  }
 }

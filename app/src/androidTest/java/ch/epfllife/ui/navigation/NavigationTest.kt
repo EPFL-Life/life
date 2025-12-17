@@ -10,15 +10,20 @@ import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.NavHostController
 import androidx.test.rule.GrantPermissionRule
 import ch.epfllife.ThemedApp
+import ch.epfllife.example_data.ExampleAssociations
 import ch.epfllife.example_data.ExampleEvents
 import ch.epfllife.example_data.ExampleUsers
 import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.authentication.SignInResult
 import ch.epfllife.model.db.Db
+import ch.epfllife.ui.association.AssociationDetailsTestTags
+import ch.epfllife.ui.composables.DisplayedEventsTestTags
 import ch.epfllife.ui.composables.EPFLLogoTestTags
 import ch.epfllife.ui.eventDetails.EventDetailsTestTags
 import ch.epfllife.ui.eventDetails.MapScreenTestTags
+import ch.epfllife.ui.home.HomeScreenTestTags
 import ch.epfllife.utils.FakeCredentialManager
+import ch.epfllife.utils.navigateToAssociation
 import ch.epfllife.utils.navigateToEvent
 import ch.epfllife.utils.navigateToTab
 import ch.epfllife.utils.setUpEmulator
@@ -395,5 +400,209 @@ class NavigationTest {
     composeTestRule.onNodeWithText("Event Attendees").assertIsDisplayed()
     composeTestRule.onNodeWithText(attendee1.name).assertIsDisplayed()
     composeTestRule.onNodeWithText(attendee2.name).assertIsDisplayed()
+  }
+
+  @Test
+  fun calendarScreen_filterStateRestored_defaultSubscribed() {
+    setUpApp()
+
+    // 1. Navigate to Calendar
+    composeTestRule.navigateToTab(Tab.Calendar)
+
+    // 2. ASSERT: Initial state is Subscribed/Enrolled
+    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_SUBSCRIBED).assertIsDisplayed()
+
+    // 3. Navigate away
+    composeTestRule.navigateToTab(Tab.HomeScreen)
+
+    // 4. Return to Calendar
+    composeTestRule.navigateToTab(Tab.Calendar)
+
+    // 5. ASSERT: Filter must still be in Subscribed state
+    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_SUBSCRIBED).assertIsDisplayed()
+  }
+
+  @Test
+  fun calendarScreen_filterStateRestored_afterSelectingAll() {
+    setUpApp()
+
+    // 1. Navigate to Calendar
+    composeTestRule.navigateToTab(Tab.Calendar)
+
+    // 2. ACTION: Change filter to ALL
+    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_ALL).performClick()
+
+    // 3. Navigate away
+    composeTestRule.navigateToTab(Tab.Settings)
+
+    // 4. Return to Calendar
+    composeTestRule.navigateToTab(Tab.Calendar)
+
+    // 5. ASSERT: Filter must still be in ALL state
+    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_ALL).assertIsDisplayed()
+  }
+
+  @Test
+  fun homeScreen_retainsAllFilter_onReturningFromDetails() {
+    prepareEventDataForPersistence()
+    setUpApp()
+
+    composeTestRule.navigateToEvent(ExampleEvents.event1.id)
+    composeTestRule.waitForIdle()
+
+    composeTestRule
+        .onNodeWithTag(EventDetailsTestTags.BACK_BUTTON, useUnmergedTree = true)
+        .performClick()
+    composeTestRule.waitForIdle()
+
+    composeTestRule.onNodeWithTag(HomeScreenTestTags.BUTTON_ALL).assertIsDisplayed()
+  }
+
+  @Test
+  fun homeScreen_retainsSubscribedFilter_onReturningFromDetails() {
+    prepareEventDataForPersistence()
+    setUpApp()
+
+    // 1. HomeScreen default is "Subscribed" (For You)
+    composeTestRule.onNodeWithTag(HomeScreenTestTags.BUTTON_SUBSCRIBED).assertIsDisplayed()
+
+    // 2. Navigate to event details
+    composeTestRule.navigateToEvent(ExampleEvents.event1.id)
+    composeTestRule.waitForIdle()
+
+    // 3. Go back
+    composeTestRule
+        .onNodeWithTag(EventDetailsTestTags.BACK_BUTTON, useUnmergedTree = true)
+        .performClick()
+    composeTestRule.waitForIdle()
+
+    // 4. ASSERT: Should still be on "Subscribed" (For You) filter
+    composeTestRule.onNodeWithTag(HomeScreenTestTags.BUTTON_SUBSCRIBED).assertIsDisplayed()
+  }
+
+  @Test
+  fun associationBrowser_retainsAllFilter_onReturningFromDetails() {
+    val testAssociation = ExampleAssociations.association1
+    runTest { Assert.assertTrue(db.assocRepo.createAssociation(testAssociation).isSuccess) }
+
+    setUpApp()
+
+    // 1. Navigate to AssociationBrowser
+    composeTestRule.navigateToTab(Tab.AssociationBrowser)
+    composeTestRule.waitForIdle()
+
+    // 2. Switch to "All" filter
+    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_ALL).performClick()
+    composeTestRule.waitForIdle()
+
+    // 3. Click on an association to go to details
+    composeTestRule.navigateToAssociation(testAssociation.id)
+    composeTestRule.waitForIdle()
+
+    // 4. Go back from association details
+    composeTestRule
+        .onNodeWithTag(AssociationDetailsTestTags.BACK_BUTTON, useUnmergedTree = true)
+        .performClick()
+    composeTestRule.waitForIdle()
+
+    // 5. ASSERT: Should still be on "All" filter, not "Subscribed"
+    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_ALL).assertIsDisplayed()
+  }
+
+  @Test
+  fun associationBrowser_retainsSubscribedFilter_onReturningFromDetails() {
+    val testAssociation = ExampleAssociations.association1
+    runTest {
+      Assert.assertTrue(db.assocRepo.createAssociation(testAssociation).isSuccess)
+      // Subscribe user to the association
+      db.userRepo.subscribeToAssociation(testAssociation.id)
+    }
+
+    setUpApp()
+
+    // 1. Navigate to AssociationBrowser (default is "Subscribed")
+    composeTestRule.navigateToTab(Tab.AssociationBrowser)
+    composeTestRule.waitForIdle()
+
+    // 2. Verify we're on "Subscribed" filter by default
+    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_SUBSCRIBED).assertIsDisplayed()
+
+    // 3. Click on the subscribed association
+    composeTestRule.navigateToAssociation(testAssociation.id)
+    composeTestRule.waitForIdle()
+
+    // 4. Go back from association details
+    composeTestRule
+        .onNodeWithTag(AssociationDetailsTestTags.BACK_BUTTON, useUnmergedTree = true)
+        .performClick()
+    composeTestRule.waitForIdle()
+
+    // 5. ASSERT: Should still be on "Subscribed" filter
+    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_SUBSCRIBED).assertIsDisplayed()
+  }
+
+  @Test
+  fun calendarScreen_retainsAllEventsFilter_onReturningFromDetails() {
+    prepareEventDataForPersistence()
+    setUpApp()
+
+    // 1. Navigate to Calendar
+    composeTestRule.navigateToTab(Tab.Calendar)
+    composeTestRule.waitForIdle()
+
+    // 2. Switch to "All Events" filter
+    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_ALL).performClick()
+    composeTestRule.waitForIdle()
+
+    // 3. Navigate to event details
+    composeTestRule.navigateToEvent(ExampleEvents.event1.id)
+    composeTestRule.waitForIdle()
+
+    // 4. Go back
+    composeTestRule
+        .onNodeWithTag(EventDetailsTestTags.BACK_BUTTON, useUnmergedTree = true)
+        .performClick()
+    composeTestRule.waitForIdle()
+
+    // 5. ASSERT: Should still be on "All Events" filter, not "Enrolled"
+    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_ALL).assertIsDisplayed()
+  }
+
+  @Test
+  fun calendarScreen_retainsEnrolledFilter_onReturningFromDetails() {
+    prepareEventDataForPersistence()
+    setUpApp()
+
+    // 1. Navigate to Calendar (default is "Enrolled")
+    composeTestRule.navigateToTab(Tab.Calendar)
+    composeTestRule.waitForIdle()
+
+    // 2. Verify we're on "Enrolled" filter by default
+    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_SUBSCRIBED).assertIsDisplayed()
+
+    // 3. Navigate to event details
+    composeTestRule.navigateToEvent(ExampleEvents.event1.id)
+    composeTestRule.waitForIdle()
+
+    // 4. Go back
+    composeTestRule
+        .onNodeWithTag(EventDetailsTestTags.BACK_BUTTON, useUnmergedTree = true)
+        .performClick()
+    composeTestRule.waitForIdle()
+
+    // 5. ASSERT: Should still be on "Enrolled" filter
+    composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_SUBSCRIBED).assertIsDisplayed()
+  }
+
+  private fun prepareEventDataForPersistence() = runTest {
+    val event1 = ExampleEvents.event1
+    val event2 = ExampleEvents.event2
+    val assoc1 = ExampleAssociations.association1
+
+    Assert.assertTrue(db.assocRepo.createAssociation(assoc1).isSuccess)
+    Assert.assertTrue(db.eventRepo.createEvent(event1).isSuccess)
+    Assert.assertTrue(db.eventRepo.createEvent(event2).isSuccess)
+
+    db.userRepo.subscribeToEvent(event1.id)
   }
 }
