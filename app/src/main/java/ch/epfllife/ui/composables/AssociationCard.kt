@@ -12,15 +12,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import ch.epfllife.R
 import ch.epfllife.model.association.Association
 import coil.compose.AsyncImage
-import coil.request.ImageRequest
+
+private const val DEFAULT_ASSOCIATION_LOGO_URL =
+    "https://firebasestorage.googleapis.com/v0/b/epfl-life.firebasestorage.app/o/assets%2Fassoc_default.png?alt=media&token=a2971702-f669-4779-97ba-63fff11c0d8a"
 
 @Composable
 fun AssociationCard(association: Association, modifier: Modifier = Modifier, onClick: () -> Unit) {
@@ -39,17 +38,12 @@ fun AssociationCard(association: Association, modifier: Modifier = Modifier, onC
               // Club/association icon
               AsyncImage(
                   model =
-                      ImageRequest.Builder(LocalContext.current)
-                          .data(association.logoUrl ?: association.pictureUrl)
-                          .crossfade(true)
-                          .build(),
+                      association.logoUrl ?: association.pictureUrl ?: DEFAULT_ASSOCIATION_LOGO_URL,
                   contentDescription = "${association.name} logo",
                   modifier =
                       Modifier.size(56.dp)
                           .align(Alignment.CenterVertically)
-                          .testTag(AssociationCardTestTags.ASSOCIATION_LOGO),
-                  placeholder = painterResource(R.drawable.placeholder),
-                  error = painterResource(R.drawable.placeholder))
+                          .testTag(AssociationCardTestTags.ASSOCIATION_LOGO))
 
               // Text section (name + description)
               Column(modifier = Modifier.weight(1f).align(Alignment.CenterVertically)) {
