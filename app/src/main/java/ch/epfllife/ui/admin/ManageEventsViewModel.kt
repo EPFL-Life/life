@@ -18,9 +18,8 @@ sealed interface ManageEventsUIState {
   data class Error(val messageRes: Int) : ManageEventsUIState
 
   data class Success(
-      val events: List<Event>,
-      val enrolledEvents: List<String>,
-      val isFutureFilterEnabled: Boolean
+      val events: List<Pair<Event, Int>>,
+      val isFutureFilterEnabled: Boolean,
   ) : ManageEventsUIState
 }
 
@@ -30,7 +29,7 @@ class ManageEventsViewModel(private val db: Db, val associationId: String) : Vie
   val uiState: StateFlow<ManageEventsUIState> = _uiState
 
   private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-  private var allEventsCache: List<Event> = emptyList()
+  private var allEventsCache: List<Pair<Event, Int>> = emptyList()
   private var isFutureFilterEnabled = false
 
   init {
@@ -48,7 +47,7 @@ class ManageEventsViewModel(private val db: Db, val associationId: String) : Vie
     val currentState = _uiState.value
     if (currentState is ManageEventsUIState.Success) {
       isFutureFilterEnabled = !isFutureFilterEnabled
-      updateUiState(currentState.enrolledEvents)
+      updateUiState()
     }
   }
 
@@ -56,13 +55,11 @@ class ManageEventsViewModel(private val db: Db, val associationId: String) : Vie
     _uiState.value = ManageEventsUIState.Loading
 
     val result = db.assocRepo.getEventsForAssociation(associationId)
-    val currentUser = db.userRepo.getCurrentUser()
-    val enrolledEventIds = currentUser?.enrolledEvents ?: emptyList()
 
     result.fold(
         onSuccess = { events ->
-          allEventsCache = events
-          updateUiState(enrolledEventIds)
+          allEventsCache = events.map { Pair(it, db.userRepo.getUsersEnrolledInEvent(it.id).size) }
+          updateUiState()
         },
         onFailure = { e ->
           Log.e("ManageEventsVM", "Failed to load events for association $associationId", e)
@@ -70,24 +67,21 @@ class ManageEventsViewModel(private val db: Db, val associationId: String) : Vie
         })
   }
 
-  private fun updateUiState(enrolledEventIds: List<String>) {
+  private fun updateUiState() {
     val today = LocalDate.now()
     val filtered =
         if (isFutureFilterEnabled) {
-              allEventsCache.filter { event ->
+              allEventsCache.filter { (event, _) ->
                 val eventDate = event.startDateOrNull()
                 eventDate == null || !eventDate.isBefore(today)
               }
             } else {
               allEventsCache
             }
-            .sortedBy { it.startDateOrNull() ?: LocalDate.MAX }
+            .sortedBy { it.first.startDateOrNull() ?: LocalDate.MAX }
 
     _uiState.value =
-        ManageEventsUIState.Success(
-            filtered,
-            enrolledEvents = enrolledEventIds,
-            isFutureFilterEnabled = isFutureFilterEnabled)
+        ManageEventsUIState.Success(filtered, isFutureFilterEnabled = isFutureFilterEnabled)
   }
 
   private fun Event.startDateOrNull(): LocalDate? {

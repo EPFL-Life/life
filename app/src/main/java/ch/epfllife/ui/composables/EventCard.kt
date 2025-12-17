@@ -44,8 +44,9 @@ private fun formatLocationForCard(locationName: String): String {
 @Composable
 fun EventCard(
     event: Event,
-    isEnrolled: Boolean,
     modifier: Modifier = Modifier,
+    isEnrolled: Boolean? = null,
+    attendeesCount: Int? = null,
     onClick: () -> Unit,
 ) {
   val shortLocation = remember(event.location.name) { formatLocationForCard(event.location.name) }
@@ -80,17 +81,11 @@ fun EventCard(
                       overflow = TextOverflow.Ellipsis,
                       modifier = Modifier.weight(1f))
                   Spacer(Modifier.width(8.dp))
-                  if (isEnrolled) {
-                    Box(
-                        modifier =
-                            Modifier.background(color = Enrolled, shape = RoundedCornerShape(6.dp))
-                                .padding(horizontal = 8.dp, vertical = 3.dp)) {
-                          Text(
-                              text = stringResource(R.string.home_enrolled_events),
-                              style = MaterialTheme.typography.labelSmall,
-                              color = Color.White)
-                        }
-                    Spacer(Modifier.width(8.dp))
+                  if (isEnrolled != null && isEnrolled) {
+                    StatusBox(stringResource(R.string.home_enrolled_events))
+                  }
+                  if (attendeesCount != null) {
+                    StatusBox("$attendeesCount")
                   }
 
                   Text(
@@ -202,4 +197,15 @@ fun CompactEventCard(
               }
             }
       }
+}
+
+@Composable
+private fun StatusBox(status: String) {
+  Box(
+      modifier =
+          Modifier.background(color = Enrolled, shape = RoundedCornerShape(6.dp))
+              .padding(horizontal = 8.dp, vertical = 3.dp)) {
+        Text(text = status, style = MaterialTheme.typography.labelSmall, color = Color.White)
+      }
+  Spacer(Modifier.width(8.dp))
 }

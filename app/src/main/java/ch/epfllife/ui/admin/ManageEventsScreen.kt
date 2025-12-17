@@ -81,7 +81,6 @@ fun ManageEventsScreen(
         is ManageEventsUIState.Success -> {
           val successState = uiState as ManageEventsUIState.Success
           val events = successState.events
-          val enrolledEventsIds = successState.enrolledEvents
           val isFutureFilterEnabled = successState.isFutureFilterEnabled
 
           Column(
@@ -126,11 +125,9 @@ fun ManageEventsScreen(
                       style = MaterialTheme.typography.bodyMedium,
                       modifier = Modifier.testTag(ManageEventsTestTags.EMPTY_TEXT))
                 } else {
-                  events.forEach { event: Event ->
+                  events.forEach { (event, count) ->
                     EventCard(
-                        event = event,
-                        isEnrolled = enrolledEventsIds.contains(event.id),
-                        onClick = { onEditEvent(event.id) })
+                        event = event, attendeesCount = count, onClick = { onEditEvent(event.id) })
                   }
                 }
               }
