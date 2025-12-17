@@ -183,6 +183,9 @@ fun AssociationAdminScreen(
           }
         }
 
-    BackButton(modifier = Modifier.align(Alignment.TopStart), onGoBack = onGoBack)
+    BackButton(
+        modifier =
+            Modifier.align(Alignment.TopStart).testTag(AssociationAdminScreenTestTags.BACK_BUTTON),
+        onGoBack = onGoBack)
   }
 }
