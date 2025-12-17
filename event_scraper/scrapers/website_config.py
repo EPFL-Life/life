@@ -61,7 +61,7 @@ class WebsiteConfig:
     base_domain: str
     selectors: SelectorConfig
     association: Association
-    coordinates: dict = DEFAULT_COORDINATES.copy()
+    coordinates: dict = field(default_factory=lambda: DEFAULT_COORDINATES.copy())
     default_location: str = DEFAULT_LOCATION_NAME
 
 
@@ -70,7 +70,7 @@ ESN_EPFL_CONFIG = WebsiteConfig(
     url="https://epfl.esn.ch/events",
     base_domain="https://epfl.esn.ch",
     default_location=DEFAULT_LOCATION_NAME,
-    coordinates={"latitude": DEFAULT_COORDINATES.copy()},
+    coordinates=DEFAULT_COORDINATES.copy(),
     
     selectors=SelectorConfig(
         event_container=[".views-row", ".node.node-event", ".view-content .views-row"],
