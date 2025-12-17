@@ -43,7 +43,7 @@ class SettingsScreenTest {
   fun contentIsDisplayed() {
     composeTestRule.setContent {
       SettingsScreen(
-          auth = auth, onSignedOut = {}, onAdminConsoleClick = {}, onNavigateToDisplayName = {})
+          auth = auth, onSignedOut = {}, onAdminConsoleClick = {}, onNavigateToManageProfile = {})
     }
     listOf(NavigationTestTags.SETTINGS_SCREEN, SettingsScreenTestTags.SIGN_OUT_BUTTON)
         .map(composeTestRule::assertTagIsDisplayed)
@@ -60,7 +60,7 @@ class SettingsScreenTest {
           onSignedOut = { clicked = true },
           toastHelper = fakeToastHelper,
           onAdminConsoleClick = {},
-          onNavigateToDisplayName = {})
+          onNavigateToManageProfile = {})
     }
     composeTestRule.onNodeWithTag(SettingsScreenTestTags.SIGN_OUT_BUTTON).performClick()
     composeTestRule.waitForIdle()
@@ -81,7 +81,7 @@ class SettingsScreenTest {
           viewModel = SettingsViewModel(auth, db),
           onSignedOut = {},
           onAdminConsoleClick = { clicked = true },
-          onNavigateToDisplayName = {})
+          onNavigateToManageProfile = {})
     }
 
     composeTestRule.onNodeWithTag(SettingsScreenTestTags.ADMIN_CONSOLE_BUTTON).performClick()
@@ -97,7 +97,7 @@ class SettingsScreenTest {
           viewModel = SettingsViewModel(auth, db),
           onSignedOut = {},
           onAdminConsoleClick = {},
-          onNavigateToDisplayName = {})
+          onNavigateToManageProfile = {})
     }
     composeTestRule.onNodeWithTag(SettingsScreenTestTags.ADMIN_CONSOLE_BUTTON).assertDoesNotExist()
   }
@@ -111,7 +111,7 @@ class SettingsScreenTest {
           viewModel = SettingsViewModel(auth, db),
           onSignedOut = {},
           onAdminConsoleClick = {},
-          onNavigateToDisplayName = {})
+          onNavigateToManageProfile = {})
     }
     composeTestRule.waitUntil(5000) {
       try {
@@ -132,7 +132,7 @@ class SettingsScreenTest {
           viewModel = SettingsViewModel(auth, db),
           onSignedOut = {},
           onAdminConsoleClick = {},
-          onNavigateToDisplayName = {})
+          onNavigateToManageProfile = {})
     }
     composeTestRule.waitUntil(5000) {
       try {
@@ -145,7 +145,7 @@ class SettingsScreenTest {
   }
 
   @Test
-  fun displayNameButtonInvokesCallback() {
+  fun manageProfileButtonInvokesCallback() {
     val db = fakeDbWithUserRole(UserRole.USER)
     var clicked = false
 
@@ -155,11 +155,10 @@ class SettingsScreenTest {
           viewModel = SettingsViewModel(auth, db),
           onSignedOut = {},
           onAdminConsoleClick = {},
-          onNavigateToDisplayName = { clicked = true })
+          onNavigateToManageProfile = { clicked = true })
     }
 
-    val displayNameLabel = composeTestRule.activity.getString(R.string.display_name)
-    composeTestRule.onNode(hasText(displayNameLabel) and hasClickAction()).performClick()
+    composeTestRule.onNode(hasText("Manage Profile") and hasClickAction()).performClick()
 
     Assert.assertTrue(clicked)
   }

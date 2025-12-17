@@ -50,7 +50,7 @@ fun SettingsScreen(
     onSignedOut: () -> Unit,
     toastHelper: ToastHelper = SystemToastHelper(),
     onAdminConsoleClick: () -> Unit,
-    onNavigateToDisplayName: () -> Unit
+    onNavigateToManageProfile: () -> Unit
 ) {
   val context = LocalContext.current
   val uiState by viewModel.uiState.collectAsState()
@@ -78,6 +78,9 @@ fun SettingsScreen(
 
         Spacer(Modifier.height(32.dp))
 
+        SettingsButton(text = "Manage Profile", onClick = { onNavigateToManageProfile() })
+        Spacer(Modifier.height(32.dp))
+
         if (uiState.userRole == UserRole.ADMIN || uiState.userRole == UserRole.ASSOCIATION_ADMIN) {
           SettingsButton(
               text = stringResource(R.string.admin_console),
@@ -87,9 +90,7 @@ fun SettingsScreen(
           Spacer(Modifier.height(32.dp))
         }
 
-        SettingsButton(
-            text = stringResource(R.string.display_name), onClick = { onNavigateToDisplayName() })
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.weight(1f))
 
         Button(
             modifier = Modifier.fillMaxWidth().testTag(SettingsScreenTestTags.SIGN_OUT_BUTTON),
@@ -104,5 +105,7 @@ fun SettingsScreen(
                         MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold))
               }
             }
+
+        Spacer(Modifier.height(24.dp))
       }
 }
