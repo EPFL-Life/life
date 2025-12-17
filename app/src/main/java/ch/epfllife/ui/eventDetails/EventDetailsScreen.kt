@@ -207,8 +207,7 @@ private fun EventHeader(
           title,
           style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
           modifier = Modifier.testTag(EventDetailsTestTags.EVENT_TITLE),
-          maxLines = 2,
-          overflow = TextOverflow.Ellipsis,
+          maxLines = Int.MAX_VALUE,
       )
       Text(
           associationName,
