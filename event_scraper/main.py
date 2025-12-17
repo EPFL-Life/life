@@ -41,9 +41,9 @@ def main():
                 scraper = WebScraper(website_config)
                 events = scraper.scrape()
                 all_events.extend(events)
-                logger.info(f"  {website_config['name']}: {len(events)} events")
+                logger.info(f"  {website_config.name}: {len(events)} events")
             except Exception as e:
-                logger.error(f"  Failed to scrape {website_config['name']}: {e}")
+                logger.error(f"  Failed to scrape {website_config.name}: {e}")
         
 
         
