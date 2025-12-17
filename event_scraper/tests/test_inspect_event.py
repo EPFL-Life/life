@@ -99,10 +99,9 @@ class TestInspectEvent:
         with patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
             # Load and execute the module
             spec, module = load_inspect_event_module()
-            try:
-                spec.loader.exec_module(module)
-            except SystemExit:
-                pass
+            
+            spec.loader.exec_module(module)
+            
             output = mock_stdout.getvalue()
         
         # Verifications
@@ -123,10 +122,9 @@ class TestInspectEvent:
         
         with patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
             spec, module = load_inspect_event_module()
-            try:
-                spec.loader.exec_module(module)
-            except SystemExit:
-                pass
+            
+            spec.loader.exec_module(module)
+            
             output = mock_stdout.getvalue()
         
         assert "Found 0 event containers" in output
@@ -141,10 +139,9 @@ class TestInspectEvent:
         
         with patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
             spec, module = load_inspect_event_module()
-            try:
-                spec.loader.exec_module(module)
-            except SystemExit:
-                pass
+            
+            spec.loader.exec_module(module)
+            
             output = mock_stdout.getvalue()
         
         # The real image should be mentioned
@@ -171,10 +168,9 @@ class TestInspectEvent:
         
         with patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
             spec, module = load_inspect_event_module()
-            try:
-                spec.loader.exec_module(module)
-            except SystemExit:
-                pass
+            
+            spec.loader.exec_module(module)
+            
             output = mock_stdout.getvalue()
         
         assert "Nested Event" in output
@@ -189,10 +185,9 @@ class TestInspectEvent:
         mock_get.return_value = mock_response
         
         spec, module = load_inspect_event_module()
-        try:
-            spec.loader.exec_module(module)
-        except SystemExit:
-            pass
+        
+        spec.loader.exec_module(module)
+        
         
         # Verify requests.get was called with correct headers
         mock_get.assert_called_once()
@@ -210,10 +205,9 @@ class TestInspectEvent:
         
         with patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
             spec, module = load_inspect_event_module()
-            try:
-                spec.loader.exec_module(module)
-            except SystemExit:
-                pass
+            
+            spec.loader.exec_module(module)
+            
             output = mock_stdout.getvalue()
         
         assert "Found 0 event containers" in output
@@ -237,10 +231,9 @@ class TestInspectEvent:
         
         with patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
             spec, module = load_inspect_event_module()
-            try:
-                spec.loader.exec_module(module)
-            except SystemExit:
-                pass
+            
+            spec.loader.exec_module(module)
+            
             output = mock_stdout.getvalue()
         
         assert "Found 1 event containers" in output
@@ -265,10 +258,9 @@ class TestInspectEvent:
         
         with patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
             spec, module = load_inspect_event_module()
-            try:
-                spec.loader.exec_module(module)
-            except SystemExit:
-                pass
+            
+            spec.loader.exec_module(module)
+            
             output = mock_stdout.getvalue()
         
         # Verify all main sections are present
@@ -311,10 +303,9 @@ class TestInspectEvent:
         
         with patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
             spec, module = load_inspect_event_module()
-            try:
-                spec.loader.exec_module(module)
-            except SystemExit:
-                pass
+            
+            spec.loader.exec_module(module)
+            
             output = mock_stdout.getvalue()
         
         assert "Event 1" in output
@@ -343,10 +334,9 @@ class TestInspectEvent:
         
         with patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
             spec, module = load_inspect_event_module()
-            try:
-                spec.loader.exec_module(module)
-            except SystemExit:
-                pass
+            
+            spec.loader.exec_module(module)
+            
             output = mock_stdout.getvalue()
         
         # Should find dates or search for them
