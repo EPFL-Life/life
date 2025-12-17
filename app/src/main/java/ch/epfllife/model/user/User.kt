@@ -8,7 +8,9 @@ data class User(
     val enrolledEvents: List<String> = emptyList(),
     val userSettings: UserSettings = UserSettings(),
     val role: UserRole = UserRole.USER,
-    val managedAssociationIds: List<String> = emptyList() // List of Assoc that this user can manage
+    val managedAssociationIds: List<String> =
+        emptyList(), // List of Assoc that this user can manage
+    val photoUrl: String? = null
 )
 
 enum class UserRole {
