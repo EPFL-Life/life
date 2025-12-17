@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Complete end-to-end test of the scraper with Firebase"""
 
+from asyncio import events
 import sys
 import os
 import logging
@@ -15,6 +16,7 @@ logging.basicConfig(
 
 from scrapers.web_scraper import WebScraper
 from scrapers.website_config import ESN_EPFL_CONFIG
+from scrapers.website_config import AGEPOLY_CONFIG
 from firestore.database import FirebaseDatabase
 
 def test_complete():
@@ -24,9 +26,23 @@ def test_complete():
     try:
         # 1. Test WebScraper
         print("1. Testing WebScraper...")
-        scraper = WebScraper(ESN_EPFL_CONFIG)
+        from scrapers.website_config import AGEPOLY_CONFIG
+        scraper = WebScraper({
+            "name": AGEPOLY_CONFIG.name,
+            "url": AGEPOLY_CONFIG.url,
+            "base_domain": AGEPOLY_CONFIG.base_domain,
+            "selectors": AGEPOLY_CONFIG.selectors.to_dict(),
+            "association": AGEPOLY_CONFIG.association,
+            "coordinates": AGEPOLY_CONFIG.coordinates,
+            "default_location": AGEPOLY_CONFIG.default_location
+        })
         events = scraper.scrape()
-        
+
+        """ # Whenever you want to modify an event for testing
+        if events:
+            events[0].id = "test_" + events[0].id  # Prefix the first event ID for testing
+        """
+
         if not events:
             print("  No events found")
             return 1
