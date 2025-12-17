@@ -1,5 +1,6 @@
 package ch.epfllife.model.event
 
+import android.net.Uri
 import kotlinx.coroutines.CoroutineScope
 
 /** Represents a repository that manages Event items. */
@@ -53,4 +54,13 @@ interface EventRepository {
   suspend fun deleteEvent(eventId: String): Result<Unit>
 
   fun listenAll(scope: CoroutineScope, onChange: suspend (List<Event>) -> Unit)
+
+  /**
+   * Uploads an image for the event to the storage.
+   *
+   * @param eventId The unique ID of the event.
+   * @param imageUri The URI of the image to upload.
+   * @return A Result object containing the download URL of the uploaded image.
+   */
+  suspend fun uploadEventImage(eventId: String, imageUri: Uri): Result<String>
 }

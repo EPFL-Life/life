@@ -1,5 +1,6 @@
 package ch.epfllife.model.event
 
+import android.net.Uri
 import android.util.Log
 import ch.epfllife.model.association.Association
 import ch.epfllife.model.association.AssociationRepositoryFirestore
@@ -10,12 +11,17 @@ import ch.epfllife.model.user.Price
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageMetadata
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.tasks.await
 
-class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventRepository {
+class EventRepositoryFirestore(
+    private val db: FirebaseFirestore,
+    private val storage: FirebaseStorage
+) : EventRepository {
 
   override fun getNewUid(): String {
     return db.collection(FirestoreCollections.EVENTS).document().id
@@ -94,6 +100,20 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
           ::documentToEvent,
           onChange,
       )
+
+  override suspend fun uploadEventImage(eventId: String, imageUri: Uri): Result<String> {
+    return try {
+      val storageRef = storage.reference
+      val imageRef = storageRef.child("events/$eventId/image.jpg")
+      val metadata = StorageMetadata.Builder().setContentType("image/jpeg").build()
+      imageRef.putFile(imageUri, metadata).await()
+      val downloadUrl = imageRef.downloadUrl.await()
+      Result.success(downloadUrl.toString())
+    } catch (e: Exception) {
+      Log.e("EventRepoFirestore", "Error uploading event image", e)
+      Result.failure(e)
+    }
+  }
 
   companion object {
     /**

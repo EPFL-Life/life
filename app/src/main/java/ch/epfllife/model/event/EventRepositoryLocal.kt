@@ -1,5 +1,6 @@
 package ch.epfllife.model.event
 
+import android.net.Uri
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -78,5 +79,10 @@ class EventRepositoryLocal : EventRepository {
   fun seedEvents(newEvents: List<Event>) {
     events.clear()
     events.addAll(newEvents)
+  }
+
+  override suspend fun uploadEventImage(eventId: String, imageUri: Uri): Result<String> {
+    // stub logic
+    return Result.success("https://example.com/mock_event_image.jpg")
   }
 }

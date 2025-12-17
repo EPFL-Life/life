@@ -1,5 +1,6 @@
 package ch.epfllife.ui.eventDetails
 
+import android.net.Uri
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.core.app.ApplicationProvider
@@ -107,6 +108,10 @@ class EventDetailsTest {
 
           override fun listenAll(scope: CoroutineScope, onChange: suspend (List<Event>) -> Unit) =
               throw UnsupportedOperationException("Listening not supported in fake repo")
+
+          override suspend fun uploadEventImage(eventId: String, imageUri: Uri): Result<String> {
+            return Result.success("https://example.com/mock_image.jpg")
+          }
         }
 
     val viewModel = EventDetailsViewModel(Db.freshLocal().copy(eventRepo = fakeRepoThrowsException))

@@ -4,6 +4,9 @@ import android.Manifest
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -44,6 +47,7 @@ import ch.epfllife.model.db.Db
 import ch.epfllife.model.map.Location
 import ch.epfllife.model.map.NominatimLocationRepository
 import ch.epfllife.ui.composables.BackButton
+import ch.epfllife.ui.composables.ImageUploadField
 import ch.epfllife.ui.composables.Map
 import ch.epfllife.ui.composables.SubmitButton
 import java.time.LocalDate
@@ -59,6 +63,7 @@ object AddEditEventTestTags {
   const val TIME_PICKER_BOX = "AddEditEvent_TimePickerBox"
   const val LOCATION_FIELD = "AddEditEvent_LocationField"
   const val SUBMIT_BUTTON = "AddEditEvent_SubmitButton"
+  const val IMAGE_UPLOAD_BUTTON = "AddEditEvent_ImageUploadButton"
 }
 
 @Composable
@@ -141,7 +146,7 @@ private fun AddEditEventContent(
     val initial = parseCurrentDateTime()
     TimePickerDialog(
             context,
-            { _, hourOfDay, minute ->
+            { _, hourOfDay: Int, minute: Int ->
               val combinedDateTime = LocalDateTime.of(selectedDate, LocalTime.of(hourOfDay, minute))
               viewModel.updateTime(combinedDateTime.format(dateTimeFormatter))
             },
@@ -155,7 +160,7 @@ private fun AddEditEventContent(
     val initial = parseCurrentDateTime()
     DatePickerDialog(
             context,
-            { _, year, month, dayOfMonth ->
+            { _, year: Int, month: Int, dayOfMonth: Int ->
               val selectedDate = LocalDate.of(year, month + 1, dayOfMonth)
               showTimePicker(selectedDate)
             },
@@ -230,11 +235,20 @@ private fun AddEditEventContent(
             label = { Text(stringResource(R.string.event_tags)) },
             modifier = Modifier.fillMaxWidth())
 
-        OutlinedTextField(
-            value = formState.pictureUrl,
-            onValueChange = { viewModel.updatePictureUrl(it) },
-            label = { Text(stringResource(R.string.event_picture_url)) },
-            modifier = Modifier.fillMaxWidth())
+        val imagePickerLauncher =
+            rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.PickVisualMedia(),
+                onResult = { uri -> if (uri != null) viewModel.onImageSelected(uri) })
+
+        ImageUploadField(
+            label = stringResource(R.string.event_picture_url),
+            imageUrl = formState.pictureUrl,
+            isUploading = formState.isUploadingImage,
+            onUploadClick = {
+              imagePickerLauncher.launch(
+                  PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+            },
+            modifier = Modifier.fillMaxWidth().testTag(AddEditEventTestTags.IMAGE_UPLOAD_BUTTON))
 
         // --- Location Section ---
         Text(
