@@ -141,4 +141,36 @@ class ManageProfileScreenTest {
       Thread.sleep(50)
     }
   }
+
+  @Test
+  fun profilePicture_isDisplayedAndClickable() {
+    val db = Db.freshLocal()
+    val userRepo = db.userRepo as UserRepositoryLocal
+    val user = ExampleUsers.user1
+
+    runBlocking {
+      userRepo.createUser(user)
+      userRepo.simulateLogin(user.id)
+    }
+
+    composeTestRule.setContent {
+      Theme { ManageProfileScreen(db = db, onBack = {}, onSubmitSuccess = {}) }
+    }
+
+    val placeholderDesc = "Placeholder" // Icon content description
+    val profilePicDesc = "Profile Picture" // If photoUrl is present
+
+    composeTestRule.waitUntil(5_000) {
+      try {
+        composeTestRule.onNodeWithContentDescription(placeholderDesc).assertIsDisplayed()
+        true
+      } catch (_: AssertionError) {
+        false
+      }
+    }
+
+    // This click should trigger the photo launcher -> we can't easily verify the launcher
+    // we assume success if no crash and element was found.
+    composeTestRule.onNodeWithContentDescription(placeholderDesc).performClick()
+  }
 }

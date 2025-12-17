@@ -1,7 +1,9 @@
 package ch.epfllife.ui.settings
 
+import android.net.Uri
 import ch.epfllife.R
 import ch.epfllife.example_data.ExampleUsers
+import ch.epfllife.model.association.AssociationRepository
 import ch.epfllife.model.db.Db
 import ch.epfllife.model.event.EventRepository
 import ch.epfllife.model.user.UserRepository
@@ -31,7 +33,7 @@ class ManageProfileViewModelTest {
 
   @Mock lateinit var mockUserRepo: UserRepository
   @Mock lateinit var mockEventRepo: EventRepository
-  @Mock lateinit var mockAssocRepo: ch.epfllife.model.association.AssociationRepository
+  @Mock lateinit var mockAssocRepo: AssociationRepository
 
   private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -101,5 +103,67 @@ class ManageProfileViewModelTest {
 
     verify(mockUserRepo, never()).updateUser(any(), any())
     assertFalse(onSuccessCalled)
+  }
+
+  @Test
+  fun onPhotoSelected_updatesState_andSubmitUploadsPhoto() = runTest {
+    val user = ExampleUsers.user1
+    whenever(mockUserRepo.getCurrentUser()).thenReturn(user)
+    val uri = Uri.parse("content://test/image.jpg")
+    val downloadUrl = "https://firebase.storage/profile.jpg"
+    whenever(mockUserRepo.uploadUserImage(any(), any())).thenReturn(Result.success(downloadUrl))
+    whenever(mockUserRepo.updateUser(any(), any())).thenReturn(Result.success(Unit))
+
+    val db = Db(mockUserRepo, mockEventRepo, mockAssocRepo)
+    val viewModel = ManageProfileViewModel(db)
+    advanceUntilIdle()
+
+    // Simulate photo selection
+    viewModel.onPhotoSelected(uri)
+    assertEquals(downloadUrl, viewModel.photoUrl)
+
+    // Submit
+    var onSuccessCalled = false
+    viewModel.submit { onSuccessCalled = true }
+    advanceUntilIdle()
+
+    // Verify upload
+    verify(mockUserRepo).uploadUserImage(user.id, uri)
+
+    // Verify user update with new photo URL
+    val userCaptor = argumentCaptor<ch.epfllife.model.user.User>()
+    verify(mockUserRepo).updateUser(any(), userCaptor.capture())
+    assertEquals(downloadUrl, userCaptor.firstValue.photoUrl)
+
+    assertTrue(onSuccessCalled)
+  }
+
+  @Test
+  fun onPhotoSelected_updatesState_andSubmitHandlesUploadError() = runTest {
+    val user = ExampleUsers.user1
+    whenever(mockUserRepo.getCurrentUser()).thenReturn(user)
+    val uri = Uri.parse("content://test/image.jpg")
+    val exception = Exception("Upload failed")
+    whenever(mockUserRepo.uploadUserImage(any(), any())).thenReturn(Result.failure(exception))
+
+    val db = Db(mockUserRepo, mockEventRepo, mockAssocRepo)
+    val viewModel = ManageProfileViewModel(db)
+    advanceUntilIdle()
+
+    viewModel.onPhotoSelected(uri)
+
+    var onSuccessCalled = false
+    viewModel.submit { onSuccessCalled = true }
+    advanceUntilIdle()
+
+    verify(mockUserRepo).uploadUserImage(user.id, uri)
+
+    val state = viewModel.uiState.value
+    assertTrue(state is ManageProfileUiState.Error)
+    // The submit action proceeds even if photo (background async) upload failed,
+    // updating the name but keeping the old photo.
+    // Since the repo update defaults to success in this mock setup (unstubbed or default), success
+    // is called.
+    assertTrue(onSuccessCalled)
   }
 }
