@@ -217,4 +217,9 @@ class UserRepositoryLocal(
     // reused updateUser() method
     return updateUser(currentUser.id, updatedUser)
   }
+
+  override suspend fun uploadUserImage(userId: String, imageUri: android.net.Uri): Result<String> {
+    // Stub
+    return Result.success(imageUri.toString())
+  }
 }
