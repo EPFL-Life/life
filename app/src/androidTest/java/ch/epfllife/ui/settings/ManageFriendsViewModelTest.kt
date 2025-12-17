@@ -40,7 +40,7 @@ class ManageFriendsViewModelTest {
   }
 
   @Test
-  fun loadUsers_success_filtersCurrentUserAndAdmins() = runTest {
+  fun loadUsers_success_showsAdminsButFiltersSelf() = runTest {
     // Arrange
     val currentUser = ExampleUsers.user1.copy(role = UserRole.USER)
     val otherUser = ExampleUsers.user2.copy(role = UserRole.USER)
@@ -57,8 +57,10 @@ class ManageFriendsViewModelTest {
     val state = viewModel.uiState.value
     assertTrue(state is ManageFriendsUiState.Success)
     val successState = state as ManageFriendsUiState.Success
-    assertEquals(1, successState.users.size)
-    assertEquals(otherUser, successState.users.first())
+    assertEquals(2, successState.users.size)
+    assertTrue(successState.users.contains(otherUser))
+    assertTrue(successState.users.contains(adminUser))
+    assertTrue(!successState.users.contains(currentUser))
   }
 
   @Test
