@@ -12,6 +12,7 @@ import ch.epfllife.model.user.UserRepositoryFirestore
 import ch.epfllife.model.user.UserSettings
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -41,7 +42,8 @@ data class AuthUIState(
 class SignInViewModel(
     private val auth: Auth,
     // Add UserRepository, providing a default instance just like in your other ViewModels
-    private val userRepo: UserRepository = UserRepositoryFirestore(FirebaseFirestore.getInstance())
+    private val userRepo: UserRepository =
+        UserRepositoryFirestore(FirebaseFirestore.getInstance(), FirebaseStorage.getInstance())
 ) : ViewModel() {
 
   private val mutUiState = MutableStateFlow(AuthUIState())
