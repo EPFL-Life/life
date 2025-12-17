@@ -269,15 +269,19 @@ class AdminEndToEndTest {
     composeTestRule
         .onNodeWithTag(AddEditEventTestTags.DESCRIPTION_FIELD)
         .performTextInput("Event Description")
+    composeTestRule.waitForIdle()
     Espresso.closeSoftKeyboard()
     composeTestRule.onNodeWithTag(AddEditEventTestTags.TIME_PICKER_BOX).performClick()
     // Interact with DatePicker (Click OK to accept default/current date)
     onView(withText("OK")).perform(click())
     // Interact with TimePicker (Click OK to accept default/current time)
     onView(withText("OK")).perform(click())
+    composeTestRule.waitForIdle()
+    Thread.sleep(1000)
     composeTestRule.onNodeWithTag(AddEditEventTestTags.SUBMIT_BUTTON).performScrollTo()
     composeTestRule.onNodeWithTag(AddEditEventTestTags.SUBMIT_BUTTON).performClick()
     composeTestRule.waitForIdle()
+    Thread.sleep(1000)
 
     // Verify event created on manage events screen
     composeTestRule.waitUntil { composeTestRule.onNodeWithText(eventTitle).isDisplayed() }
