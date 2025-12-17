@@ -220,4 +220,31 @@ class AddEditEventViewModelTest {
         assertEquals(R.string.event_location_lookup_failed, state.locationErrorRes)
         assertFalse(state.isLocationSearching)
       }
+
+  @Test
+  fun onImageSelected_uploadsImageAndUpdatesState() =
+      runTest(mainDispatcherRule.testDispatcher) {
+        // Arrange
+        val mockDb = mockk<Db>(relaxed = true)
+        val mockEventRepo = mockk<ch.epfllife.model.event.EventRepository>(relaxed = true)
+        coEvery { mockDb.eventRepo } returns mockEventRepo
+
+        val downloadUrl = "https://example.com/image.jpg"
+        coEvery { mockEventRepo.uploadEventImage(any(), any()) } returns Result.success(downloadUrl)
+        coEvery { mockEventRepo.getNewUid() } returns "new-event-id"
+
+        val viewModel =
+            AddEditEventViewModel(mockDb, associationId, locationRepository = locationRepository)
+        val uri = mockk<android.net.Uri>()
+
+        // Act
+        viewModel.onImageSelected(uri)
+        advanceTimeBy(1000)
+
+        // Assert
+        val state = viewModel.formState.value
+        assertEquals(downloadUrl, state.pictureUrl)
+        assertFalse(state.isUploadingImage)
+        coVerify { mockEventRepo.uploadEventImage(any(), uri) }
+      }
 }

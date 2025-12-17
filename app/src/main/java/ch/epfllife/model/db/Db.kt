@@ -23,7 +23,7 @@ data class Db(
     val firestore: Db by lazy {
       Db(
           userRepo = UserRepositoryFirestore(Firebase.firestore),
-          eventRepo = EventRepositoryFirestore(Firebase.firestore),
+          eventRepo = EventRepositoryFirestore(Firebase.firestore, FirebaseStorage.getInstance()),
           assocRepo =
               AssociationRepositoryFirestore(Firebase.firestore, FirebaseStorage.getInstance()),
       )
@@ -46,7 +46,7 @@ data class Db(
     fun forTest(storage: FirebaseStorage): Db {
       return Db(
           userRepo = UserRepositoryFirestore(Firebase.firestore),
-          eventRepo = EventRepositoryFirestore(Firebase.firestore),
+          eventRepo = EventRepositoryFirestore(Firebase.firestore, storage),
           assocRepo = AssociationRepositoryFirestore(Firebase.firestore, storage),
       )
     }

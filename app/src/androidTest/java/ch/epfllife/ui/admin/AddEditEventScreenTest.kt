@@ -1,6 +1,7 @@
 package ch.epfllife.ui.admin
 
 import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.hasText
@@ -116,5 +117,17 @@ class AddEditEventScreenTest {
     composeTestRule
         .onNodeWithTag(AddEditEventTestTags.TIME_FIELD)
         .assert(hasText(":", substring = true))
+  }
+
+  @Test
+  fun imageUploadButton_isDisplayed() {
+    val association = ExampleAssociations.association1
+    val db = Db.freshLocal()
+    runBlocking { db.assocRepo.createAssociation(association) }
+
+    setContent(db = db, associationId = association.id)
+    composeTestRule.waitForIdle()
+
+    composeTestRule.onNodeWithTag(AddEditEventTestTags.IMAGE_UPLOAD_BUTTON).assertIsDisplayed()
   }
 }

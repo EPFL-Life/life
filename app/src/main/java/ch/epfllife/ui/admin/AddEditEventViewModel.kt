@@ -29,7 +29,8 @@ data class AddEditEventFormState(
     val time: String = "",
     val priceText: String = "",
     val pictureUrl: String = "",
-    val tagsText: String = ""
+    val tagsText: String = "",
+    val isUploadingImage: Boolean = false
 )
 
 sealed interface AddEditEventUIState {
@@ -147,6 +148,29 @@ class AddEditEventViewModel(
     performLocationSearch(_formState.value.locationName.trim(), autoTriggered = false)
   }
 
+  fun onImageSelected(uri: android.net.Uri) {
+    viewModelScope.launch {
+      update { copy(isUploadingImage = true) }
+      try {
+        val idToUse = loadedEvent?.id ?: eventId ?: stableId
+
+        Log.d("AddEditEventVM", "Uploading image for event $idToUse")
+        db.eventRepo
+            .uploadEventImage(idToUse, uri)
+            .onSuccess { url -> update { copy(pictureUrl = url, isUploadingImage = false) } }
+            .onFailure { e ->
+              Log.e("AddEditEventVM", "Failed to upload image", e)
+              update { copy(isUploadingImage = false) }
+            }
+      } catch (_: Exception) {
+        update { copy(isUploadingImage = false) }
+      }
+    }
+  }
+
+  // Lazy property for new event ID
+  private val stableId: String by lazy { db.eventRepo.getNewUid() }
+
   private fun performLocationSearch(query: String, autoTriggered: Boolean) {
     locationSearchJob?.cancel()
     if (query.length < LOCATION_QUERY_MIN_CHARS) {
@@ -237,6 +261,8 @@ class AddEditEventViewModel(
 
       val tags = s.tagsText.split(",").map { it.trim() }.filter { it.isNotEmpty() }
 
+      val eventIdToUse = loadedEvent?.id ?: eventId ?: stableId
+
       val event =
           (loadedEvent?.copy(
               title = s.title,
@@ -247,7 +273,7 @@ class AddEditEventViewModel(
               pictureUrl = s.pictureUrl.ifBlank { null },
               tags = tags)
               ?: Event(
-                  id = "local-${System.currentTimeMillis()}",
+                  id = eventIdToUse,
                   title = s.title,
                   description = s.description,
                   location = location,

@@ -14,7 +14,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,7 +22,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ch.epfllife.R
 import ch.epfllife.model.event.Event
@@ -34,13 +32,6 @@ object EventCardTestTags {
   fun getEventCardTestTag(eventId: String) = "eventCard_$eventId"
 }
 
-private fun formatLocationForCard(locationName: String): String {
-  // Cards should stay compact: show only a short location label (before the first comma).
-  val normalized = locationName.lines().joinToString(" ") { it.trim() }.trim()
-  val short = normalized.substringBefore(",").trim()
-  return short.ifBlank { normalized }
-}
-
 @Composable
 fun EventCard(
     event: Event,
@@ -48,7 +39,6 @@ fun EventCard(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-  val shortLocation = remember(event.location.name) { formatLocationForCard(event.location.name) }
 
   Card(
       onClick = onClick,
@@ -117,7 +107,7 @@ fun EventCard(
                 verticalAlignment = Alignment.CenterVertically) {
                   InfoItem(
                       icon = Icons.Outlined.CalendarMonth,
-                      text = shortLocation,
+                      text = event.location.name,
                       modifier = Modifier.weight(1f, fill = false))
                   Spacer(Modifier.width(16.dp))
                   InfoItem(icon = Icons.Outlined.AccessTime, text = event.time)
@@ -142,9 +132,7 @@ private fun InfoItem(
     Text(
         text = text,
         style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis)
+        color = MaterialTheme.colorScheme.onSurfaceVariant)
   }
 }
 

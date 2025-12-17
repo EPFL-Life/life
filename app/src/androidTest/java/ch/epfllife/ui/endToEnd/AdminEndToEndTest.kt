@@ -241,7 +241,7 @@ class AdminEndToEndTest {
     composeTestRule.onNodeWithText(newTitle).assertIsDisplayed()
   }
 
-  @Ignore
+  @Ignore("Currently broken")
   @Test
   fun createEventAsAssocAdmin() {
     val assoc = ExampleAssociations.association2
