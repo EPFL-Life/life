@@ -27,7 +27,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class EditDisplayNameViewModelTest {
+class ManageProfileViewModelTest {
 
   @Mock lateinit var mockUserRepo: UserRepository
   @Mock lateinit var mockEventRepo: EventRepository
@@ -55,10 +55,10 @@ class EditDisplayNameViewModelTest {
 
         val db = Db(mockUserRepo, mockEventRepo, mockAssocRepo)
 
-        val viewModel = EditDisplayNameViewModel(db)
+        val viewModel = ManageProfileViewModel(db)
         advanceUntilIdle()
 
-        assertEquals(EditDisplayNameUiState.Success, viewModel.uiState.value)
+        assertEquals(ManageProfileUiState.Success, viewModel.uiState.value)
         assertEquals(user.name, viewModel.displayName)
         assertTrue(viewModel.isFormValid())
 
@@ -85,12 +85,12 @@ class EditDisplayNameViewModelTest {
     whenever(mockUserRepo.getCurrentUser()).thenReturn(null)
 
     val db = Db(mockUserRepo, mockEventRepo, mockAssocRepo)
-    val viewModel = EditDisplayNameViewModel(db)
+    val viewModel = ManageProfileViewModel(db)
     advanceUntilIdle()
 
     val state = viewModel.uiState.value
-    assertTrue(state is EditDisplayNameUiState.Error)
-    assertEquals(R.string.error_loading_user, (state as EditDisplayNameUiState.Error).messageRes)
+    assertTrue(state is ManageProfileUiState.Error)
+    assertEquals(R.string.error_loading_user, (state as ManageProfileUiState.Error).messageRes)
 
     assertEquals("", viewModel.displayName)
     assertFalse(viewModel.isFormValid())

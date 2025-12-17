@@ -14,7 +14,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
-class EditDisplayNameScreenTest {
+class ManageProfileScreenTest {
 
   @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
@@ -31,12 +31,10 @@ class EditDisplayNameScreenTest {
 
     var submitCalled = false
     composeTestRule.setContent {
-      Theme {
-        EditDisplayNameScreen(db = db, onBack = {}, onSubmitSuccess = { submitCalled = true })
-      }
+      Theme { ManageProfileScreen(db = db, onBack = {}, onSubmitSuccess = { submitCalled = true }) }
     }
 
-    val title = composeTestRule.activity.getString(R.string.edit_display_name)
+    val title = "Manage Profile" // Hardcoded in screen
     val submitLabel = composeTestRule.activity.getString(R.string.submit)
 
     composeTestRule.waitUntil(5_000) {
@@ -55,6 +53,7 @@ class EditDisplayNameScreenTest {
     composeTestRule.onNodeWithText(submitLabel).assertIsEnabled()
 
     composeTestRule.onNode(hasSetTextAction()).performTextClearance()
+    // Depending on logic, empty might disable submit or validaiton
     composeTestRule.onNodeWithText(submitLabel).assertIsNotEnabled()
 
     val newNameRaw = "  ${ExampleUsers.user2.name}  "
@@ -86,7 +85,7 @@ class EditDisplayNameScreenTest {
       userRepo.simulateLogin(user.id)
     }
 
-    val viewModel = EditDisplayNameViewModel(db)
+    val viewModel = ManageProfileViewModel(db)
     viewModel.awaitUiStateSuccess()
 
     runBlocking { userRepo.deleteUser(user.id) }
@@ -94,7 +93,7 @@ class EditDisplayNameScreenTest {
     var backCalled = false
     composeTestRule.setContent {
       Theme {
-        EditDisplayNameScreen(
+        ManageProfileScreen(
             db = db, viewModel = viewModel, onBack = { backCalled = true }, onSubmitSuccess = {})
       }
     }
@@ -133,11 +132,11 @@ class EditDisplayNameScreenTest {
     }
   }
 
-  private fun EditDisplayNameViewModel.awaitUiStateSuccess(timeoutMillis: Long = 5_000) {
+  private fun ManageProfileViewModel.awaitUiStateSuccess(timeoutMillis: Long = 5_000) {
     val timeoutAt = System.currentTimeMillis() + timeoutMillis
-    while (uiState.value != EditDisplayNameUiState.Success) {
+    while (uiState.value != ManageProfileUiState.Success) {
       if (System.currentTimeMillis() >= timeoutAt) {
-        error("EditDisplayNameScreen did not load within ${timeoutMillis}ms")
+        error("ManageProfileScreen did not load within ${timeoutMillis}ms")
       }
       Thread.sleep(50)
     }
