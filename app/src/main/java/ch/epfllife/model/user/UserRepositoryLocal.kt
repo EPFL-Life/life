@@ -222,4 +222,23 @@ class UserRepositoryLocal(
     // Stub
     return Result.success(imageUri.toString())
   }
+
+  override suspend fun followUser(userId: String): Result<Unit> {
+    val currentUser = getCurrentUser() ?: return Result.failure(Exception("Not logged in"))
+    if (currentUser.id == userId) return Result.failure(Exception("Cannot follow self"))
+
+    // very simple behaviour here
+    val newFollowing = (currentUser.following + userId).distinct()
+    val updatedUser = currentUser.copy(following = newFollowing)
+    return updateUser(currentUser.id, updatedUser)
+  }
+
+  override suspend fun unfollowUser(userId: String): Result<Unit> {
+    val currentUser = getCurrentUser() ?: return Result.failure(Exception("Not logged in"))
+
+    // very simple behaviour here
+    val newFollowing = currentUser.following - userId
+    val updatedUser = currentUser.copy(following = newFollowing)
+    return updateUser(currentUser.id, updatedUser)
+  }
 }

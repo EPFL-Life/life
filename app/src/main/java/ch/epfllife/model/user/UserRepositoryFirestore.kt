@@ -7,6 +7,7 @@ import ch.epfllife.model.firestore.FirestoreCollections
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageMetadata
@@ -161,7 +162,9 @@ class UserRepositoryFirestore(
             managedAssociationIds =
                 (document["managedAssociationIds"] as? List<*>)?.mapNotNull { it as? String }
                     ?: emptyList(),
-            photoUrl = document.getString("photoUrl"))
+            photoUrl = document.getString("photoUrl"),
+            following =
+                (document["following"] as? List<*>)?.mapNotNull { it as? String } ?: emptyList())
       } catch (e: NullPointerException) {
         // this can happen when one of the required fields is not present
         Log.e("UserRepository", "Error converting document to User", e)
@@ -312,6 +315,37 @@ class UserRepositoryFirestore(
       Result.success(downloadUrl.toString())
     } catch (e: Exception) {
       Log.e("UserRepository", "Error uploading user image", e)
+      Result.failure(e)
+    }
+  }
+
+  override suspend fun followUser(userId: String): Result<Unit> {
+    val currentUser = getCurrentUser() ?: return Result.failure(Exception("Not logged in"))
+    if (currentUser.id == userId) return Result.failure(Exception("Cannot follow self"))
+
+    return try {
+      db.collection(FirestoreCollections.USERS)
+          .document(currentUser.id)
+          .update("following", FieldValue.arrayUnion(userId))
+          .await()
+      Result.success(Unit)
+    } catch (e: Exception) {
+      Log.e("UserRepository", "Error following user", e)
+      Result.failure(e)
+    }
+  }
+
+  override suspend fun unfollowUser(userId: String): Result<Unit> {
+    val currentUser = getCurrentUser() ?: return Result.failure(Exception("Not logged in"))
+
+    return try {
+      db.collection(FirestoreCollections.USERS)
+          .document(currentUser.id)
+          .update("following", FieldValue.arrayRemove(userId))
+          .await()
+      Result.success(Unit)
+    } catch (e: Exception) {
+      Log.e("UserRepository", "Error unfollowing user", e)
       Result.failure(e)
     }
   }

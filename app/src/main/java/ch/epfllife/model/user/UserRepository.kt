@@ -97,4 +97,8 @@ interface UserRepository {
   suspend fun getUsersEnrolledInEvent(eventId: String): List<User>
 
   suspend fun uploadUserImage(userId: String, imageUri: android.net.Uri): Result<String>
+
+  suspend fun followUser(userId: String): Result<Unit>
+
+  suspend fun unfollowUser(userId: String): Result<Unit>
 }
