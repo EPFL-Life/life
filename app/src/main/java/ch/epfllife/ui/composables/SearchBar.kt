@@ -29,8 +29,7 @@ fun SearchBar(
     modifier: Modifier = Modifier,
     query: String = "",
     onQueryChange: (String) -> Unit = {},
-    searchColorBar: Color = Gray,
-    onFilterClick: () -> Unit = {}
+    searchColorBar: Color = Gray
 ) {
   Surface(
       color = searchColorBar,
