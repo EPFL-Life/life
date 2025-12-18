@@ -1,0 +1,175 @@
+<resources>
+    <string name="app_name">EPFL Life</string>
+    <string name="default_web_client_id">85738580828-ovg7unu9rcn0cckulm8immn9dkv1eu77.apps.googleusercontent.com</string>
+
+    <!-- SignIn Screen -->
+    <string name="signin_welcome">Willkommen</string>
+    <string name="signin_epfllife_logo_alt_text">EPFLLife-Logo</string>
+    <string name="signin_google_logo_alt_text">Google-Logo</string>
+    <string name="signin_success_message">Anmeldung erfolgreich</string>
+    <string name="signin_failure_message">Anmeldung fehlgeschlagen</string>
+    <string name="signin_cancelled_message">Anmeldung vom Benutzer abgebrochen</string>
+    <string name="signin_with_google">Mit Google anmelden</string>
+
+    <!-- Home screen -->
+    <string name="home_empty_title">Hier gibt es nichts!</string>
+    <string name="home_empty_description">
+        Abonniere Vereine, um deinen Feed zu füllen.
+        Beginne, indem du unten in der Navigationsleiste auf das Symbol „Vereine“ klickst.
+    </string>
+    <string name="home_no_events_title">Keine Veranstaltungen verfügbar</string>
+    <string name="home_no_events_description">Derzeit sind keine Veranstaltungen veröffentlicht. Schau bald wieder vorbei!</string>
+    <string name="home_enrolled_events">Angemeldet</string>
+    <string name="home_enroll_events">Anmelden</string>
+
+    <!-- Association Browser screen -->
+    <string name="associations_empty_title">Noch keine abonnierten Vereine!</string>
+    <string name="associations_empty_description">Drücke oben auf die Schaltfläche „Alle Vereine“, um alle Vereine zu durchsuchen und die zu abonnieren, die dir gefallen</string>
+    <string name="associations_no_all_title">Keine Vereine verfügbar</string>
+    <string name="associations_no_all_description">Derzeit sind keine Vereine verfügbar. Bitte versuche es später erneut.</string>
+
+    <!-- Association and Home screen filter -->
+    <string name="subscribed_filter">Für dich</string>
+    <string name="all_events_filter">Alle Veranstaltungen</string>
+    <string name="all_associations_filter">Alle Vereine</string>
+
+    <!-- Association Details Screen -->
+    <string name="association_image_description">Vereinsbild</string>
+    <string name="back_button_description">Zurück</string>
+    <string name="subscribe_to">%1$s abonnieren</string>
+    <string name="unsubscribe_from">%1$s abbestellen</string>
+    <string name="about_section_title">Über</string>
+    <string name="social_pages_title">Soziale Netzwerke</string>
+    <string name="instagram_description">Instagram</string>
+    <string name="telegram_description">Telegram</string>
+    <string name="whatsapp_description">WhatsApp</string>
+    <string name="linkedin_description">LinkedIn</string>
+    <string name="website_description">Webseite</string>
+    <string name="about_placeholder">Keine Beschreibung verfügbar.</string>
+    <string name="upcoming_events_title">Kommende Veranstaltungen</string>
+
+    <!-- Attendee List Screen -->
+    <string name="attendees">Teilnehmende</string>
+
+    <!-- Settings screen-->
+    <string name="signout_successful">Abmeldung erfolgreich</string>
+    <string name="settings_title">Einstellungen</string>
+    <string name="sign_out">Abmelden</string>
+    <string name="manage_friends_title">Freunde verwalten</string>
+    <string name="manage_profile_title">Profil verwalten</string>
+
+    <!-- Edit display name-->
+    <string name="display_name">Anzeigename</string>
+    <string name="edit_display_name">Anzeigenamen bearbeiten</string>
+    <string name="display_name_helper">
+Verwende deinen vollständigen Namen, damit Freunde dich in Teilnehmerlisten leicht finden können.
+</string>
+
+    <!-- Calendar screen-->
+    <string name="calendar_filter_enrolled">Angemeldet</string>
+    <string name="calendar_filter_all_events">Alle Veranstaltungen</string>
+    <string name="calendar_current_month_format">%1$s</string>
+    <string name="calendar_card_date_day_format">%1$s %2$d</string>
+    <string name="calendar_card_date_range_format">%1$s %2$d-%3$d</string>
+    <string name="calendar_upcoming_events_title">Kommende Veranstaltungen</string>
+    <string name="calendar_no_events_placeholder">Keine Veranstaltungen gefunden</string>
+    <string name="calendar_search_hint">Veranstaltungen suchen</string>
+
+    <!-- Errors -->
+    <string name="error_association_not_found">Verein nicht gefunden</string>
+    <string name="error_loading_association">Verein konnte nicht geladen werden</string>
+    <string name="error_enroll_failed">Anmeldung fehlgeschlagen: Bitte versuche es erneut.</string>
+    <string name="error_unenroll_failed">Abmeldung fehlgeschlagen: Bitte versuche es erneut.</string>
+    <string name="error_event_not_found">Ereignis konnte nicht gefunden werden. Bitte versuchen Sie es erneut.</string>
+    <string name="error_loading_event">Veranstaltung konnte nicht geladen werden</string>
+    <string name="error_loading_associations">Vereine konnten nicht geladen werden: %1$s</string>
+    <string name="retry">Erneut versuchen</string>
+    <string name="error_loading_user">Benutzerprofil konnte nicht geladen werden</string>
+    <string name="error_updating_profile">Profil konnte nicht aktualisiert werden: Bitte versuche es erneut.</string>
+
+    <!-- Admin Association-->
+    <string name="settings_screen_association">Verein auswählen</string>
+    <string name="add_new_association">Neuen Verein hinzufügen</string>
+    <string name="manage_association">%1$s verwalten</string>
+    <string name="manage_association_fallback">Verein verwalten</string>
+    <string name="general_info">Allgemeine Informationen</string>
+    <string name="association_name_required">Vereinsname*</string>
+    <string name="short_description_required">Kurzbeschreibung*</string>
+    <string name="about_association_required">Über den Verein*</string>
+    <string name="event_category_label">Veranstaltungskategorie</string>
+    <string name="upload_images">Bilder hochladen</string>
+    <string name="logo_url">Logo-URL</string>
+    <string name="banner_url">Banner-URL</string>
+    <string name="submit">Absenden</string>
+    <string name="settings_selected_association">Ausgewählt: %1$s</string>
+
+    <!-- Manage events -->
+    <string name="manage_events_title">Veranstaltungen verwalten</string>
+    <string name="add_new_event">Neue Veranstaltung hinzufügen</string>
+    <string name="manage_events_empty">Keine kommenden Veranstaltungen für diesen Verein.</string>
+    <string name="error_loading_events">Veranstaltungen konnten nicht geladen werden: %1$s</string>
+    <string name="error_loading_events_generic">Veranstaltungen konnten nicht geladen werden</string>
+
+    <!-- Add/Edit event form -->
+    <string name="edit_event">Veranstaltung bearbeiten</string>
+    <string name="event_title_required">Titel*</string>
+    <string name="event_description_required">Beschreibung*</string>
+    <string name="event_location_section_title">Ort</string>
+    <string name="event_location_name_label">Ortsname*</string>
+    <string name="event_location_search">Ort suchen</string>
+    <string name="event_location_searching">Ort wird gesucht…</string>
+    <string name="event_location_coordinates">Koordinaten des Ortes</string>
+    <string name="event_location_latitude">Breitengrad</string>
+    <string name="event_location_longitude">Längengrad</string>
+    <string name="event_location_no_match">Kein passender Ort gefunden.</string>
+    <string name="event_location_lookup_failed">Ort konnte nicht abgerufen werden. Bitte versuche es erneut.</string>
+    <string name="event_location_resolved_description">Ergebnis: %1$s</string>
+    <string name="event_location_query_too_short">Mindestens 3 Zeichen eingeben.</string>
+    <string name="event_time_required">Datum und Uhrzeit*</string>
+    <string name="event_price_optional">Preis (optional)</string>
+    <string name="event_tags">Tags (durch Kommas getrennt)</string>
+    <string name="event_picture_url">Bild-URL</string>
+
+    <!-- Extra -->
+    <string name="search_bar_placeholder">Suchen…</string>
+    <string name="show_more">Mehr anzeigen…</string>
+    <string name="show_less">Weniger anzeigen</string>
+    <string name="share">Teilen</string>
+    <string name="share_sender_unknown">Jemand</string>
+    <string name="share_invite_message">%2$s hat dich zu %1$s eingeladen! Lade die EPFL Life App herunter, um mehr zu erfahren.</string>
+
+
+    <string name="calendar_previous_month">Vorheriger Monat</string>
+    <string name="calendar_next_month">Nächster Monat</string>
+    <string name="calendar_day_mon">Mo</string>
+    <string name="calendar_day_tue">Di</string>
+    <string name="calendar_day_wed">Mi</string>
+    <string name="calendar_day_thu">Do</string>
+    <string name="calendar_day_fri">Fr</string>
+    <string name="calendar_day_sat">Sa</string>
+    <string name="calendar_day_sun">So</string>
+    <string name="calendar_events_for_date">Veranstaltungen am %1$s</string>
+    <string name="calendar_no_events_on_day">Keine Veranstaltungen an diesem Tag.</string>
+
+    <!-- Admin Association-->
+    <string name="delete_association_button">Verein löschen</string>
+    <string name="toggle_future_events_filter">Filter für zukünftige Veranstaltungen umschalten</string>
+    <string name="delete_association_title">Verein löschen</string>
+    <string name="delete_association_confirmation">Möchtest du diesen Verein wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.</string>
+    <string name="delete_association_success">Verein erfolgreich gelöscht</string>
+    <string name="delete_association_failure">Verein konnte nicht gelöscht werden</string>
+    <string name="delete_button">Löschen</string>
+    <string name="cancel_button">Abbrechen</string>
+    <string name="admin_console">Admin-Konsole</string>
+
+    <!-- Friend System -->
+    <string name="manage_friends_no_users_found">Keine Benutzer gefunden</string>
+    <string name="user_not_logged_in">Benutzer nicht angemeldet</string>
+    <string name="error_loading_users">Benutzer konnten nicht geladen werden</string>
+    <string name="follow_button_follow">Folgen</string>
+    <string name="follow_button_unfollow">Nicht mehr folgen</string>
+    <string name="error_user_not_found_or_logged_in">Benutzer nicht gefunden oder nicht angemeldet</string>
+    <string name="error_loading_profile">Profil konnte nicht geladen werden</string>
+
+
+</resources>

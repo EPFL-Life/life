@@ -1,0 +1,183 @@
+<resources>
+    <string name="app_name">EPFL Life</string>
+
+    <!-- SignIn Screen -->
+    <string name="signin_welcome">ようこそ</string>
+    <string name="signin_epfllife_logo_alt_text">EPFLLife ロゴ</string>
+    <string name="signin_google_logo_alt_text">Google ロゴ</string>
+    <string name="signin_success_message">ログインに成功しました</string>
+    <string name="signin_failure_message">ログインに失敗しました</string>
+    <string name="signin_cancelled_message">ユーザーによってログインがキャンセルされました</string>
+    <string name="signin_with_google">Google でログイン</string>
+
+    <!-- Home screen -->
+    <string name="home_empty_title">ここには何もありません！</string>
+    <string name="home_empty_description">
+        フィードを充実させるために、サークルをフォローしてください。
+        下のナビゲーションバーにある「サークル」アイコンを押して始めましょう。
+    </string>
+    <string name="home_no_events_title">利用可能なイベントはありません</string>
+    <string name="home_no_events_description">
+        現在、公開されているイベントはありません。しばらくしてから再度ご確認ください。
+    </string>
+    <string name="home_enrolled_events">参加済み</string>
+    <string name="home_enroll_events">参加する</string>
+
+    <!-- Association Browser screen -->
+    <string name="associations_empty_title">まだフォローしているサークルはありません！</string>
+    <string name="associations_empty_description">
+        上の「すべてのサークル」を押して、気に入ったサークルをフォローしてください
+    </string>
+    <string name="associations_no_all_title">参加可能なサークルはありません</string>
+    <string name="associations_no_all_description">
+        現在、表示できるサークルはありません。後でもう一度確認してください。
+    </string>
+
+    <!-- Filters -->
+    <string name="subscribed_filter">おすすめ</string>
+    <string name="all_events_filter">すべてのイベント</string>
+    <string name="all_associations_filter">すべてのサークル</string>
+
+    <!-- Association Details Screen -->
+    <string name="association_image_description">サークルの画像</string>
+    <string name="back_button_description">戻る</string>
+    <string name="subscribe_to">%1$s をフォロー</string>
+    <string name="unsubscribe_from">%1$s のフォローを解除</string>
+    <string name="about_section_title">概要</string>
+    <string name="social_pages_title">ソーシャルページ</string>
+    <string name="instagram_description">Instagram</string>
+    <string name="telegram_description">Telegram</string>
+    <string name="whatsapp_description">WhatsApp</string>
+    <string name="linkedin_description">LinkedIn</string>
+    <string name="website_description">ウェブサイト</string>
+    <string name="about_placeholder">説明はありません。</string>
+    <string name="upcoming_events_title">今後のイベント</string>
+
+    <!-- Attendee List Screen -->
+    <string name="attendees">イベント参加者</string>
+
+    <!-- Settings -->
+    <string name="signout_successful">ログアウトしました</string>
+    <string name="settings_title">設定</string>
+    <string name="sign_out">ログアウト</string>
+
+    <!-- Edit display name -->
+    <string name="display_name">表示名</string>
+    <string name="edit_display_name">表示名を編集</string>
+    <string name="display_name_helper">
+        友達がイベント参加者リストで簡単に見つけられるように、フルネームを使用してください。
+    </string>
+    <string name="manage_friends_title">フレンドを管理</string>
+    <string name="manage_profile_title">プロフィールを管理</string>
+
+    <!-- Calendar -->
+    <string name="calendar_filter_enrolled">参加済み</string>
+    <string name="calendar_filter_all_events">すべてのイベント</string>
+    <string name="calendar_current_month_format">%1$s</string> <!-- e.g. November CHECK THIS!!!! -->
+    <string name="calendar_card_date_day_format">%1$s %2$d</string> <!-- e.g. Oct 4 CHECK THIS !!!!! -->
+    <string name="calendar_card_date_range_format">%1$s %2$d-%3$d</string> <!-- e.g. Oct 27-30 CHECK THIS !!!!-->
+    <string name="calendar_upcoming_events_title">今後のイベント</string>
+    <string name="calendar_no_events_placeholder">イベントが見つかりません</string>
+    <string name="calendar_search_hint">イベントを検索</string>
+
+    <!-- Errors -->
+    <string name="error_association_not_found">サークルが見つかりません</string>
+    <string name="error_loading_association">サークルの読み込みに失敗しました</string>
+    <string name="error_enroll_failed">参加に失敗しました。もう一度お試しください。</string>
+    <string name="error_unenroll_failed">参加解除に失敗しました。もう一度お試しください。</string>
+    <string name="error_event_not_found">イベントが見つかりませんでした。もう一度お試しください。</string>
+    <string name="error_loading_event">イベントの読み込みに失敗しました</string>
+    <string name="error_loading_associations">
+        サークルの読み込みに失敗しました：%1$s
+    </string>
+    <string name="retry">再試行</string>
+    <string name="error_loading_user">ユーザープロフィールの読み込みに失敗しました</string>
+    <string name="error_updating_profile">
+        プロフィールの更新に失敗しました。もう一度お試しください。
+    </string>
+
+    <!-- Admin Association-->
+    <string name="settings_screen_association">サークルを選択</string>
+    <string name="add_new_association">新しいサークルを追加</string>
+    <string name="manage_association">%1$s を管理</string>
+    <string name="manage_association_fallback">サークルを管理</string>
+    <string name="general_info">基本情報</string>
+    <string name="association_name_required">サークル名*</string>
+    <string name="short_description_required">短い説明*</string>
+    <string name="about_association_required">サークルについて*</string>
+    <string name="event_category_label">イベントカテゴリ</string>
+    <string name="upload_images">画像をアップロード</string>
+    <string name="logo_url">ロゴ URL</string>
+    <string name="banner_url">バナー URL</string>
+    <string name="submit">送信</string>
+    <string name="settings_selected_association">選択中：%1$s</string>
+
+    <!-- Manage events -->
+    <string name="manage_events_title">イベント管理</string>
+    <string name="add_new_event">新しいイベントを追加</string>
+    <string name="manage_events_empty">このサークルには今後のイベントはありません。</string>
+    <string name="error_loading_events">イベントの読み込みに失敗しました：%1$s</string>
+    <string name="error_loading_events_generic">イベントの読み込みに失敗しました</string>
+
+    <!-- Add/Edit event form -->
+    <string name="edit_event">イベントを編集</string>
+    <string name="event_title_required">タイトル*</string>
+    <string name="event_description_required">説明*</string>
+    <string name="event_location_section_title">場所</string>
+    <string name="event_location_name_label">場所名*</string>
+    <string name="event_location_search">場所を検索</string>
+    <string name="event_location_searching">場所を検索中...</string>
+    <string name="event_location_coordinates">位置座標</string>
+    <string name="event_location_latitude">緯度</string>
+    <string name="event_location_longitude">経度</string>
+    <string name="event_location_no_match">一致する場所が見つかりません。</string>
+    <string name="event_location_lookup_failed">場所を取得できませんでした。再試行してください。</string>
+    <string name="event_location_resolved_description">結果：%1$s</string>
+    <string name="event_location_query_too_short">3文字以上入力してください。</string>
+    <string name="event_time_required">日時*</string>
+    <string name="event_price_optional">料金（任意）</string>
+    <string name="event_tags">タグ（カンマ区切り）</string>
+    <string name="event_picture_url">画像 URL</string>
+
+    <!-- Extra -->
+    <string name="search_bar_placeholder">検索…</string>
+    <string name="show_more">もっと見る…</string>
+    <string name="show_less">表示を減らす</string>
+    <string name="share">共有</string>
+    <string name="share_sender_unknown">誰か</string>
+    <string name="share_invite_message">%2$s さんから %1$s に招待されました！EPFL Life アプリをダウンロードして確認してください。</string>
+
+
+    <string name="calendar_previous_month">前の月</string>
+    <string name="calendar_next_month">次の月</string>
+    <string name="calendar_day_mon">月</string>
+    <string name="calendar_day_tue">火</string>
+    <string name="calendar_day_wed">水</string>
+    <string name="calendar_day_thu">木</string>
+    <string name="calendar_day_fri">金</string>
+    <string name="calendar_day_sat">土</string>
+    <string name="calendar_day_sun">日</string>
+    <string name="calendar_events_for_date">%1$s のイベント</string>
+    <string name="calendar_no_events_on_day">この日はイベントがありません。</string>
+
+    <!-- Admin Association -->
+    <string name="delete_association_button">サークルを削除</string>
+    <string name="toggle_future_events_filter">今後のイベントフィルターを切り替え</string>
+    <string name="delete_association_title">サークルを削除</string>
+    <string name="delete_association_confirmation">このサークルを削除してもよろしいですか？この操作は元に戻せません。</string>
+    <string name="delete_association_success">サークルが正常に削除されました</string>
+    <string name="delete_association_failure">サークルの削除に失敗しました</string>
+    <string name="delete_button">削除</string>
+    <string name="cancel_button">キャンセル</string>
+    <string name="admin_console">管理コンソール</string>
+
+    <!-- Friend System -->
+    <string name="manage_friends_no_users_found">ユーザーが見つかりません</string>
+    <string name="user_not_logged_in">ログインしていません</string>
+    <string name="error_loading_users">ユーザーの読み込みに失敗しました</string>
+    <string name="follow_button_follow">フォロー</string>
+    <string name="follow_button_unfollow">フォロー解除</string>
+    <string name="error_user_not_found_or_logged_in">ユーザーが見つからないか、ログインしていません</string>
+    <string name="error_loading_profile">プロフィールの読み込みに失敗しました</string>
+
+</resources>

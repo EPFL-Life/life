@@ -1,0 +1,175 @@
+<resources>
+    <string name="app_name">EPFL Life</string>
+    <string name="default_web_client_id">85738580828-ovg7unu9rcn0cckulm8immn9dkv1eu77.apps.googleusercontent.com</string>
+
+    <!-- SignIn Screen -->
+    <string name="signin_welcome">Bienvenido</string>
+    <string name="signin_epfllife_logo_alt_text">Logotipo de EPFLLife</string>
+    <string name="signin_google_logo_alt_text">Logotipo de Google</string>
+    <string name="signin_success_message">Inicio de sesión exitoso</string>
+    <string name="signin_failure_message">Error al iniciar sesión</string>
+    <string name="signin_cancelled_message">Inicio de sesión cancelado por el usuario</string>
+    <string name="signin_with_google">Iniciar sesión con Google</string>
+
+    <!-- Home screen -->
+    <string name="home_empty_title">¡No hay nada aquí!</string>
+    <string name="home_empty_description">
+        Suscríbete a asociaciones para llenar tu feed.
+        Empieza pulsando el icono “Asociaciones” en la barra de navegación inferior.
+    </string>
+    <string name="home_no_events_title">No hay eventos disponibles</string>
+    <string name="home_no_events_description">Actualmente no hay eventos publicados. ¡Vuelve pronto!</string>
+    <string name="home_enrolled_events">Inscrito</string>
+    <string name="home_enroll_events">Inscribirse</string>
+
+    <!-- Association Browser screen -->
+    <string name="associations_empty_title">¡Aún no estás suscrito a ninguna asociación!</string>
+    <string name="associations_empty_description">Pulsa el botón “Todas las asociaciones” arriba para explorar todas las asociaciones y suscribirte a las que te gusten</string>
+    <string name="associations_no_all_title">No hay asociaciones disponibles</string>
+    <string name="associations_no_all_description">Actualmente no hay asociaciones para mostrar. Por favor, vuelve a intentarlo más tarde.</string>
+
+    <!-- Association and Home screen filter -->
+    <string name="subscribed_filter">Para ti</string>
+    <string name="all_events_filter">Todos los eventos</string>
+    <string name="all_associations_filter">Todas las asociaciones</string>
+
+    <!-- Association Details Screen -->
+    <string name="association_image_description">Imagen de la asociación</string>
+    <string name="back_button_description">Atrás</string>
+    <string name="subscribe_to">Suscribirse a %1$s</string>
+    <string name="unsubscribe_from">Darse de baja de %1$s</string>
+    <string name="about_section_title">Acerca de</string>
+    <string name="social_pages_title">Redes sociales</string>
+    <string name="instagram_description">Instagram</string>
+    <string name="telegram_description">Telegram</string>
+    <string name="whatsapp_description">WhatsApp</string>
+    <string name="linkedin_description">LinkedIn</string>
+    <string name="website_description">Sitio web</string>
+    <string name="about_placeholder">No hay descripción disponible.</string>
+    <string name="upcoming_events_title">Próximos eventos</string>
+
+    <!-- Attendee List Screen -->
+    <string name="attendees">Asistentes al evento</string>
+
+    <!-- Settings screen-->
+    <string name="signout_successful">Cierre de sesión exitoso</string>
+    <string name="settings_title">Configuración</string>
+    <string name="sign_out">Cerrar sesión</string>
+    <string name="manage_friends_title">Gestionar amigos</string>
+    <string name="manage_profile_title">Gestionar perfil</string>
+
+    <!-- Edit display name-->
+    <string name="display_name">Nombre visible</string>
+    <string name="edit_display_name">Editar nombre visible</string>
+    <string name="display_name_helper">
+Usa tu nombre completo para que tus amigos puedan encontrarte fácilmente en las listas de participantes.
+</string>
+
+    <!-- Calendar screen-->
+    <string name="calendar_filter_enrolled">Inscrito</string>
+    <string name="calendar_filter_all_events">Todos los eventos</string>
+    <string name="calendar_current_month_format">%1$s</string>
+    <string name="calendar_card_date_day_format">%1$s %2$d</string>
+    <string name="calendar_card_date_range_format">%1$s %2$d-%3$d</string>
+    <string name="calendar_upcoming_events_title">Próximos eventos</string>
+    <string name="calendar_no_events_placeholder">No se encontraron eventos</string>
+    <string name="calendar_search_hint">Buscar eventos</string>
+
+    <!-- Errors -->
+    <string name="error_association_not_found">Asociación no encontrada</string>
+    <string name="error_loading_association">Error al cargar la asociación</string>
+    <string name="error_enroll_failed">Error al inscribirse: inténtalo de nuevo.</string>
+    <string name="error_unenroll_failed">Error al cancelar la inscripción: inténtalo de nuevo.</string>
+    <string name="error_event_not_found">No se pudo encontrar el evento. Por favor, inténtelo de nuevo.</string>
+    <string name="error_loading_event">Error al cargar el evento</string>
+    <string name="error_loading_associations">Error al cargar las asociaciones: %1$s</string>
+    <string name="retry">Reintentar</string>
+    <string name="error_loading_user">Error al cargar el perfil del usuario</string>
+    <string name="error_updating_profile">Error al actualizar el perfil: inténtalo de nuevo.</string>
+
+    <!-- Admin Association-->
+    <string name="settings_screen_association">Seleccionar asociación</string>
+    <string name="add_new_association">Añadir nueva asociación</string>
+    <string name="manage_association">Gestionar %1$s</string>
+    <string name="manage_association_fallback">Gestionar asociación</string>
+    <string name="general_info">Información general</string>
+    <string name="association_name_required">Nombre de la asociación*</string>
+    <string name="short_description_required">Descripción corta*</string>
+    <string name="about_association_required">Acerca de la asociación*</string>
+    <string name="event_category_label">Categoría del evento</string>
+    <string name="upload_images">Subir imágenes</string>
+    <string name="logo_url">URL del logotipo</string>
+    <string name="banner_url">URL del banner</string>
+    <string name="submit">Enviar</string>
+    <string name="settings_selected_association">Seleccionado: %1$s</string>
+
+    <!-- Manage events -->
+    <string name="manage_events_title">Gestionar eventos</string>
+    <string name="add_new_event">Añadir nuevo evento</string>
+    <string name="manage_events_empty">No hay eventos próximos para esta asociación.</string>
+    <string name="error_loading_events">Error al cargar los eventos: %1$s</string>
+    <string name="error_loading_events_generic">Error al cargar los eventos</string>
+
+    <!-- Add/Edit event form -->
+    <string name="edit_event">Editar evento</string>
+    <string name="event_title_required">Título*</string>
+    <string name="event_description_required">Descripción*</string>
+    <string name="event_location_section_title">Ubicación</string>
+    <string name="event_location_name_label">Nombre de la ubicación*</string>
+    <string name="event_location_search">Buscar ubicación</string>
+    <string name="event_location_searching">Buscando ubicación...</string>
+    <string name="event_location_coordinates">Coordenadas de la ubicación</string>
+    <string name="event_location_latitude">Latitud</string>
+    <string name="event_location_longitude">Longitud</string>
+    <string name="event_location_no_match">No se encontró ninguna ubicación coincidente.</string>
+    <string name="event_location_lookup_failed">Error al obtener la ubicación. Inténtalo de nuevo.</string>
+    <string name="event_location_resolved_description">Resultado: %1$s</string>
+    <string name="event_location_query_too_short">Escribe al menos 3 caracteres.</string>
+    <string name="event_time_required">Fecha y hora*</string>
+    <string name="event_price_optional">Precio (opcional)</string>
+    <string name="event_tags">Etiquetas (separadas por comas)</string>
+    <string name="event_picture_url">URL de la imagen</string>
+
+    <!-- Extra -->
+    <string name="search_bar_placeholder">Buscar…</string>
+    <string name="show_more">Mostrar más…</string>
+    <string name="show_less">Mostrar menos</string>
+    <string name="share">Compartir</string>
+    <string name="share_sender_unknown">Alguien</string>
+    <string name="share_invite_message">¡%2$s te ha invitado a %1$s! Descarga la app EPFL Life para verlo.</string>
+
+
+    <string name="calendar_previous_month">Mes anterior</string>
+    <string name="calendar_next_month">Mes siguiente</string>
+    <string name="calendar_day_mon">Lun</string>
+    <string name="calendar_day_tue">Mar</string>
+    <string name="calendar_day_wed">Mié</string>
+    <string name="calendar_day_thu">Jue</string>
+    <string name="calendar_day_fri">Vie</string>
+    <string name="calendar_day_sat">Sáb</string>
+    <string name="calendar_day_sun">Dom</string>
+    <string name="calendar_events_for_date">Eventos para %1$s</string>
+    <string name="calendar_no_events_on_day">No hay eventos este día.</string>
+
+    <!-- Admin Association-->
+    <string name="delete_association_button">Eliminar asociación</string>
+    <string name="toggle_future_events_filter">Alternar filtro de eventos futuros</string>
+    <string name="delete_association_title">Eliminar asociación</string>
+    <string name="delete_association_confirmation">¿Estás seguro de que deseas eliminar esta asociación? Esta acción no se puede deshacer.</string>
+    <string name="delete_association_success">Asociación eliminada correctamente</string>
+    <string name="delete_association_failure">Error al eliminar la asociación</string>
+    <string name="delete_button">Eliminar</string>
+    <string name="cancel_button">Cancelar</string>
+    <string name="admin_console">Consola de administración</string>
+
+    <!-- Friend System -->
+    <string name="manage_friends_no_users_found">No se encontraron usuarios</string>
+    <string name="user_not_logged_in">Usuario no ha iniciado sesión</string>
+    <string name="error_loading_users">No se pudieron cargar los usuarios</string>
+    <string name="follow_button_follow">Seguir</string>
+    <string name="follow_button_unfollow">Dejar de seguir</string>
+    <string name="error_user_not_found_or_logged_in">Usuario no encontrado o no ha iniciado sesión</string>
+    <string name="error_loading_profile">No se pudo cargar el perfil</string>
+
+
+</resources>
