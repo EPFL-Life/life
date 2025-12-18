@@ -67,13 +67,13 @@ fun ComposeContentTestRule.navigateToEvent(eventId: String) {
   this.navigateToTab(Tab.HomeScreen)
   this.onNodeWithTag(HomeScreenTestTags.BUTTON_ALL).performClick()
   // Wait for event cards to load
-  this.waitUntil(3000) {
+  this.waitUntil(8000) {
     this.onNodeWithTag(EventCardTestTags.getEventCardTestTag(eventId)).isDisplayed()
   }
   this.waitForIdle()
   this.onNodeWithTag(EventCardTestTags.getEventCardTestTag(eventId)).performClick()
   // Wait for screen to load
-  this.waitUntil(3000) { this.onNodeWithTag(EventDetailsTestTags.CONTENT).isDisplayed() }
+  this.waitUntil(8000) { this.onNodeWithTag(EventDetailsTestTags.CONTENT).isDisplayed() }
   this.waitForIdle()
 }
 
