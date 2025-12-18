@@ -47,23 +47,28 @@ The following section presents the **high-fidelity mockups** created in Figma fo
 These mockups represent the final look and feel of the interface before implementation, ensuring design consistency across all screens.
 
 <p align="center">
-  <img src="../figma-work/mockup-screenshots/AllMockups.png" alt="All Mockup Screens" width="1346">
+  <img src="../figma-work/mockup-screenshots/AllMockUps.png" alt="All Mockup Screens" width="1110">
 </p>
 
 ### User Flows
 <p align="center">
-  <img src="../figma-work/mockup-screenshots/mockupUserFlow1.png" alt="Association Details Mockup" width="986"><br>
-  <img src="../figma-work/mockup-screenshots/mockupUserFlow2.png" alt="Event Details Mockup" width="980"><br>
-<img src="../figma-work/mockup-screenshots/mockupUserFlow3.png" alt="Event Details Mockup" width="718"><br>
-<img src="../figma-work/mockup-screenshots/mockupUserFlow4.png" alt="Event Details Mockup" width="1100"><br>
-<img src="../figma-work/mockup-screenshots/mockupUserFlow5.png" alt="Event Details Mockup" width="836"><br>
-<img src="../figma-work/mockup-screenshots/mockupUserFlow6.png" alt="Event Details Mockup" width="1043"><br>
-<img src="../figma-work/mockup-screenshots/mockupUserFlow7.png" alt="Event Details Mockup" width="1042">
-<img src="../figma-work/mockup-screenshots/mockupUserFlow8.png" alt="Event Details Mockup" width="986">
-<img src="../figma-work/mockup-screenshots/mockupUserFlow9.png" alt="Event Details Mockup" width="918">
-<img src="../figma-work/mockup-screenshots/mockupUserFlow10.png" alt="Event Details Mockup" width="1477">
-<img src="../figma-work/mockup-screenshots/mockupUserFlow11.png" alt="Event Details Mockup" width="1503">
-<img src="../figma-work/mockup-screenshots/mockupUserFlow12.png" alt="Event Details Mockup" width="1503">
+  <img src="../figma-work/mockup-screenshots/UserFlow1.png" alt="Association Details Mockup" width="1056"><br>
+  <img src="../figma-work/mockup-screenshots/UserFlow2.png" alt="Event Details Mockup" width="1053"><br>
+<img src="../figma-work/mockup-screenshots/UserFlow3.png" alt="Event Details Mockup" width="1040"><br>
+<img src="../figma-work/mockup-screenshots/UserFlow4.png" alt="Event Details Mockup" width="1403"><br>
+<img src="../figma-work/mockup-screenshots/UserFlow5.png" alt="Event Details Mockup" width="1149"><br>
+<img src="../figma-work/mockup-screenshots/UserFlow6.png" alt="Event Details Mockup" width="1126"><br>
+<img src="../figma-work/mockup-screenshots/UserFlow7.png" alt="Event Details Mockup" width="1328">
+<img src="../figma-work/mockup-screenshots/UserFlow8.png" alt="Event Details Mockup" width="1060">
+<img src="../figma-work/mockup-screenshots/UserFlow9.png" alt="Event Details Mockup" width="1288">
+<img src="../figma-work/mockup-screenshots/UserFlow10.png" alt="Event Details Mockup" width="1398">
+<img src="../figma-work/mockup-screenshots/UserFlow11.png" alt="Event Details Mockup" width="1389">
+<img src="../figma-work/mockup-screenshots/UserFlow12.png" alt="Event Details Mockup" width="1384">
+<img src="../figma-work/mockup-screenshots/UserFlow13.png" alt="Event Details Mockup" width="1070">
+<img src="../figma-work/mockup-screenshots/UserFlow14.png" alt="Event Details Mockup" width="1302">
+<img src="../figma-work/mockup-screenshots/UserFlow15.png" alt="Event Details Mockup" width="927">
+<img src="../figma-work/mockup-screenshots/UserFlow16.png" alt="Event Details Mockup" width="1303">
+<img src="../figma-work/mockup-screenshots/UserFlow17.png" alt="Event Details Mockup" width="1326">
 </p>
 
 These mockups highlight:
