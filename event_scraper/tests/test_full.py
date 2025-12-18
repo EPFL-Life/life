@@ -35,7 +35,7 @@ def test_complete():
         
         # Show first event
         first = events[0]
-        print(f"\n    FIRST EVENT SAMPLE:")
+        print("\n    FIRST EVENT SAMPLE:")
         print(f"      ID: {first.id}")
         print(f"      Title: {first.title}")
         print(f"      Date: {first.time}")

@@ -393,7 +393,7 @@ class WebScraper(BaseScraper):
                 try:
                     amount = float(match.group(1))
                     return Price(cents=int(amount * 100))
-                except:
+                except ValueError:
                     pass
         
         return Price(cents=0) 
