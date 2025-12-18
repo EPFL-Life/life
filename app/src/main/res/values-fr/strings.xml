@@ -79,8 +79,8 @@
         <string name="error_loading_association">Échec du chargement de l’association</string>
         <string name="error_enroll_failed">Échec de l’inscription : veuillez réessayer.</string>
         <string name="error_unenroll_failed">Échec de la désinscription : veuillez réessayer.</string>
-        <string name="error_event_not_found">Échec de la désinscription : veuillez réessayer.</string>
-        <string name="error_loading_event">Échec du chargement de l’événement</string>
+    <string name="error_event_not_found">Impossible de trouver l’événement. Veuillez réessayer.</string>
+    <string name="error_loading_event">Échec du chargement de l’événement</string>
         <string name="error_loading_associations">Échec du chargement des associations : %1$s</string>
         <string name="retry">Réessayer</string>
         <string name="error_loading_user">Impossible de charger le profil utilisateur</string>
@@ -159,8 +159,6 @@
     <string name="delete_button">Supprimer</string>
     <string name="cancel_button">Annuler</string>
     <string name="admin_console">Console d’administration</string>
-
-
 
     <!-- Friend System -->
     <string name="manage_friends_no_users_found">Aucun utilisateur trouvé</string>
