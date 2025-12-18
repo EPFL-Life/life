@@ -21,7 +21,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 
-class EndToEndTest2 : FirestoreLifeTest() {
+class EnrollEndToEndTest : FirestoreLifeTest() {
   @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
   private fun setUpApp() {
