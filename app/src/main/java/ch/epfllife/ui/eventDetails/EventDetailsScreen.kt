@@ -6,6 +6,7 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -42,6 +43,7 @@ import ch.epfllife.ui.composables.ShareButton
 import ch.epfllife.ui.theme.LifeRed
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import kotlinx.coroutines.launch
 
 object EventDetailsTestTags {
   const val LOADING_INDICATOR = "loadingIndicator"
@@ -88,6 +90,24 @@ internal fun buildShareChooserIntent(context: Context, shareText: String): Inten
   }
 }
 
+internal fun buildImageShareChooserIntent(
+    context: Context,
+    shareText: String,
+    imageUri: Uri
+): Intent {
+  val sendIntent =
+      Intent(Intent.ACTION_SEND).apply {
+        type = "image/png"
+        putExtra(Intent.EXTRA_TEXT, shareText)
+        putExtra(Intent.EXTRA_STREAM, imageUri)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+      }
+
+  return Intent.createChooser(sendIntent, context.getString(R.string.share)).apply {
+    if (context !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+  }
+}
+
 @Composable
 fun EventDetailsScreen(
     eventId: String,
@@ -121,25 +141,44 @@ fun EventDetailsScreen(
     }
 
     is EventDetailsUIState.Success -> {
-      val onShareEvent =
-          remember(state.event.title, state.senderName, state.event.pictureUrl, context) {
-            {
-              val messageWithImage =
-                  buildShareMessage(
-                      context = context,
-                      eventTitle = state.event.title,
-                      senderName = state.senderName,
-                      pictureUrl = state.event.pictureUrl,
-                  )
-              val chooser = buildShareChooserIntent(context, messageWithImage)
-
-              try {
-                context.startActivity(chooser)
-              } catch (_: ActivityNotFoundException) {
-                // No compatible activity to handle sharing on this device.
+      val scope = rememberCoroutineScope()
+      val onShareEvent: () -> Unit =
+          remember(
+              state.event.title,
+              state.senderName,
+              state.senderProfileUrl,
+              state.event.pictureUrl,
+              context,
+              scope) {
+                {
+                  scope.launch {
+                    val message =
+                        context.getString(
+                            R.string.share_invite_message, state.event.title, state.senderName)
+                    try {
+                      val uri =
+                          InvitationGenerator(context)
+                              .generateAndStoreInvitationAttributes(
+                                  state.event, state.senderName, state.senderProfileUrl)
+                      val chooser = buildImageShareChooserIntent(context, message, uri)
+                      context.startActivity(chooser)
+                    } catch (e: Exception) {
+                      e.printStackTrace()
+                      // Fallback to text only if generation fails for some reason
+                      val messageWithImage =
+                          buildShareMessage(
+                              context, state.event.title, state.senderName, state.event.pictureUrl)
+                      val chooser = buildShareChooserIntent(context, messageWithImage)
+                      try {
+                        context.startActivity(chooser)
+                      } catch (_: ActivityNotFoundException) {
+                        // No compatible activity
+                      }
+                    }
+                  }
+                  Unit
+                }
               }
-            }
-          }
 
       EventDetailsContent(
           event = state.event,

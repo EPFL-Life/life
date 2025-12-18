@@ -21,6 +21,7 @@ sealed class EventDetailsUIState {
       val isEnrolled: Boolean,
       val attendees: List<User>,
       val senderName: String = "",
+      val senderProfileUrl: String? = null
   ) : EventDetailsUIState()
 
   data class Error(val message: String) : EventDetailsUIState()
@@ -62,7 +63,8 @@ class EventDetailsViewModel(
                 event = event,
                 isEnrolled = user?.enrolledEvents?.contains(eventId) == true,
                 attendees = attendees,
-                senderName = senderName)
+                senderName = senderName,
+                senderProfileUrl = user?.photoUrl)
       } catch (e: Exception) {
         _uiState.value = EventDetailsUIState.Error(context.getString(R.string.error_loading_event))
       }
