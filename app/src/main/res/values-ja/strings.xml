@@ -35,6 +35,7 @@
 
     <!-- Filters -->
     <string name="subscribed_filter">おすすめ</string>
+    <string name="subscribed_association_filter">フォロー中</string>
     <string name="all_events_filter">すべてのイベント</string>
     <string name="all_associations_filter">すべてのサークル</string>
 

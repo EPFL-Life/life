@@ -30,6 +30,7 @@
 
     <!-- Association and Home screen filter -->
     <string name="subscribed_filter">Per te</string>
+    <string name="subscribed_association_filter">Iscritto</string>
     <string name="all_events_filter">Tutti gli eventi</string>
     <string name="all_associations_filter">Tutte le associazioni</string>
 

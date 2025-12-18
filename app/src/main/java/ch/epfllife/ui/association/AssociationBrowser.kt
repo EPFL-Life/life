@@ -62,7 +62,7 @@ fun AssociationBrowser(
     DisplayedSubscriptionFilter(
         selected = selected,
         onSelected = { selected = it },
-        subscribedLabel = stringResource(id = R.string.subscribed_filter),
+        subscribedLabel = stringResource(id = R.string.subscribed_association_filter),
         allLabel = stringResource(id = R.string.all_associations_filter),
     )
 
