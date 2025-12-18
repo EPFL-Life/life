@@ -3,6 +3,8 @@
 </p>
 
 # EPFL LIFE
+This README provides a high-level overview of the project, while detailed technical and design documentation can be found in the Wiki and Figma links below.
+
 
 ## Pitch
 
@@ -15,30 +17,62 @@ The problem we are trying to solve is the mess that is event announcements. Asso
 
 ## Core features for associations
 
-Associations can make announcements and publish events. Announcements are for informational purposes, while events have concrete dates and locations attached. Students are able to signal attendance, giving the event organizers more planning security.
+Associations and their administrators can:
+- Create and manage association pages
+- Publish events with dates, locations, prices, descriptions and images
+- Edit existing events and association details
+- View the list of attendees for their events
 
 ## Core features for students
 
-Students can log in via EPFL SSO and then see announcements and events in a feed. They can subscribe to associations to make sure they don't miss anything. With a map view, they are able to navigate from their current position to event locations.
+Students can:
+- Log in using Google-based authentication 
+- Browse and subscribe to associations 
+- View and enroll in events 
+- Access a personalized calendar showing enrolled events 
+- Switch between viewing all events or only enrolled events 
+- View event locations on an interactive map 
+- Follow friends and see their attendance highlighted in event participant lists 
+- Manage their profile information (name and profile picture)
+- Share events to their friends
 
 ## Extended features (stretch)
 
-- Calendar of events
-- Events nearby
 - Live events (user-post with photo+location)
-- digital membership cards
+- Association announcements
+- Digital membership cards
 - Europe-wide login for guest students
-- Ticket exchange (& payment?)
-- See friend's attendance
-- Automatic web/Telegram scraping
+- Ticket and payment integration
+- Event discovery based on proximity
+
+## Project Architecture Overview
+
+EPFL LIFE is an Android application built using a modular architecture:
+
+- **Frontend**: Android app built with Jetpack Compose, handling UI, navigation, and user interaction.
+- **Authentication**: Google-based authentication used to manage user accounts and sessions.
+- **Data Layer**: Centralized repositories manage associations, events, users, and attendance data.
+- **External Services**: Firestore Database to store association, event and user data, and Firebase Storage to save uploaded media such as profile pictures, banners and association logos. 
+- **Maps & Location**: Integrated google maps to view event locations and the user’s current position.
+- **Admin Features**: Separate flows for association administrators to manage events and profiles.
+
+A detailed breakdown of the architecture, data flow, and implementation decisions is available in the project Wiki.
+
 
 ## Wiki
 
-We now have a [wiki](https://github.com/EPFL-Life/life/wiki) explaining the app features.
+The project Wiki serves as the main technical documentation hub.  
+It includes detailed explanations of the app architecture, data flow, feature implementation, and developer guidelines.
+
+Please take a look at the [wiki](https://github.com/EPFL-Life/life/wiki) explaining the app features.
 
 ## Figma
 
 https://www.figma.com/design/qNjleM72FjEUEppPUSS2Ok/EPFL-Life?node-id=0-1&t=auqmWM20TucyArQS-1
+
+### Figma Design Documentation
+
+All wireframes, mockups, and user flow diagrams are documented in the [**Figma Design Documentation →**](docs/figma-designs.md)
 
 ## Architecture
 
@@ -51,7 +85,3 @@ as the starting point.
 It also uses the [Android Sample Project](https://github.com/GabrielFleischer/Android-Sample) as an inspiration.
 It may contain AI generated code and text.
 
-## Figma Wireframes & User Flows
-## Figma Design Documentation
-
-All wireframes, mockups, and user flow diagrams are documented in the [**Figma Design Documentation →**](docs/figma-designs.md)
