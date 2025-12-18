@@ -151,7 +151,7 @@ class AssociationRepositoryFirestore(
 
         // 6. Get the optional socialLinks field
         val socialLinks =
-            (document.get("socialLinks") as? Map<*, *>)?.let { map ->
+            (document["socialLinks"] as? Map<*, *>)?.let { map ->
               map.entries
                   .filter { (k, v) -> k is String && v is String }
                   .associate { (k, v) -> k as String to v as String }
