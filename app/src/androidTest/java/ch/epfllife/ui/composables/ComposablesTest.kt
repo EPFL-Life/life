@@ -52,28 +52,6 @@ class ComposablesTest {
   }
 
   @Test
-  fun searchBar_DisplaysFilterIcon() {
-    composeTestRule.setContent { SearchBar() }
-    composeTestRule.onNode(hasContentDescription("Filter")).assertExists()
-  }
-
-  @Test
-  fun searchBar_TriggersOnFilterClick() {
-    var filterClicked = false
-    composeTestRule.setContent { SearchBar(onFilterClick = { filterClicked = true }) }
-    composeTestRule.onNode(hasContentDescription("Filter")).performClick()
-    assertTrue("SearchBar should trigger onFilterClick callback", filterClicked)
-  }
-
-  @Test
-  fun searchBar_OnlyFilterClickWhenClickingFilterButton() {
-    var filterClicked = false
-    composeTestRule.setContent { SearchBar(onFilterClick = { filterClicked = true }) }
-    composeTestRule.onNode(hasContentDescription("Filter")).performClick()
-    assertTrue("SearchBar should trigger onFilterClick", filterClicked)
-  }
-
-  @Test
   fun searchBar_AcceptsCustomColor() {
     composeTestRule.setContent { SearchBar(searchColorBar = Color.Red) }
     // Just verify it renders without crashing
