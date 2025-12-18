@@ -18,8 +18,7 @@ import androidx.compose.ui.unit.dp
 import ch.epfllife.model.association.Association
 import coil.compose.AsyncImage
 
-private const val DEFAULT_ASSOCIATION_LOGO_URL =
-    "https://firebasestorage.googleapis.com/v0/b/epfl-life.firebasestorage.app/o/assets%2Fassoc_default.png?alt=media&token=a2971702-f669-4779-97ba-63fff11c0d8a"
+private const val DEFAULT_ASSOCIATION_LOGO_URL = "https://i.ibb.co/p7wH3hJ/assoc-default.png"
 
 @Composable
 fun AssociationCard(association: Association, modifier: Modifier = Modifier, onClick: () -> Unit) {

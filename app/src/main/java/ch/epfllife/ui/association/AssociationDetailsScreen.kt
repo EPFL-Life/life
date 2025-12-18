@@ -53,8 +53,7 @@ object AssociationDetailsTestTags {
 }
 
 private const val DEFAULT_ASSOCIATION_IMAGE_URL =
-    "https://firebasestorage.googleapis.com/v0/b/epfl-life.firebasestorage.app/o/assets%2Fdefault_assoc_banner.png?alt=media&token=45192f39-bb42-4592-a414-8af65f23b89e" +
-        ""
+    "https://i.ibb.co/Mk16BCSg/default-assoc-banner.png"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
