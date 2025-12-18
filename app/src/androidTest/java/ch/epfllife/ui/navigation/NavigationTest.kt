@@ -17,6 +17,7 @@ import ch.epfllife.model.authentication.Auth
 import ch.epfllife.model.authentication.SignInResult
 import ch.epfllife.model.db.Db
 import ch.epfllife.ui.association.AssociationDetailsTestTags
+import ch.epfllife.ui.calendar.CalendarTestTags
 import ch.epfllife.ui.composables.DisplayedEventsTestTags
 import ch.epfllife.ui.composables.EPFLLogoTestTags
 import ch.epfllife.ui.eventDetails.EventDetailsTestTags
@@ -408,6 +409,7 @@ class NavigationTest {
 
     // 1. Navigate to Calendar
     composeTestRule.navigateToTab(Tab.Calendar)
+    composeTestRule.onNodeWithTag(CalendarTestTags.GRID_VIEW_TOGGLE).performClick()
 
     // 2. ASSERT: Initial state is Subscribed/Enrolled
     composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_SUBSCRIBED).assertIsDisplayed()
@@ -428,6 +430,7 @@ class NavigationTest {
 
     // 1. Navigate to Calendar
     composeTestRule.navigateToTab(Tab.Calendar)
+    composeTestRule.onNodeWithTag(CalendarTestTags.GRID_VIEW_TOGGLE).performClick()
 
     // 2. ACTION: Change filter to ALL
     composeTestRule.onNodeWithTag(DisplayedEventsTestTags.BUTTON_ALL).performClick()
@@ -548,6 +551,7 @@ class NavigationTest {
 
     // 1. Navigate to Calendar
     composeTestRule.navigateToTab(Tab.Calendar)
+    composeTestRule.onNodeWithTag(CalendarTestTags.GRID_VIEW_TOGGLE).performClick()
     composeTestRule.waitForIdle()
 
     // 2. Switch to "All Events" filter
@@ -575,6 +579,7 @@ class NavigationTest {
 
     // 1. Navigate to Calendar (default is "Enrolled")
     composeTestRule.navigateToTab(Tab.Calendar)
+    composeTestRule.onNodeWithTag(CalendarTestTags.GRID_VIEW_TOGGLE).performClick()
     composeTestRule.waitForIdle()
 
     // 2. Verify we're on "Enrolled" filter by default

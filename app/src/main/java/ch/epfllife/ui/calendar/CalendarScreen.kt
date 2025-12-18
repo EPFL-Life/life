@@ -78,7 +78,7 @@ fun CalendarScreen(
             "${date.month.getDisplayName(TextStyle.FULL, Locale.getDefault())} ${date.year}"
           }
 
-  var isGridView by remember { mutableStateOf(true) }
+  var isGridView by rememberSaveable { mutableStateOf(true) }
 
   Column(
       modifier =
